@@ -1,0 +1,44 @@
+name: Deploy to NPM
+on:
+  release:
+    types: [published]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+
+      - name: Install packages
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          npm install
+
+      - name: Build and deploy
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_REF_TAG: ${{ github.ref }}
+          NPMJS_REGISTRY: registry.npmjs.org
+          NPMJS_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          export VERSION=${GITHUB_REF_TAG:10:50}
+          echo "Version is $VERSION"
+          npm version --no-git-tag-version "${VERSION}"
+          npm run build
+          echo "//${NPMJS_REGISTRY}/:_authToken=${NPMJS_TOKEN}" > .npmrc
+          [ $(echo "${VERSION}" | grep rc) ] && echo "publishing with next tag to npm - ${VERSION}" || echo "publishing with latest tag to npm - ${VERSION}"
+          [ $(echo "${VERSION}" | grep rc) ] && npm publish --access public --tag next || npm publish --access public
+          echo "Published to npm registry: ${NPMJS_REGISTRY}"
+          tar -cvzf /tmp/dist.tar.gz dist/
+
+      - name: Create artifacts
+        if: success() && startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@master
+        with:
+          name: dist.tar.gz
+          path: /tmp/dist.tar.gz
