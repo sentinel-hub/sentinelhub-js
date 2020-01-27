@@ -1,0 +1,44 @@
+{
+  "name": "@sentinel-hub/sentinelhub-js",
+  "version": "1.0.0",
+  "main": "dist/sentinelHub.cjs.js",
+  "module": "dist/sentinelHub.esm.js",
+  "browser": "dist/sentinelHub.umd.js",
+  "dependencies": {
+    "@turf/helpers": "^6.1.4",
+    "@types/xml2js": "^0.4.4",
+    "axios": "^0.18.0",
+    "query-string": "^6.4.2",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.3",
+    "@storybook/html": "^5.3.3",
+    "@typescript-eslint/eslint-plugin": "^1.9.0",
+    "@typescript-eslint/parser": "^1.9.0",
+    "babel-loader": "^8.0.6",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.17.1",
+    "rollup": "^0.67.0",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript2": "^0.20.1",
+    "typescript": "^3.5.1"
+  },
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "test": "node test/test.js",
+    "pretest": "npm run build",
+    "lint": "eslint --max-warnings 0 --ext .ts,js src/",
+    "prettier": "prettier --write \"{src,example}/**/*.{ts,js}\"",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ]
+}

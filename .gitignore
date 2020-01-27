@@ -1,0 +1,16 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+dist/
+# dependencies
+node_modules
+.env
+
+# misc
+.DS_Store
+.idea
+npm-debug.log
+*.log
+.rpt2_cache
+*.sublime-project
+*.sublime-workspace
+
+
