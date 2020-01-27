@@ -18,6 +18,7 @@ import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
+import { Polarization } from 'src';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -160,15 +161,86 @@ export class LayersFactory {
         if (!SHLayerClass) {
           throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
         }
-        return new SHLayerClass(
-          LayersFactory.parseSHInstanceId(baseUrl),
-          layerId,
-          null,
-          null,
-          null,
-          title,
-          description,
-        );
+
+        switch (dataset.id) {
+          case DATASET_AWS_S1GRD_IW.id:
+            return new S1GRDIWAWSLayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+              Polarization.SV,
+            );
+
+          case DATASET_S2L1C.id:
+            return new S2L1CLayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+
+          case DATASET_S2L2A.id:
+            return new S2L2ALayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+
+          case DATASET_AWS_L8L1C.id:
+            return new Landsat8AWSLayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+
+          case DATASET_MODIS.id:
+            return new MODISLayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+
+          case DATASET_AWS_DEM.id:
+            return new DEMLayer(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+
+          default:
+            return new SHLayerClass(
+              LayersFactory.parseSHInstanceId(baseUrl),
+              layerId,
+              null,
+              null,
+              null,
+              title,
+              description,
+            );
+        }
       } else {
         return new WmsLayer(baseUrl, layerId, title, description);
       }
