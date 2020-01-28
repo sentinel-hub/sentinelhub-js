@@ -155,94 +155,38 @@ export class LayersFactory {
     const layersInfos = await LayersFactory.getLayersListFromBaseUrl(baseUrl);
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
     return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
-      if (dataset) {
-        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
-        if (!SHLayerClass) {
-          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-        }
-
-        switch (dataset.id) {
-          case DATASET_AWS_S1GRD_IW.id:
-            return new S1GRDIWAWSLayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-              Polarization.SV,
-            );
-
-          case DATASET_S2L1C.id:
-            return new S2L1CLayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-
-          case DATASET_S2L2A.id:
-            return new S2L2ALayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-
-          case DATASET_AWS_L8L1C.id:
-            return new Landsat8AWSLayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-
-          case DATASET_MODIS.id:
-            return new MODISLayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-
-          case DATASET_AWS_DEM.id:
-            return new DEMLayer(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-
-          default:
-            return new SHLayerClass(
-              LayersFactory.parseSHInstanceId(baseUrl),
-              layerId,
-              null,
-              null,
-              null,
-              title,
-              description,
-            );
-        }
-      } else {
+      if (!dataset) {
         return new WmsLayer(baseUrl, layerId, title, description);
+      };
+
+      switch (dataset.id) {
+        case DATASET_AWS_S1GRD_IW.id:
+          return new S1GRDIWAWSLayer(
+            LayersFactory.parseSHInstanceId(baseUrl),
+            layerId,
+            null,
+            null,
+            null,
+            title,
+            description,
+            Polarization.SV,
+          );
+        default:
+          const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
+          if (!SHLayerClass) {
+            throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+          }
+          return new SHLayerClass(
+            LayersFactory.parseSHInstanceId(baseUrl),
+            layerId,
+            null,
+            null,
+            null,
+            title,
+            description,
+          );
       }
     });
   }
