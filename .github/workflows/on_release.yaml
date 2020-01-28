@@ -26,7 +26,8 @@ jobs:
           NPMJS_REGISTRY: registry.npmjs.org
           NPMJS_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          export VERSION=${GITHUB_REF_TAG:10:50}
+          echo "Extracting version from GITHUB_REF_TAG: $GITHUB_REF_TAG"
+          export VERSION=$(echo "$GITHUB_REF_TAG" | sed -e "s#^refs/tags/##")
           echo "Version is $VERSION"
           npm version --no-git-tag-version "${VERSION}"
           npm run build
