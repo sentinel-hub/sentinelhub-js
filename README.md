@@ -15,9 +15,12 @@
   - [Fetching images](#fetching-images)
   - [Searching for data](#searching-for-data)
   - [Backwards compatibility](#backwards-compatibility)
-- [Running examples](#running-examples)
-  - [Node.js](#node-js)
-  - [Storybook](#storybook)
+- [Authentication for Processing API](#authentication-for-processing-api)
+- [Examples](#examples)
+  - [Preparation before running examples](#preparation-before-running-examples)
+  - [Running examples](#running-examples)
+    - [Node.js](#node-js)
+    - [Storybook](#storybook)
 - [Copyright and license](#copyright-and-license)
 
 -----
@@ -96,6 +99,8 @@ Some information about the layer is only accessible to authenticated users. In c
   const after = isAuthTokenSet(); // true
 ```
 
+The process of getting the authentication token is described in [Authentication for Processing API](#authentication-for-processing-api).
+
 ## Fetching images
 
 Maps which correspond to these layers can be fetched via different protocols like WMS and Processing. Not all of the protocols can be used in all cases; for example, Processing can only render layers for which it has access to the `evalscript` and for which evalscript version 3 is used.
@@ -162,11 +167,78 @@ If we already have a WMS GetMap URL, we can use it directly:
   const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
 
-# Running examples
+# Authentication for Processing API
 
-Most of the example can be run as-is, however for some of them (those using Processing API) authentication token should be set. See [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication) for details.
+Requests to Processing API need to be authenticated.
+Authentication is done by requesting an authentication token and setting it as described in [Layers](#layers).
+The authentication token is retrieved by making a request to the `https://services.sentinel-hub.com/oauth/token` endpoint with the OAuth Client's id and secret.
 
-## Node.js
+To get the OAuth Client's id and secret, a new OAuth Client must be created in [**User settings**](https://apps.sentinel-hub.com/dashboard/#/account/settings) on **Sentinel Hub Dashboard** under **OAuth clients**.
+OAuth Client's secret is shown only before the creation process is finished so be mindful to save it.
+
+In javascript requesting the authentication token can be done with builtin XMLHttpRequest:
+
+```javascript
+const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
+const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
+
+let xhr = new XMLHttpRequest();
+xhr.open("POST", 'https://services.sentinel-hub.com/oauth/token', true);
+xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+xhr.onreadystatechange = function() {
+  if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+    console.log(xhr.responseText);
+  }
+}
+xhr.send("grant_type=client_credentials&client_id="+clientId+"&client_secret="+clientSecret);
+```
+
+Or by making the request with Axios:
+
+```javascript
+const axios = require('axios');
+
+const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
+const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
+
+await axios({
+  method: 'post',
+  url: 'https://services.sentinel-hub.com/oauth/token',
+  headers: { 'content-type': 'application/x-www-form-urlencoded' },
+  data: "grant_type=client_credentials&client_id="+clientId+"&client_secret="+clientSecret,
+})
+  .then(function(response){
+    console.log(response.data.access_token);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+```
+
+More about authentication is avilable at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
+
+# Examples
+This project contains some examples to demonstrate how the library is used.
+Some preparation is needed before running the examples.
+
+## Preparation before running examples
+To run the examples, the environment variables must be set.
+These variables should be put in the `.env` file in the root folder of this project.
+
+- `INSTANCE_ID`: id of the configuration instance that will be used in examples
+- `S2L2A_LAYER_ID`: id of the Sentinel-2 L2A layer from that instance
+- `CLIENT_ID`: OAuth Client's id (optional, authentication is needed for examples that use Processing API)
+- `CLIENT_SECRET`: OAuth Client's secret (optional, authentication is needed for examples that use Processing API)
+
+Instance can be created with the [**Configurator**](https://apps.sentinel-hub.com/dashboard/#/configurations) on the **Sentinel Hub Dashboard**.
+It should contain at least layers for Sentinel-2 L1C, Sentinel-2 L2A and Sentinel-1 GRD.
+
+`CLIENT_ID` and `CLIENT_SECRET` are needed so that the authentication token can be requested, which is then used in examples that use Processing API.
+The process of getting those two is described in [Authentication for Processing API](#authentication-for-processing-api)
+
+## Running examples
+
+### Node.js
 
 ```bash
 $ npm install
@@ -175,7 +247,7 @@ $ cd example/node
 $ node index.js
 ```
 
-## Storybook
+### Storybook
 
 ```bash
 $ npm install
