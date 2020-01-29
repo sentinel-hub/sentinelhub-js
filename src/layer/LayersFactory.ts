@@ -18,7 +18,6 @@ import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
-import { Polarization } from 'src';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -161,33 +160,19 @@ export class LayersFactory {
         return new WmsLayer(baseUrl, layerId, title, description);
       }
 
-      switch (dataset.id) {
-        case DATASET_AWS_S1GRD_IW.id:
-          return new S1GRDIWAWSLayer(
-            LayersFactory.parseSHInstanceId(baseUrl),
-            layerId,
-            null,
-            null,
-            null,
-            title,
-            description,
-            Polarization.SV,
-          );
-        default:
-          const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
-          if (!SHLayerClass) {
-            throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-          }
-          return new SHLayerClass(
-            LayersFactory.parseSHInstanceId(baseUrl),
-            layerId,
-            null,
-            null,
-            null,
-            title,
-            description,
-          );
+      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
+      if (!SHLayerClass) {
+        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
       }
+      return new SHLayerClass(
+        LayersFactory.parseSHInstanceId(baseUrl),
+        layerId,
+        null,
+        null,
+        null,
+        title,
+        description,
+      );
     });
   }
 }
