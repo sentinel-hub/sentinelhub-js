@@ -1,25 +1,31 @@
 import {
-  LayersFactory,
   WmsLayer,
   S1GRDIWAWSLayer,
   S2L2ALayer,
   setAuthToken,
-  isAuthTokenSet,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
-  Polarization,
 } from '../dist/sentinelHub.esm';
 
-const instanceId = process.env.STORYBOOK_INSTANCE_ID;
-if (!instanceId) {
-  throw new Error("STORYBOOK_INSTANCE_ID environment variable is not defined!");
+import axios from 'axios';
+
+if (!process.env.INSTANCE_ID) {
+  throw new Error("INSTANCE_ID environment variable is not defined!");
 };
-const s2l2aLayerId = process.env.STORYBOOK_S2L2A_LAYER_ID;
-if (!s2l2aLayerId) {
-  throw new Error("STORYBOOK_S2L2A_LAYER_ID environment variable is not defined!");
+
+if (!process.env.S2L2A_LAYER_ID) {
+  throw new Error("S2L2A_LAYER_ID environment variable is not defined!");
 };
+
+if (!process.env.S1GRD_LAYER_ID) {
+  throw new Error("S1GRD_LAYER_ID environment variable is not defined!");
+}
+
+const instanceId = process.env.INSTANCE_ID;
+const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
+const s1grdLayerId = process.env.S1GRD_LAYER_ID;
 
 export default {
   title: 'Demo',
@@ -29,6 +35,10 @@ export const S2GetMapURL = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMapUrl (only WMS supports this) for Sentinel-2 L2A</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
 
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
@@ -45,13 +55,17 @@ export const S2GetMapURL = () => {
   const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
 
-  return img;
+  return wrapperEl;
 };
 
-export const S2GetMap = () => {
+export const S2GetMapWMS = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with WMS for Sentinel-2 L2A</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
 
   // getMap is async:
   const perform = async () => {
@@ -72,21 +86,50 @@ export const S2GetMap = () => {
   };
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const S2GetMapProcessing = () => {
-  if (!process.env.STORYBOOK_AUTH_TOKEN) {
-    return '<div>Please set auth token for Processing API (STORYBOOK_AUTH_TOKEN env var)</div>';
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
-  setAuthToken(process.env.STORYBOOK_AUTH_TOKEN);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-2 L2A</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   // getMap is async:
   const perform = async () => {
+    let authToken;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    await axios({
+      method: 'post',
+      url: 'https://services.sentinel-hub.com/oauth/token',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    })
+      .then(response => {
+        authToken = response.data.access_token;
+        console.log('Auth token retrieved successfully');
+      })
+      .catch(function (error) {
+        console.log('Error occurred:', {
+          status: error.response.status,
+          statusText: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        });
+        return;
+      });
+
+    setAuthToken(authToken);
+
     const layerS2L2A = new S2L2ALayer(
       instanceId,
       s2l2aLayerId,
@@ -120,22 +163,51 @@ export const S2GetMapProcessing = () => {
   };
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const S1GetMapProcessingFromLayer = () => {
-  if (!process.env.STORYBOOK_AUTH_TOKEN) {
-    return '<div>Please set auth token for Processing API (STORYBOOK_AUTH_TOKEN env var)</div>';
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
-  setAuthToken(process.env.STORYBOOK_AUTH_TOKEN);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-1 GRD</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   // getMap is async:
   const perform = async () => {
-    const layer = new S1GRDIWAWSLayer(instanceId, 'S1GRDIWDV');
+    let authToken;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    await axios({
+      method: 'post',
+      url: 'https://services.sentinel-hub.com/oauth/token',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    })
+      .then(response => {
+        authToken = response.data.access_token;
+        console.log('Auth token retrieved successfully');
+      })
+      .catch(function (error) {
+        console.log('Error occurred:', {
+          status: error.response.status,
+          statusText: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        });
+        return;
+      });
+
+    setAuthToken(authToken);
+
+    const layer = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
 
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
@@ -151,13 +223,18 @@ export const S1GetMapProcessingFromLayer = () => {
   };
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const WmsGetMap = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with WMS for generic WMS layer</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
 
   // getMap is async:
   const perform = async () => {
@@ -180,13 +257,18 @@ export const WmsGetMap = () => {
   };
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const S2FindTiles = () => {
-  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A');
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-2 L2A</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
   const perform = async () => {
     const data = await layerS2L2A.findTiles(
       bbox,
@@ -200,13 +282,18 @@ export const S2FindTiles = () => {
   };
   perform().then(() => {});
 
-  return containerEl;
+  return wrapperEl;
 };
 
 export const S1GRDFindTiles = () => {
-  const layerS1 = new S1GRDIWAWSLayer(instanceId, 'layerId', null, null, null, null, null, Polarization.DV);
+  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
+  
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-1 GRD</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
   const perform = async () => {
     const data = await layerS1.findTiles(
       bbox,
@@ -221,7 +308,7 @@ export const S1GRDFindTiles = () => {
   };
   perform().then(() => {});
 
-  return containerEl;
+  return wrapperEl;
 };
 
 function renderTilesList(containerEl, list) {

@@ -197,6 +197,7 @@ Or by making the request with Axios:
 
 ```javascript
 const axios = require('axios');
+// import axios from 'axios';
 
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
@@ -231,7 +232,7 @@ These variables should be put in the `.env` file in the root folder of this proj
 - `CLIENT_SECRET`: OAuth Client's secret (optional, authentication is needed for examples that use Processing API)
 
 Instance can be created with the [**Configurator**](https://apps.sentinel-hub.com/dashboard/#/configurations) on the **Sentinel Hub Dashboard**.
-It should contain at least layers for Sentinel-2 L1C, Sentinel-2 L2A and Sentinel-1 GRD.
+It should contain one Sentinel-2 L2A layer and one Sentinel-1 GRD layer .
 
 `CLIENT_ID` and `CLIENT_SECRET` are needed so that the authentication token can be requested, which is then used in examples that use Processing API.
 The process of getting those two is described in [Authentication for Processing API](#authentication-for-processing-api)

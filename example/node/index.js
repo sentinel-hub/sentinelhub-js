@@ -83,37 +83,16 @@ async function run() {
   setAuthToken(authToken);
   printOut('Auth token set:', isAuthTokenSet());
 
-  let o;
-  let b;
-  const layerS1ortho = new S1GRDIWAWSLayer(
-    instanceId,
-    'S1-GRD-IW-SV-ORTHOTRUE-BACKSIGME',
-    null,
-    null,
-    null,
-    null,
-    null,
-    Polarization.DV,
-  );
-  o = await layerS1ortho.getOrthorectify();
-  b = await layerS1ortho.getBackscatterCoeff();
+  const layerS1ortho = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-SV-ORTHOTRUE-BACKSIGME');
   printOut('Layer:', { layerId: layerS1ortho.layerId, title: layerS1ortho.title });
-  printOut('Orthorectify & backscatter:', { o, b: b });
+  printOut('Orthorectify & backscatter:', { o: layerS1ortho.orthorectify, b: layerS1ortho.backscatterCoeff });
 
-  const layerS1orthoFalse = new S1GRDIWAWSLayer(
-    instanceId,
-    'S1-GRD-IW-DV-ORTHOFALSE-BSGAMMA0',
-    null,
-    null,
-    null,
-    null,
-    null,
-    Polarization.DV,
-  );
-  o = await layerS1orthoFalse.getOrthorectify();
-  b = await layerS1orthoFalse.getBackscatterCoeff();
+  const layerS1orthoFalse = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-DV-ORTHOFALSE-BSGAMMA0');
   printOut('Layer:', { layerId: layerS1orthoFalse.layerId, title: layerS1orthoFalse.title });
-  printOut('Orthorectify & backscatter:', { o, b });
+  printOut('Orthorectify & backscatter:', {
+    o: layerS1orthoFalse.orthorectify,
+    b: layerS1orthoFalse.backscatterCoeff,
+  });
 
   // finally, display the image:
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
