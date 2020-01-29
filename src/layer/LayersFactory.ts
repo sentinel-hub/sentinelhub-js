@@ -154,24 +154,25 @@ export class LayersFactory {
     const layersInfos = await LayersFactory.getLayersListFromBaseUrl(baseUrl);
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
     return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
-      if (dataset) {
-        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
-        if (!SHLayerClass) {
-          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-        }
-        return new SHLayerClass(
-          LayersFactory.parseSHInstanceId(baseUrl),
-          layerId,
-          null,
-          null,
-          null,
-          title,
-          description,
-        );
-      } else {
+      if (!dataset) {
         return new WmsLayer(baseUrl, layerId, title, description);
       }
+
+      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
+      if (!SHLayerClass) {
+        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+      }
+      return new SHLayerClass(
+        LayersFactory.parseSHInstanceId(baseUrl),
+        layerId,
+        null,
+        null,
+        null,
+        title,
+        description,
+      );
     });
   }
 }

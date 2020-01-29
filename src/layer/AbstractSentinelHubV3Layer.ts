@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-import { getAuthToken } from 'src/auth';
+import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType } from 'src/layer/const';
 import { fetchCached } from 'src/layer/utils';
 import { wmsGetMapUrl } from 'src/layer/wms';
-import { processingGetMap } from 'src/layer/processing';
+import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 
 // this class provides any SHv3-specific functionality to the subclasses:
@@ -42,7 +42,26 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error('Could not fetch layer params - instanceId and layerId must be set on Layer');
     }
-    const layersParams = await this.fetchLayersParamsFromSentinelHubLayersV3();
+    if (!this.dataset) {
+      throw new Error('This layer does not support Processing API (unknown dataset)');
+    }
+    if (!isAuthTokenSet) {
+      throw new Error('authToken is not set');
+    }
+    const authToken = getAuthToken();
+
+    const url = `${this.dataset.shServiceHostname}configuration/v1/wms/instances/${this.instanceId}/layers`;
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+    };
+    const res = await fetchCached(url, { responseType: 'json', headers: headers }, false);
+    const layersParams = res.data.map((l: any) => ({
+      layerId: l.id,
+      ...l.datasourceDefaults,
+      evalscript: l.styles[0].evalScript,
+      dataProduct: l.styles[0].dataProduct,
+    }));
+
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
     if (!layerParams) {
       throw new Error('Layer params could not be found');
@@ -50,26 +69,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return layerParams;
   }
 
-  private async fetchLayersParamsFromSentinelHubLayersV3(forceFetch = false): Promise<object[]> {
-    const authToken = getAuthToken();
-    if (authToken === null) {
-      throw new Error('authToken is not set');
-    }
-    if (!this.dataset) {
-      throw new Error('This layer does not support Processing API (unknown dataset)');
-    }
-    const url = `${this.dataset.shServiceHostname}configuration/v1/wms/instances/${this.instanceId}/layers`;
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-    };
-    const res = await fetchCached(url, { responseType: 'json', headers: headers }, forceFetch);
-    const layersParams = res.data.map((l: any) => ({
-      layerId: l.id,
-      ...l.datasourceDefaults,
-      evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct,
-    }));
-    return layersParams;
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    // Subclasses should override this method if they wish to supply additional
+    // parameters to Processing API.
+    // Typically, if additional layer data is needed for that, this code will be called:
+    //   const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+    return payload;
   }
 
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
@@ -91,7 +96,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-      return processingGetMap(this.dataset, params, this.evalscript, this.dataProduct);
+
+      // allow subclasses to update payload with their own parameters:
+      const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
+      const updatedPayload = await this.updateProcessingGetMapPayload(payload);
+
+      return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);

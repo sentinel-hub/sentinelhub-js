@@ -16,7 +16,7 @@ enum MosaickingOrder {
   LEAST_CC = 'leastCC',
 }
 
-type ProcessingPayload = {
+export type ProcessingPayload = {
   input: {
     bounds: {
       bbox?: BBoxTurf;
@@ -36,10 +36,12 @@ type ProcessingPayload = {
           maxCloudCoverage: number;
           previewMode?: PreviewMode;
           mosaickingOrder?: MosaickingOrder;
+          [key: string]: any;
         };
         processing?: {
           upsampling?: Interpolator;
           downsampling?: Interpolator;
+          [key: string]: any;
         };
         type: string;
       }
@@ -61,17 +63,12 @@ type ProcessingPayload = {
   dataProduct?: string;
 };
 
-export async function processingGetMap(
+export function createProcessingPayload(
   dataset: Dataset,
   params: GetMapParams,
   evalscript: string | null = null,
   dataProduct: string | null = null,
-): Promise<Blob> {
-  const authToken = getAuthToken();
-  if (!authToken) {
-    throw new Error('Must be authenticated to use Processing API');
-  }
-
+): ProcessingPayload {
   const { bbox } = params;
 
   const payload: ProcessingPayload = {
@@ -151,7 +148,16 @@ export async function processingGetMap(
     throw new Error('Either evalscript or dataProduct should be defined with Processing API');
   }
 
-  const response = await axios.post(`${dataset.shServiceHostname}api/v1/process`, payload, {
+  return payload;
+}
+
+export async function processingGetMap(shServiceHostname: string, payload: ProcessingPayload): Promise<Blob> {
+  const authToken = getAuthToken();
+  if (!authToken) {
+    throw new Error('Must be authenticated to use Processing API');
+  }
+
+  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, {
     headers: {
       Authorization: 'Bearer ' + authToken,
       'Content-Type': 'application/json',
