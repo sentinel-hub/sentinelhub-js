@@ -123,6 +123,37 @@ export const S2GetMapProcessing = () => {
   return img;
 };
 
+export const S1GetMapProcessingFromLayer = () => {
+  if (!process.env.STORYBOOK_AUTH_TOKEN) {
+    return '<div>Please set auth token for Processing API (STORYBOOK_AUTH_TOKEN env var)</div>';
+  }
+  setAuthToken(process.env.STORYBOOK_AUTH_TOKEN);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  // getMap is async:
+  const perform = async () => {
+    const layer = new S1GRDIWAWSLayer(instanceId, 'S1GRDIWDV');
+
+    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return img;
+};
+
 export const WmsGetMap = () => {
   const img = document.createElement('img');
   img.width = '512';
