@@ -1,6 +1,7 @@
 import { BBox } from 'src/bbox';
 import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
 import { DATASET_AWS_S1GRD_IW } from 'src/layer/dataset';
+import { ProcessingPayload } from 'src/layer/processing';
 
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 
@@ -49,52 +50,22 @@ export class S1GRDIWAWSLayer extends AbstractSentinelHubV3Layer {
     backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
-    if (!polarization) {
-      throw new Error('Polarization should be set');
-    }
     this.polarization = polarization;
     this.orthorectify = orthorectify;
     this.backscatterCoeff = backscatterCoeff;
   }
 
-  private async updateParamsViaService(): Promise<void> {
-    const params = await this.fetchLayerParamsFromSHServiceV3();
-    this.orthorectify = params['orthorectify'];
-    this.backscatterCoeff = params['backCoeff'];
-  }
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3();
 
-  public async getOrthorectify(): Promise<boolean> {
-    if (this.orthorectify) {
-      return this.orthorectify;
-    }
-    try {
-      await this.updateParamsViaService();
-      if (this.orthorectify === null) {
-        throw new Error('orthorectify should not be null!');
-      }
-      return this.orthorectify;
-    } catch (ex) {
-      throw new Error(
-        `Parameter 'orthorectify' is not specified and there was an error fetching it: ${ex.message}`,
-      );
-    }
-  }
+    this.polarization = layerParams['polarization'];
+    this.backscatterCoeff = layerParams['backCoeff'];
+    this.orthorectify = layerParams['orthorectify'];
 
-  public async getBackscatterCoeff(): Promise<BackscatterCoeff> {
-    if (this.backscatterCoeff) {
-      return this.backscatterCoeff;
-    }
-    try {
-      await this.updateParamsViaService();
-      if (this.backscatterCoeff === null) {
-        throw new Error('backscatterCoeff should not be null!');
-      }
-      return this.backscatterCoeff;
-    } catch (ex) {
-      throw new Error(
-        `Parameter 'backscatterCoeff' is not specified and there was an error fetching it: ${ex.message}`,
-      );
-    }
+    payload.input.data[0].dataFilter.polarization = this.polarization;
+    payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
+    payload.input.data[0].processing.orthorectify = this.orthorectify;
+    return payload;
   }
 
   public async findTiles(

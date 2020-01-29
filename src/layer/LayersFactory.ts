@@ -159,7 +159,7 @@ export class LayersFactory {
     return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
       if (!dataset) {
         return new WmsLayer(baseUrl, layerId, title, description);
-      };
+      }
 
       switch (dataset.id) {
         case DATASET_AWS_S1GRD_IW.id:
