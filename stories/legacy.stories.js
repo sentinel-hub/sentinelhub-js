@@ -2,14 +2,18 @@ import {
   legacyGetMapFromUrl, ApiType, setAuthToken
 } from '../dist/sentinelHub.esm';
 
-const instanceId = process.env.STORYBOOK_INSTANCE_ID;
-if (!instanceId) {
-  throw new Error("STORYBOOK_INSTANCE_ID environment variable is not defined!");
+import axios from 'axios';
+
+if (!process.env.INSTANCE_ID) {
+  throw new Error("INSTANCE_ID environment variable is not defined!");
 };
-const s2l2aLayerId = process.env.STORYBOOK_S2L2A_LAYER_ID;
-if (!s2l2aLayerId) {
-  throw new Error("STORYBOOK_S2L2A_LAYER_ID environment variable is not defined!");
+
+if (!process.env.S2L2A_LAYER_ID) {
+  throw new Error("S2L2A_LAYER_ID environment variable is not defined!");
 };
+
+const instanceId = process.env.INSTANCE_ID;
+const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 
 export default {
   title: 'legacyGetMap[Url]',
@@ -26,32 +30,65 @@ export const WMSLegacyGetMapFromUrlWithEvalscript = () => {
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>WMS LegacyGetMapFromUrl With Evalscript</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsEvalscript}`);
     img.src = URL.createObjectURL(imageBlob);
   }
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const ProcessingLegacyGetMapFromUrlWithEvalscriptAndFallback = () => {
-  if (!process.env.STORYBOOK_AUTH_TOKEN) {
-    return '<div>Please set auth token for Processing API (STORYBOOK_AUTH_TOKEN env var)</div>';
-  };
-  setAuthToken(process.env.STORYBOOK_AUTH_TOKEN);
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>Processing LegacyGetMapFromUrl With Evalscript And Fallback</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
+    let authToken;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    await axios({
+      method: 'post',
+      url: 'https://services.sentinel-hub.com/oauth/token',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    })
+      .then(response => {
+        authToken = response.data.access_token;
+        console.log('Auth token retrieved successfully');
+      })
+      .catch(function (error) {
+        console.log('Error occurred:', {
+          status: error.response.status,
+          statusText: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        });
+        return;
+      });
+
+    setAuthToken(authToken);
+
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsEvalscript}`, ApiType.PROCESSING, true);
     img.src = URL.createObjectURL(imageBlob);
   }
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const WMSLegacyGetMapFromUrl = () => {
@@ -59,32 +96,65 @@ export const WMSLegacyGetMapFromUrl = () => {
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>WMS LegacyGetMapFromUrl</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsNoEvalscript}`);
     img.src = URL.createObjectURL(imageBlob);
   }
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const ProcessingLegacyGetMapFromUrl = () => {
-  if (!process.env.STORYBOOK_AUTH_TOKEN) {
-    return '<div>Please set auth token for Processing API (STORYBOOK_AUTH_TOKEN env var)</div>';
-  };
-  setAuthToken(process.env.STORYBOOK_AUTH_TOKEN);
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>Processing LegacyGetMapFromUrl</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
+    let authToken;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
+
+    await axios({
+      method: 'post',
+      url: 'https://services.sentinel-hub.com/oauth/token',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    })
+      .then(response => {
+        authToken = response.data.access_token;
+        console.log('Auth token retrieved successfully');
+      })
+      .catch(function (error) {
+        console.log('Error occurred:', {
+          status: error.response.status,
+          statusText: error.response.status,
+          headers: error.response.headers,
+          data: error.response.data,
+        });
+        return;
+      });
+
+    setAuthToken(authToken);
+
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsNoEvalscript}`, ApiType.PROCESSING, true);
     img.src = URL.createObjectURL(imageBlob);
   }
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
 
 export const WMSLegacyGetMapFromUrlDatesNotTimes = () => {
@@ -92,11 +162,15 @@ export const WMSLegacyGetMapFromUrlDatesNotTimes = () => {
   img.width = '512';
   img.height = '512';
 
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>WMS LegacyGetMapFromUrl Dates Not Times</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsNoEvalscriptJustDates}`);
     img.src = URL.createObjectURL(imageBlob);
   }
   perform().then(() => {});
 
-  return img;
+  return wrapperEl;
 };
