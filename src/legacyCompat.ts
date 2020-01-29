@@ -304,6 +304,9 @@ function bboxFromParams(service: ServiceType, version: string, crsAuthId: CRS_ID
     default:
       throw new Error('Unsupported CRS - bbox could not be parsed');
   }
+  // SH services support switched min & max X/Y, but we don't:
+  [minX, maxX] = [Math.min(minX, maxX), Math.max(minX, maxX)];
+  [minY, maxY] = [Math.min(minY, maxY), Math.max(minY, maxY)];
   return new BBox(crs, minX, minY, maxX, maxY);
 }
 
