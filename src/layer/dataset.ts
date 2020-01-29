@@ -56,7 +56,7 @@ export const DATASET_AWS_S1GRD_IW: Dataset = {
   id: 'AWS_S1GRD_IW',
   shJsonGetCapabilitiesDataset: 'S1GRD',
   shWmsEvalsource: 'S1GRD',
-  shProcessingApiDatasourceAbbreviation: 'S1GRDIWAWS',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
 };
