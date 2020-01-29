@@ -337,7 +337,7 @@ function timeFromParams(params: any): Date[] {
     fromTime = new Date(timeParts[0]);
     toTime = new Date(timeParts[1]);
     if (!isTimeSpecifiedInDate(timeParts[1])) {
-      toTime.setHours(23, 59, 59, 999);
+      toTime.setUTCHours(23, 59, 59, 999);
     }
   } else if (timeParts.length === 1) {
     // "When a single time is specified the service will return data from beginning of
@@ -345,7 +345,7 @@ function timeFromParams(params: any): Date[] {
     fromTime = new Date('1970-01-01');
     toTime = new Date(timeParts[0]);
     if (!isTimeSpecifiedInDate(timeParts[0])) {
-      toTime.setHours(23, 59, 59, 999);
+      toTime.setUTCHours(23, 59, 59, 999);
     }
   }
 
