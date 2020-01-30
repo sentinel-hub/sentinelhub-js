@@ -104,31 +104,7 @@ export const S2GetMapProcessing = () => {
 
   // getMap is async:
   const perform = async () => {
-    let authToken;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    await axios({
-      method: 'post',
-      url: 'https://services.sentinel-hub.com/oauth/token',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-    })
-      .then(response => {
-        authToken = response.data.access_token;
-        console.log('Auth token retrieved successfully');
-      })
-      .catch(function (error) {
-        console.log('Error occurred:', {
-          status: error.response.status,
-          statusText: error.response.status,
-          headers: error.response.headers,
-          data: error.response.data,
-        });
-        return;
-      });
-
-    setAuthToken(authToken);
+    await setAuthTokenWithOAuthCredentials();
 
     const layerS2L2A = new S2L2ALayer(
       instanceId,
@@ -181,31 +157,7 @@ export const S1GetMapProcessingFromLayer = () => {
 
   // getMap is async:
   const perform = async () => {
-    let authToken;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    await axios({
-      method: 'post',
-      url: 'https://services.sentinel-hub.com/oauth/token',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-    })
-      .then(response => {
-        authToken = response.data.access_token;
-        console.log('Auth token retrieved successfully');
-      })
-      .catch(function (error) {
-        console.log('Error occurred:', {
-          status: error.response.status,
-          statusText: error.response.status,
-          headers: error.response.headers,
-          data: error.response.data,
-        });
-        return;
-      });
-
-    setAuthToken(authToken);
+    await setAuthTokenWithOAuthCredentials();
 
     const layer = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
 
@@ -327,4 +279,31 @@ function renderTilesList(containerEl, list) {
       li.innerHTML = `${key} : ${text}`;
     }
   });
+}
+
+async function setAuthTokenWithOAuthCredentials () {
+  let authToken;
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+
+  await axios({
+    method: 'post',
+    url: 'https://services.sentinel-hub.com/oauth/token',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+  })
+    .then(response => {
+      authToken = response.data.access_token;
+      setAuthToken(authToken);
+      console.log('Auth token retrieved and set successfully');
+    })
+    .catch(function (error) {
+      console.log('Error occurred:', {
+        status: error.response.status,
+        statusText: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      return;
+    });
 }

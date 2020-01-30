@@ -57,31 +57,7 @@ export const ProcessingLegacyGetMapFromUrlWithEvalscriptAndFallback = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    let authToken;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    await axios({
-      method: 'post',
-      url: 'https://services.sentinel-hub.com/oauth/token',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-    })
-      .then(response => {
-        authToken = response.data.access_token;
-        console.log('Auth token retrieved successfully');
-      })
-      .catch(function (error) {
-        console.log('Error occurred:', {
-          status: error.response.status,
-          statusText: error.response.status,
-          headers: error.response.headers,
-          data: error.response.data,
-        });
-        return;
-      });
-
-    setAuthToken(authToken);
+    await setAuthTokenWithOAuthCredentials();
 
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsEvalscript}`, ApiType.PROCESSING, true);
     img.src = URL.createObjectURL(imageBlob);
@@ -123,31 +99,7 @@ export const ProcessingLegacyGetMapFromUrl = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    let authToken;
-    const clientId = process.env.CLIENT_ID;
-    const clientSecret = process.env.CLIENT_SECRET;
-
-    await axios({
-      method: 'post',
-      url: 'https://services.sentinel-hub.com/oauth/token',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-    })
-      .then(response => {
-        authToken = response.data.access_token;
-        console.log('Auth token retrieved successfully');
-      })
-      .catch(function (error) {
-        console.log('Error occurred:', {
-          status: error.response.status,
-          statusText: error.response.status,
-          headers: error.response.headers,
-          data: error.response.data,
-        });
-        return;
-      });
-
-    setAuthToken(authToken);
+    await setAuthTokenWithOAuthCredentials();
 
     const imageBlob = await legacyGetMapFromUrl(`${baseUrl}?${queryParamsNoEvalscript}`, ApiType.PROCESSING, true);
     img.src = URL.createObjectURL(imageBlob);
@@ -174,3 +126,30 @@ export const WMSLegacyGetMapFromUrlDatesNotTimes = () => {
 
   return wrapperEl;
 };
+
+async function setAuthTokenWithOAuthCredentials() {
+  let authToken;
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+
+  await axios({
+    method: 'post',
+    url: 'https://services.sentinel-hub.com/oauth/token',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+  })
+    .then(response => {
+      authToken = response.data.access_token;
+      setAuthToken(authToken);
+      console.log('Auth token retrieved and set successfully');
+    })
+    .catch(function (error) {
+      console.log('Error occurred:', {
+        status: error.response.status,
+        statusText: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      return;
+    });
+}
