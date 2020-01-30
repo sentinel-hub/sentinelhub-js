@@ -231,7 +231,7 @@ These variables should be put in the `.env` file in the root folder of this proj
 
 - `INSTANCE_ID`: id of the configuration instance that will be used in examples
 - `S2L2A_LAYER_ID`: id of the Sentinel-2 L2A layer from that instance
-- 'S1GRD_LAYER_ID`: id of the Sentinel-1 GRD layer from that instance
+- `S1GRD_LAYER_ID`: id of the Sentinel-1 GRD layer from that instance
 
 Instance can be created with the [**Configurator**](https://apps.sentinel-hub.com/dashboard/#/configurations) on the **Sentinel Hub Dashboard**.
 It should contain one Sentinel-2 L2A layer and one Sentinel-1 GRD layer .
