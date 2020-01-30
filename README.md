@@ -170,7 +170,9 @@ If we already have a WMS GetMap URL, we can use it directly:
 # Authentication for Processing API
 
 Requests to Processing API need to be authenticated.
-Authentication is done by requesting an authentication token and setting it as described in [Layers](#layers).
+Documentation about authentication is available at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
+
+In short, authentication is done by requesting an authentication token and setting it as described in [Layers](#layers).
 The authentication token is retrieved by making a request to the `https://services.sentinel-hub.com/oauth/token` endpoint with the OAuth Client's id and secret.
 
 To get the OAuth Client's id and secret, a new OAuth Client must be created in [**User settings**](https://apps.sentinel-hub.com/dashboard/#/account/settings) on **Sentinel Hub Dashboard** under **OAuth clients**.
@@ -179,44 +181,22 @@ OAuth Client's secret is shown only before the creation process is finished so b
 In javascript requesting the authentication token can be done with builtin XMLHttpRequest:
 
 ```javascript
+const { setAuthToken } = require('sentinelhub-js');
+
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
 
 let xhr = new XMLHttpRequest();
 xhr.open("POST", 'https://services.sentinel-hub.com/oauth/token', true);
 xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-xhr.onreadystatechange = function() {
+xhr.onreadystatechange = function () {
   if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-    console.log(xhr.responseText);
+    const responseObj = JSON.parse(xhr.response);
+    setAuthToken(xhr.response.access_token);
   }
 }
-xhr.send("grant_type=client_credentials&client_id="+clientId+"&client_secret="+clientSecret);
+xhr.send("grant_type=client_credentials&client_id=" + clientId + "&client_secret=" + clientSecret);  
 ```
-
-Or by making the request with Axios:
-
-```javascript
-const axios = require('axios');
-// import axios from 'axios';
-
-const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
-const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
-
-await axios({
-  method: 'post',
-  url: 'https://services.sentinel-hub.com/oauth/token',
-  headers: { 'content-type': 'application/x-www-form-urlencoded' },
-  data: "grant_type=client_credentials&client_id="+clientId+"&client_secret="+clientSecret,
-})
-  .then(function(response){
-    console.log(response.data.access_token);
-  })
-  .catch(function(error) {
-    console.log(error);
-  });
-```
-
-More about authentication is avilable at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
 
 # Examples
 This project contains some examples to demonstrate how the library is used.
@@ -234,7 +214,7 @@ These variables should be put in the `.env` file in the root folder of this proj
 - `S1GRD_LAYER_ID`: id of the Sentinel-1 GRD layer from that instance
 
 Instance can be created with the [**Configurator**](https://apps.sentinel-hub.com/dashboard/#/configurations) on the **Sentinel Hub Dashboard**.
-It should contain one Sentinel-2 L2A layer and one Sentinel-1 GRD layer .
+It should contain at least one Sentinel-2 L2A layer and one Sentinel-1 GRD layer, whose layer IDs should be the same as set in `S2L2A_LAYER_ID` and `S1GRD_LAYER_ID` env vars respectively.
 
 `CLIENT_ID` and `CLIENT_SECRET` are needed so that the authentication token can be requested, which is then used in examples that use Processing API.
 The process of getting those two is described in [Authentication for Processing API](#authentication-for-processing-api)
