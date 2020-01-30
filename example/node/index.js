@@ -18,6 +18,45 @@ function printOut(title, value) {
   console.log(`\n${'='.repeat(10)}\n${title}`, JSON.stringify(value, null, 4));
 }
 
+async function setAuthTokenWithOAuthCredentials() {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    printOut(
+      'Other examples need an auth token. Set env vars CLIENT_ID and CLIENT_SECRET and run again.',
+      null,
+    );
+    return;
+  }
+
+  let authToken;
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+  printOut('Requesting auth token with client id from env vars:', clientId);
+
+  await axios({
+    method: 'post',
+    url: 'https://services.sentinel-hub.com/oauth/token',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+  })
+    .then(response => {
+      authToken = response.data.access_token;
+      printOut('Auth token retrieved successfully:', authToken);
+    })
+    .catch(function(error) {
+      printOut('Error occurred:', {
+        status: error.response.status,
+        statusText: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      return;
+    });
+
+  printOut('Auth token set:', isAuthTokenSet());
+  setAuthToken(authToken);
+  printOut('Auth token set:', isAuthTokenSet());
+}
+
 async function run() {
   if (!process.env.INSTANCE_ID) {
     printOut('Example needs instance id to run. Please set env var INSTANCE_ID and run again', null);
@@ -61,42 +100,7 @@ async function run() {
   printOut(`Layer title:`, layer.title);
   printOut('Layer description:', layer.description);
 
-  if (!process.env.CLIENT_ID && !process.env.CLIENT_SECRET) {
-    printOut(
-      'Other examples need an auth token. Set env vars CLIENT_ID and CLIENT_SECRET and run again.',
-      null,
-    );
-    return;
-  }
-
-  let authToken;
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  printOut('Requesting auth token with client id and secret from env vars:', { clientId, clientSecret });
-
-  await axios({
-    method: 'post',
-    url: 'https://services.sentinel-hub.com/oauth/token',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-  })
-    .then(response => {
-      authToken = response.data.access_token;
-      printOut('Auth token retrieved successfully:', authToken);
-    })
-    .catch(function(error) {
-      printOut('Error occurred:', {
-        status: error.response.status,
-        statusText: error.response.status,
-        headers: error.response.headers,
-        data: error.response.data,
-      });
-      return;
-    });
-
-  printOut('Auth token set:', isAuthTokenSet());
-  setAuthToken(authToken);
-  printOut('Auth token set:', isAuthTokenSet());
+  await setAuthTokenWithOAuthCredentials();
 
   const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
