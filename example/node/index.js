@@ -5,6 +5,7 @@ const {
   S2L2ALayer,
   setAuthToken,
   isAuthTokenSet,
+  getAuthTokenFromOAuth,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -27,30 +28,12 @@ async function setAuthTokenWithOAuthCredentials() {
     return;
   }
 
-  let authToken;
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
   printOut('Requesting auth token with client id from env vars:', clientId);
 
-  await axios({
-    method: 'post',
-    url: 'https://services.sentinel-hub.com/oauth/token',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-  })
-    .then(response => {
-      authToken = response.data.access_token;
-      printOut('Auth token retrieved successfully:', authToken);
-    })
-    .catch(function(error) {
-      printOut('Error occurred:', {
-        status: error.response.status,
-        statusText: error.response.status,
-        headers: error.response.headers,
-        data: error.response.data,
-      });
-      return;
-    });
+  const authToken = await getAuthTokenFromOAuth(clientId, clientSecret);
+  printOut('Auth token retrieved successfully:', authToken);
 
   printOut('Auth token set:', isAuthTokenSet());
   setAuthToken(authToken);
