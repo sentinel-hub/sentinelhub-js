@@ -172,12 +172,12 @@ If we already have a WMS GetMap URL, we can use it directly:
 Requests to Processing API need to be authenticated.
 Documentation about authentication is available at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
 
-In short, authentication is done by getting an authentication token using OAuth Client's id and secret, and setting it as described in [Layers](#layers).
+In short, authentication is done by getting an authentication token using OAuth Client's id and secret, and setting it.
 
 To get the OAuth Client's id and secret, a new OAuth Client must be created in [**User settings**](https://apps.sentinel-hub.com/dashboard/#/account/settings) on **Sentinel Hub Dashboard** under **OAuth clients**.
 OAuth Client's secret is shown only before the creation process is finished so be mindful to save it.
 
-Getting the authentication token by calling a function with the OAuth Client's id and secret as its parameters:
+Getting the authentication token by calling `getAuthTokenFromOAuth()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
 const { setAuthToken, getAuthTokenFromOAuth } = require('sentinelhub-js');
