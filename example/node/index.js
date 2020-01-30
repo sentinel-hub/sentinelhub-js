@@ -9,7 +9,6 @@ const {
   BBox,
   MimeTypes,
   ApiType,
-  Polarization,
 } = require('../../dist/sentinelHub.cjs');
 
 const dotenv = require('dotenv').config({ path: '../../.env' });
@@ -24,9 +23,25 @@ async function run() {
     printOut('Example needs instance id to run. Please set env var INSTANCE_ID and run again', null);
     return;
   }
+  if (!process.env.S2L2A_LAYER_ID) {
+    printOut(
+      'Example needs id of Sentinel-2 L2A layer to run. Please set env var S2L2A_LAYER_ID and run again',
+      null,
+    );
+    return;
+  }
+  if (!process.env.S1GRD_LAYER_ID) {
+    printOut(
+      'Example needs id of Sentinel-1 GRD layer to run. Please set env var S1GRD_LAYER_ID and run again',
+      null,
+    );
+    return;
+  }
 
   const instanceId = process.env.INSTANCE_ID;
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
+  const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
+  const s1grdLayerId = process.env.S1GRD_LAYER_ID;
 
   printOut('JSON GetCapabilities', await LayersFactory.fetchGetCapabilitiesJson(baseUrl));
 
@@ -83,16 +98,9 @@ async function run() {
   setAuthToken(authToken);
   printOut('Auth token set:', isAuthTokenSet());
 
-  const layerS1ortho = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-SV-ORTHOTRUE-BACKSIGME');
-  printOut('Layer:', { layerId: layerS1ortho.layerId, title: layerS1ortho.title });
-  printOut('Orthorectify & backscatter:', { o: layerS1ortho.orthorectify, b: layerS1ortho.backscatterCoeff });
-
-  const layerS1orthoFalse = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-DV-ORTHOFALSE-BSGAMMA0');
-  printOut('Layer:', { layerId: layerS1orthoFalse.layerId, title: layerS1orthoFalse.title });
-  printOut('Orthorectify & backscatter:', {
-    o: layerS1orthoFalse.orthorectify,
-    b: layerS1orthoFalse.backscatterCoeff,
-  });
+  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+  printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
+  printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
   // finally, display the image:
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
@@ -108,7 +116,7 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
-  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A');
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL:', imageUrl);
 
