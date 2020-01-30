@@ -11,16 +11,76 @@ const {
   ApiType,
 } = require('../../dist/sentinelHub.cjs');
 
-// settings:
-// const instanceId = 'cd280189-7c51-45a6-ab05-f96a76067710';
-const instanceId = '9ca27fa8-d558-4ec9-9f06-68300b8de423';
+const dotenv = require('dotenv').config({ path: '../../.env' });
+const axios = require('axios');
 
 function printOut(title, value) {
   console.log(`\n${'='.repeat(10)}\n${title}`, JSON.stringify(value, null, 4));
 }
 
+async function setAuthTokenWithOAuthCredentials() {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    printOut(
+      'Other examples need an auth token. Set env vars CLIENT_ID and CLIENT_SECRET and run again.',
+      null,
+    );
+    return;
+  }
+
+  let authToken;
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+  printOut('Requesting auth token with client id from env vars:', clientId);
+
+  await axios({
+    method: 'post',
+    url: 'https://services.sentinel-hub.com/oauth/token',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+  })
+    .then(response => {
+      authToken = response.data.access_token;
+      printOut('Auth token retrieved successfully:', authToken);
+    })
+    .catch(function(error) {
+      printOut('Error occurred:', {
+        status: error.response.status,
+        statusText: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data,
+      });
+      return;
+    });
+
+  printOut('Auth token set:', isAuthTokenSet());
+  setAuthToken(authToken);
+  printOut('Auth token set:', isAuthTokenSet());
+}
+
 async function run() {
+  if (!process.env.INSTANCE_ID) {
+    printOut('Example needs instance id to run. Please set env var INSTANCE_ID and run again', null);
+    return;
+  }
+  if (!process.env.S2L2A_LAYER_ID) {
+    printOut(
+      'Example needs id of Sentinel-2 L2A layer to run. Please set env var S2L2A_LAYER_ID and run again',
+      null,
+    );
+    return;
+  }
+  if (!process.env.S1GRD_LAYER_ID) {
+    printOut(
+      'Example needs id of Sentinel-1 GRD layer to run. Please set env var S1GRD_LAYER_ID and run again',
+      null,
+    );
+    return;
+  }
+
+  const instanceId = process.env.INSTANCE_ID;
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
+  const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
+  const s1grdLayerId = process.env.S1GRD_LAYER_ID;
 
   printOut('JSON GetCapabilities', await LayersFactory.fetchGetCapabilitiesJson(baseUrl));
 
@@ -40,27 +100,11 @@ async function run() {
   printOut(`Layer title:`, layer.title);
   printOut('Layer description:', layer.description);
 
-  if (!process.env.AUTH_TOKEN) {
-    printOut('Other examples need an auth token. Set env var AUTH_TOKEN and run again.', null);
-    return;
-  }
+  await setAuthTokenWithOAuthCredentials();
 
-  printOut('Auth token set:', isAuthTokenSet());
-  setAuthToken(process.env.AUTH_TOKEN);
-  printOut('Auth token set:', isAuthTokenSet());
-
-  let o;
-  let b;
-  const layerS1ortho = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-SV-ORTHOTRUE-BACKSIGME');
-  o = await layerS1ortho.getOrthorectify();
-  b = await layerS1ortho.getBackscatterCoeff();
-  printOut('Orthorectify & backscatter:', { o, b: b });
-  printOut('Orthorectify & backscatter:', b);
-
-  const layerS1orthoFalse = new S1GRDIWAWSLayer(instanceId, 'S1-GRD-IW-DV-ORTHOFALSE-BSGAMMA0');
-  o = await layerS1orthoFalse.getOrthorectify();
-  b = await layerS1orthoFalse.getBackscatterCoeff();
-  printOut('Orthorectify & backscatter:', { o, b });
+  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+  printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
+  printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
   // finally, display the image:
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
@@ -68,15 +112,15 @@ async function run() {
 
   const getMapParams = {
     bbox: bbox,
-    from: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    to: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
   };
   printOut('GetMapParams:', getMapParams);
 
-  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A');
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL:', imageUrl);
 
