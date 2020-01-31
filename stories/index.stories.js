@@ -3,13 +3,13 @@ import {
   S1GRDIWAWSLayer,
   S2L2ALayer,
   setAuthToken,
+  isAuthTokenSet,
+  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
 } from '../dist/sentinelHub.esm';
-
-import axios from 'axios';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
@@ -282,28 +282,13 @@ function renderTilesList(containerEl, list) {
 }
 
 async function setAuthTokenWithOAuthCredentials () {
-  let authToken;
+  if (isAuthTokenSet()) {
+    console.log('Auth token is already set.');
+    return;
+  }
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
-
-  await axios({
-    method: 'post',
-    url: 'https://services.sentinel-hub.com/oauth/token',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
-  })
-    .then(response => {
-      authToken = response.data.access_token;
-      setAuthToken(authToken);
-      console.log('Auth token retrieved and set successfully');
-    })
-    .catch(function (error) {
-      console.log('Error occurred:', {
-        status: error.response.status,
-        statusText: error.response.status,
-        headers: error.response.headers,
-        data: error.response.data,
-      });
-      return;
-    });
+  const authToken = await requestAuthToken(clientId, clientSecret);
+  setAuthToken(authToken);
+  console.log('Auth token retrieved and set successfully');
 }
