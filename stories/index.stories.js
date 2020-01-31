@@ -3,14 +3,13 @@ import {
   S1GRDIWAWSLayer,
   S2L2ALayer,
   setAuthToken,
-  getAuthTokenFromOAuth,
+  isAuthTokenSet,
+  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
 } from '../dist/sentinelHub.esm';
-
-import axios from 'axios';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
@@ -283,9 +282,13 @@ function renderTilesList(containerEl, list) {
 }
 
 async function setAuthTokenWithOAuthCredentials () {
+  if (isAuthTokenSet()) {
+    console.log('Auth token is already set.');
+    return;
+  }
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await getAuthTokenFromOAuth(clientId, clientSecret);
+  const authToken = await requestAuthToken(clientId, clientSecret);
   setAuthToken(authToken);
   console.log('Auth token retrieved and set successfully');
 }

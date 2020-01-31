@@ -1,6 +1,6 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
-import { setAuthToken, isAuthTokenSet, getAuthTokenFromOAuth } from 'src/auth';
+import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
 import { ApiType, MimeTypes } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
@@ -42,7 +42,7 @@ export {
   // auth:
   setAuthToken,
   isAuthTokenSet,
-  getAuthTokenFromOAuth,
+  requestAuthToken,
   // other:
   ApiType,
   SUPPORTED_CRS_OBJ,

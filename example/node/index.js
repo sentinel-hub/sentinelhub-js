@@ -1,3 +1,5 @@
+const dotenv = require('dotenv').config({ path: '../../.env' });
+
 const {
   LayersFactory,
   WmsLayer,
@@ -5,15 +7,12 @@ const {
   S2L2ALayer,
   setAuthToken,
   isAuthTokenSet,
-  getAuthTokenFromOAuth,
+  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
 } = require('../../dist/sentinelHub.cjs');
-
-const dotenv = require('dotenv').config({ path: '../../.env' });
-const axios = require('axios');
 
 function printOut(title, value) {
   console.log(`\n${'='.repeat(10)}\n${title}`, JSON.stringify(value, null, 4));
@@ -28,11 +27,16 @@ async function setAuthTokenWithOAuthCredentials() {
     return;
   }
 
+  if (isAuthTokenSet()) {
+    printOut('Auth token is already set.');
+    return;
+  }
+
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
   printOut('Requesting auth token with client id from env vars:', clientId);
 
-  const authToken = await getAuthTokenFromOAuth(clientId, clientSecret);
+  const authToken = await requestAuthToken(clientId, clientSecret);
   printOut('Auth token retrieved successfully:', authToken);
 
   printOut('Auth token set:', isAuthTokenSet());
