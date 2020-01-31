@@ -1,8 +1,6 @@
 import {
-  legacyGetMapFromUrl, ApiType, setAuthToken, getAuthTokenFromOAuth
+  legacyGetMapFromUrl, ApiType, setAuthToken, requestAuthToken
 } from '../dist/sentinelHub.esm';
-
-import axios from 'axios';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
@@ -128,9 +126,14 @@ export const WMSLegacyGetMapFromUrlDatesNotTimes = () => {
 };
 
 async function setAuthTokenWithOAuthCredentials() {
+  if (isAuthTokenSet()) {
+    console.log('Auth token is already set.');
+    return;
+  }
+
   const clientId = process.env.CLIENT_ID;
   const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await getAuthTokenFromOAuth(clientId, clientSecret);
+  const authToken = await requestAuthToken(clientId, clientSecret);
   setAuthToken(authToken);
   console.log('Auth token retrieved and set successfully');
 }

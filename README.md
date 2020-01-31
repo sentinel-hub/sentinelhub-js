@@ -177,14 +177,14 @@ In short, authentication is done by getting an authentication token using OAuth 
 To get the OAuth Client's id and secret, a new OAuth Client must be created in [**User settings**](https://apps.sentinel-hub.com/dashboard/#/account/settings) on **Sentinel Hub Dashboard** under **OAuth clients**.
 OAuth Client's secret is shown only before the creation process is finished so be mindful to save it.
 
-Getting the authentication token by calling `getAuthTokenFromOAuth()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
+Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-const { setAuthToken, getAuthTokenFromOAuth } = require('sentinelhub-js');
+const { setAuthToken, requestAuthToken } = require('sentinelhub-js');
 
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
-const authToken = await getAuthTokenFromOAuth(clientId, clientSecret);
+const authToken = await requestAuthToken(clientId, clientSecret);
 setAuthToken(authToken);
 ```
 

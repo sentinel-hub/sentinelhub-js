@@ -7,6 +7,9 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(newAuthToken: string): void {
+  if (newAuthToken === undefined) {
+    throw new Error('Parameter newAuthToken must not be undefined');
+  }
   authToken = newAuthToken;
 }
 
@@ -14,7 +17,7 @@ export function isAuthTokenSet(): boolean {
   return authToken !== null;
 }
 
-export async function getAuthTokenFromOAuth(clientId: string, clientSecret: string): Promise<any> {
+export async function requestAuthToken(clientId: string, clientSecret: string): Promise<any> {
   let response = await axios({
     method: 'post',
     url: 'https://services.sentinel-hub.com/oauth/token',
