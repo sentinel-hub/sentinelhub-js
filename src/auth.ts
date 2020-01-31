@@ -7,8 +7,8 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(newAuthToken: string): void {
-  if (newAuthToken === undefined) {
-    throw new Error('Parameter newAuthToken must not be undefined');
+  if (!newAuthToken) {
+    throw new Error('Parameter newAuthToken must be a non-empty string');
   }
   authToken = newAuthToken;
 }
