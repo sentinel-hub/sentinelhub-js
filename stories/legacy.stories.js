@@ -1,5 +1,5 @@
 import {
-  legacyGetMapFromUrl, ApiType, setAuthToken, requestAuthToken
+  legacyGetMapFromUrl, ApiType, setAuthToken, isAuthTokenSet, requestAuthToken
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
