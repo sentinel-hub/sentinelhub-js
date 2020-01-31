@@ -172,30 +172,20 @@ If we already have a WMS GetMap URL, we can use it directly:
 Requests to Processing API need to be authenticated.
 Documentation about authentication is available at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
 
-In short, authentication is done by requesting an authentication token and setting it as described in [Layers](#layers).
-The authentication token is retrieved by making a request to the `https://services.sentinel-hub.com/oauth/token` endpoint with the OAuth Client's id and secret.
+In short, authentication is done by getting an authentication token using OAuth Client's id and secret, and setting it.
 
 To get the OAuth Client's id and secret, a new OAuth Client must be created in [**User settings**](https://apps.sentinel-hub.com/dashboard/#/account/settings) on **Sentinel Hub Dashboard** under **OAuth clients**.
 OAuth Client's secret is shown only before the creation process is finished so be mindful to save it.
 
-In javascript requesting the authentication token can be done with builtin XMLHttpRequest:
+Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-const { setAuthToken } = require('sentinelhub-js');
+const { setAuthToken, requestAuthToken } = require('sentinelhub-js');
 
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
-
-let xhr = new XMLHttpRequest();
-xhr.open("POST", 'https://services.sentinel-hub.com/oauth/token', true);
-xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-xhr.onreadystatechange = function () {
-  if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-    const responseObj = JSON.parse(xhr.response);
-    setAuthToken(xhr.response.access_token);
-  }
-}
-xhr.send("grant_type=client_credentials&client_id=" + clientId + "&client_secret=" + clientSecret);  
+const authToken = await requestAuthToken(clientId, clientSecret);
+setAuthToken(authToken);
 ```
 
 # Examples
