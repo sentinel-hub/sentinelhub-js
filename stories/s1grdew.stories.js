@@ -1,27 +1,29 @@
 import {
-  S3OLCILayer,
+  S1GRDEWAWSLayer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
   CRS_EPSG4326,
+  CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
+  OrbitDirection,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.S3OLCI_LAYER_ID) {
-  throw new Error("S3OLCI_LAYER_ID environment variable is not defined!");
+if (!process.env.S1GRDEW_LAYER_ID) {
+  throw new Error("S1GRDEW_LAYER_ID environment variable is not defined!");
 };
 
 const instanceId = process.env.INSTANCE_ID;
-const layerId = process.env.S3OLCI_LAYER_ID;
+const layerId = process.env.S1GRDEW_LAYER_ID;
 
 export default {
-  title: 'Sentinel 3 OLCI',
+  title: 'Sentinel 1 GRD EW - AWS',
 };
 
 export const getMapURL = () => {
@@ -33,17 +35,16 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S1GRDEWAWSLayer(instanceId, layerId);
 
-  const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
+  const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
   const getMapParams = {
     bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-    width: 512,
+    fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+  width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    maxCCPercent: 50,
   };
   const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -61,17 +62,15 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S3OLCILayer(instanceId, layerId);
-
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -97,29 +96,29 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(
+    const layer = new S1GRDEWAWSLayer(
       instanceId,
       layerId,
       `
       //VERSION=3
       function setup() {
         return {
-          input: ["B08", "B06", "B04"],
+          input: ["HH"],
           output: { bands: 3 }
         };
       }
 
       function evaluatePixel(sample) {
-        return [2.5 * sample.B08, 2.5 * sample.B06, 2.5 * sample.B04];
+        return [2.5 * sample.HH, 2.5 * sample.HH, 2.5 * sample.HH];
       }
     `,
     );
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -149,13 +148,13 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(instanceId, layerId);
+    const layer = new S1GRDEWAWSLayer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -169,8 +168,8 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S3OLCILayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+  const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+  const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -180,9 +179,10 @@ export const findTiles = () => {
   const perform = async () => {
     const data = await layer.findTiles(
       bbox,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       5,
+      null,
       null,
     );
     renderTilesList(containerEl, data.tiles);
