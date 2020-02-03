@@ -25,6 +25,24 @@ export const DATASET_S2L1C: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
 };
 
+export const DATASET_S3SLSTR: Dataset = {
+  id: 'CRE_S3SLSTR',
+  shJsonGetCapabilitiesDataset: 'S3SLSTR',
+  shWmsEvalsource: 'S3SLSTR',
+  shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
+};
+
+export const DATASET_S3OLCI: Dataset = {
+  id: 'CRE_S3OLCI',
+  shJsonGetCapabilitiesDataset: 'S3OLCI',
+  shWmsEvalsource: 'S3OLCI',
+  shProcessingApiDatasourceAbbreviation: 'S3OLCI',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
+};
+
 export const DATASET_AWS_L8L1C: Dataset = {
   id: 'AWS_L8L1C',
   shJsonGetCapabilitiesDataset: 'L8L1C',
