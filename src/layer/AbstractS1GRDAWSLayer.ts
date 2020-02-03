@@ -4,6 +4,15 @@ import { ProcessingPayload } from 'src/layer/processing';
 
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 
+/*
+  Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
+*/
+
+export enum AcquisitionMode {
+  IW = 'IW',
+  EW = 'EW',
+}
+
 export enum Polarization {
   DV = 'DV',
   SH = 'SH',
@@ -14,11 +23,6 @@ export enum Polarization {
 export enum OrbitDirection {
   ASCENDING = 'ASCENDING',
   DESCENDING = 'DESCENDING',
-}
-
-export enum AcquisitionMode {
-  IW = 'IW',
-  EW = 'EW',
 }
 
 export enum Resolution {
