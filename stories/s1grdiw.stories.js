@@ -1,27 +1,29 @@
 import {
-  S3OLCILayer,
+  S1GRDIWAWSLayer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
   CRS_EPSG4326,
+  CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
+  OrbitDirection,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.S3OLCI_LAYER_ID) {
-  throw new Error("S3OLCI_LAYER_ID environment variable is not defined!");
+if (!process.env.S1GRDIW_LAYER_ID) {
+  throw new Error("S1GRDIW_LAYER_ID environment variable is not defined!");
 };
 
 const instanceId = process.env.INSTANCE_ID;
-const layerId = process.env.S3OLCI_LAYER_ID;
+const layerId = process.env.S1GRDIW_LAYER_ID;
 
 export default {
-  title: 'Sentinel 3 OLCI',
+  title: 'Sentinel 1 GRD IW - AWS',
 };
 
 export const getMapURL = () => {
@@ -33,9 +35,10 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S1GRDIWAWSLayer(instanceId, layerId);
 
-  const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
+  // const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
+  const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
   const getMapParams = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
@@ -43,7 +46,6 @@ export const getMapURL = () => {
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    maxCCPercent: 50,
   };
   const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -61,9 +63,10 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S3OLCILayer(instanceId, layerId);
+    const layer = new S1GRDIWAWSLayer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    // const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+    const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
@@ -71,7 +74,6 @@ export const getMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -97,20 +99,20 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(
+    const layer = new S1GRDIWAWSLayer(
       instanceId,
       layerId,
       `
       //VERSION=3
       function setup() {
         return {
-          input: ["B08", "B06", "B04"],
+          input: ["VV"],
           output: { bands: 3 }
         };
       }
 
       function evaluatePixel(sample) {
-        return [2.5 * sample.B08, 2.5 * sample.B06, 2.5 * sample.B04];
+        return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
       }
     `,
     );
@@ -149,7 +151,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(instanceId, layerId);
+    const layer = new S1GRDIWAWSLayer(instanceId, layerId);
 
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
@@ -169,7 +171,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S1GRDIWAWSLayer(instanceId, layerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 
@@ -184,6 +186,7 @@ export const findTiles = () => {
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       null,
+      OrbitDirection.ASCENDING,
     );
     renderTilesList(containerEl, data.tiles);
   };

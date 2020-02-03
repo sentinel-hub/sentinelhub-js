@@ -14,6 +14,7 @@ import {
 } from 'src/layer/dataset';
 import { WmsLayer } from 'src/layer/WmsLayer';
 import { S1GRDIWAWSLayer } from 'src/layer/S1GRDIWAWSLayer';
+import { S1GRDEWAWSLayer } from 'src/layer/S1GRDEWAWSLayer';
 import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
@@ -23,7 +24,7 @@ import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
-import { Polarization, OrbitDirection } from 'src/layer/S1GRDIWAWSLayer';
+import { Polarization, OrbitDirection } from 'src/layer/AbstractS1GRDAWSLayer';
 
 export {
   LayersFactory,
@@ -36,6 +37,7 @@ export {
   // layers:
   WmsLayer,
   S1GRDIWAWSLayer,
+  S1GRDEWAWSLayer,
   S2L2ALayer,
   S2L1CLayer,
   S3SLSTRLayer,

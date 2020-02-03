@@ -7,7 +7,7 @@ import { OrbitDirection } from 'src';
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
   orbitDirection?: OrbitDirection;
-  view: 'NADIR' | 'OBLIQUE',
+  view: 'NADIR' | 'OBLIQUE';
 };
 
 export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
@@ -28,7 +28,15 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       orbitDirection: orbitDirection,
       view: view,
     };
-    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, maxCloudCoverage, findTilesDatasetParameters);
+    const response = await this.fetchTiles(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      maxCloudCoverage,
+      findTilesDatasetParameters,
+    );
     return {
       tiles: response.data.tiles.map(tile => {
         return {

@@ -31,7 +31,7 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (only WMS supports this)</h2>";
+  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const layer = new S3SLSTRLayer(instanceId, layerId);

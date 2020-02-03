@@ -7,6 +7,24 @@ export type Dataset = {
   searchIndexUrl: string;
 };
 
+export const DATASET_AWS_S1GRD_IW: Dataset = {
+  id: 'AWS_S1GRD_IW',
+  shJsonGetCapabilitiesDataset: 'S1GRD',
+  shWmsEvalsource: 'S1GRD',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
+  shServiceHostname: 'https://services.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+};
+
+export const DATASET_AWS_S1GRD_EW: Dataset = {
+  id: 'AWS_S1GRD_EW',
+  shJsonGetCapabilitiesDataset: 'S1GRD',
+  shWmsEvalsource: 'S1GRD',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
+  shServiceHostname: 'https://services.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+};
+
 export const DATASET_S2L2A: Dataset = {
   id: 'AWS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',
@@ -68,13 +86,4 @@ export const DATASET_AWS_DEM: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'DEM',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: null,
-};
-
-export const DATASET_AWS_S1GRD_IW: Dataset = {
-  id: 'AWS_S1GRD_IW',
-  shJsonGetCapabilitiesDataset: 'S1GRD',
-  shWmsEvalsource: 'S1GRD',
-  shProcessingApiDatasourceAbbreviation: 'S1GRD',
-  shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
 };

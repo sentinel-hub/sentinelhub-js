@@ -200,11 +200,13 @@ These variables should be put in the `.env` file in the root folder of this proj
 - `CLIENT_SECRET`: OAuth Client's secret (optional, authentication is needed for examples that use Processing API)
 
 - `INSTANCE_ID`: id of the configuration instance that will be used in examples
+- `S1GRDIW_LAYER_ID`: id of the Sentinel-1 GRD IW layer from that instance
+- `S1GRDEW_LAYER_ID`: id of the Sentinel-1 GRD EW layer from that instance
 - `S2L2A_LAYER_ID`: id of the Sentinel-2 L2A layer from that instance
-- `S1GRD_LAYER_ID`: id of the Sentinel-1 GRD layer from that instance
+- ... (see `.env.example` for full list)
 
 Instance can be created with the [**Configurator**](https://apps.sentinel-hub.com/dashboard/#/configurations) on the **Sentinel Hub Dashboard**.
-It should contain at least one Sentinel-2 L2A layer and one Sentinel-1 GRD layer, whose layer IDs should be the same as set in `S2L2A_LAYER_ID` and `S1GRD_LAYER_ID` env vars respectively.
+It should contain at least one Sentinel-2 L2A layer and one Sentinel-1 GRD layer, whose layer IDs should be the same as set in `S2L2A_LAYER_ID` and `S1GRDIW_LAYER_ID` env vars respectively.
 
 `CLIENT_ID` and `CLIENT_SECRET` are needed so that the authentication token can be requested, which is then used in examples that use Processing API.
 The process of getting those two is described in [Authentication for Processing API](#authentication-for-processing-api)

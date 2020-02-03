@@ -19,13 +19,13 @@ if (!process.env.S2L2A_LAYER_ID) {
   throw new Error("S2L2A_LAYER_ID environment variable is not defined!");
 };
 
-if (!process.env.S1GRD_LAYER_ID) {
-  throw new Error("S1GRD_LAYER_ID environment variable is not defined!");
+if (!process.env.S1GRDIW_LAYER_ID) {
+  throw new Error("S1GRDIW_LAYER_ID environment variable is not defined!");
 }
 
 const instanceId = process.env.INSTANCE_ID;
 const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
-const s1grdLayerId = process.env.S1GRD_LAYER_ID;
+const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
 
 export default {
   title: 'Demo',
@@ -37,7 +37,7 @@ export const S2GetMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (only WMS supports this) for Sentinel-2 L2A</h2>";
+  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
@@ -241,7 +241,7 @@ export const S1GRDFindTiles = () => {
   const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
-  
+
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = "<h2>findTiles for Sentinel-1 GRD</h2>";
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
