@@ -60,6 +60,12 @@ export type PaginatedTiles = {
   hasMore: boolean;
 };
 
+export type Flyover = {
+  tiles: Tile[];
+  startTime: string;
+  endTime: string;
+};
+
 export type MimeType =
   | 'application/json'
   | 'text/xml'

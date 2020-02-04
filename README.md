@@ -148,7 +148,8 @@ We can always use layer to search for data availability:
   const tilesS1 = layerS1.findTiles(bbox, fromDate, toDate, maxCount, offset, orbitDirection);
 
   const dates = layerS2L2A.findDatesUTC(bbox, fromDate, toDate, cloudCoverage);
-  const flyovers = layerS2L2A.findFlyovers(bbox, fromDate, toDate, cloudCoverage);
+
+  const flyovers = layerS2L2A.groupTilesByFlyovers(tilesS2.tiles);
 ```
 
 ## Backwards compatibility
