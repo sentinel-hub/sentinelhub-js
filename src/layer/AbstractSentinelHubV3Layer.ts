@@ -50,7 +50,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const authToken = getAuthToken();
 
-    const url = `${this.dataset.shServiceHostname}configuration/v1/wms/instances/${this.instanceId}/layers`;
+    // Note that for SH v3 service, the endpoint for fetching the list of layers is always
+    // https://services.sentinel-hub.com/, even for creodias datasets:
+    const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
@@ -156,7 +158,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       clipping: bboxPolygon,
       maxcount: maxCount,
       maxCloudCoverage: maxCloudCoverage ? maxCloudCoverage / 100 : null,
-      timefrom: fromTime.toISOString(),
+      timeFrom: fromTime.toISOString(),
       timeTo: toTime.toISOString(),
       offset: offset,
     };
