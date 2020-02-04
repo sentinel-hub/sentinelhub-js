@@ -10,18 +10,20 @@ import {
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-  DATASET_AWS_S1GRD_IW,
+  DATASET_AWSEU_S1GRD,
 } from 'src/layer/dataset';
 import { WmsLayer } from 'src/layer/WmsLayer';
-import { S1GRDIWAWSLayer } from 'src/layer/S1GRDIWAWSLayer';
+import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
 import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
+import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
+import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
-import { Polarization, OrbitDirection } from 'src/layer/S1GRDIWAWSLayer';
+import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
 
 export {
   LayersFactory,
@@ -30,12 +32,14 @@ export {
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-  DATASET_AWS_S1GRD_IW,
+  DATASET_AWSEU_S1GRD,
   // layers:
   WmsLayer,
-  S1GRDIWAWSLayer,
+  S1GRDAWSEULayer,
   S2L2ALayer,
   S2L1CLayer,
+  S3SLSTRLayer,
+  S3OLCILayer,
   MODISLayer,
   DEMLayer,
   Landsat8AWSLayer,
@@ -50,7 +54,9 @@ export {
   CRS_EPSG3857,
   CRS_WGS84,
   MimeTypes,
+  AcquisitionMode,
   Polarization,
+  Resolution,
   OrbitDirection,
   BBox,
   // legacy:
