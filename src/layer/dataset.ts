@@ -52,6 +52,15 @@ export const DATASET_S3OLCI: Dataset = {
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
 };
 
+export const DATASET_S5PL2: Dataset = {
+  id: 'CRE_S5PL2',
+  shJsonGetCapabilitiesDataset: 'S5PL2',
+  shWmsEvalsource: 'S5P_L2',
+  shProcessingApiDatasourceAbbreviation: 'S5PL2',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex',
+};
+
 export const DATASET_AWS_L8L1C: Dataset = {
   id: 'AWS_L8L1C',
   shJsonGetCapabilitiesDataset: 'L8L1C',
