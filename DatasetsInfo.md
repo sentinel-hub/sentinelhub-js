@@ -1,3 +1,7 @@
+# Dataset information
+
+- most important info: Period a.k.a. orbit time (time in which the satellite makes 1 circle around the Earth)
+
 # Copernicus
 
 ## Sentinel-1
@@ -15,8 +19,9 @@
   - Period: 98.6 min / 2 = ‭49.3 min = 2958000 ms **(used in `datasets.ts`)**
   - Revisit time (of the same area): 12 days / 2 = 6 days
 
-https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Facts_and_figures
-https://sentinel.esa.int/web/sentinel/missions/sentinel-1/satellite-description/orbit
+- info sources: 
+  - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Facts_and_figures
+  - https://sentinel.esa.int/web/sentinel/missions/sentinel-1/satellite-description/orbit
 
 ## Sentinel-2
 
@@ -33,8 +38,9 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-1/satellite-description/
   - Period: 100.6 min / 2 = 50.3 min = 3018000‬ ms **(used in `datasets.ts`)**
   - Revisit time (of the same area): 10 days / 2 = 5 days
 
-https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2/Facts_and_figures
-https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/orbit
+- info sources: 
+  - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2/Facts_and_figures
+  - https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/orbit
 
 ## Sentinel-3
 
@@ -50,8 +56,9 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/
 - Both satellites:
   - Period: 100.99 min / 2 = 50.495 min = 3029700 ms **(used in `datasets.ts`)**
 
-https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-3/Facts_and_figures
-https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/orbit
+- info sources: 
+  - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-3/Facts_and_figures
+  - https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/orbit
 
 
 ## Sentinel-5P
@@ -65,9 +72,10 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/
   - Period (time to circle the Earth 1 time = 1 orbit): 101 min = 6060000 ms **(used in `datasets.ts`)**
   - Revisit time (of the same area) on the equator: ???
 
-https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-5P/Facts_and_figures
-https://sentinel.esa.int/web/sentinel/missions/sentinel-5p/orbit
-https://www.esa.int/Enabling_Support/Operations/Sentinel-5P_operations
+- info sources: 
+  - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-5P/Facts_and_figures
+  - https://sentinel.esa.int/web/sentinel/missions/sentinel-5p/orbit
+  - https://www.esa.int/Enabling_Support/Operations/Sentinel-5P_operations
 
 # Landsat
 
@@ -76,14 +84,16 @@ https://www.esa.int/Enabling_Support/Operations/Sentinel-5P_operations
 - Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
-https://www.usgs.gov/land-resources/nli/landsat/landsat-5
+- info sources: 
+  - https://www.usgs.gov/land-resources/nli/landsat/landsat-5
 
 ## Landsat 7
 
 - Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
-https://www.usgs.gov/land-resources/nli/landsat/landsat-7
+- info sources: 
+  - https://www.usgs.gov/land-resources/nli/landsat/landsat-7
 
 
 ## Landsat 8
@@ -91,7 +101,8 @@ https://www.usgs.gov/land-resources/nli/landsat/landsat-7
 - Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
-https://www.usgs.gov/land-resources/nli/landsat/landsat-8
+- info sources: 
+  - https://www.usgs.gov/land-resources/nli/landsat/landsat-8
 
 # Other
 
@@ -99,7 +110,8 @@ https://www.usgs.gov/land-resources/nli/landsat/landsat-8
 
 - Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 
-https://sos.noaa.gov/datasets/polar-orbiting-aqua-satellite-and-modis-swath/
+- info sources: 
+  - https://sos.noaa.gov/datasets/polar-orbiting-aqua-satellite-and-modis-swath/
 
 ## DEM
 
