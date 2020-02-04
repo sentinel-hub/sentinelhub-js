@@ -156,8 +156,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       clipping: bboxPolygon,
       maxcount: maxCount,
       maxCloudCoverage: maxCloudCoverage ? maxCloudCoverage / 100 : null,
-      fromTime: fromTime.toISOString(),
-      toTime: toTime.toISOString(),
+      timefrom: fromTime.toISOString(),
+      timeTo: toTime.toISOString(),
       offset: offset,
     };
 

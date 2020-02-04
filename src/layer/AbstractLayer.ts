@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
+import { GetMapParams, ApiType, Tile, PaginatedTiles, Flyover } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
 
@@ -40,5 +40,52 @@ export class AbstractLayer {
     offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not implemented yet');
+  }
+
+  // public findFlyovers(
+  //   bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+  //   fromDate: any, // eslint-disable-line @typescript-eslint/no-unused-vars
+  //   toDate: any, // eslint-disable-line @typescript-eslint/no-unused-vars
+  //   maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+  //   offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+  // ): Promise<PaginatedFlyovers> {
+  //   throw new Error('Not implemented yet');
+  // }
+
+  public groupTilesByFlyovers(tiles: Tile[]): Flyover[] {
+    if (!this.dataset || !this.dataset.orbitTimeMilliSeconds) {
+      throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+    }
+
+    let orbitTimeMS = this.dataset.orbitTimeMilliSeconds;
+    let flyovers = <Flyover[]>[];
+
+    let j = 0;
+    for (let i = 0; i < tiles.length; i++) {
+      if (!tiles[i - 1]) {
+        flyovers[j] = <Flyover>{};
+        flyovers[j].tiles = [];
+        flyovers[j].tiles.push(tiles[i]);
+        flyovers[j].startTime = tiles[i].sensingTime;
+        flyovers[j].endTime = tiles[i].sensingTime;
+      } else {
+        const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
+        const currDateMS = new Date(tiles[i].sensingTime).getTime();
+        const diffMS = prevDateMS - currDateMS;
+
+        if (diffMS < orbitTimeMS) {
+          flyovers[j].tiles.push(tiles[i]);
+          flyovers[j].endTime = tiles[i].sensingTime;
+        } else {
+          j++;
+          flyovers[j] = <Flyover>{};
+          flyovers[j].tiles = [];
+          flyovers[j].tiles.push(tiles[i]);
+          flyovers[j].startTime = tiles[i].sensingTime;
+          flyovers[j].endTime = tiles[i].sensingTime;
+        }
+      }
+    }
+    return flyovers;
   }
 }

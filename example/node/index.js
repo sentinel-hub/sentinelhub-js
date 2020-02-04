@@ -5,6 +5,7 @@ const {
   WmsLayer,
   S1GRDIWAWSLayer,
   S2L2ALayer,
+  OrbitDirection,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
@@ -117,6 +118,32 @@ async function run() {
   // fs.writeFileSync('/tmp/imagewms.jpeg', Buffer.from(new Uint8Array(imageBlob)));
   // const imageBlob2 = await layer.getMap(getMapParams, API_PROCESSING);
   // fs.writeFileSync('/tmp/imageprocessing.jpeg', Buffer.from(new Uint8Array(imageBlob)));
+
+  const tilesS2L2A = await layerS2L2A.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    20,
+    0,
+    100,
+  );
+  // printOut('tiles for S2 L2A', tilesS2L2A);
+  tilesS2L2A.tiles.map(t => console.log(t.sensingTime));
+  const flyoversS2L2A = layerS2L2A.groupTilesByFlyovers(tilesS2L2A.tiles);
+  printOut('flyovers for S2 L2A', flyoversS2L2A);
+
+  const tilesS1GRD = await layerS1.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    10,
+    0,
+    OrbitDirection.ASCENDING,
+  );
+  // printOut('tiles for S1 GRD', tilesS1GRD);
+  tilesS1GRD.tiles.map(t => console.log(t.sensingTime));
+  const flyoversS1GRD = layerS1.groupTilesByFlyovers(tilesS1GRD.tiles);
+  printOut('flyovers for S1 GRD', flyoversS1GRD);
 }
 
 run()
