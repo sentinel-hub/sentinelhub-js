@@ -7,17 +7,8 @@ export type Dataset = {
   searchIndexUrl: string;
 };
 
-export const DATASET_AWS_S1GRD_IW: Dataset = {
-  id: 'AWS_S1GRD_IW',
-  shJsonGetCapabilitiesDataset: 'S1GRD',
-  shWmsEvalsource: 'S1GRD',
-  shProcessingApiDatasourceAbbreviation: 'S1GRD',
-  shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
-};
-
-export const DATASET_AWS_S1GRD_EW: Dataset = {
-  id: 'AWS_S1GRD_EW',
+export const DATASET_AWSEU_S1GRD: Dataset = {
+  id: 'AWSEU_S1GRD',
   shJsonGetCapabilitiesDataset: 'S1GRD',
   shWmsEvalsource: 'S1GRD',
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
