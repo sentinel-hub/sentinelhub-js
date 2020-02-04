@@ -61,7 +61,7 @@ export class AbstractLayer {
       } else {
         const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
         const currDateMS = new Date(tiles[i].sensingTime).getTime();
-        const diffMS = prevDateMS - currDateMS;
+        const diffMS = Math.abs(prevDateMS - currDateMS);
 
         if (diffMS < orbitTimeMS) {
           flyovers[j].tiles.push(tiles[i]);
