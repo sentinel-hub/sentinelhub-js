@@ -1,5 +1,5 @@
 import {
-  S1GRDEWAWSLayer,
+  S1GRDAWSEULayer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
@@ -9,6 +9,9 @@ import {
   MimeTypes,
   ApiType,
   OrbitDirection,
+  Polarization,
+  AcquisitionMode,
+  Resolution,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -35,7 +38,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer(instanceId, layerId);
 
   const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
   const getMapParams = {
@@ -62,7 +65,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+    const layer = new S1GRDAWSEULayer(instanceId, layerId);
     const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
@@ -96,7 +99,7 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDEWAWSLayer(
+    const layer = new S1GRDAWSEULayer(
       instanceId,
       layerId,
       `
@@ -112,6 +115,59 @@ export const getMapProcessing = () => {
         return [2.5 * sample.HH, 2.5 * sample.HH, 2.5 * sample.HH];
       }
     `,
+    );
+
+    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+      maxCCPercent: 100,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingWithoutInstance = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layer = new S1GRDAWSEULayer(
+      null,
+      null,
+      `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["HH"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.HH, 2.5 * sample.HH, 2.5 * sample.HH];
+      }
+    `,null, null, null, null, AcquisitionMode.EW, Polarization.DH, Resolution.MEDIUM
+
     );
 
     const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
@@ -148,7 +204,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+    const layer = new S1GRDAWSEULayer(instanceId, layerId);
 
     const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
@@ -168,7 +224,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDEWAWSLayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer(instanceId, layerId);
   const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
   const containerEl = document.createElement('pre');
 
