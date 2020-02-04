@@ -58,6 +58,7 @@ export class LayersFactory {
   ];
 
   private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
+    [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
     [DATASET_S2L2A.shJsonGetCapabilitiesDataset]: DATASET_S2L2A,
     [DATASET_S2L1C.shJsonGetCapabilitiesDataset]: DATASET_S2L1C,
     [DATASET_S3SLSTR.shJsonGetCapabilitiesDataset]: DATASET_S3SLSTR,
@@ -65,10 +66,10 @@ export class LayersFactory {
     [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
-    [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
   };
 
   private static readonly LAYER_FROM_DATASET = {
+    [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
     [DATASET_S2L2A.id]: S2L2ALayer,
     [DATASET_S2L1C.id]: S2L1CLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
@@ -76,7 +77,6 @@ export class LayersFactory {
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
-    [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
   };
 
   private static async getLayersListFromBaseUrl(baseUrl: string, forceFetch = false): Promise<any[]> {
