@@ -1,6 +1,6 @@
 import {
   WmsLayer,
-  S1GRDIWAWSLayer,
+  S1GRDAWSEULayer,
   S2L2ALayer,
   setAuthToken,
   isAuthTokenSet,
@@ -159,7 +159,7 @@ export const S1GetMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+    const layer = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
 
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
@@ -238,7 +238,7 @@ export const S2FindTiles = () => {
 };
 
 export const S1GRDFindTiles = () => {
-  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 

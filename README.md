@@ -45,7 +45,7 @@ Basic (WMS-capable) `Layer` can be initialized like this:
   const layer = new WmsLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', 'Title', 'Description');
 ```
 
-Such layer would only allow WMS requests. However, `Layer` is also a superclass for multiple dataset-specific subclasses (like `S1GRDIWAWSLayer`) which can be instantiated with their own specific parameters and thus unlock additional powers.
+Such layer would only allow WMS requests. However, `Layer` is also a superclass for multiple dataset-specific subclasses (like `S1GRDAWSEULayer` - Sentinel-1 GRD data on AWS eu-central-1 Sentinel Hub endpoint) which can be instantiated with their own specific parameters and thus unlock additional powers.
 
 When it comes to Sentinel Hub layers, there are four ways to determine their content:
 
@@ -55,16 +55,16 @@ When it comes to Sentinel Hub layers, there are four ways to determine their con
 - by `dataProduct`: the structure which contains an ID of a pre-existing product
 
 ```javascript
-  import { S1GRDIWAWSLayer } from 'sentinelhub-js';
+  import { S1GRDAWSEULayer } from 'sentinelhub-js';
 
-  layerS1 = new S1GRDIWAWSLayer(instanceId, '<layer-id>', null, null, null, 'Title', 'Description');
-  layerS1 = new S1GRDIWAWSLayer(instanceId, null, myEvalscript);
-  layerS1 = new S1GRDIWAWSLayer(instanceId, null, null, myEvalscriptUrl);
-  layerS1 = new S1GRDIWAWSLayer(instanceId, null, null, null, '<data-product-id>');
-  layerS1 = new S1GRDIWAWSLayer(instanceId, '<layer-id>', null, null, null, 'Title', 'Description', orthorectified=true);
+  let layerS1;
+  layerS1 = new S1GRDAWSEULayer(instanceId, '<layer-id>', null, null, null, 'Title', 'Description');
+  layerS1 = new S1GRDAWSEULayer(null, null, myEvalscript, null, null, 'Title', 'Description', 'IW', 'DV', 'HIGH');
+  layerS1 = new S1GRDAWSEULayer(null, null, null, myEvalscriptUrl, null, 'Title', 'Description', 'IW', 'DV', 'HIGH');
+  layerS1 = new S1GRDAWSEULayer(null, null, null, null, '<data-product-id>', 'Title', 'Description', 'EW', 'DH', 'MEDIUM');
 ```
 
-It is also possible to get the list of the layers that service endpoint supports:
+It is also possible to create layers as they are defined in Sentinel Hub configuration instance:
 
 ```javascript
   import { LayersFactory } from 'sentinelhub-js';
@@ -143,7 +143,7 @@ We can always use layer to search for data availability:
   const cloudCoveragePercent = 50;
   const tilesS2 = layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset, cloudCoverage);
 
-  const layerS1 = new S1GRDIWAWSLayer(instanceId, 'LayerS1GRD');
+  const layerS1 = new S1GRDAWSEULayer(instanceId, 'LayerS1GRD');
   const orbitDirection = OrbitDirection.ASCENDING;
   const tilesS1 = layerS1.findTiles(bbox, fromDate, toDate, maxCount, offset, orbitDirection);
 
