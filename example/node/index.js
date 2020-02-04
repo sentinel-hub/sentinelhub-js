@@ -109,6 +109,7 @@ async function run() {
   printOut('GetMapParams:', getMapParams);
 
   // get tiles and flyovers for S2 L2A layer
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const tilesS2L2A = await layerS2L2A.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
@@ -117,10 +118,10 @@ async function run() {
     0,
     100,
   );
-  printOut('tiles for S2 L2A', tilesS2L2A);
+  printOut('tiles for S2 L2A:', tilesS2L2A);
   // tilesS2L2A.tiles.map(t => console.log(t.sensingTime));
   const flyoversS2L2A = layerS2L2A.groupTilesByFlyovers(tilesS2L2A.tiles);
-  printOut('flyovers for S2 L2A', flyoversS2L2A);
+  printOut('flyovers for S2 L2A:', flyoversS2L2A);
 
   // get tiles and flyovers for S1 GRD Layer
   const tilesS1GRD = await layerS1.findTiles(
@@ -131,15 +132,14 @@ async function run() {
     0,
     OrbitDirection.ASCENDING,
   );
-  printOut('tiles for S1 GRD', tilesS1GRD);
+  printOut('tiles for S1 GRD:', tilesS1GRD);
   // tilesS1GRD.tiles.map(t => console.log(t.sensingTime));
   const flyoversS1GRD = layerS1.groupTilesByFlyovers(tilesS1GRD.tiles);
-  printOut('flyovers for S1 GRD', flyoversS1GRD);
+  printOut('flyovers for S1 GRD:', flyoversS1GRD);
 
   // finally, display the image:
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
-  printOut('URL:', imageUrl);
+  printOut('URL of S2 L2A image:', imageUrl);
 
   // this doesn't work because node.js doesn't support Blob:
   // const fs = require('fs');
