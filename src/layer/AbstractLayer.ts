@@ -58,13 +58,12 @@ export class AbstractLayer {
     }
 
     let orbitTimeMS = this.dataset.orbitTimeMilliSeconds;
-    let flyovers = <Flyover[]>[];
+    let flyovers = [] as Flyover[];
 
     let j = 0;
     for (let i = 0; i < tiles.length; i++) {
       if (!tiles[i - 1]) {
-        flyovers[j] = <Flyover>{};
-        flyovers[j].tiles = [];
+        flyovers[j] = { tiles: [], startTime: null, endTime: null };
         flyovers[j].tiles.push(tiles[i]);
         flyovers[j].startTime = tiles[i].sensingTime;
         flyovers[j].endTime = tiles[i].sensingTime;
@@ -78,8 +77,7 @@ export class AbstractLayer {
           flyovers[j].endTime = tiles[i].sensingTime;
         } else {
           j++;
-          flyovers[j] = <Flyover>{};
-          flyovers[j].tiles = [];
+          flyovers[j] = { tiles: [], startTime: null, endTime: null };
           flyovers[j].tiles.push(tiles[i]);
           flyovers[j].startTime = tiles[i].sensingTime;
           flyovers[j].endTime = tiles[i].sensingTime;
