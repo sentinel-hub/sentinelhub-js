@@ -1,6 +1,7 @@
 import { BBox } from 'src/bbox';
 import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
+import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
 
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 
@@ -16,8 +17,8 @@ export enum AcquisitionMode {
 export enum Polarization {
   DV = 'DV',
   SH = 'SH',
-  SV = 'SV',
   DH = 'DH',
+  SV = 'SV',
 }
 
 export enum OrbitDirection {
@@ -31,18 +32,20 @@ export enum Resolution {
 }
 
 type S1GRDFindTilesDatasetParameters = {
-  type?: string;
-  acquisitionMode?: AcquisitionMode;
-  polarization?: Polarization;
+  type: string;
+  acquisitionMode: AcquisitionMode;
+  polarization: Polarization;
   orbitDirection?: OrbitDirection;
   resolution?: Resolution;
 };
 
-export class AbstractS1GRDAWSLayer extends AbstractSentinelHubV3Layer {
+export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
+  public readonly dataset = DATASET_AWSEU_S1GRD;
+
+  protected acquisitionMode: AcquisitionMode;
   protected polarization: Polarization;
   protected orthorectify: boolean | null = false;
   protected backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
-  protected acquisitionMode: AcquisitionMode | null = null;
   protected resolution: Resolution | null = null;
 
   public constructor(
@@ -53,28 +56,41 @@ export class AbstractS1GRDAWSLayer extends AbstractSentinelHubV3Layer {
     dataProduct: string | null = null,
     title: string | null = null,
     description: string | null = null,
+    acquisitionMode: AcquisitionMode | null = null,
     polarization: Polarization | null = null,
+    resolution: Resolution | null = null,
     orthorectify: boolean | null = false,
     backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID,
-    resolution: Resolution | null = null,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+    this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
+    this.resolution = resolution;
     this.orthorectify = orthorectify;
     this.backscatterCoeff = backscatterCoeff;
-    this.resolution = resolution;
   }
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+    if (this.polarization === null || this.acquisitionMode === null || this.resolution === null) {
+      if (this.instanceId === null || this.layerId === null) {
+        throw new Error(
+          "Parameters polarization, acquisitionMode and/or resolution are not set, but can't fetch them from service - instanceId and layerId are not available",
+        );
+      }
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3();
 
-    this.polarization = layerParams['polarization'];
-    this.backscatterCoeff = layerParams['backCoeff'];
-    this.orthorectify = layerParams['orthorectify'];
+      this.acquisitionMode = layerParams['acquisitionMode'];
+      this.polarization = layerParams['polarization'];
+      this.resolution = layerParams['resolution'];
+      this.backscatterCoeff = layerParams['backCoeff'];
+      this.orthorectify = layerParams['orthorectify'];
 
-    payload.input.data[0].dataFilter.polarization = this.polarization;
-    payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
-    payload.input.data[0].processing.orthorectify = this.orthorectify;
+      payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
+      payload.input.data[0].dataFilter.polarization = this.polarization;
+      payload.input.data[0].dataFilter.resolution = this.resolution;
+      payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
+      payload.input.data[0].processing.orthorectify = this.orthorectify;
+    }
     return payload;
   }
 
