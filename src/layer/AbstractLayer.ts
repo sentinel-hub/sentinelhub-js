@@ -42,16 +42,6 @@ export class AbstractLayer {
     throw new Error('Not implemented yet');
   }
 
-  // public findFlyovers(
-  //   bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-  //   fromDate: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-  //   toDate: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-  //   maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-  //   offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-  // ): Promise<PaginatedFlyovers> {
-  //   throw new Error('Not implemented yet');
-  // }
-
   public groupTilesByFlyovers(tiles: Tile[]): Flyover[] {
     if (!this.dataset || !this.dataset.orbitTimeMilliSeconds) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
