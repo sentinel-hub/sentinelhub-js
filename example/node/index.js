@@ -3,7 +3,7 @@ require('dotenv').config({ path: '../../.env' });
 const {
   LayersFactory,
   WmsLayer,
-  S1GRDIWAWSLayer,
+  S1GRDAWSEULayer,
   S2L2ALayer,
   OrbitDirection,
   setAuthToken,
@@ -90,7 +90,7 @@ async function run() {
 
   await setAuthTokenWithOAuthCredentials();
 
-  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
   printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
