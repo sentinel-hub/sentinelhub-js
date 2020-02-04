@@ -63,10 +63,11 @@ export class AbstractLayer {
     let j = 0;
     for (let i = 0; i < tiles.length; i++) {
       if (!tiles[i - 1]) {
-        flyovers[j] = { tiles: [], startTime: null, endTime: null };
-        flyovers[j].tiles.push(tiles[i]);
-        flyovers[j].startTime = tiles[i].sensingTime;
-        flyovers[j].endTime = tiles[i].sensingTime;
+        flyovers[j] = {
+          tiles: [tiles[i]],
+          startTime: tiles[i].sensingTime,
+          endTime: tiles[i].sensingTime,
+        };
       } else {
         const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
         const currDateMS = new Date(tiles[i].sensingTime).getTime();
@@ -77,10 +78,11 @@ export class AbstractLayer {
           flyovers[j].endTime = tiles[i].sensingTime;
         } else {
           j++;
-          flyovers[j] = { tiles: [], startTime: null, endTime: null };
-          flyovers[j].tiles.push(tiles[i]);
-          flyovers[j].startTime = tiles[i].sensingTime;
-          flyovers[j].endTime = tiles[i].sensingTime;
+          flyovers[j] = {
+            tiles: [tiles[i]],
+            startTime: tiles[i].sensingTime,
+            endTime: tiles[i].sensingTime,
+          };
         }
       }
     }
