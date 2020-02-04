@@ -94,7 +94,7 @@ async function run() {
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
   printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
-  // finally, display the image:
+  // set the parameters for getting tiles, flyovers and images
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   printOut('BBox:', bbox);
 
@@ -108,6 +108,35 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
+  // get tiles and flyovers for S2 L2A layer
+  const tilesS2L2A = await layerS2L2A.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    20,
+    0,
+    100,
+  );
+  printOut('tiles for S2 L2A', tilesS2L2A);
+  // tilesS2L2A.tiles.map(t => console.log(t.sensingTime));
+  const flyoversS2L2A = layerS2L2A.groupTilesByFlyovers(tilesS2L2A.tiles);
+  printOut('flyovers for S2 L2A', flyoversS2L2A);
+
+  // get tiles and flyovers for S1 GRD Layer
+  const tilesS1GRD = await layerS1.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    10,
+    0,
+    OrbitDirection.ASCENDING,
+  );
+  printOut('tiles for S1 GRD', tilesS1GRD);
+  // tilesS1GRD.tiles.map(t => console.log(t.sensingTime));
+  const flyoversS1GRD = layerS1.groupTilesByFlyovers(tilesS1GRD.tiles);
+  printOut('flyovers for S1 GRD', flyoversS1GRD);
+
+  // finally, display the image:
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL:', imageUrl);
@@ -118,32 +147,6 @@ async function run() {
   // fs.writeFileSync('/tmp/imagewms.jpeg', Buffer.from(new Uint8Array(imageBlob)));
   // const imageBlob2 = await layer.getMap(getMapParams, API_PROCESSING);
   // fs.writeFileSync('/tmp/imageprocessing.jpeg', Buffer.from(new Uint8Array(imageBlob)));
-
-  const tilesS2L2A = await layerS2L2A.findTiles(
-    getMapParams.bbox,
-    getMapParams.fromTime,
-    getMapParams.toTime,
-    20,
-    0,
-    100,
-  );
-  // printOut('tiles for S2 L2A', tilesS2L2A);
-  tilesS2L2A.tiles.map(t => console.log(t.sensingTime));
-  const flyoversS2L2A = layerS2L2A.groupTilesByFlyovers(tilesS2L2A.tiles);
-  printOut('flyovers for S2 L2A', flyoversS2L2A);
-
-  const tilesS1GRD = await layerS1.findTiles(
-    getMapParams.bbox,
-    getMapParams.fromTime,
-    getMapParams.toTime,
-    10,
-    0,
-    OrbitDirection.ASCENDING,
-  );
-  // printOut('tiles for S1 GRD', tilesS1GRD);
-  tilesS1GRD.tiles.map(t => console.log(t.sensingTime));
-  const flyoversS1GRD = layerS1.groupTilesByFlyovers(tilesS1GRD.tiles);
-  printOut('flyovers for S1 GRD', flyoversS1GRD);
 }
 
 run()
