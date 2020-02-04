@@ -1,7 +1,6 @@
 import {
   WmsLayer,
-  S1GRDAWSEULayer,
-  S2L2ALayer,
+  S3SLSTRLayer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
@@ -15,32 +14,27 @@ if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.S2L2A_LAYER_ID) {
-  throw new Error("S2L2A_LAYER_ID environment variable is not defined!");
+if (!process.env.S3SLSTR_LAYER_ID) {
+  throw new Error("S3SLSTR_LAYER_ID environment variable is not defined!");
 };
-
-if (!process.env.S1GRDIW_LAYER_ID) {
-  throw new Error("S1GRDIW_LAYER_ID environment variable is not defined!");
-}
 
 const instanceId = process.env.INSTANCE_ID;
-const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
-const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
+const layerId = process.env.S3SLSTR_LAYER_ID;
 
 export default {
-  title: 'Demo',
+  title: 'Sentinel 3 SLSTR',
 };
 
-export const S2GetMapURL = () => {
+export const getMapURL = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>";
+  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const layer = new S3SLSTRLayer(instanceId, layerId);
 
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   const getMapParams = {
@@ -52,24 +46,23 @@ export const S2GetMapURL = () => {
     format: MimeTypes.JPEG,
     maxCCPercent: 50,
   };
-  const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
+  const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
 
   return wrapperEl;
 };
 
-export const S2GetMapWMS = () => {
+export const getMapWMS = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS for Sentinel-2 L2A</h2>";
+  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  // getMap is async:
   const perform = async () => {
-    const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+    const layer = new S3SLSTRLayer(instanceId, layerId);
 
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
@@ -81,7 +74,7 @@ export const S2GetMapWMS = () => {
       format: MimeTypes.JPEG,
       maxCCPercent: 100,
     };
-    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -89,7 +82,7 @@ export const S2GetMapWMS = () => {
   return wrapperEl;
 };
 
-export const S2GetMapProcessing = () => {
+export const getMapProcessing = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
@@ -99,27 +92,26 @@ export const S2GetMapProcessing = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-2 L2A</h2>";
+  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  // getMap is async:
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layerS2L2A = new S2L2ALayer(
+    const layer = new S3SLSTRLayer(
       instanceId,
-      s2l2aLayerId,
+      layerId,
       `
       //VERSION=3
       function setup() {
         return {
-          input: ["B02", "B03", "B04"],
+          input: ["S1", "S2", "S3"],
           output: { bands: 3 }
         };
       }
 
       function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+        return [1.1 * sample.S3, 1.1 * sample.S2, 1.1 * sample.S1];
       }
     `,
     );
@@ -134,7 +126,7 @@ export const S2GetMapProcessing = () => {
       format: MimeTypes.JPEG,
       maxCCPercent: 100,
     };
-    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -142,7 +134,7 @@ export const S2GetMapProcessing = () => {
   return wrapperEl;
 };
 
-export const S1GetMapProcessingFromLayer = () => {
+export const getMapProcessingFromLayer = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
@@ -152,14 +144,13 @@ export const S1GetMapProcessingFromLayer = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-1 GRD</h2>";
+  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  // getMap is async:
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
+    const layer = new S3SLSTRLayer(instanceId, layerId);
 
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
@@ -178,84 +169,26 @@ export const S1GetMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
-export const WmsGetMap = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS for generic WMS layer</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
-
-
-  // getMap is async:
-  const perform = async () => {
-    const layer = new WmsLayer(
-      'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
-      'PROBAV_S1_TOA_333M',
-    );
-
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-    const getMapParams = {
-      bbox: bbox,
-      fromTime: new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)), // 2020-01-10/2020-01-10
-      toTime: new Date(Date.UTC(2020, 1 - 1, 10, 23, 59, 59)),
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
-
-export const S2FindTiles = () => {
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+export const findTiles = () => {
+  const layer = new S3SLSTRLayer(instanceId, layerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-2 L2A</h2>";
+  wrapperEl.innerHTML = "<h2>findTiles</h2>";
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
   const perform = async () => {
-    const data = await layerS2L2A.findTiles(
+    const data = await layer.findTiles(
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       null,
       60,
+      "DESCENDING",
+      "OBLIQUE",
     );
-    renderTilesList(containerEl, data.tiles);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
-
-export const S1GRDFindTiles = () => {
-  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
-  const containerEl = document.createElement('pre');
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-1 GRD</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
-
-  const perform = async () => {
-    const data = await layerS1.findTiles(
-      bbox,
-      new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      5,
-      0,
-      'ASCENDING',
-    );
-
     renderTilesList(containerEl, data.tiles);
   };
   perform().then(() => {});

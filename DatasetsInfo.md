@@ -7,12 +7,12 @@
 - 1 satellite:
   - Orbital cycle: 12 days
   - Orbits per cycle: 175
-  - Calculated time for 1 orbit: ~98,742 min (should be the same as Period)
+  - Calculated time for 1 orbit: ~98.742 min (should be the same as Period)
   - Period (time to circle the Earth 1 time = 1 orbit): 98.6 min
   - Revisit time (of the same area) on the equator: 12 days
 
 - Both satellites:
-  - Period: 98.6 min / 2 = ‭49.3 min = 2.958.000 ms **(used in `datasets.ts`)**
+  - Period: 98.6 min / 2 = ‭49.3 min = 2958000 ms **(used in `datasets.ts`)**
   - Revisit time (of the same area): 12 days / 2 = 6 days
 
 https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Facts_and_figures
@@ -25,12 +25,12 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-1/satellite-description/
 - 1 satellite:
   - Orbital cycle: 10 days
   - Orbits per cycle: 143
-  - Calculated time for 1 orbit: ~100,699 min (should be the same as Period)
+  - Calculated time for 1 orbit: ~100.699 min (should be the same as Period)
   - Period (time to circle the Earth 1 time by = 1 orbit): 100.6 min
   - Revisit time (of the same area) on the equator: 10 days
 
 - Both satellites:
-  - Period: 100.6 min / 2 = 50.3 min = 3.018.000‬ ms **(used in `datasets.ts`)**
+  - Period: 100.6 min / 2 = 50.3 min = 3018000‬ ms **(used in `datasets.ts`)**
   - Revisit time (of the same area): 10 days / 2 = 5 days
 
 https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2/Facts_and_figures
@@ -43,12 +43,12 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/
 - 1 satellite:
   - Orbital cycle: 27 days
   - Orbits per cycle: 385
-  - Calculated time for 1 orbit: ~100,987 min (should be the same as Period)
+  - Calculated time for 1 orbit: ~100.987 min (should be the same as Period)
   - Period (time to circle the Earth 1 time = 1 orbit): 100.99 min
   - Revisit time (of the same area) on the equator : SLSTR ~1 day, OLCI ~2 days
 
 - Both satellites:
-  - Period: 100.99 min / 2 = 50.495 min = 3.029.700 ms **(used in `datasets.ts`)**
+  - Period: 100.99 min / 2 = 50.495 min = 3029700 ms **(used in `datasets.ts`)**
 
 https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-3/Facts_and_figures
 https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/orbit
@@ -61,8 +61,8 @@ https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/
 - 1 satellite:
   - Orbital cycle: 16 days
   - Orbits per cycle: 227 (16 per day)
-  - Calculated time for 1 orbit: ~101,498 min (should be the same as Period)
-  - Period (time to circle the Earth 1 time = 1 orbit): 101 min = 6.060.000 ms **(used in `datasets.ts`)**
+  - Calculated time for 1 orbit: ~101.498 min (should be the same as Period)
+  - Period (time to circle the Earth 1 time = 1 orbit): 101 min = 6060000 ms **(used in `datasets.ts`)**
   - Revisit time (of the same area) on the equator: ???
 
 https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-5P/Facts_and_figures
@@ -73,14 +73,14 @@ https://www.esa.int/Enabling_Support/Operations/Sentinel-5P_operations
 
 ## Landsat 5
 
-- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5.940.000 ms **(used in `datasets.ts`)**
+- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
 https://www.usgs.gov/land-resources/nli/landsat/landsat-5
 
 ## Landsat 7
 
-- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5.940.000 ms **(used in `datasets.ts`)**
+- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
 https://www.usgs.gov/land-resources/nli/landsat/landsat-7
@@ -88,7 +88,7 @@ https://www.usgs.gov/land-resources/nli/landsat/landsat-7
 
 ## Landsat 8
 
-- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5.940.000 ms **(used in `datasets.ts`)**
+- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 - Revisit time (of the same area) at the equator: 16 days
 
 https://www.usgs.gov/land-resources/nli/landsat/landsat-8
@@ -97,7 +97,7 @@ https://www.usgs.gov/land-resources/nli/landsat/landsat-8
 
 ## MODIS
 
-- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5.940.000 ms **(used in `datasets.ts`)**
+- Period (time to circle the Earth 1 time = 1 orbit): 99 minutes = 5940000 ms **(used in `datasets.ts`)**
 
 https://sos.noaa.gov/datasets/polar-orbiting-aqua-satellite-and-modis-swath/
 

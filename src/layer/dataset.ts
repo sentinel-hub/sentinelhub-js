@@ -8,6 +8,16 @@ export type Dataset = {
   orbitTimeMilliSeconds: number;
 };
 
+export const DATASET_AWSEU_S1GRD: Dataset = {
+  id: 'AWSEU_S1GRD',
+  shJsonGetCapabilitiesDataset: 'S1GRD',
+  shWmsEvalsource: 'S1GRD',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
+  shServiceHostname: 'https://services.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+  orbitTimeMilliSeconds: 2958000,
+};
+
 export const DATASET_S2L2A: Dataset = {
   id: 'AWS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',
@@ -26,6 +36,26 @@ export const DATASET_S2L1C: Dataset = {
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
   orbitTimeMilliSeconds: 3018000,
+};
+
+export const DATASET_S3SLSTR: Dataset = {
+  id: 'CRE_S3SLSTR',
+  shJsonGetCapabilitiesDataset: 'S3SLSTR',
+  shWmsEvalsource: 'S3SLSTR',
+  shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
+  orbitTimeMilliSeconds: 3029700,
+};
+
+export const DATASET_S3OLCI: Dataset = {
+  id: 'CRE_S3OLCI',
+  shJsonGetCapabilitiesDataset: 'S3OLCI',
+  shWmsEvalsource: 'S3OLCI',
+  shProcessingApiDatasourceAbbreviation: 'S3OLCI',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
+  orbitTimeMilliSeconds: 3029700,
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
@@ -56,14 +86,4 @@ export const DATASET_AWS_DEM: Dataset = {
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: null,
   orbitTimeMilliSeconds: null,
-};
-
-export const DATASET_AWS_S1GRD_IW: Dataset = {
-  id: 'AWS_S1GRD_IW',
-  shJsonGetCapabilitiesDataset: 'S1GRD',
-  shWmsEvalsource: 'S1GRD',
-  shProcessingApiDatasourceAbbreviation: 'S1GRD',
-  shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
-  orbitTimeMilliSeconds: 2958000,
 };
