@@ -74,7 +74,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     if (this.polarization === null || this.acquisitionMode === null || this.resolution === null) {
       if (this.instanceId === null || this.layerId === null) {
         throw new Error(
-          "Parameters polarization, acquisitionMode and/or resolution are not set, but can't fetch them from service - instanceId and layerId are not available",
+          "Parameters polarization, acquisitionMode and/or resolution are not set and can't be fetched from service because instanceId and layerId are not available",
         );
       }
       const layerParams = await this.fetchLayerParamsFromSHServiceV3();
