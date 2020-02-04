@@ -56,9 +56,9 @@ async function run() {
     );
     return;
   }
-  if (!process.env.S1GRD_LAYER_ID) {
+  if (!process.env.S1GRDIW_LAYER_ID) {
     printOut(
-      'Example needs id of Sentinel-1 GRD layer to run. Please set env var S1GRD_LAYER_ID and run again',
+      'Example needs id of Sentinel-1 GRD layer to run. Please set env var S1GRDIW_LAYER_ID and run again',
       null,
     );
     return;
@@ -67,7 +67,7 @@ async function run() {
   const instanceId = process.env.INSTANCE_ID;
   const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
   const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
-  const s1grdLayerId = process.env.S1GRD_LAYER_ID;
+  const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
 
   printOut('JSON GetCapabilities', await LayersFactory.fetchGetCapabilitiesJson(baseUrl));
 
