@@ -5,7 +5,7 @@ export type Dataset = {
   shProcessingApiDatasourceAbbreviation: string;
   shServiceHostname: string;
   searchIndexUrl: string;
-  orbitTimeMilliSeconds: number;
+  orbitTimeMinutes: number;
 };
 
 export const DATASET_AWSEU_S1GRD: Dataset = {
@@ -15,7 +15,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
-  orbitTimeMilliSeconds: 2958000,
+  orbitTimeMinutes: 49.3,
 };
 
 export const DATASET_S2L2A: Dataset = {
@@ -25,7 +25,7 @@ export const DATASET_S2L2A: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L2A',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
-  orbitTimeMilliSeconds: 3018000,
+  orbitTimeMinutes: 50.3,
 };
 
 export const DATASET_S2L1C: Dataset = {
@@ -35,7 +35,7 @@ export const DATASET_S2L1C: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L1C',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
-  orbitTimeMilliSeconds: 3018000,
+  orbitTimeMinutes: 50.3,
 };
 
 export const DATASET_S3SLSTR: Dataset = {
@@ -45,7 +45,7 @@ export const DATASET_S3SLSTR: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
-  orbitTimeMilliSeconds: 3029700,
+  orbitTimeMinutes: 50.495,
 };
 
 export const DATASET_S3OLCI: Dataset = {
@@ -55,7 +55,7 @@ export const DATASET_S3OLCI: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S3OLCI',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
-  orbitTimeMilliSeconds: 3029700,
+  orbitTimeMinutes: 50.495,
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
@@ -65,7 +65,7 @@ export const DATASET_AWS_L8L1C: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'L8L1C',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/searchIndex',
-  orbitTimeMilliSeconds: 5940000,
+  orbitTimeMinutes: 99,
 };
 
 export const DATASET_MODIS: Dataset = {
@@ -75,7 +75,7 @@ export const DATASET_MODIS: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'MODIS',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/searchIndex',
-  orbitTimeMilliSeconds: 5940000,
+  orbitTimeMinutes: 99,
 };
 
 export const DATASET_AWS_DEM: Dataset = {
@@ -85,5 +85,5 @@ export const DATASET_AWS_DEM: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'DEM',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: null,
-  orbitTimeMilliSeconds: null,
+  orbitTimeMinutes: null,
 };
