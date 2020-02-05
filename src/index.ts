@@ -24,6 +24,9 @@ import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
+import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
+
+registerAxiosCacheRetryInterceptors();
 
 export {
   LayersFactory,
