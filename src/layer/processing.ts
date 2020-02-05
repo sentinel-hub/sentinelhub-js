@@ -4,6 +4,7 @@ import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
 import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { RequestConfig } from 'src/utils/axiosInterceptors';
 
 enum PreviewMode {
   DETAIL = 'DETAIL',
@@ -15,7 +16,6 @@ enum MosaickingOrder {
   LEAST_RECENT = 'leastRecent',
   LEAST_CC = 'leastCC',
 }
-
 export type ProcessingPayload = {
   input: {
     bounds: {
@@ -156,18 +156,16 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
-
-  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, {
+  const requestConfig: RequestConfig = {
     headers: {
       Authorization: 'Bearer ' + authToken,
       'Content-Type': 'application/json',
       Accept: '*/*',
     },
     responseType: 'blob',
-    params: {
-      useCache: true,
-      retries: 5,
-    },
-  });
+    useCache: true,
+    retries: 5,
+  };
+  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;
 }

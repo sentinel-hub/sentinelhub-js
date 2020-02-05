@@ -1,7 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
+const DELAY = 3000;
+export interface RequestConfig extends AxiosRequestConfig {
+  useCache?: boolean;
+  retries?: number;
+}
 
 export const registerAxiosCacheRetryInterceptors = (): any => {
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
@@ -9,7 +14,7 @@ export const registerAxiosCacheRetryInterceptors = (): any => {
 };
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
-  if (!(request.params && request.params.useCache)) {
+  if (!(request && request.useCache)) {
     return request;
   }
 
@@ -72,7 +77,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 };
 
 const setCacheResponse = async (response: any): Promise<any> => {
-  if (response.config.params && response.config.params.useCache) {
+  if (response.config && response.config.useCache) {
     let cache;
     try {
       cache = await caches.open(SENTINEL_HUB_CACHE);
@@ -83,7 +88,7 @@ const setCacheResponse = async (response: any): Promise<any> => {
 
     let cacheKey;
     if (response.config.method === 'get') {
-      cacheKey = generateCacheKey(response.config.url, stringify(response.config.params));
+      cacheKey = generateCacheKey(response.config.url, stringify(response.config));
     }
     if (response.config.method === 'post') {
       const body = response.config.data;
