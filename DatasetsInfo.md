@@ -1,7 +1,7 @@
 # Dataset information
 
 Most important info is Period / orbit time which is used for finding flyover times of orbits over a chosen area.
-Orbit time is the time in which the satellite makes 1 circle around the Earth (or in the missions with 2 satellites, half the circle around the Earth as both satellites travel on the same track).
+Orbit time is the time in which the satellite makes 1 circle around the Earth (or in the missions with 2 satellites, half the circle around the Earth as both satellites travel on the same track with approximately 180° difference).
 
 # Copernicus
 
