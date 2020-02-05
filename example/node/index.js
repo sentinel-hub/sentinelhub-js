@@ -94,7 +94,7 @@ async function run() {
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
   printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
-  // set the parameters for getting tiles, flyovers and images
+  // set the parameters for getting tiles, flyover intervals and images
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   printOut('BBox:', bbox);
 
@@ -108,7 +108,7 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
-  // get tiles and flyovers for S2 L2A layer
+  // get tiles and flyover intervals for S2 L2A layer
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const tilesS2L2A = await layerS2L2A.findTiles(
     getMapParams.bbox,
@@ -119,11 +119,10 @@ async function run() {
     100,
   );
   printOut('tiles for S2 L2A:', tilesS2L2A);
-  // tilesS2L2A.tiles.map(t => console.log(t.sensingTime));
-  const flyoversS2L2A = layerS2L2A.groupTilesByFlyovers(tilesS2L2A.tiles);
-  printOut('flyovers for S2 L2A:', flyoversS2L2A);
+  const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
+  printOut('flyover intervals for S2 L2A:', flyoverIntervalsS2L2A);
 
-  // get tiles and flyovers for S1 GRD Layer
+  // get tiles and flyover intervals for S1 GRD Layer
   const tilesS1GRD = await layerS1.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
@@ -133,9 +132,8 @@ async function run() {
     OrbitDirection.ASCENDING,
   );
   printOut('tiles for S1 GRD:', tilesS1GRD);
-  // tilesS1GRD.tiles.map(t => console.log(t.sensingTime));
-  const flyoversS1GRD = layerS1.groupTilesByFlyovers(tilesS1GRD.tiles);
-  printOut('flyovers for S1 GRD:', flyoversS1GRD);
+  const flyoverIntervalsS1GRD = layerS1.findFlyoverIntervals(tilesS1GRD.tiles);
+  printOut('flyover intervals for S1 GRD:', flyoverIntervalsS1GRD);
 
   // finally, display the image:
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);

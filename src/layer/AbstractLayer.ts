@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { GetMapParams, ApiType, Tile, PaginatedTiles, Flyover } from 'src/layer/const';
+import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
 
@@ -42,21 +42,20 @@ export class AbstractLayer {
     throw new Error('Not implemented yet');
   }
 
-  public groupTilesByFlyovers(tiles: Tile[]): Flyover[] {
-    if (!this.dataset || !this.dataset.orbitTimeMilliSeconds) {
+  public findFlyoverIntervals(tiles: Tile[]): FlyoverInterval[] {
+    if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
 
-    let orbitTimeMS = this.dataset.orbitTimeMilliSeconds;
-    let flyovers = [] as Flyover[];
+    let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
+    let flyoverIntervals: FlyoverInterval[] = [];
 
     let j = 0;
     for (let i = 0; i < tiles.length; i++) {
-      if (!tiles[i - 1]) {
-        flyovers[j] = {
-          tiles: [tiles[i]],
-          startTime: tiles[i].sensingTime,
-          endTime: tiles[i].sensingTime,
+      if (i === 0) {
+        flyoverIntervals[j] = {
+          fromTime: tiles[i].sensingTime,
+          toTime: tiles[i].sensingTime,
         };
       } else {
         const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
@@ -64,18 +63,16 @@ export class AbstractLayer {
         const diffMS = Math.abs(prevDateMS - currDateMS);
 
         if (diffMS < orbitTimeMS) {
-          flyovers[j].tiles.push(tiles[i]);
-          flyovers[j].endTime = tiles[i].sensingTime;
+          flyoverIntervals[j].toTime = tiles[i].sensingTime;
         } else {
           j++;
-          flyovers[j] = {
-            tiles: [tiles[i]],
-            startTime: tiles[i].sensingTime,
-            endTime: tiles[i].sensingTime,
+          flyoverIntervals[j] = {
+            fromTime: tiles[i].sensingTime,
+            toTime: tiles[i].sensingTime,
           };
         }
       }
     }
-    return flyovers;
+    return flyoverIntervals;
   }
 }
