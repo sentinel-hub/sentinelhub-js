@@ -83,6 +83,47 @@ export const getMapWMS = () => {
   return wrapperEl;
 };
 
+export const getMapWMSEvalscript = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with WMS using evalscript v1</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    const layer = new S5PL2Layer(
+      instanceId,
+      layerId,
+      `
+      var val = CLOUD_BASE_PRESSURE;
+      var minVal = 10000.0;
+      var maxVal = 110000.0;
+      var diff = maxVal - minVal;
+      var limits = [minVal, minVal + 0.125 * diff, minVal + 0.375 * diff, minVal + 0.625 * diff, minVal + 0.875 * diff, maxVal];
+      var colors = [[0, 0, 0.5], [0, 0, 1], [0, 1, 1], [1, 1, 0], [1, 0, 0], [0.5, 0, 0]];
+      return colorBlend(val, limits, colors);
+      `,
+    );
+    // const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
+    const bbox = new BBox(CRS_EPSG3857, 1408887.3053523689,5087648.602661333,1487158.8223163893,5165920.119625352);
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const getMapProcessing = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
