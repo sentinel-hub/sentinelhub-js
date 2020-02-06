@@ -4,7 +4,7 @@ import { stringify } from 'query-string';
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const DELAY = 3000;
 const RETRIES = 5;
-export interface RequestConfig extends AxiosRequestConfig {
+export interface IRequestConfig extends AxiosRequestConfig {
   useCache?: boolean;
   retries?: number;
 }
