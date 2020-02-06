@@ -164,7 +164,6 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
     },
     responseType: 'blob',
     useCache: true,
-    retries: 5,
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;

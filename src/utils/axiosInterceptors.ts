@@ -3,6 +3,7 @@ import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const DELAY = 3000;
+const RETRIES = 5;
 export interface RequestConfig extends AxiosRequestConfig {
   useCache?: boolean;
   retries?: number;
@@ -105,22 +106,18 @@ const setCacheResponse = async (response: any): Promise<any> => {
 };
 
 const retryRequests = (err: any): any => {
-  if (err.config) {
-    const config = err.config;
-    if (!config.retries) {
-      return Promise.reject(err);
-    }
-
-    config.retryCount = config.retryCount || 0;
-
-    if (config.retryCount >= config.retries) {
-      console.error('retries exceeded', config.retryCount);
-      return Promise.reject(err);
-    }
-    const DELAY = 3000;
-    config.retryCount += 1;
-    return new Promise(resolve => setTimeout(() => resolve(axios(config)), DELAY));
+  if (!err.config) {
+    return Promise.reject(err);
   }
+  if (shouldRetry(err.response.status)) {
+    err.config.retriesCount = err.config.retriesCount | 0;
+    const shouldRetry = err.config.retriesCount < RETRIES;
+    if (shouldRetry) {
+      err.config.retriesCount += 1;
+      return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DELAY));
+    }
+  }
+
   return Promise.reject(err);
 };
 
@@ -142,3 +139,5 @@ const sha256 = async (message: any): Promise<any> => {
   const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
   return hashHex;
 };
+
+const shouldRetry = (errorStatus: number): boolean => errorStatus >= 500 && errorStatus <= 599;
