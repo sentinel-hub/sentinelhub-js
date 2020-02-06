@@ -89,7 +89,7 @@ const setCacheResponse = async (response: any): Promise<any> => {
 
     let cacheKey;
     if (response.config.method === 'get') {
-      cacheKey = generateCacheKey(response.config.url, stringify(response.config));
+      cacheKey = generateCacheKey(response.config.url, stringify(response.config.params));
     }
     if (response.config.method === 'post') {
       const body = response.config.data;
