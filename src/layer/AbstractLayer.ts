@@ -47,7 +47,7 @@ export class AbstractLayer {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
 
-    tiles.sort((a, b) => (new Date(a.sensingTime).getTime() >= new Date(b.sensingTime).getTime() ? 1 : -1));
+    tiles.sort((a, b) => (new Date(a.sensingTime).getTime() > new Date(b.sensingTime).getTime() ? 1 : -1));
     let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
     let flyoverIntervals: FlyoverInterval[] = [];
 
