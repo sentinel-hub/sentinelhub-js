@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
+const EXPIRY_HEADER_KEY = 'Cache_Expires';
+const EXPIRES_IN_SECONDS = 60 * 30;
 const DELAY = 3000;
 const RETRIES = 5;
 export interface IRequestConfig extends AxiosRequestConfig {
@@ -10,6 +12,7 @@ export interface IRequestConfig extends AxiosRequestConfig {
 }
 
 export const registerAxiosCacheRetryInterceptors = (): any => {
+  findAndDeleteExpiredCachedItems();
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
   axios.interceptors.response.use(setCacheResponse, retryRequests);
 };
@@ -43,22 +46,25 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
-  const response = await cache.match(cacheKey);
-  if (response) {
+  const cachedResponse = await cache.match(cacheKey);
+  if (cachedResponse) {
+    if (!hasCachedResponseExpired(cachedResponse)) {
+      return request;
+    }
     request.adapter = async () => {
       // response from cache api follows the same structure as the fetch api, hence this hack
       // could be better if the caller handles the response (response.blob) instead of the caching function?
       let responseData;
       switch (request.responseType) {
         case 'blob':
-          responseData = await response.blob();
+          responseData = await cachedResponse.blob();
           break;
         case 'text':
-          responseData = await response.text();
+          responseData = await cachedResponse.text();
           break;
         case 'json':
         case undefined:
-          responseData = await response.json();
+          responseData = await cachedResponse.json();
           break;
         default:
           throw new Error('Unsupported response type: ' + request.responseType);
@@ -88,6 +94,14 @@ const setCacheResponse = async (response: any): Promise<any> => {
     }
 
     let cacheKey;
+
+    const expires = new Date();
+    expires.setSeconds(expires.getSeconds() + EXPIRES_IN_SECONDS);
+    response.headers = {
+      ...response.headers,
+      [EXPIRY_HEADER_KEY]: expires.getTime(),
+    };
+
     if (response.config.method === 'get') {
       cacheKey = generateCacheKey(response.config.url, stringify(response.config.params));
     }
@@ -141,3 +155,23 @@ const sha256 = async (message: any): Promise<any> => {
 };
 
 const shouldRetry = (errorStatus: number): boolean => errorStatus >= 500 && errorStatus <= 599;
+
+const hasCachedResponseExpired = (response: Response) => {
+  if (!response) {
+    return true;
+  }
+  const now = new Date();
+  const expirationDate = Number(response.headers.get(EXPIRY_HEADER_KEY));
+  return expirationDate < now.getTime();
+};
+
+const findAndDeleteExpiredCachedItems = async () => {
+  const cache = await caches.open(SENTINEL_HUB_CACHE);
+  const cacheKeys = await cache.keys();
+  cacheKeys.forEach(async key => {
+    const cachedResponse = await cache.match(key);
+    if (hasCachedResponseExpired(cachedResponse)) {
+      cache.delete(key);
+    }
+  });
+};
