@@ -156,7 +156,7 @@ const sha256 = async (message: any): Promise<any> => {
 
 const shouldRetry = (errorStatus: number): boolean => errorStatus >= 500 && errorStatus <= 599;
 
-const hasCachedResponseExpired = (response: Response) : boolean => {
+const hasCachedResponseExpired = (response: Response): boolean => {
   if (!response) {
     return true;
   }
@@ -165,7 +165,7 @@ const hasCachedResponseExpired = (response: Response) : boolean => {
   return expirationDate < now.getTime();
 };
 
-const findAndDeleteExpiredCachedItems = async () : Promise<void> => {
+const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
   const cache = await caches.open(SENTINEL_HUB_CACHE);
   const cacheKeys = await cache.keys();
   cacheKeys.forEach(async key => {
