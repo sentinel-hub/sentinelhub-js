@@ -3,8 +3,9 @@ require('dotenv').config({ path: '../../.env' });
 const {
   LayersFactory,
   WmsLayer,
-  S1GRDIWAWSLayer,
+  S1GRDAWSEULayer,
   S2L2ALayer,
+  OrbitDirection,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
@@ -89,11 +90,11 @@ async function run() {
 
   await setAuthTokenWithOAuthCredentials();
 
-  const layerS1 = new S1GRDIWAWSLayer(instanceId, s1grdLayerId);
+  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
   printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
-  // finally, display the image:
+  // set the parameters for getting tiles, flyover intervals and images
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   printOut('BBox:', bbox);
 
@@ -107,9 +108,36 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
+  // get tiles and flyover intervals for S2 L2A layer
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const tilesS2L2A = await layerS2L2A.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    20,
+    0,
+    100,
+  );
+  printOut('tiles for S2 L2A:', tilesS2L2A);
+  const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
+  printOut('flyover intervals for S2 L2A:', flyoverIntervalsS2L2A);
+
+  // get tiles and flyover intervals for S1 GRD Layer
+  const tilesS1GRD = await layerS1.findTiles(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    10,
+    0,
+    OrbitDirection.ASCENDING,
+  );
+  printOut('tiles for S1 GRD:', tilesS1GRD);
+  const flyoverIntervalsS1GRD = layerS1.findFlyoverIntervals(tilesS1GRD.tiles);
+  printOut('flyover intervals for S1 GRD:', flyoverIntervalsS1GRD);
+
+  // finally, display the image:
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
-  printOut('URL:', imageUrl);
+  printOut('URL of S2 L2A image:', imageUrl);
 
   // this doesn't work because node.js doesn't support Blob:
   // const fs = require('fs');

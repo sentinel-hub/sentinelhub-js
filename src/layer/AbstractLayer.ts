@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
+import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
 
@@ -40,5 +40,41 @@ export class AbstractLayer {
     offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not implemented yet');
+  }
+
+  public findFlyoverIntervals(tiles: Tile[]): FlyoverInterval[] {
+    if (!this.dataset || !this.dataset.orbitTimeMinutes) {
+      throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+    }
+
+    tiles.sort((a, b) => (new Date(a.sensingTime).getTime() > new Date(b.sensingTime).getTime() ? 1 : -1));
+    let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
+    let flyoverIntervals: FlyoverInterval[] = [];
+
+    let j = 0;
+    for (let i = 0; i < tiles.length; i++) {
+      if (i === 0) {
+        flyoverIntervals[j] = {
+          fromTime: tiles[i].sensingTime,
+          toTime: tiles[i].sensingTime,
+        };
+        continue;
+      }
+
+      const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
+      const currDateMS = new Date(tiles[i].sensingTime).getTime();
+      const diffMS = Math.abs(prevDateMS - currDateMS);
+
+      if (diffMS < orbitTimeMS) {
+        flyoverIntervals[j].toTime = tiles[i].sensingTime;
+      } else {
+        j++;
+        flyoverIntervals[j] = {
+          fromTime: tiles[i].sensingTime,
+          toTime: tiles[i].sensingTime,
+        };
+      }
+    }
+    return flyoverIntervals;
   }
 }

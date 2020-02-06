@@ -60,6 +60,11 @@ export type PaginatedTiles = {
   hasMore: boolean;
 };
 
+export type FlyoverInterval = {
+  fromTime: string;
+  toTime: string;
+};
+
 export type MimeType =
   | 'application/json'
   | 'text/xml'
