@@ -39,7 +39,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId);
+  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
 
   const getMapParams = {
     bbox: bbox,
@@ -65,7 +65,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(instanceId, layerId);
+    const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
 
     const getMapParams = {
       bbox: bbox,
@@ -99,6 +99,7 @@ export const getMapWMSEvalscript = () => {
       `
         return [2.5 * VV, 1.5 * VV, 0.5 * VV];
       `,
+      null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH
     );
 
     const getMapParams = {
@@ -119,7 +120,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId);
+  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');

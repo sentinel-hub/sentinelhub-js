@@ -31,6 +31,9 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, title, description);
+    if (!acquisitionMode || !polarization || !resolution) {
+      throw new Error("Parameters acquisitionMode, polarization and resolution are mandatory");
+    }
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
     this.resolution = resolution;
@@ -41,5 +44,17 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   protected getEvalsource(): string {
     // ignore this.dataset.shWmsEvalsource and return the string based on acquisitionMode:
     return this.acquisitionMode === AcquisitionMode.EW ? 'S1_EW' : 'S1';
+  }
+
+  protected getFindTilesAdditionalParameters() : Record<string, string> {
+    return {
+      productType: 'GRD',
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+    };
+  }
+
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {};
   }
 }

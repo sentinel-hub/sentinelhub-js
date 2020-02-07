@@ -34,12 +34,12 @@ export class AbstractLayer {
     throw new Error('Not implemented');
   }
 
-  public findTiles(
+  public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not implemented yet');
   }

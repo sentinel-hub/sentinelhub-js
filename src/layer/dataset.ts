@@ -24,7 +24,7 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   shWmsEvalsource: null, // it's complicated - allowed values are 'S1' (for IW) and 'S1_EW'
   shProcessingApiDatasourceAbbreviation: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
   orbitTimeMinutes: 49.3,
 };
 
