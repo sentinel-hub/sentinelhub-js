@@ -1,4 +1,8 @@
-import { GetMapParams, ApiType } from 'src/layer/const';
+import axios from 'axios';
+import { stringify } from 'query-string';
+
+import { BBox } from 'src/bbox';
+import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 
@@ -46,5 +50,59 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       this.evalscriptUrl,
       this.getEvalsource(),
     );
+  }
+
+  protected getFindTilesAdditionalParameters() : Record<string, string> {
+    return {};
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {};
+  }
+
+  public async findTiles(bbox: BBox, fromTime: Date, toTime: Date, maxCount: number = 50, offset: number = 0): Promise<PaginatedTiles> {
+    if (!this.dataset.searchIndexUrl) {
+      throw new Error('This dataset does not support searching for tiles');
+    }
+    const bboxPolygon = {
+      type: 'Polygon',
+      crs: { type: 'name', properties: { name: bbox.crs.urn } },
+      coordinates: [
+        [
+          [bbox.minY, bbox.maxX],
+          [bbox.maxY, bbox.maxX],
+          [bbox.maxY, bbox.minX],
+          [bbox.minY, bbox.minX],
+          [bbox.minY, bbox.maxX],
+        ],
+      ],
+    };
+    const payload = bboxPolygon;
+    const params = {
+      expand: 'true',
+      timefrom: fromTime.toISOString(),
+      timeto: toTime.toISOString(),
+      maxcount: maxCount,
+      offset: Number(offset),
+      ...this.getFindTilesAdditionalParameters(),
+    };
+
+    const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
+    const response = await axios.post(url, payload, {
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const responseTiles: any[] = response.data.tiles;
+    return {
+      tiles: responseTiles.map(tile => {
+        return {
+          geometry: tile.tileDrawRegionGeometry,
+          sensingTime: new Date(tile.sensingTime),
+          meta: this.extractFindTilesMeta(tile),
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
   }
 }

@@ -51,7 +51,7 @@ export enum BackscatterCoeff {
 
 export type Tile = {
   geometry: Polygon | MultiPolygon;
-  sensingTime: string;
+  sensingTime: Date;
   meta: Record<string, any>;
 };
 
@@ -61,8 +61,8 @@ export type PaginatedTiles = {
 };
 
 export type FlyoverInterval = {
-  fromTime: string;
-  toTime: string;
+  fromTime: Date;
+  toTime: Date;
 };
 
 export type MimeType =
