@@ -5,6 +5,7 @@ export type Dataset = {
   shProcessingApiDatasourceAbbreviation: string;
   shServiceHostname: string;
   searchIndexUrl: string;
+  findDatesUrl: string;
   orbitTimeMinutes: number;
 };
 
@@ -15,6 +16,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
 };
 
@@ -25,6 +27,7 @@ export const DATASET_S2L2A: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L2A',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
+  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
   orbitTimeMinutes: 50.3,
 };
 
@@ -35,6 +38,7 @@ export const DATASET_S2L1C: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L1C',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
+  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
   orbitTimeMinutes: 50.3,
 };
 
@@ -45,6 +49,7 @@ export const DATASET_S3SLSTR: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
+  findDatesUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/findAvailableData',
   orbitTimeMinutes: 50.495,
 };
 
@@ -55,6 +60,7 @@ export const DATASET_S3OLCI: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S3OLCI',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
+  findDatesUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/findAvailableData',
   orbitTimeMinutes: 50.495,
 };
 
@@ -65,6 +71,7 @@ export const DATASET_AWS_L8L1C: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'L8L1C',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/searchIndex',
+  findDatesUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/findAvailableData',
   orbitTimeMinutes: 99,
 };
 
@@ -75,6 +82,7 @@ export const DATASET_MODIS: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'MODIS',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/searchIndex',
+  findDatesUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/findAvailableData',
   orbitTimeMinutes: 99,
 };
 
@@ -85,5 +93,6 @@ export const DATASET_AWS_DEM: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'DEM',
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: null,
+  findDatesUrl: null,
   orbitTimeMinutes: null,
 };
