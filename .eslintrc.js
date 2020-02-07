@@ -10,10 +10,8 @@ module.exports = {
     sourceType: 'module', // Allows for the use of imports
   },
   rules: {
-    '@typescript-eslint/interface-name-prefix': 'always',
     '@typescript-eslint/no-explicit-any': 'always',
     '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
-    '@typescript-eslint/interface-name-prefix': ['error', 'always'],
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/prefer-interface': 'off',

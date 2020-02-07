@@ -3,7 +3,7 @@ import axios from 'axios';
 import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
-import { IRequestConfig } from 'src/utils/axiosInterceptors';
+import { RequestConfig } from 'src/utils/axiosInterceptors';
 
 export class AbstractLayer {
   public title: string | null = null;
@@ -20,7 +20,7 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
-        const requestConfig: IRequestConfig = { responseType: 'blob', useCache: true };
+        const requestConfig: RequestConfig = { responseType: 'blob', useCache: true };
         const response = await axios.get(url, requestConfig);
         return response.data;
       default:
