@@ -28,4 +28,14 @@ export class S2L2ALayer extends AbstractSentinelHubV3Layer {
       hasMore: response.data.hasMore,
     };
   }
+
+  public async findDates(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCloudCoverage?: number,
+  ): Promise<Date[]> {
+    const response = await this.fetchDates(bbox, fromTime, toTime, maxCloudCoverage);
+    return response.data.map(date => new Date(date));
+  }
 }

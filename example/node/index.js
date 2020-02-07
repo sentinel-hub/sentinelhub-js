@@ -108,36 +108,57 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
-  // get tiles and flyover intervals for S2 L2A layer
+  const maxCount = 20;
+  printOut('maximum number of returned tiles is:', maxCount);
+
+  // get tiles, flyover intervals and dates for S2 L2A layer
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const tilesS2L2A = await layerS2L2A.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    20,
+    maxCount,
     0,
     100,
   );
   printOut('tiles for S2 L2A:', tilesS2L2A);
+
   const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
   printOut('flyover intervals for S2 L2A:', flyoverIntervalsS2L2A);
 
-  // get tiles and flyover intervals for S1 GRD Layer
+  const datesS2L2A = await layerS2L2A.findDates(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    100,
+  );
+  printOut('dates for S2 L2A', datesS2L2A);
+
+  // get tiles, flyover intervals and dates for S1 GRD Layer
   const tilesS1GRD = await layerS1.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    10,
+    maxCount,
     0,
     OrbitDirection.ASCENDING,
   );
   printOut('tiles for S1 GRD:', tilesS1GRD);
+
   const flyoverIntervalsS1GRD = layerS1.findFlyoverIntervals(tilesS1GRD.tiles);
   printOut('flyover intervals for S1 GRD:', flyoverIntervalsS1GRD);
 
-  // finally, display the image:
-  const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
-  printOut('URL of S2 L2A image:', imageUrl);
+  const datesS1GRD = await layerS1.findDates(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    OrbitDirection.ASCENDING,
+  );
+  printOut('dates for S1 GRD', datesS1GRD);
+
+  // // finally, display the image:
+  // const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
+  // printOut('URL of S2 L2A image:', imageUrl);
 
   // this doesn't work because node.js doesn't support Blob:
   // const fs = require('fs');

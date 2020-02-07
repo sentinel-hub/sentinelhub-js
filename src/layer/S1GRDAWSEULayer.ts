@@ -135,4 +135,22 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       hasMore: response.data.hasMore,
     };
   }
+
+  public async findDates(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    orbitDirection?: OrbitDirection,
+  ): Promise<Date[]> {
+    const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+      orbitDirection: orbitDirection,
+      resolution: this.resolution,
+    };
+
+    const response = await this.fetchDates(bbox, fromTime, toTime, null, findDatesDatasetParameters);
+    return response.data.map(date => new Date(date));
+  }
 }
