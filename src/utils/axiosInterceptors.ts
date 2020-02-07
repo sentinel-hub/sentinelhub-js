@@ -47,10 +47,10 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
   }
 
   const cachedResponse = await cache.match(cacheKey);
+  if (!hasCachedResponseExpired(cachedResponse)) {
+    return request;
+  }
   if (cachedResponse) {
-    if (!hasCachedResponseExpired(cachedResponse)) {
-      return request;
-    }
     request.adapter = async () => {
       // response from cache api follows the same structure as the fetch api, hence this hack
       // could be better if the caller handles the response (response.blob) instead of the caching function?
