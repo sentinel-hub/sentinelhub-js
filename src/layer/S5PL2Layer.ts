@@ -52,7 +52,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => {
         return {
-          geometry: tile.dataGeometry,
+          geometry: tile.tileDrawRegionGeometry,
           sensingTime: tile.sensingTime,
           meta: {},
         };
