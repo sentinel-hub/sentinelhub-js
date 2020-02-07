@@ -7,9 +7,6 @@ import {
   BBox,
   MimeTypes,
   ApiType,
-  Polarization,
-  AcquisitionMode,
-  Resolution,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -201,9 +198,7 @@ export const getMapProcessingWithoutInstance = () => {
       function evaluatePixel(sample) {
         return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
-    `,null, null, null, null, AcquisitionMode.EW, Polarization.DH, Resolution.MEDIUM
-
-    );
+    `);
 
     const getMapParams = {
       bbox: bbox,
