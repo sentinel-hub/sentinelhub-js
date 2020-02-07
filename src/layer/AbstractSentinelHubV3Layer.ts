@@ -146,11 +146,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       crs: { type: 'name', properties: { name: bbox.crs.urn } },
       coordinates: [
         [
-          [bbox.minY, bbox.maxX],
-          [bbox.maxY, bbox.maxX],
-          [bbox.maxY, bbox.minX],
-          [bbox.minY, bbox.minX],
-          [bbox.minY, bbox.maxX],
+          [bbox.minX, bbox.maxY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.maxX, bbox.minY],
+          [bbox.minX, bbox.minY],
+          [bbox.minX, bbox.maxY],
         ],
       ],
     };
