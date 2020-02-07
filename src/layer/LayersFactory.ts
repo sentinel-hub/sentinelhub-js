@@ -12,6 +12,8 @@ import {
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
+  DATASET_EOCLOUD_S1GRD,
+  Dataset,
 } from 'src/layer/dataset';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { WmsLayer } from 'src/layer/WmsLayer';
@@ -24,6 +26,7 @@ import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
+import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -54,9 +57,12 @@ export class LayersFactory {
     instantiate appropriate layers.
   */
 
-  public static readonly KNOWN_SH_SERVICE_HOSTNAMES: string[] = [
+  public static readonly SH_SERVICE_HOSTNAMES_V1_OR_V2: string[] = ['https://eocloud.sentinel-hub.com/'];
+
+  public static readonly SH_SERVICE_HOSTNAMES_V3: string[] = [
     'https://services.sentinel-hub.com/',
     'https://services-uswest2.sentinel-hub.com/',
+    'https://creodias.sentinel-hub.com/',
   ];
 
   private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
@@ -71,7 +77,13 @@ export class LayersFactory {
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
   };
 
-  private static readonly LAYER_FROM_DATASET = {
+  private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
+    S1: DATASET_EOCLOUD_S1GRD,
+    S1_EW: DATASET_EOCLOUD_S1GRD,
+    S1_EW_SH: DATASET_EOCLOUD_S1GRD,
+  };
+
+  private static readonly LAYER_FROM_DATASET_V3 = {
     [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
     [DATASET_S2L2A.id]: S2L2ALayer,
     [DATASET_S2L1C.id]: S2L1CLayer,
@@ -83,30 +95,9 @@ export class LayersFactory {
     [DATASET_AWS_DEM.id]: DEMLayer,
   };
 
-  private static async getLayersListFromBaseUrl(baseUrl: string, forceFetch = false): Promise<any[]> {
-    for (let hostname of LayersFactory.KNOWN_SH_SERVICE_HOSTNAMES) {
-      if (baseUrl.startsWith(hostname)) {
-        const getCapabilitiesJson = await LayersFactory.fetchGetCapabilitiesJson(baseUrl, forceFetch);
-        return getCapabilitiesJson.map(layerInfo => ({
-          layerId: layerInfo.id,
-          title: layerInfo.name,
-          description: layerInfo.description,
-          dataset:
-            layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-              ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-              : null,
-        }));
-      }
-    }
-
-    const parsedXml = await LayersFactory.fetchGetCapabilitiesXml(baseUrl, forceFetch);
-    return parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
-      layerId: layerInfo.Name[0],
-      title: layerInfo.Title[0],
-      description: layerInfo.Abstract[0],
-      datasetId: null,
-    }));
-  }
+  private static readonly LAYER_FROM_DATASET_V12 = {
+    [DATASET_EOCLOUD_S1GRD.id]: S1GRDEOCloudLayer,
+  };
 
   private static async parseXml(xmlString: string): Promise<GetCapabilitiesXml> {
     return new Promise((resolve, reject) => {
@@ -146,10 +137,27 @@ export class LayersFactory {
     return res.data.layers;
   }
 
+  private static async fetchGetCapabilitiesJsonV1(baseUrl: string, forceFetch = false): Promise<any[]> {
+    const instanceId = this.parseSHInstanceId(baseUrl);
+    const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
+    const res = await fetchCached(url, { responseType: 'json' }, forceFetch);
+    return res.data.layers;
+  }
+
   private static parseSHInstanceId(baseUrl: string): string {
     const INSTANCE_ID_LENGTH = 36;
-    for (let hostname of LayersFactory.KNOWN_SH_SERVICE_HOSTNAMES) {
+    // AWS:
+    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V3) {
       const prefix = `${hostname}ogc/wms/`;
+      if (!baseUrl.startsWith(prefix)) {
+        continue;
+      }
+      const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
+      return instanceId;
+    }
+    // EOCloud:
+    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V1_OR_V2) {
+      const prefix = `${hostname}v1/wms/`;
       if (!baseUrl.startsWith(prefix)) {
         continue;
       }
@@ -163,7 +171,36 @@ export class LayersFactory {
     baseUrl: string,
     filterLayers: Function | null = null,
   ): Promise<AbstractLayer[]> {
-    const layersInfos = await LayersFactory.getLayersListFromBaseUrl(baseUrl);
+    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V3) {
+      if (baseUrl.startsWith(hostname)) {
+        return await this.makeLayersSHv3(baseUrl, filterLayers);
+      }
+    }
+
+    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V1_OR_V2) {
+      if (baseUrl.startsWith(hostname)) {
+        return await this.makeLayersSHv12(baseUrl, filterLayers);
+      }
+    }
+
+    return await this.makeLayersWms(baseUrl, filterLayers);
+  }
+
+  private static async makeLayersSHv3(
+    baseUrl: string,
+    filterLayers: Function | null,
+  ): Promise<AbstractLayer[]> {
+    const getCapabilitiesJson = await LayersFactory.fetchGetCapabilitiesJson(baseUrl);
+    const layersInfos = getCapabilitiesJson.map(layerInfo => ({
+      layerId: layerInfo.id,
+      title: layerInfo.name,
+      description: layerInfo.description,
+      dataset:
+        layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+          ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+          : null,
+    }));
+
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
@@ -172,7 +209,7 @@ export class LayersFactory {
         return new WmsLayer(baseUrl, layerId, title, description);
       }
 
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET[dataset.id];
+      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
       if (!SHLayerClass) {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
       }
@@ -186,5 +223,62 @@ export class LayersFactory {
         description,
       );
     });
+  }
+
+  private static async makeLayersSHv12(
+    baseUrl: string,
+    filterLayers: Function | null,
+  ): Promise<AbstractLayer[]> {
+    const getCapabilitiesJsonV1 = await LayersFactory.fetchGetCapabilitiesJsonV1(baseUrl);
+
+    const result: AbstractLayer[] = [];
+    for (let layerInfo of getCapabilitiesJsonV1) {
+      const layerId = layerInfo.name;
+      const dataset = LayersFactory.DATASET_FROM_JSON_GETCAPABILITIES_V1[layerInfo.settings.datasourceName];
+      if (!dataset) {
+        throw new Error(`Unknown dataset for layer ${layerId} (${layerInfo.settings.datasourceName})`);
+      }
+
+      const keepLayer = Boolean(filterLayers(layerId, dataset));
+      if (!keepLayer) {
+        continue;
+      }
+
+      const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
+      if (!SH12LayerClass) {
+        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
+      }
+      const layer = SH12LayerClass.makeLayer(
+        layerInfo,
+        LayersFactory.parseSHInstanceId(baseUrl),
+        layerId,
+        layerInfo.settings.evalJSScript || null,
+        null,
+        layerInfo.settings.title,
+        layerInfo.settings.description,
+      );
+      result.push(layer);
+    }
+    return result;
+  }
+
+  private static async makeLayersWms(
+    baseUrl: string,
+    filterLayers: Function | null,
+  ): Promise<AbstractLayer[]> {
+    const parsedXml = await LayersFactory.fetchGetCapabilitiesXml(baseUrl);
+    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
+      layerId: layerInfo.Name[0],
+      title: layerInfo.Title[0],
+      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+      dataset: null,
+    }));
+
+    const filteredLayersInfos =
+      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description }) => new WmsLayer(baseUrl, layerId, title, description),
+    );
   }
 }
