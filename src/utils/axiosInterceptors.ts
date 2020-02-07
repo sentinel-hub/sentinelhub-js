@@ -95,11 +95,10 @@ const setCacheResponse = async (response: any): Promise<any> => {
 
     let cacheKey;
 
-    const expires = new Date();
-    expires.setSeconds(expires.getSeconds() + EXPIRES_IN_SECONDS);
+    const expiresMs = new Date().getTime() + EXPIRES_IN_SECONDS * 1000;
     response.headers = {
       ...response.headers,
-      [EXPIRY_HEADER_KEY]: expires.getTime(),
+      [EXPIRY_HEADER_KEY]: expiresMs,
     };
 
     if (response.config.method === 'get') {
