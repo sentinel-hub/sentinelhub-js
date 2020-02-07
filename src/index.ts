@@ -14,6 +14,7 @@ import {
 } from 'src/layer/dataset';
 import { WmsLayer } from 'src/layer/WmsLayer';
 import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
+import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
@@ -40,6 +41,7 @@ export {
   // layers:
   WmsLayer,
   S1GRDAWSEULayer,
+  S1GRDEOCloudLayer,
   S2L2ALayer,
   S2L1CLayer,
   S3SLSTRLayer,
