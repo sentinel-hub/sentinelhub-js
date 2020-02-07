@@ -4,7 +4,6 @@ import {
   isAuthTokenSet,
   requestAuthToken,
   CRS_EPSG3857,
-  CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
@@ -23,6 +22,7 @@ if (!process.env.S5PL2_LAYER_ID) {
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S5PL2_LAYER_ID;
+const bbox = new BBox(CRS_EPSG3857, 1408887.3053523689,5087648.602661333,1487158.8223163893,5165920.119625352);
 
 export default {
   title: 'Sentinel 5P L2',
@@ -39,8 +39,6 @@ export const getMapURL = () => {
 
   const layer = new S5PL2Layer(instanceId, layerId);
 
-  const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
-  // const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   const getMapParams = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -66,7 +64,6 @@ export const getMapWMS = () => {
 
   const perform = async () => {
     const layer = new S5PL2Layer(instanceId, layerId);
-    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -106,8 +103,6 @@ export const getMapWMSEvalscript = () => {
       return colorBlend(val, limits, colors);
       `,
     );
-    // const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
-    const bbox = new BBox(CRS_EPSG3857, 1408887.3053523689,5087648.602661333,1487158.8223163893,5165920.119625352);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -158,7 +153,6 @@ export const getMapProcessing = () => {
     `,
     );
 
-    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -211,7 +205,6 @@ export const getMapProcessingWithoutInstance = () => {
 
     );
 
-    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -247,7 +240,6 @@ export const getMapProcessingFromLayer = () => {
 
     const layer = new S5PL2Layer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -266,7 +258,6 @@ export const getMapProcessingFromLayer = () => {
 
 export const findTiles = () => {
   const layer = new S5PL2Layer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
