@@ -55,8 +55,8 @@ export class AbstractLayer {
     for (let i = 0; i < tiles.length; i++) {
       if (i === 0) {
         flyoverIntervals[j] = {
-          fromTime: tiles[i].sensingTime,
-          toTime: tiles[i].sensingTime,
+          fromTime: new Date(tiles[i].sensingTime),
+          toTime: new Date(tiles[i].sensingTime),
         };
         continue;
       }
@@ -66,12 +66,12 @@ export class AbstractLayer {
       const diffMS = Math.abs(prevDateMS - currDateMS);
 
       if (diffMS < orbitTimeMS) {
-        flyoverIntervals[j].toTime = tiles[i].sensingTime;
+        flyoverIntervals[j].toTime = new Date(tiles[i].sensingTime);
       } else {
         j++;
         flyoverIntervals[j] = {
-          fromTime: tiles[i].sensingTime,
-          toTime: tiles[i].sensingTime,
+          fromTime: new Date(tiles[i].sensingTime),
+          toTime: new Date(tiles[i].sensingTime),
         };
       }
     }
