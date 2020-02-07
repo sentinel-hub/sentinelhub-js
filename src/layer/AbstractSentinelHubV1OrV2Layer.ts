@@ -52,7 +52,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     );
   }
 
-  protected getFindTilesAdditionalParameters() : Record<string, string> {
+  protected getFindTilesAdditionalParameters(): Record<string, string> {
     return {};
   }
 
@@ -61,7 +61,13 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  public async findTiles(bbox: BBox, fromTime: Date, toTime: Date, maxCount: number = 50, offset: number = 0): Promise<PaginatedTiles> {
+  public async findTiles(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number = 50,
+    offset: number = 0,
+  ): Promise<PaginatedTiles> {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
@@ -104,5 +110,19 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       }),
       hasMore: response.data.hasMore,
     };
+  }
+
+  // Subclasses should override this helper method for LayersFactory.makeLayers. It constructs
+  // a layer based on layerInfo and other parameters.
+  public static makeLayer(
+    layerInfo: any, // eslint-disable-line @typescript-eslint/no-unused-vars
+    instanceId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    layerId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
+    evalscript: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    evalscriptUrl: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    title: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    description: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): AbstractSentinelHubV1OrV2Layer {
+    throw new Error('Not implemented');
   }
 }

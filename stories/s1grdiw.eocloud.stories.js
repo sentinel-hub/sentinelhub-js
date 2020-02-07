@@ -3,15 +3,16 @@ import {
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
-  CRS_EPSG4326,
   CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
+  DATASET_EOCLOUD_S1GRD,
   OrbitDirection,
   AcquisitionMode,
   Polarization,
   Resolution,
+  LayersFactory,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.EOC_INSTANCE_ID) {
@@ -66,6 +67,34 @@ export const getMapWMS = () => {
 
   const perform = async () => {
     const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapWMSLayersFactory = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
 
     const getMapParams = {
       bbox: bbox,

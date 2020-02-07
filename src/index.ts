@@ -5,12 +5,15 @@ import { ApiType, MimeTypes } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
 import {
+  DATASET_AWSEU_S1GRD,
+  DATASET_EOCLOUD_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_S3SLSTR,
+  DATASET_S3OLCI,
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-  DATASET_AWSEU_S1GRD,
 } from 'src/layer/dataset';
 import { WmsLayer } from 'src/layer/WmsLayer';
 import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
@@ -32,12 +35,15 @@ registerAxiosCacheRetryInterceptors();
 
 export {
   LayersFactory,
+  DATASET_AWSEU_S1GRD,
+  DATASET_EOCLOUD_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_S3SLSTR,
+  DATASET_S3OLCI,
   DATASET_AWS_L8L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-  DATASET_AWSEU_S1GRD,
   // layers:
   WmsLayer,
   S1GRDAWSEULayer,
