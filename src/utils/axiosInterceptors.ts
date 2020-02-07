@@ -6,7 +6,7 @@ const EXPIRY_HEADER_KEY = 'Cache_Expires';
 const EXPIRES_IN_SECONDS = 60 * 30;
 const DELAY = 3000;
 const RETRIES = 5;
-export interface IRequestConfig extends AxiosRequestConfig {
+export interface RequestConfig extends AxiosRequestConfig {
   useCache?: boolean;
   retries?: number;
 }
