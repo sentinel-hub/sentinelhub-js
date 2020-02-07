@@ -27,7 +27,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     this.collectionId = collectionId;
   }
 
-  private shouldFetchAdditionalParams(): Boolean {
+  private shouldFetchAdditionalParams(): boolean {
     if (this.collectionId === null) {
       if (this.instanceId === null || this.layerId === null) {
         throw new Error(
