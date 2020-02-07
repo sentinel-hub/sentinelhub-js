@@ -11,6 +11,7 @@ import {
   DATASET_AWSEU_S1GRD,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_BYOC,
 } from 'src/layer/dataset';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { WmsLayer } from 'src/layer/WmsLayer';
@@ -22,6 +23,7 @@ import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
+import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -77,6 +79,7 @@ export class LayersFactory {
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
+    [DATASET_BYOC.id]: BYOCLayer,
   };
 
   private static async getLayersListFromBaseUrl(baseUrl: string, forceFetch = false): Promise<any[]> {
