@@ -3,7 +3,7 @@ import {
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
-  CRS_EPSG4326,
+  CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
@@ -19,7 +19,14 @@ if (!process.env.BYOC_LAYER_ID) {
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.BYOC_LAYER_ID;
-const bbox = new BBox(CRS_EPSG4326, 10.9433305, 41.6851063, 12.2326018, 42.1466082);
+
+const bbox = new BBox(
+  CRS_EPSG3857,
+  1252344.271424327,
+  5165920.119625352,
+  1330615.7883883484,
+  5244191.636589374,
+);
 
 export default {
   title: 'BYOC with v3 script',
