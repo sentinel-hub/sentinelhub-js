@@ -44,7 +44,7 @@ export {
   MODISLayer,
   DEMLayer,
   Landsat8AWSLayer,
-  BYOCLayer as CUSTOMLayer,
+  BYOCLayer,
   // auth:
   setAuthToken,
   isAuthTokenSet,
