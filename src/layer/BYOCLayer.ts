@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
@@ -85,5 +86,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       }),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected createSearchIndexRequestConfig(): AxiosRequestConfig {
+    return {};
   }
 }
