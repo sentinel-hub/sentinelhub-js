@@ -1,7 +1,7 @@
 import { BackscatterCoeff } from 'src/layer/const';
 import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 
-import { AbstractSentinelHubV1OrV2Layer } from './AbstractSentinelHubV1OrV2Layer';
+import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 
 /*

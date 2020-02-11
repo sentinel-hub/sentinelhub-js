@@ -88,6 +88,36 @@ export const DATASET_AWS_L8L1C: Dataset = {
   orbitTimeMinutes: 99,
 };
 
+export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
+  id: 'EOC_L5',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: 'L5',
+  shProcessingApiDatasourceAbbreviation: null,
+  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
+  orbitTimeMinutes: 99,
+};
+
+export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
+  id: 'EOC_L7',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: 'L7',
+  shProcessingApiDatasourceAbbreviation: null,
+  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
+  orbitTimeMinutes: 99,
+};
+
+export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
+  id: 'EOC_L8',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: null,
+  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
+  orbitTimeMinutes: 99,
+};
+
 export const DATASET_MODIS: Dataset = {
   id: 'AWS_MODIS',
   shJsonGetCapabilitiesDataset: 'MODIS',

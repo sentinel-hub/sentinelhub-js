@@ -14,6 +14,9 @@ import {
   DATASET_BYOC,
   DATASET_S5PL2,
   DATASET_EOCLOUD_S1GRD,
+  DATASET_EOCLOUD_LANDSAT5,
+  DATASET_EOCLOUD_LANDSAT7,
+  DATASET_EOCLOUD_LANDSAT8,
   Dataset,
 } from 'src/layer/dataset';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -29,6 +32,9 @@ import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
+import { Landsat5EOCloudLayer } from './Landsat5EOCloudLayer';
+import { Landsat7EOCloudLayer } from './Landsat7EOCloudLayer';
+import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -83,6 +89,9 @@ export class LayersFactory {
     S1: DATASET_EOCLOUD_S1GRD,
     S1_EW: DATASET_EOCLOUD_S1GRD,
     S1_EW_SH: DATASET_EOCLOUD_S1GRD,
+    L5: DATASET_EOCLOUD_LANDSAT5,
+    L7: DATASET_EOCLOUD_LANDSAT7,
+    L8: DATASET_EOCLOUD_LANDSAT8,
   };
 
   private static readonly LAYER_FROM_DATASET_V3 = {
@@ -100,6 +109,9 @@ export class LayersFactory {
 
   private static readonly LAYER_FROM_DATASET_V12 = {
     [DATASET_EOCLOUD_S1GRD.id]: S1GRDEOCloudLayer,
+    [DATASET_EOCLOUD_LANDSAT5.id]: Landsat5EOCloudLayer,
+    [DATASET_EOCLOUD_LANDSAT7.id]: Landsat7EOCloudLayer,
+    [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
   };
 
   private static async parseXml(xmlString: string): Promise<GetCapabilitiesXml> {
