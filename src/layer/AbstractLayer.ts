@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
+import { RequestConfig } from 'src/utils/axiosInterceptors';
 
 export class AbstractLayer {
   public title: string | null = null;
@@ -19,7 +20,8 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
-        const response = await axios.get(url, { responseType: 'blob' });
+        const requestConfig: RequestConfig = { responseType: 'blob', useCache: true };
+        const response = await axios.get(url, requestConfig);
         return response.data;
       default:
         const className = this.constructor.name;
@@ -32,12 +34,12 @@ export class AbstractLayer {
     throw new Error('Not implemented');
   }
 
-  public findTiles(
+  public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not implemented yet');
   }
@@ -47,7 +49,7 @@ export class AbstractLayer {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
 
-    tiles.sort((a, b) => (new Date(a.sensingTime).getTime() > new Date(b.sensingTime).getTime() ? 1 : -1));
+    tiles.sort((a, b) => a.sensingTime.getTime() - b.sensingTime.getTime());
     let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
     let flyoverIntervals: FlyoverInterval[] = [];
 
@@ -61,8 +63,8 @@ export class AbstractLayer {
         continue;
       }
 
-      const prevDateMS = new Date(tiles[i - 1].sensingTime).getTime();
-      const currDateMS = new Date(tiles[i].sensingTime).getTime();
+      const prevDateMS = tiles[i - 1].sensingTime.getTime();
+      const currDateMS = tiles[i].sensingTime.getTime();
       const diffMS = Math.abs(prevDateMS - currDateMS);
 
       if (diffMS < orbitTimeMS) {
