@@ -3,6 +3,7 @@ import axios from 'axios';
 import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
+import { RequestConfig } from 'src/utils/axiosInterceptors';
 
 export class AbstractLayer {
   public title: string | null = null;
@@ -19,7 +20,8 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
-        const response = await axios.get(url, { responseType: 'blob' });
+        const requestConfig: RequestConfig = { responseType: 'blob', useCache: true };
+        const response = await axios.get(url, requestConfig);
         return response.data;
       default:
         const className = this.constructor.name;
