@@ -189,15 +189,3 @@ function renderTilesList(containerEl, list) {
     }
   });
 }
-
-async function setAuthTokenWithOAuthCredentials () {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}
