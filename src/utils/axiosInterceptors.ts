@@ -47,38 +47,37 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
   }
 
   const cachedResponse = await cache.match(cacheKey);
-  if (!hasCachedResponseExpired(cachedResponse)) {
+  if (!cachedResponse || !hasCachedResponseExpired(cachedResponse)) {
     return request;
   }
-  if (cachedResponse) {
-    request.adapter = async () => {
-      // response from cache api follows the same structure as the fetch api, hence this hack
-      // could be better if the caller handles the response (response.blob) instead of the caching function?
-      let responseData;
-      switch (request.responseType) {
-        case 'blob':
-          responseData = await cachedResponse.blob();
-          break;
-        case 'text':
-          responseData = await cachedResponse.text();
-          break;
-        case 'json':
-        case undefined:
-          responseData = await cachedResponse.json();
-          break;
-        default:
-          throw new Error('Unsupported response type: ' + request.responseType);
-      }
 
-      return Promise.resolve({
-        data: responseData,
-        headers: request.headers,
-        request: request,
-        config: request,
-        responseType: request.responseType,
-      });
-    };
-  }
+  request.adapter = async () => {
+    // response from cache api follows the same structure as the fetch api, hence this hack
+    // could be better if the caller handles the response (response.blob) instead of the caching function?
+    let responseData;
+    switch (request.responseType) {
+      case 'blob':
+        responseData = await cachedResponse.blob();
+        break;
+      case 'text':
+        responseData = await cachedResponse.text();
+        break;
+      case 'json':
+      case undefined:
+        responseData = await cachedResponse.json();
+        break;
+      default:
+        throw new Error('Unsupported response type: ' + request.responseType);
+    }
+
+    return Promise.resolve({
+      data: responseData,
+      headers: request.headers,
+      request: request,
+      config: request,
+      responseType: request.responseType,
+    });
+  };
 
   return request;
 };
