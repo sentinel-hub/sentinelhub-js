@@ -320,7 +320,7 @@ export const findDates = () => {
       OrbitDirection.ASCENDING,
     );
     
-    containerEl.innerHTML = "<ul>" + data.map(d => "<li>"+d+"</li>") + "</ul>";
+    containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";
   };
   perform().then(() => {});
 
