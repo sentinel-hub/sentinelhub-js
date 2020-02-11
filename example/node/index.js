@@ -156,9 +156,9 @@ async function run() {
   );
   printOut('dates for S1 GRD', datesS1GRD);
 
-  // // finally, display the image:
-  // const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
-  // printOut('URL of S2 L2A image:', imageUrl);
+  // finally, display the image:
+  const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
+  printOut('URL of S2 L2A image:', imageUrl);
 
   // this doesn't work because node.js doesn't support Blob:
   // const fs = require('fs');
