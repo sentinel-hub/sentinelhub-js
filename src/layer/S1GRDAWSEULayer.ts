@@ -120,18 +120,16 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       findTilesDatasetParameters,
     );
     return {
-      tiles: response.data.tiles.map(tile => {
-        return {
-          geometry: tile.dataGeometry,
-          sensingTime: tile.sensingTime,
-          meta: {
-            orbitDirection: tile.orbitDirection,
-            polarization: tile.polarization,
-            acquisitionMode: tile.acquisitionMode,
-            resolution: tile.resolution,
-          },
-        };
-      }),
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: new Date(tile.sensingTime),
+        meta: {
+          orbitDirection: tile.orbitDirection,
+          polarization: tile.polarization,
+          acquisitionMode: tile.acquisitionMode,
+          resolution: tile.resolution,
+        },
+      })),
       hasMore: response.data.hasMore,
     };
   }
