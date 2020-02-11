@@ -110,7 +110,7 @@ export function wmsGetMapUrl(
   }
 
   if (evalscript) {
-    queryParams.evalscript = evalscript;
+    queryParams.evalscript = btoa(evalscript);
   }
   if (evalscriptUrl) {
     queryParams.evalscripturl = evalscriptUrl;
