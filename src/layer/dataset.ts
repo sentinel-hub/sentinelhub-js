@@ -75,6 +75,7 @@ export const DATASET_S5PL2: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S5PL2',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex',
+  orbitTimeMinutes: 101,
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
