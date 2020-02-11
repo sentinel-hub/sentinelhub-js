@@ -82,8 +82,8 @@ export class AbstractLayer {
 
   public findDates(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: any, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     // any additional
   ): Promise<Date[]> {
     throw new Error('Not implemented yet');
