@@ -2,23 +2,23 @@ enum ShDatasetParametersType {
   BYOC = 'BYOC',
   S1GRD = 'S1GRD',
   S2 = 'S2',
-  S2GM = 'S2GM', 
+  S2GM = 'S2GM',
   S3 = 'S3',
   S3SLSTR = 'S3SLSTR',
   S5PL2 = 'S5PL2',
-};
+}
 
 enum EocDatasetParametersType {
-  S1GRD = 'S1GRD', 
+  S1GRD = 'S1GRD',
   S5PL2 = 'S5PL2',
-};
+}
 
 export type Dataset = {
   id: string;
   shJsonGetCapabilitiesDataset: string | null;
   shWmsEvalsource: string;
   shProcessingApiDatasourceAbbreviation: string;
-  datasetParametersType: string | null; // possible values: BYOC, CatalogueIndexRequestParameters, S1GRD, S2, S2GM, S3, S3SLSTR, S5PL2
+  datasetParametersType: string | null;
   shServiceHostname: string;
   searchIndexUrl: string;
   findDatesUrl: string;
