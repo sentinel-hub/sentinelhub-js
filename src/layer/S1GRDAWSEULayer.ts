@@ -103,7 +103,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     orbitDirection?: OrbitDirection,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
       orbitDirection: orbitDirection,
@@ -141,7 +141,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     orbitDirection?: OrbitDirection,
   ): Promise<Date[]> {
     const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
       orbitDirection: orbitDirection,

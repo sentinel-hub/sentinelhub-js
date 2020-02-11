@@ -37,7 +37,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     productType?: ProductType,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       productType: productType,
     };
     const response = await this.fetchTiles(
@@ -68,7 +68,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     productType?: ProductType,
   ): Promise<Date[]> {
     const findDatesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       productType: productType,
     };
 

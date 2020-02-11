@@ -24,7 +24,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       orbitDirection: orbitDirection,
       view: view,
     };
@@ -59,7 +59,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ): Promise<Date[]> {
     const findDatesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       orbitDirection: orbitDirection,
       view: view,
     };
