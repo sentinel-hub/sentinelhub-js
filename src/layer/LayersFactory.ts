@@ -11,6 +11,7 @@ import {
   DATASET_AWSEU_S1GRD,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_S5PL2,
 } from 'src/layer/dataset';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { WmsLayer } from 'src/layer/WmsLayer';
@@ -19,6 +20,7 @@ import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
 import { S3OLCILayer } from 'src/layer/S3OLCILayer';
+import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
@@ -63,6 +65,7 @@ export class LayersFactory {
     [DATASET_S2L1C.shJsonGetCapabilitiesDataset]: DATASET_S2L1C,
     [DATASET_S3SLSTR.shJsonGetCapabilitiesDataset]: DATASET_S3SLSTR,
     [DATASET_S3OLCI.shJsonGetCapabilitiesDataset]: DATASET_S3OLCI,
+    [DATASET_S5PL2.shJsonGetCapabilitiesDataset]: DATASET_S5PL2,
     [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
@@ -74,6 +77,7 @@ export class LayersFactory {
     [DATASET_S2L1C.id]: S2L1CLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
     [DATASET_S3OLCI.id]: S3OLCILayer,
+    [DATASET_S5PL2.id]: S5PL2Layer,
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,

@@ -74,7 +74,7 @@ export async function legacyGetMapFromParams(
               `Evalsource ${evalsource} is not valid on this layer (was expecting ${expectedEvalsource})`,
             );
           }
-          layer.setEvalscript(evalscript);
+          layer.setEvalscript(decodedEvalscript);
         } else if (evalscriptUrl) {
           // Processing API doesn't support evalscriptUrl, bail out:
           throw new Error('Parameter evalscriptUrl is not supported with Processing API');
