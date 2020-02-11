@@ -1,34 +1,28 @@
 import {
-  S1GRDAWSEULayer,
+  S5PL2Layer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
-  CRS_EPSG4326,
   CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
-  OrbitDirection,
-  AcquisitionMode,
-  Polarization,
-  Resolution,
-  DATASET_AWSEU_S1GRD,
-  LayersFactory,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error("INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.S1GRDIW_LAYER_ID) {
-  throw new Error("S1GRDIW_LAYER_ID environment variable is not defined!");
+if (!process.env.S5PL2_LAYER_ID) {
+  throw new Error("S5PL2_LAYER_ID environment variable is not defined!");
 };
 
 const instanceId = process.env.INSTANCE_ID;
-const layerId = process.env.S1GRDIW_LAYER_ID;
+const layerId = process.env.S5PL2_LAYER_ID;
+const bbox = new BBox(CRS_EPSG3857, 1408887.3053523689,5087648.602661333,1487158.8223163893,5165920.119625352);
 
 export default {
-  title: 'Sentinel 1 GRD IW - AWS',
+  title: 'Sentinel 5P L2',
 };
 
 export const getMapURL = () => {
@@ -40,15 +34,13 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const layer = new S5PL2Layer(instanceId, layerId);
 
-  // const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
-  const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
   const getMapParams = {
     bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-    width: 512,
+    fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+  width: 512,
     height: 512,
     format: MimeTypes.JPEG,
   };
@@ -68,14 +60,11 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S1GRDAWSEULayer(instanceId, layerId);
-
-    // const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-    const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
+    const layer = new S5PL2Layer(instanceId, layerId);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -88,23 +77,33 @@ export const getMapWMS = () => {
   return wrapperEl;
 };
 
-export const getMapWMSLayersFactory = () => {
+export const getMapWMSEvalscript = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
+  wrapperEl.innerHTML = "<h2>GetMap with WMS using evalscript v1</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_AWSEU_S1GRD.shServiceHostname}ogc/wms/${instanceId}`, (lId, datasetId) => layerId === lId))[0];
-
-    const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
+    const layer = new S5PL2Layer(
+      instanceId,
+      layerId,
+      `
+      var val = CLOUD_BASE_PRESSURE;
+      var minVal = 10000.0;
+      var maxVal = 110000.0;
+      var diff = maxVal - minVal;
+      var limits = [minVal, minVal + 0.125 * diff, minVal + 0.375 * diff, minVal + 0.625 * diff, minVal + 0.875 * diff, maxVal];
+      var colors = [[0, 0, 0.5], [0, 0, 1], [0, 1, 1], [1, 1, 0], [1, 0, 0], [0.5, 0, 0]];
+      return colorBlend(val, limits, colors);
+      `,
+    );
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -116,7 +115,6 @@ export const getMapWMSLayersFactory = () => {
 
   return wrapperEl;
 };
-
 
 export const getMapProcessing = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
@@ -134,29 +132,28 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(
+    const layer = new S5PL2Layer(
       instanceId,
       layerId,
       `
       //VERSION=3
       function setup() {
         return {
-          input: ["VV"],
+          input: ["CO"],
           output: { bands: 3 }
         };
       }
 
       function evaluatePixel(sample) {
-        return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
+        return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
     `,
     );
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -186,30 +183,27 @@ export const getMapProcessingWithoutInstance = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(
+    const layer = new S5PL2Layer(
       null,
       null,
       `
       //VERSION=3
       function setup() {
         return {
-          input: ["VV"],
+          input: ["CO"],
           output: { bands: 3 }
         };
       }
 
       function evaluatePixel(sample) {
-        return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
+        return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
-    `,null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH
+    `);
 
-    );
-
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -239,13 +233,12 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(instanceId, layerId);
+    const layer = new S5PL2Layer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -259,8 +252,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+  const layer = new S5PL2Layer(instanceId, layerId);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -270,11 +262,11 @@ export const findTiles = () => {
   const perform = async () => {
     const data = await layer.findTiles(
       bbox,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       5,
       null,
-      OrbitDirection.ASCENDING,
+      null,
     );
     renderTilesList(containerEl, data.tiles);
   };
