@@ -38,16 +38,14 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       findTilesDatasetParameters,
     );
     return {
-      tiles: response.data.tiles.map(tile => {
-        return {
-          geometry: tile.dataGeometry,
-          sensingTime: tile.sensingTime,
-          meta: {
-            cloudCoverPercent: tile.cloudCoverPercentage,
-            orbitDirection: tile.orbitDirection,
-          },
-        };
-      }),
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: new Date(tile.sensingTime),
+        meta: {
+          cloudCoverPercent: tile.cloudCoverPercentage,
+          orbitDirection: tile.orbitDirection,
+        },
+      })),
       hasMore: response.data.hasMore,
     };
   }
