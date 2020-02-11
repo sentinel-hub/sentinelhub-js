@@ -101,13 +101,11 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const responseTiles: any[] = response.data.tiles;
     return {
-      tiles: responseTiles.map(tile => {
-        return {
-          geometry: tile.tileDrawRegionGeometry,
-          sensingTime: new Date(tile.sensingTime),
-          meta: this.extractFindTilesMeta(tile),
-        };
-      }),
+      tiles: responseTiles.map(tile => ({
+        geometry: tile.tileDrawRegionGeometry,
+        sensingTime: new Date(tile.sensingTime),
+        meta: this.extractFindTilesMeta(tile),
+      })),
       hasMore: response.data.hasMore,
     };
   }
