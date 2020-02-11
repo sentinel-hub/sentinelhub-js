@@ -12,6 +12,8 @@ import {
   AcquisitionMode,
   Polarization,
   Resolution,
+  DATASET_AWSEU_S1GRD,
+  LayersFactory,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -85,6 +87,36 @@ export const getMapWMS = () => {
 
   return wrapperEl;
 };
+
+export const getMapWMSLayersFactory = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(`${DATASET_AWSEU_S1GRD.shServiceHostname}ogc/wms/${instanceId}`, (lId, datasetId) => layerId === lId))[0];
+
+    const bbox = new BBox(CRS_EPSG3857, 2115070.33, 2273030.93, 2226389.82, 2391878.59);
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 
 export const getMapProcessing = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {

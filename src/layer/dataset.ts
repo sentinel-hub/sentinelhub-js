@@ -1,6 +1,6 @@
 export type Dataset = {
   id: string;
-  shJsonGetCapabilitiesDataset: string;
+  shJsonGetCapabilitiesDataset: string | null;
   shWmsEvalsource: string;
   shProcessingApiDatasourceAbbreviation: string;
   shServiceHostname: string;
@@ -17,6 +17,17 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
   findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
+  orbitTimeMinutes: 49.3,
+};
+
+export const DATASET_EOCLOUD_S1GRD: Dataset = {
+  id: 'EOC_S1GRD_IW',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: null, // it's complicated - allowed values are 'S1' (for IW) and 'S1_EW'
+  shProcessingApiDatasourceAbbreviation: null,
+  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
+  findDatesUrl: null,
   orbitTimeMinutes: 49.3,
 };
 
