@@ -88,7 +88,7 @@ export function wmsGetMapUrl(
 
   queryParams.time = `${params.fromTime.toISOString()}/${params.toTime.toISOString()}`;
 
-  if (params.maxCloudCoverPercent) {
+  if (params.maxCloudCoverPercent !== undefined) {
     queryParams.maxcc = params.maxCloudCoverPercent;
   }
 
