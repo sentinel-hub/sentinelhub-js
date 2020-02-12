@@ -19,7 +19,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
-    maxCloudCoverage?: number,
+    maxCloudCoverPercent?: number,
     orbitDirection: OrbitDirection | null = OrbitDirection.DESCENDING,
     view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ): Promise<PaginatedTiles> {
@@ -34,7 +34,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      maxCloudCoverage,
+      maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
     return {

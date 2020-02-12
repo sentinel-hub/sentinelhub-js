@@ -132,7 +132,7 @@ export const getMapWMSEvalscript = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);

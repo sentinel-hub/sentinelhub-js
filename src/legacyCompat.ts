@@ -146,7 +146,7 @@ function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegac
   }
 
   if (params.maxcc) {
-    getMapParams.maxCCPercent = parseInt(params.maxcc);
+    getMapParams.maxCloudCoverPercent = parseInt(params.maxcc);
   }
   if (params.preview) {
     getMapParams.preview = previewFromParams(params);

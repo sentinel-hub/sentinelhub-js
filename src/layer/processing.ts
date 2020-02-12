@@ -87,7 +87,7 @@ export function createProcessingPayload(
               to: params.toTime.toISOString(),
             },
             mosaickingOrder: MosaickingOrder.MOST_RECENT,
-            maxCloudCoverage: params.maxCCPercent, // maximum allowable cloud coverage in percent
+            maxCloudCoverage: params.maxCloudCoverPercent, // maximum allowable cloud coverage in percent
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,

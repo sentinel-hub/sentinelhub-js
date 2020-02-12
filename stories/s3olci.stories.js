@@ -43,7 +43,7 @@ export const getMapURL = () => {
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    maxCCPercent: 50,
+    maxCloudCoverPercent: 50,
   };
   const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -71,7 +71,7 @@ export const getMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -123,7 +123,7 @@ export const getMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
