@@ -52,7 +52,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     );
   }
 
-  protected getFindTilesAdditionalParameters(): Record<string, string> {
+  protected getFindTilesAdditionalParameters(): Record<string, any> {
     return {};
   }
 
@@ -108,24 +108,5 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       })),
       hasMore: response.data.hasMore,
     };
-  }
-
-  // This helper method is called by LayersFactory.makeLayers(). It constructs
-  // a layer based on layerInfo and other parameters. Subclasses can override it
-  // to use different constructor parameters based on layerInfo.
-  //
-  // A bit of TypeScript magic: since we want to construct a child class from the static
-  // method, we use the method outlined here: https://stackoverflow.com/a/51749145/593487
-  public static makeLayer<ChildLayer extends typeof AbstractSentinelHubV1OrV2Layer>(
-    this: ChildLayer,
-    layerInfo: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    instanceId: string,
-    layerId: string,
-    evalscript: string | null,
-    evalscriptUrl: string | null,
-    title: string | null,
-    description: string | null,
-  ): AbstractSentinelHubV1OrV2Layer {
-    return new this(instanceId, layerId, evalscript, evalscriptUrl, title, description);
   }
 }

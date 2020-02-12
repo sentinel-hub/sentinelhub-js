@@ -34,7 +34,8 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+  const maxCloudCoverPercent = 0;
+  const layer = new Landsat5EOCloudLayer(instanceId, layerId, null, null, null, null, maxCloudCoverPercent);
 
   const getMapParams = {
     bbox: bbox,
@@ -69,6 +70,7 @@ export const getMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
+      maxCloudCoverPercent: 0,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -89,7 +91,6 @@ export const getMapWMSLayersFactory = () => {
 
   const perform = async () => {
     const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
-
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
@@ -97,6 +98,7 @@ export const getMapWMSLayersFactory = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
+      maxCloudCoverPercent: 0,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -123,7 +125,6 @@ export const getMapWMSEvalscript = () => {
         return [2.5 * B04, 1.5 * B03, 0.5 * B02];
       `,
     );
-    console.log("aaaaaaaaaaaaaaaaaaa", layer)
 
     const getMapParams = {
       bbox: bbox,

@@ -95,7 +95,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     );
   }
 
-  protected getFindTilesAdditionalParameters(): Record<string, string> {
+  protected getFindTilesAdditionalParameters(): Record<string, any> {
     return {
       productType: 'GRD',
       acquisitionMode: this.acquisitionMode,
