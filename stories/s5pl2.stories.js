@@ -157,7 +157,7 @@ export const getMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -207,7 +207,7 @@ export const getMapProcessingWithoutInstance = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);

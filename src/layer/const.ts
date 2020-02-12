@@ -11,7 +11,7 @@ export type GetMapParams = {
   width?: number;
   height?: number;
   // optional additional parameters:
-  maxCCPercent?: number;
+  maxCloudCoverPercent?: number;
   preview?: number;
   geometry?: string;
   quality?: number;

@@ -50,7 +50,7 @@ export const S2GetMapURL = () => {
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    maxCCPercent: 50,
+    maxCloudCoverPercent: 50,
   };
   const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -79,7 +79,7 @@ export const S2GetMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -132,7 +132,7 @@ export const S2GetMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
+      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);

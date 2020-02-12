@@ -140,8 +140,8 @@ We can always use layer to search for data availability:
   import { OrbitDirection } from 'sentinelhub-js';
 
   const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A');
-  const cloudCoveragePercent = 50;
-  const tilesS2L2A = layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset, cloudCoverage);
+  const maxCloudCoverPercent = 50;
+  const tilesS2L2A = layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset, maxCloudCoverPercent);
   const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
 
   const layerS1 = new S1GRDAWSEULayer(instanceId, 'LayerS1GRD');
@@ -149,7 +149,7 @@ We can always use layer to search for data availability:
   const tilesS1 = layerS1.findTiles(bbox, fromDate, toDate, maxCount, offset, orbitDirection);
   const flyoverIntervalsS1 = layerS1.findFlyoverIntervals(tilesS1.tiles);
 
-  const dates = layerS2L2A.findDatesUTC(bbox, fromDate, toDate, cloudCoverage);
+  const dates = layerS2L2A.findDatesUTC(bbox, fromDate, toDate, maxCloudCoverPercent);
 ```
 
 ## Backwards compatibility

@@ -142,7 +142,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     maxCount: number = 1,
     offset: number = 0,
-    maxCloudCoverage?: number | null,
+    maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
     if (!this.dataset.searchIndexUrl) {
@@ -161,10 +161,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         ],
       ],
     };
+    // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
+    // the tiles we get cloudCoverPercentage (0..100).
     const payload: any = {
       clipping: bboxPolygon,
       maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverage ? maxCloudCoverage / 100 : null,
+      maxCloudCoverage: maxCloudCoverPercent ? maxCloudCoverPercent / 100 : null,
       timeFrom: fromTime.toISOString(),
       timeTo: toTime.toISOString(),
       offset: offset,
