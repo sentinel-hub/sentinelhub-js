@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
@@ -129,6 +129,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscriptUrl = evalscriptUrl;
   }
 
+  protected createSearchIndexRequestConfig(): AxiosRequestConfig {
+    const requestConfig: AxiosRequestConfig = {
+      headers: { 'Accept-CRS': 'EPSG:4326' },
+    };
+    return requestConfig;
+  }
+
   protected fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -146,11 +153,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       crs: { type: 'name', properties: { name: bbox.crs.urn } },
       coordinates: [
         [
-          [bbox.minY, bbox.maxX],
-          [bbox.maxY, bbox.maxX],
-          [bbox.maxY, bbox.minX],
-          [bbox.minY, bbox.minX],
-          [bbox.minY, bbox.maxX],
+          [bbox.minX, bbox.maxY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.maxX, bbox.minY],
+          [bbox.minX, bbox.minY],
+          [bbox.minX, bbox.maxY],
         ],
       ],
     };
@@ -167,8 +174,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.datasetParameters = datasetParameters;
     }
 
-    return axios.post(this.dataset.searchIndexUrl, payload, {
-      headers: { 'Accept-CRS': 'EPSG:4326' },
-    });
+    return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 }
