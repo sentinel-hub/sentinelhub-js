@@ -32,9 +32,9 @@ import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
-import { Landsat5EOCloudLayer } from './Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from './Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
+import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
+import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
+import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {

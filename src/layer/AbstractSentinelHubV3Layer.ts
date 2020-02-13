@@ -99,25 +99,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         }
       }
 
-      // allow subclasses to update payload with their own parameters:
-      const additionalDataFilterParams = this.getProcessingAPIAdditionalDataFilterParams();
       const payload = createProcessingPayload(
         this.dataset,
         params,
         this.evalscript,
         this.dataProduct,
-        additionalDataFilterParams,
       );
+      // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
 
       return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);
-  }
-
-  protected getProcessingAPIAdditionalDataFilterParams(): Record<string, any> {
-    return {};
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {

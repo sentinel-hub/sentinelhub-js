@@ -3,6 +3,7 @@ import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { OrbitDirection } from 'src';
+import { ProcessingPayload } from 'src/layer/processing';
 
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
@@ -34,10 +35,9 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     this.view = view;
   }
 
-  protected getProcessingAPIAdditionalDataFilterParams(): Record<string, any> {
-    return {
-      maxCloudCoverage: this.maxCloudCoverPercent,
-    };
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    return payload;
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
