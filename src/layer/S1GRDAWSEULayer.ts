@@ -138,17 +138,18 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    orbitDirection?: OrbitDirection,
+    datasetSpecificParameters?: { orbitDirection?: OrbitDirection },
   ): Promise<Date[]> {
     const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
-      orbitDirection: orbitDirection,
       resolution: this.resolution,
+      orbitDirection: datasetSpecificParameters && datasetSpecificParameters.orbitDirection,
     };
 
-    const response = await this.fetchDates(bbox, fromTime, toTime, null, findDatesDatasetParameters);
-    return response.data.map(date => new Date(date));
+    console.log('s1grdawsiw layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
+
+    return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
   }
 }

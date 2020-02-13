@@ -293,6 +293,31 @@ function renderTilesList(containerEl, list) {
   });
 }
 
+export const findDates = () => {
+  const layer = new S5PL2Layer(instanceId, layerId);
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findDates</h2>" +
+    "from: " + new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) + "<br />" +
+    "to: " + new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59));
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
+  const perform = async () => {
+    const data = await layer.findDates(
+      bbox,
+      new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+      {productType: 'NO2'}
+    );
+    
+    containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
+
 async function setAuthTokenWithOAuthCredentials () {
   if (isAuthTokenSet()) {
     console.log('Auth token is already set.');

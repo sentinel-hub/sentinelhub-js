@@ -130,7 +130,7 @@ async function run() {
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    100,
+    { maxCloudCoverage: 100 },
   );
   printOut('dates for S2 L2A', datesS2L2A);
 
@@ -148,12 +148,9 @@ async function run() {
   const flyoverIntervalsS1GRD = layerS1.findFlyoverIntervals(tilesS1GRD.tiles);
   printOut('flyover intervals for S1 GRD:', flyoverIntervalsS1GRD);
 
-  const datesS1GRD = await layerS1.findDates(
-    getMapParams.bbox,
-    getMapParams.fromTime,
-    getMapParams.toTime,
-    OrbitDirection.ASCENDING,
-  );
+  const datesS1GRD = await layerS1.findDates(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime, {
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
   printOut('dates for S1 GRD', datesS1GRD);
 
   // finally, display the image:
