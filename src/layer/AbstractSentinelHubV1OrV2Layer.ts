@@ -37,6 +37,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return this.dataset.shWmsEvalsource;
   }
 
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
   public getMapUrl(params: GetMapParams, api: ApiType): string {
     if (api !== ApiType.WMS) {
       throw new Error('Only WMS is supported on this layer');
@@ -49,6 +53,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       this.evalscript,
       this.evalscriptUrl,
       this.getEvalsource(),
+      this.getWmsGetMapUrlAdditionalParameters(),
     );
   }
 

@@ -33,7 +33,6 @@ export type ProcessingPayload = {
             from: string;
             to: string;
           };
-          maxCloudCoverage: number;
           previewMode?: PreviewMode;
           mosaickingOrder?: MosaickingOrder;
           [key: string]: any;
@@ -68,6 +67,7 @@ export function createProcessingPayload(
   params: GetMapParams,
   evalscript: string | null = null,
   dataProduct: string | null = null,
+  additionalDataFilterParams: Record<string, any>,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -87,7 +87,7 @@ export function createProcessingPayload(
               to: params.toTime.toISOString(),
             },
             mosaickingOrder: MosaickingOrder.MOST_RECENT,
-            maxCloudCoverage: params.maxCloudCoverPercent, // maximum allowable cloud coverage in percent
+            ...additionalDataFilterParams,
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,

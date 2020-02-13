@@ -53,6 +53,7 @@ export function wmsGetMapUrl(
   evalscript: string | null = null,
   evalscriptUrl: string | null = null,
   evalsource: string | null = null,
+  additionalParameters: Record<string, any> = {},
 ): string {
   const queryParams: OgcGetMapOptions = {
     version: OGC_SERVICES_IMPLEMENTED_VERSIONS[ServiceType.WMS],
@@ -69,6 +70,7 @@ export function wmsGetMapUrl(
     transparent: true,
     gain: undefined,
     gamma: undefined,
+    ...additionalParameters,
   };
 
   if (layers === null) {
@@ -87,10 +89,6 @@ export function wmsGetMapUrl(
   }
 
   queryParams.time = `${params.fromTime.toISOString()}/${params.toTime.toISOString()}`;
-
-  if (params.maxCloudCoverPercent !== undefined) {
-    queryParams.maxcc = params.maxCloudCoverPercent;
-  }
 
   if (params.width && params.height) {
     queryParams.width = params.width;
