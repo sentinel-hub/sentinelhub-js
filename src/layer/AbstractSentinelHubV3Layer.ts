@@ -99,12 +99,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         }
       }
 
-      const payload = createProcessingPayload(
-        this.dataset,
-        params,
-        this.evalscript,
-        this.dataProduct,
-      );
+      const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
 
