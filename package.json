@@ -6,10 +6,12 @@
   "browser": "dist/sentinelHub.umd.js",
   "dependencies": {
     "@turf/helpers": "^6.1.4",
+    "@types/jest": "^25.1.2",
     "@types/xml2js": "^0.4.4",
     "axios": "^0.18.1",
     "jest": "^25.1.0",
     "query-string": "^6.4.2",
+    "ts-jest": "^25.2.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -37,6 +39,18 @@
     "prettier": "prettier --write \"{src,example}/**/*.{ts,js}\"",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "moduleDirectories": ["node_modules", "."],
+    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
   },
   "types": "dist/index.d.ts",
   "files": [
