@@ -5,7 +5,6 @@ import {
   MimeTypes,
   ApiType,
   DATASET_EOCLOUD_LANDSAT5,
-  OrbitDirection,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -131,7 +130,6 @@ export const getMapWMSEvalscript = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);

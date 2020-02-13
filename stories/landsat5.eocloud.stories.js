@@ -5,7 +5,6 @@ import {
   MimeTypes,
   ApiType,
   DATASET_EOCLOUD_LANDSAT5,
-  OrbitDirection,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -70,7 +69,6 @@ export const getMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCloudCoverPercent: 0,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -98,7 +96,6 @@ export const getMapWMSLayersFactory = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCloudCoverPercent: 0,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -133,7 +130,6 @@ export const getMapWMSEvalscript = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCloudCoverPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
