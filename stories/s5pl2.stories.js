@@ -252,7 +252,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S5PL2Layer(instanceId, layerId);
+  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, "SO2");
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
