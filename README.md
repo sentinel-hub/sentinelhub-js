@@ -139,17 +139,19 @@ We can always use layer to search for data availability:
 ```typescript
   import { OrbitDirection } from 'sentinelhub-js';
 
-  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A');
   const maxCloudCoverPercent = 50;
-  const tilesS2L2A = layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset, maxCloudCoverPercent);
+  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A', null, null, null, null, null, maxCloudCoverPercent);
+  const tilesS2L2A = layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset);
   const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
+  const dates = layerS2L2A.findDatesUTC(bbox, fromDate, toDate);
 
-  const layerS1 = new S1GRDAWSEULayer(instanceId, 'LayerS1GRD');
-  const orbitDirection = OrbitDirection.ASCENDING;
-  const tilesS1 = layerS1.findTiles(bbox, fromDate, toDate, maxCount, offset, orbitDirection);
+  const layerS1 = new S1GRDAWSEULayer(
+    instanceId, 'LayerS1GRD',
+    null, null, null, null, null, null, null, null,
+    true, BackscatterCoeff.GAMMA0_ELLIPSOID, OrbitDirection.ASCENDING
+  );
+  const tilesS1 = layerS1.findTiles(bbox, fromDate, toDate, maxCount, offset);
   const flyoverIntervalsS1 = layerS1.findFlyoverIntervals(tilesS1.tiles);
-
-  const dates = layerS2L2A.findDatesUTC(bbox, fromDate, toDate, maxCloudCoverPercent);
 ```
 
 ## Backwards compatibility
