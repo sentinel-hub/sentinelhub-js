@@ -39,9 +39,15 @@ export class S2L1CLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
-    maxCloudCoverPercent?: number,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, maxCloudCoverPercent);
+    const response = await this.fetchTiles(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      this.maxCloudCoverPercent,
+    );
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,

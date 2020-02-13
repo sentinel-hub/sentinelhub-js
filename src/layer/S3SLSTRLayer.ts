@@ -52,14 +52,11 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
-    maxCloudCoverPercent?: number,
-    orbitDirection: OrbitDirection | null = OrbitDirection.DESCENDING,
-    view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
-      orbitDirection: orbitDirection,
-      view: view,
+      orbitDirection: this.orbitDirection,
+      view: this.view,
     };
     const response = await this.fetchTiles(
       bbox,
@@ -67,7 +64,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      maxCloudCoverPercent,
+      this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
     return {

@@ -157,8 +157,7 @@ export const findTiles = () => {
       new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
-      null,
-      OrbitDirection.ASCENDING,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };

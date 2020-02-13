@@ -47,6 +47,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   protected orthorectify: boolean | null = false;
   protected backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
   protected resolution: Resolution | null = null;
+  protected orbitDirection: OrbitDirection | null = null;
 
   public constructor(
     instanceId: string | null,
@@ -61,6 +62,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     resolution: Resolution | null = null,
     orthorectify: boolean | null = false,
     backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID,
+    orbitDirection: OrbitDirection | null = null,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
     this.acquisitionMode = acquisitionMode;
@@ -68,29 +70,39 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.resolution = resolution;
     this.orthorectify = orthorectify;
     this.backscatterCoeff = backscatterCoeff;
+    this.orbitDirection = orbitDirection;
+  }
+
+  protected async updateLayerFromServiceIfNeeded(): Promise<void> {
+    if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
+      return;
+    }
+    if (this.instanceId === null || this.layerId === null) {
+      throw new Error(
+        "Parameters polarization, acquisitionMode and/or resolution are not set and can't be fetched from service because instanceId and layerId are not available",
+      );
+    }
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+
+    this.acquisitionMode = layerParams['acquisitionMode'];
+    this.polarization = layerParams['polarization'];
+    this.resolution = layerParams['resolution'];
+    this.backscatterCoeff = layerParams['backCoeff'];
+    this.orthorectify = layerParams['orthorectify'];
+    this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
   }
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    if (this.polarization === null || this.acquisitionMode === null || this.resolution === null) {
-      if (this.instanceId === null || this.layerId === null) {
-        throw new Error(
-          "Parameters polarization, acquisitionMode and/or resolution are not set and can't be fetched from service because instanceId and layerId are not available",
-        );
-      }
-      const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+    await this.updateLayerFromServiceIfNeeded();
 
-      this.acquisitionMode = layerParams['acquisitionMode'];
-      this.polarization = layerParams['polarization'];
-      this.resolution = layerParams['resolution'];
-      this.backscatterCoeff = layerParams['backCoeff'];
-      this.orthorectify = layerParams['orthorectify'];
-
-      payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
-      payload.input.data[0].dataFilter.polarization = this.polarization;
-      payload.input.data[0].dataFilter.resolution = this.resolution;
-      payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
-      payload.input.data[0].processing.orthorectify = this.orthorectify;
+    payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
+    payload.input.data[0].dataFilter.polarization = this.polarization;
+    payload.input.data[0].dataFilter.resolution = this.resolution;
+    if (this.orbitDirection !== null) {
+      payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
     }
+    payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
+    payload.input.data[0].processing.orthorectify = this.orthorectify;
     return payload;
   }
 
@@ -100,13 +112,14 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
-    orbitDirection?: OrbitDirection,
   ): Promise<PaginatedTiles> {
+    await this.updateLayerFromServiceIfNeeded();
+
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
-      orbitDirection: orbitDirection,
+      orbitDirection: this.orbitDirection,
       resolution: this.resolution,
     };
 

@@ -146,7 +146,17 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+  const layer = new S1GRDEOCloudLayer(
+    instanceId,
+    layerId,
+    null,
+    null,
+    null,
+    null,
+    AcquisitionMode.IW,
+    Polarization.DV,
+    OrbitDirection.ASCENDING,
+  );
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');

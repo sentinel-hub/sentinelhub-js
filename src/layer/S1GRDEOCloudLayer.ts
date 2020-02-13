@@ -2,7 +2,7 @@ import { BackscatterCoeff } from 'src/layer/const';
 import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
-import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -16,6 +16,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   protected orthorectify: boolean | null = false;
   protected backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
   protected resolution: Resolution | null = null;
+  protected orbitDirection: OrbitDirection | null = null;
 
   public constructor(
     instanceId: string | null,
@@ -26,6 +27,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     description: string | null = null,
     acquisitionMode: AcquisitionMode | null = null,
     polarization: Polarization | null = null,
+    orbitDirection: OrbitDirection | null = null,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, title, description);
     // it is not possible to determine these parameters by querying the service, because there
@@ -35,6 +37,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     }
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
+    this.orbitDirection = orbitDirection;
   }
 
   public static makeLayer(
@@ -96,10 +99,15 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   }
 
   protected getFindTilesAdditionalParameters(): Record<string, any> {
-    return {
+    const result = {
       productType: 'GRD',
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
+      orbitDirection: this.orbitDirection,
     };
+    if (this.orbitDirection !== null) {
+      result.orbitDirection = this.orbitDirection;
+    }
+    return result;
   }
 }
