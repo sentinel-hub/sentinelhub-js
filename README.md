@@ -143,7 +143,7 @@ We can always use layer to search for data availability:
   const cloudCoveragePercent = 50;
   const tilesS2L2A = await layerS2L2A.findTiles(bbox, fromDate, toDate, maxCount, offset, cloudCoverage);
   const flyoverIntervalsS2L2A = layerS2L2A.findFlyoverIntervals(tilesS2L2A.tiles);
-  const datesS2L2A = await layerS2L2A.findDates(bbox, fromTime, toTime, {cloudCoverage: cloudCoveragePercent});
+  const datesS2L2A = await layerS2L2A.findDates(bbox, fromTime, toTime, {maxCloudCoverage: cloudCoveragePercent});
 
   const layerS1 = new S1GRDAWSEULayer(instanceId, 'LayerS1GRD');
   const orbitDirection = OrbitDirection.ASCENDING;
