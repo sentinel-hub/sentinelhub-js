@@ -1,5 +1,4 @@
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
 
 // same as AbstractSentinelHubV1OrV2Layer, but with maxCloudCoverPercent (useful for Landsat datasets)
 export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1OrV2Layer {
@@ -35,32 +34,5 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
     return {
       cloudCoverPercent: tile.cloudCoverPercent,
     };
-  }
-
-  // This helper method is called by LayersFactory.makeLayers(). It constructs
-  // a layer based on layerInfo and other parameters. Subclasses can override it
-  // to use different constructor parameters based on layerInfo.
-  //
-  // A bit of TypeScript magic: since we want to construct a child class from the static
-  // method, we use the method outlined here: https://stackoverflow.com/a/51749145/593487
-  public static makeLayer<ChildLayer extends typeof AbstractSentinelHubV1OrV2WithCCLayer>(
-    this: ChildLayer,
-    layerInfo: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    instanceId: string,
-    layerId: string,
-    evalscript: string | null,
-    evalscriptUrl: string | null,
-    title: string | null,
-    description: string | null,
-  ): AbstractLayer {
-    return new this(
-      instanceId,
-      layerId,
-      evalscript,
-      evalscriptUrl,
-      title,
-      description,
-      layerInfo.settings.maxCC,
-    );
   }
 }
