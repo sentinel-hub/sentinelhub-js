@@ -65,14 +65,15 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    productType?: ProductType,
+    datasetSpecificParameters?: { productType?: ProductType },
   ): Promise<Date[]> {
     const findDatesDatasetParameters: S5PL2FindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
-      productType: productType,
+      productType: datasetSpecificParameters && datasetSpecificParameters.productType,
     };
 
-    const response = await this.fetchDates(bbox, fromTime, toTime, null, findDatesDatasetParameters);
-    return response.data.map(date => new Date(date));
+    console.log('s5pl2 layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
+
+    return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
   }
 }

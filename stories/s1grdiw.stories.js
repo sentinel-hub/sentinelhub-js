@@ -317,7 +317,9 @@ export const findDates = () => {
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      OrbitDirection.ASCENDING,
+      {
+        orbitDirection: OrbitDirection.ASCENDING
+      },
     );
     
     containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";

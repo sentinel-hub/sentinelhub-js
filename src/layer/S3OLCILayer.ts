@@ -24,8 +24,14 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     };
   }
 
+  // public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+  //   const response = await this.fetchDates(bbox, fromTime, toTime);
+  //   return response.data.map(date => new Date(date));
+  // }
+
   public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    const response = await this.fetchDates(bbox, fromTime, toTime);
-    return response.data.map(date => new Date(date));
+    console.log('s3olci layer, finddates', { bbox, fromTime, toTime });
+
+    return super.findDates(bbox, fromTime, toTime);
   }
 }

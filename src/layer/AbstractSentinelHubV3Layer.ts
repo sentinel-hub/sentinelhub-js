@@ -210,4 +210,77 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       headers: { 'Accept-CRS': 'EPSG:4326' },
     });
   }
+
+  /*
+
+s1grdawseu:
+type: this.dataset.shProcessingApiDatasourceAbbreviation,
+acquisitionMode: this.acquisitionMode,
+polarization: this.polarization,
+orbitDirection: orbitDirection,
+resolution: this.resolution,
+
+s2l1c: maxCloudCoverage
+s2l2a: maxCloudCoverage
+
+s3olci: /
+
+s3slstr:
+maxCloudCoverage: maxCloudCoverage,
+type: this.dataset.shProcessingApiDatasourceAbbreviation,
+orbitDirection: orbitDirection,
+view: view,
+
+s5pl2a: 
+type: this.dataset.shProcessingApiDatasourceAbbreviation,
+productType: productType,
+
+*/
+
+  public async findDates(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    // maxCloudCoverage?: number | null,
+    // datasetParameters?: Record<string, any> | null,
+    datasetSpecificParameters?: Record<string, any> | null,
+  ): Promise<Date[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    console.log('AbstractSHV3Layer', { bbox, fromTime, toTime, datasetSpecificParameters });
+
+    const bboxPolygon = {
+      type: 'Polygon',
+      crs: { type: 'name', properties: { name: bbox.crs.urn } },
+      coordinates: [
+        [
+          [bbox.minY, bbox.maxX],
+          [bbox.maxY, bbox.maxX],
+          [bbox.maxY, bbox.minX],
+          [bbox.minY, bbox.minX],
+          [bbox.minY, bbox.maxX],
+        ],
+      ],
+    };
+    const payload: any = {
+      queryArea: bboxPolygon,
+      from: fromTime.toISOString(),
+      to: toTime.toISOString(),
+      // maxCloudCoverage: maxCloudCoverage ? maxCloudCoverage / 100 : null,
+    };
+
+    if (datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage) {
+      payload.maxCloudCoverage = datasetSpecificParameters.maxCloudCoverage;
+    }
+
+    if (datasetSpecificParameters && datasetSpecificParameters.datasetParameters) {
+      payload.datasetParameters = datasetSpecificParameters.datasetParameters;
+    }
+
+    const response = await axios.post(this.dataset.findDatesUrl, payload);
+
+    return response.data.map((date: string) => new Date(date));
+  }
 }
