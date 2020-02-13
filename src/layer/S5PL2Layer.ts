@@ -24,7 +24,7 @@ export enum ProductType {
 type S5PL2FindTilesDatasetParameters = {
   type: string;
   productType: ProductType;
-  minQa?: number;
+  // minQa?: number;
 };
 
 export class S5PL2Layer extends AbstractSentinelHubV3Layer {
@@ -46,9 +46,6 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     minQa: number | null = null,
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
-    if (productType === null) {
-      throw new Error('Parameter productType must be specified!');
-    }
     this.productType = productType;
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     this.minQa = minQa;
@@ -71,10 +68,13 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
+    if (this.productType === null) {
+      throw new Error('Parameter productType must be specified!');
+    }
     const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
       productType: this.productType,
-      minQa: this.minQa,
+      // minQa: this.minQa,
     };
     const response = await this.fetchTiles(
       bbox,
