@@ -1,4 +1,3 @@
-import { GetMapParams, ApiType } from 'src/layer/const';
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 import { AbstractLayer } from './AbstractLayer';
 
@@ -19,12 +18,10 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 
-  public getMapUrl(params: GetMapParams, api: ApiType): string {
-    const getMapParams: GetMapParams = {
-      maxCloudCoverPercent: this.maxCloudCoverPercent,
-      ...params,
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {
+      maxcc: this.maxCloudCoverPercent,
     };
-    return super.getMapUrl(getMapParams, api);
   }
 
   protected getFindTilesAdditionalParameters(): Record<string, any> {
@@ -56,6 +53,14 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
     title: string | null,
     description: string | null,
   ): AbstractLayer {
-    return new this(instanceId, layerId, evalscript, evalscriptUrl, title, description, layerInfo.settings.maxCC);
+    return new this(
+      instanceId,
+      layerId,
+      evalscript,
+      evalscriptUrl,
+      title,
+      description,
+      layerInfo.settings.maxCC,
+    );
   }
 }

@@ -100,13 +100,28 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       // allow subclasses to update payload with their own parameters:
-      const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
+      const additionalDataFilterParams = this.getProcessingAPIAdditionalDataFilterParams();
+      const payload = createProcessingPayload(
+        this.dataset,
+        params,
+        this.evalscript,
+        this.dataProduct,
+        additionalDataFilterParams,
+      );
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
 
       return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);
+  }
+
+  protected getProcessingAPIAdditionalDataFilterParams(): Record<string, any> {
+    return {};
+  }
+
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {};
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {
@@ -118,7 +133,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const baseUrl = `${this.dataset.shServiceHostname}ogc/wms/${this.instanceId}`;
     const evalsource = this.dataset.shWmsEvalsource;
-    return wmsGetMapUrl(baseUrl, this.layerId, params, this.evalscript, this.evalscriptUrl, evalsource);
+    return wmsGetMapUrl(
+      baseUrl,
+      this.layerId,
+      params,
+      this.evalscript,
+      this.evalscriptUrl,
+      evalsource,
+      this.getWmsGetMapUrlAdditionalParameters(),
+    );
   }
 
   public setEvalscript(evalscript: string): void {

@@ -12,6 +12,39 @@ type S3SLSTRFindTilesDatasetParameters = {
 
 export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3SLSTR;
+  protected maxCloudCoverPercent: number;
+  protected orbitDirection: OrbitDirection | null;
+  protected view: 'NADIR' | 'OBLIQUE';
+
+  public constructor(
+    instanceId: string | null,
+    layerId: string | null = null,
+    evalscript: string | null = null,
+    evalscriptUrl: string | null = null,
+    dataProduct: string | null = null,
+    title: string | null = null,
+    description: string | null = null,
+    maxCloudCoverPercent: number | null = 100,
+    orbitDirection: OrbitDirection | null = null,
+    view: 'NADIR' | 'OBLIQUE' = 'NADIR',
+  ) {
+    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+    this.maxCloudCoverPercent = maxCloudCoverPercent;
+    this.orbitDirection = orbitDirection;
+    this.view = view;
+  }
+
+  protected getProcessingAPIAdditionalDataFilterParams(): Record<string, any> {
+    return {
+      maxCloudCoverage: this.maxCloudCoverPercent,
+    };
+  }
+
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {
+      maxcc: this.maxCloudCoverPercent,
+    };
+  }
 
   public async findTiles(
     bbox: BBox,
