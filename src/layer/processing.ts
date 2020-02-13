@@ -67,7 +67,6 @@ export function createProcessingPayload(
   params: GetMapParams,
   evalscript: string | null = null,
   dataProduct: string | null = null,
-  additionalDataFilterParams: Record<string, any>,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -87,7 +86,6 @@ export function createProcessingPayload(
               to: params.toTime.toISOString(),
             },
             mosaickingOrder: MosaickingOrder.MOST_RECENT,
-            ...additionalDataFilterParams,
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,

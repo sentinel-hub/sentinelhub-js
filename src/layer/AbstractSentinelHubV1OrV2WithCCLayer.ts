@@ -1,5 +1,5 @@
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
-import { AbstractLayer } from './AbstractLayer';
+import { AbstractLayer } from 'src/layer/AbstractLayer';
 
 // same as AbstractSentinelHubV1OrV2Layer, but with maxCloudCoverPercent (useful for Landsat datasets)
 export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1OrV2Layer {

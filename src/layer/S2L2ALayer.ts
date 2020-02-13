@@ -2,6 +2,7 @@ import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S2L2A } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from 'src/layer/processing';
 
 export class S2L2ALayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S2L2A;
@@ -21,10 +22,9 @@ export class S2L2ALayer extends AbstractSentinelHubV3Layer {
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 
-  protected getProcessingAPIAdditionalDataFilterParams(): Record<string, any> {
-    return {
-      maxCloudCoverage: this.maxCloudCoverPercent,
-    };
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    return payload;
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
