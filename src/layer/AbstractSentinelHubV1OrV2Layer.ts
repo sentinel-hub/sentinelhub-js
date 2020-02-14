@@ -76,11 +76,11 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       crs: { type: 'name', properties: { name: bbox.crs.urn } },
       coordinates: [
         [
-          [bbox.minY, bbox.maxX],
-          [bbox.maxY, bbox.maxX],
-          [bbox.maxY, bbox.minX],
-          [bbox.minY, bbox.minX],
-          [bbox.minY, bbox.maxX],
+          [bbox.minX, bbox.minY],
+          [bbox.maxX, bbox.minY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.minX, bbox.maxY],
+          [bbox.minX, bbox.minY],
         ],
       ],
     };
@@ -110,17 +110,22 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     };
   }
 
-  // Subclasses should override this helper method for LayersFactory.makeLayers. It constructs
-  // a layer based on layerInfo and other parameters.
-  public static makeLayer(
+  // This helper method is called by LayersFactory.makeLayers(). It constructs
+  // a layer based on layerInfo and other parameters. Subclasses can override it
+  // to use different constructor parameters based on layerInfo.
+  //
+  // A bit of TypeScript magic: since we want to construct a child class from the static
+  // method, we use the method outlined here: https://stackoverflow.com/a/51749145/593487
+  public static makeLayer<ChildLayer extends typeof AbstractSentinelHubV1OrV2Layer>(
+    this: ChildLayer,
     layerInfo: any, // eslint-disable-line @typescript-eslint/no-unused-vars
-    instanceId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    layerId: string, // eslint-disable-line @typescript-eslint/no-unused-vars
-    evalscript: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-    evalscriptUrl: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-    title: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-    description: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    instanceId: string,
+    layerId: string,
+    evalscript: string | null,
+    evalscriptUrl: string | null,
+    title: string | null,
+    description: string | null,
   ): AbstractSentinelHubV1OrV2Layer {
-    throw new Error('Not implemented');
+    return new this(instanceId, layerId, evalscript, evalscriptUrl, title, description);
   }
 }
