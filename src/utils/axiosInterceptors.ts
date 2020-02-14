@@ -47,7 +47,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
   }
 
   const cachedResponse = await cache.match(cacheKey);
-  if (!cachedResponse || !hasCachedResponseExpired(cachedResponse)) {
+  if (!cachedResponse || hasCachedResponseExpired(cachedResponse)) {
     return request;
   }
 
