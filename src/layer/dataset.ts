@@ -144,3 +144,13 @@ export const DATASET_AWS_DEM: Dataset = {
   findDatesUrl: null,
   orbitTimeMinutes: null,
 };
+
+export const DATASET_BYOC: Dataset = {
+  id: 'CUSTOM',
+  shJsonGetCapabilitiesDataset: 'CUSTOM',
+  shWmsEvalsource: 'CUSTOM',
+  shProcessingApiDatasourceAbbreviation: 'CUSTOM',
+  shServiceHostname: 'https://services.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex',
+  orbitTimeMinutes: null,
+};
