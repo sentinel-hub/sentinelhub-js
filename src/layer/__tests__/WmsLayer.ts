@@ -74,7 +74,7 @@ test('WmsLayer.getMap makes an appropriate request', () => {
     width: '512',
     height: '512',
   });
-  expect(axiosParams).toBe({
+  expect(axiosParams).toEqual({
     responseType: 'blob',
     useCache: true,
   });
