@@ -47,7 +47,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
   }
 
   const cachedResponse = await cache.match(cacheKey);
-  if (!cachedResponse || hasCachedResponseExpired(cachedResponse)) {
+  if (!cachedResponse || !cacheStillValid(cachedResponse)) {
     return request;
   }
 
@@ -154,13 +154,13 @@ const sha256 = async (message: any): Promise<any> => {
 
 const shouldRetry = (errorStatus: number): boolean => errorStatus >= 500 && errorStatus <= 599;
 
-const hasCachedResponseExpired = (response: Response): boolean => {
+const cacheStillValid = (response: Response): boolean => {
   if (!response) {
     return true;
   }
   const now = new Date();
   const expirationDate = Number(response.headers.get(EXPIRY_HEADER_KEY));
-  return expirationDate < now.getTime();
+  return expirationDate > now.getTime();
 };
 
 const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
@@ -168,7 +168,7 @@ const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
   const cacheKeys = await cache.keys();
   cacheKeys.forEach(async key => {
     const cachedResponse = await cache.match(key);
-    if (hasCachedResponseExpired(cachedResponse)) {
+    if (!cacheStillValid(cachedResponse)) {
       cache.delete(key);
     }
   });
