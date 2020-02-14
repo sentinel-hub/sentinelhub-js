@@ -1,6 +1,6 @@
 export default {
   get: jest.fn(() => {
-    console.log('Mocking axios.get!');
+    // axios.get() response:
     return Promise.resolve({ data: {} });
   }),
   interceptors: {
