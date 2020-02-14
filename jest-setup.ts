@@ -1,27 +1,44 @@
+declare global {
+  namespace jest {
+    interface Matchers<R> {
+      toHaveQueryParams(expectedParams: Record<string, string>): R;
+      toHaveOrigin(expectedOrigin: string): R;
+    }
+  }
+}
 
 expect.extend({
-  toIncludeQueryParam(received, requestedParams) {
-    try {
-      assertUrlIncludesParams(received, requestedParams);
+  toHaveQueryParams(received, expectedParams) {
+    const { params } = breakUrl(received);
+    for (let k in expectedParams) {
+      if (String(params[k]) !== String(expectedParams[k])) {
+        return {
+          message: () => `URL query parameter [${k}] should have value [${expectedParams[k]}], instead it has value [${params[k]}]`,
+          pass: false,
+        };
+      }
+    }
+    return {
+      message: () =>
+        `URL [${received}] should not include all of the values [${JSON.stringify(expectedParams)}], but it does`,
+      pass: true,
+    };
+  },
+
+  toHaveOrigin(received, expectedOrigin) {
+    const { origin } = breakUrl(received);
+    if (origin !== expectedOrigin) {
       return {
-        message: () =>
-          `URL [${received}] should not include all of the values [${String(requestedParams)}], but it does`, // this is printed out if we use .not
-        pass: true,
-      };
-    } catch (errMsg) {
-      return {
-        message: () => errMsg,
+        message: () => `URL hostname should have value [${expectedOrigin}], instead it has value [${origin}]`,
         pass: false,
       };
     }
+    return {
+      message: () => `URL hostname should not have value [${expectedOrigin}], but it does`, // if .not is used
+      pass: true,
+    };
   },
 });
-
-declare namespace jest {
-  interface Matchers<R> {
-    toIncludeQueryParam(requestedParams: Record<string, string>): R;
-  }
-}
 
 /* ************************ */
 
@@ -33,19 +50,10 @@ function breakUrl(urlWithQueryParams: string) {
   });
   const baseUrl = `${url.origin}${url.pathname}`;
   return {
+    origin: url.origin,
     baseUrl: baseUrl,
     params: params,
   };
 }
 
-function assertUrlIncludesParams(url: string, requestedParams: Record<string, string>): void {
-  const { baseUrl, params } = breakUrl(url);
-
-  for (let k in requestedParams) {
-    if (String(params[k]) !== String(requestedParams[k])) {
-      throw `URL query parameter [${k}] should have value [${requestedParams[k]}], instead it has value [${
-        params[k]
-      }]`;
-    }
-  }
-}
+export default undefined;
