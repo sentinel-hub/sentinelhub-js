@@ -14,9 +14,9 @@ jobs:
 
       - name: Run linter
         run: |
-          npm install
+          npm ci
           npm run lint
 
       - name: Run tests
         run: |
-          npm run jest
+          npm run test
