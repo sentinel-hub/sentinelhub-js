@@ -1,31 +1,4 @@
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer } from 'src';
-import { assertUrlIncludesParams } from 'src/testutils';
-
-expect.extend({
-  toIncludeQueryParam(received, requestedParams) {
-    try {
-      assertUrlIncludesParams(received, requestedParams);
-      return {
-        message: () =>
-          `URL [${received}] should not include all of the values [${String(requestedParams)}], but it does`, // this is printed out if we use .not
-        pass: true,
-      };
-    } catch (errMsg) {
-      return {
-        message: () => errMsg,
-        pass: false,
-      };
-    }
-  },
-});
-
-declare global {
-  namespace jest {
-    interface Matchers<R> {
-      toIncludeQueryParam(requestedParams: Record<string, string>): R;
-    }
-  }
-}
 
 test('WmsLayer.getMapUrl returns an URL', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);

@@ -50,6 +50,7 @@
       "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "moduleDirectories": ["node_modules", "."],
+    "setupFilesAfterEnv": ["<rootDir>/jest-setup.ts"],
     "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
   },
   "types": "dist/index.d.ts",
