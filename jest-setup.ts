@@ -1,14 +1,32 @@
 declare global {
   namespace jest {
     interface Matchers<R> {
-      toHaveQueryParams(expectedParams: Record<string, string>): R;
+      toHaveQueryParams(expectedParamsKeys: Array<string>): R;
+      toHaveQueryParamsValues(expectedParams: Record<string, string>): R;
       toHaveOrigin(expectedOrigin: string): R;
     }
   }
 }
 
 expect.extend({
-  toHaveQueryParams(received, expectedParams) {
+  toHaveQueryParams(received, expectedParamsKeys) {
+    const { params } = breakUrl(received);
+    for (let k of expectedParamsKeys) {
+      if (params[k] === undefined) {
+        return {
+          message: () => `URL query parameter [${k}] should exist, but it doesn't`,
+          pass: false,
+        };
+      }
+    }
+    return {
+      message: () =>
+        `URL [${received}] should not include all of the parameters ${JSON.stringify(expectedParamsKeys)}, but it does`,
+      pass: true,
+    };
+  },
+
+  toHaveQueryParamsValues(received, expectedParams) {
     const { params } = breakUrl(received);
     for (let k in expectedParams) {
       if (String(params[k]) !== String(expectedParams[k])) {

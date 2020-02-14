@@ -1,4 +1,4 @@
-import "jest-setup";
+import 'jest-setup';
 
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer } from 'src';
 
@@ -19,11 +19,9 @@ test('WmsLayer.getMapUrl returns an URL', () => {
     format: MimeTypes.JPEG,
   };
   const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
-  expect(imageUrl).toBe(
-    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?version=1.1.1&service=WMS&request=GetMap&format=image%2Fjpeg&crs=EPSG%3A4326&layers=PROBAV_S1_TOA_333M&bbox=19%2C20%2C20%2C21&time=2020-01-10T00%3A00%3A00.000Z%2F2020-01-10T23%3A59%3A59.000Z&width=512&height=512&showlogo=false&transparent=true&',
-  );
+
   expect(imageUrl).toHaveOrigin('https://proba-v-mep.esa.int');
-  expect(imageUrl).toHaveQueryParams({
+  expect(imageUrl).toHaveQueryParamsValues({
     service: 'WMS',
     version: '1.1.1',
     request: 'GetMap',
@@ -35,4 +33,6 @@ test('WmsLayer.getMapUrl returns an URL', () => {
     width: '512',
     height: '512',
   });
+  expect(imageUrl).not.toHaveQueryParams(['showlogo']);
+  expect(imageUrl).not.toHaveQueryParams(['transparent']);
 });
