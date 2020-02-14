@@ -23,10 +23,4 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
       hasMore: response.data.hasMore,
     };
   }
-
-  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    console.log('s3olci layer, finddates', { bbox, fromTime, toTime });
-
-    return super.findDates(bbox, fromTime, toTime);
-  }
 }
