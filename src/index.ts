@@ -30,9 +30,9 @@ import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
-// import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
+import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
 
-// registerAxiosCacheRetryInterceptors();
+registerAxiosCacheRetryInterceptors();
 
 export {
   LayersFactory,
