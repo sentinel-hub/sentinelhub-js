@@ -5,7 +5,6 @@ import {
   MimeTypes,
   ApiType,
   DATASET_EOCLOUD_LANDSAT5,
-  OrbitDirection,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -123,7 +122,6 @@ export const getMapWMSEvalscript = () => {
         return [2.5 * B04, 1.5 * B03, 0.5 * B02];
       `,
     );
-    console.log("aaaaaaaaaaaaaaaaaaa", layer)
 
     const getMapParams = {
       bbox: bbox,
@@ -157,7 +155,6 @@ export const findTiles = () => {
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       null,
-      OrbitDirection.ASCENDING,
     );
     renderTilesList(containerEl, data.tiles);
   };
