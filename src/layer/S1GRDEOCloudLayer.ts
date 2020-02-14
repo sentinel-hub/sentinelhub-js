@@ -103,7 +103,6 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       productType: 'GRD',
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
-      orbitDirection: this.orbitDirection,
     };
     if (this.orbitDirection !== null) {
       result.orbitDirection = this.orbitDirection;
