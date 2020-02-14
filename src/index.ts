@@ -26,6 +26,7 @@ import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
+import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
@@ -56,6 +57,7 @@ export {
   MODISLayer,
   DEMLayer,
   Landsat8AWSLayer,
+  BYOCLayer,
   // auth:
   setAuthToken,
   isAuthTokenSet,
