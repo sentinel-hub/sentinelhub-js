@@ -65,8 +65,8 @@ export function wmsGetMapUrl(
     time: undefined,
     width: undefined,
     height: undefined,
-    showlogo: false,
-    transparent: true,
+    showlogo: undefined,
+    transparent: undefined,
     gain: undefined,
     gamma: undefined,
   };
@@ -164,7 +164,10 @@ export function wmsGetMapUrl(
   for (let k of validUnknownParamsKeys) {
     unknownParams[k] = params.unknown[k];
   }
-  const unknownParamsStr = unknownParams ? '&' + stringify(unknownParams, { sort: false }) : '';
+  const unknownParamsStr =
+    unknownParams && Object.keys(unknownParams).length > 0
+      ? '&' + stringify(unknownParams, { sort: false })
+      : '';
 
   return `${baseUrl}?${queryString}${unknownParamsStr}`;
 }
