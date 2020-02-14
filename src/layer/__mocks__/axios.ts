@@ -10,5 +10,5 @@ export default {
     response: {
       use: () => {},
     },
-  }
+  },
 };
