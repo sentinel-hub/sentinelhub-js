@@ -11,7 +11,11 @@ import {
   DATASET_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_S5PL2,
   DATASET_AWS_L8L1C,
+  DATASET_EOCLOUD_LANDSAT5,
+  DATASET_EOCLOUD_LANDSAT7,
+  DATASET_EOCLOUD_LANDSAT8,
   DATASET_MODIS,
   DATASET_AWS_DEM,
 } from 'src/layer/dataset';
@@ -25,12 +29,15 @@ import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
+import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
+import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
+import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
-import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
+import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -42,7 +49,11 @@ export {
   DATASET_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_S5PL2,
   DATASET_AWS_L8L1C,
+  DATASET_EOCLOUD_LANDSAT5,
+  DATASET_EOCLOUD_LANDSAT7,
+  DATASET_EOCLOUD_LANDSAT8,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   // layers:
@@ -56,6 +67,9 @@ export {
   S5PL2Layer,
   MODISLayer,
   DEMLayer,
+  Landsat5EOCloudLayer,
+  Landsat7EOCloudLayer,
+  Landsat8EOCloudLayer,
   Landsat8AWSLayer,
   BYOCLayer,
   // auth:

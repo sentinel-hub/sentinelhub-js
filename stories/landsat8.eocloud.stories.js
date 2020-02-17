@@ -1,14 +1,10 @@
 import {
-  S1GRDEOCloudLayer,
+  Landsat8EOCloudLayer,
   CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
-  DATASET_EOCLOUD_S1GRD,
-  OrbitDirection,
-  AcquisitionMode,
-  Polarization,
-  Resolution,
+  DATASET_EOCLOUD_LANDSAT8,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -16,16 +12,16 @@ if (!process.env.EOC_INSTANCE_ID) {
   throw new Error("EOC_INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.EOC_S1GRDIW_LAYER_ID) {
-  throw new Error("EOC_S1GRDIW_LAYER_ID environment variable is not defined!");
+if (!process.env.EOC_LANDSAT8_LAYER_ID) {
+  throw new Error("EOC_LANDSAT8_LAYER_ID environment variable is not defined!");
 };
 
 const instanceId = process.env.EOC_INSTANCE_ID;
-const layerId = process.env.EOC_S1GRDIW_LAYER_ID;
+const layerId = process.env.EOC_LANDSAT8_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 
 export default {
-  title: 'Sentinel 1 GRD IW - EOCloud',
+  title: 'Landsat 8 - EOCloud',
 };
 
 export const getMapURL = () => {
@@ -37,7 +33,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+  const layer = new Landsat8EOCloudLayer(instanceId, layerId);
 
   const getMapParams = {
     bbox: bbox,
@@ -63,7 +59,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+    const layer = new Landsat8EOCloudLayer(instanceId, layerId);
 
     const getMapParams = {
       bbox: bbox,
@@ -91,7 +87,7 @@ export const getMapWMSLayersFactory = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_LANDSAT8.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -119,13 +115,12 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(
+    const layer = new Landsat8EOCloudLayer(
       instanceId,
       layerId,
       `
-        return [2.5 * VV, 1.5 * VV, 0.5 * VV];
+        return [2.5 * B04, 1.5 * B03, 0.5 * B02];
       `,
-      null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH
     );
 
     const getMapParams = {
@@ -146,7 +141,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+  const layer = new Landsat8EOCloudLayer(instanceId, layerId);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -156,11 +151,10 @@ export const findTiles = () => {
   const perform = async () => {
     const data = await layer.findTiles(
       bbox,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       null,
-      OrbitDirection.ASCENDING,
     );
     renderTilesList(containerEl, data.tiles);
   };
