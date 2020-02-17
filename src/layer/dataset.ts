@@ -126,8 +126,10 @@ export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   shJsonGetCapabilitiesDataset: null,
   shWmsEvalsource: 'L5',
   shProcessingApiDatasourceAbbreviation: null,
+  datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
+  findDatesUrl: null,
   orbitTimeMinutes: 99,
 };
 
@@ -136,8 +138,10 @@ export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
   shJsonGetCapabilitiesDataset: null,
   shWmsEvalsource: 'L7',
   shProcessingApiDatasourceAbbreviation: null,
+  datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
+  findDatesUrl: null,
   orbitTimeMinutes: 99,
 };
 
@@ -146,8 +150,10 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   shJsonGetCapabilitiesDataset: null,
   shWmsEvalsource: 'L8',
   shProcessingApiDatasourceAbbreviation: null,
+  datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
+  findDatesUrl: null,
   orbitTimeMinutes: 99,
 };
 
@@ -180,7 +186,9 @@ export const DATASET_BYOC: Dataset = {
   shJsonGetCapabilitiesDataset: 'CUSTOM',
   shWmsEvalsource: 'CUSTOM',
   shProcessingApiDatasourceAbbreviation: 'CUSTOM',
+  datasetParametersType: null,
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex',
   orbitTimeMinutes: null,
+  findDatesUrl: null,
 };

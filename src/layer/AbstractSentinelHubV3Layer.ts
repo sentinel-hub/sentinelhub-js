@@ -187,8 +187,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('This dataset does not support searching for dates');
     }
 
-    console.log('AbstractSHV3Layer', { bbox, fromTime, toTime, datasetSpecificParameters });
-
     const bboxPolygon = {
       type: 'Polygon',
       crs: { type: 'name', properties: { name: bbox.crs.urn } },
