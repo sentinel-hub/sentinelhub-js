@@ -148,8 +148,6 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       orbitDirection: datasetSpecificParameters && datasetSpecificParameters.orbitDirection,
     };
 
-    console.log('s1grdawsiw layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
-
     return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
   }
 }

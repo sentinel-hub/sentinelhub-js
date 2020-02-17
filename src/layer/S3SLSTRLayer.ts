@@ -66,8 +66,6 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       view: datasetSpecificParameters.view,
     };
 
-    console.log('s3slstr layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
-
     return super.findDates(bbox, fromTime, toTime, {
       maxCloudCoverage: datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage,
       datasetParameters: findDatesDatasetParameters,

@@ -35,8 +35,6 @@ export class S2L2ALayer extends AbstractSentinelHubV3Layer {
       maxCloudCoverage?: number;
     },
   ): Promise<Date[]> {
-    console.log('s2l2a layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
-
     return super.findDates(bbox, fromTime, toTime, {
       maxCloudCoverage: datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage,
     });

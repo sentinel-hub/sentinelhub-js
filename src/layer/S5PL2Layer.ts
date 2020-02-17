@@ -72,8 +72,6 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       productType: datasetSpecificParameters && datasetSpecificParameters.productType,
     };
 
-    console.log('s5pl2 layer, finddates', { bbox, fromTime, toTime, datasetSpecificParameters });
-
     return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
   }
 }
