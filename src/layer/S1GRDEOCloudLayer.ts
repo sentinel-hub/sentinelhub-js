@@ -99,7 +99,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   }
 
   protected getFindTilesAdditionalParameters(): Record<string, any> {
-    const result = {
+    const result: Record<string, any> = {
       productType: 'GRD',
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
