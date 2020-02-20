@@ -56,7 +56,7 @@ test('WmsLayer.getMap makes an appropriate request', () => {
   };
   layer.getMap(getMapParams, ApiType.WMS);
 
-  expect(axios.get.mock.calls.length).toBe(1);
+  expect(axios.get).toHaveBeenCalledTimes(1);
 
   const call: any = axios.get.mock.calls[0]; // cast to `any` so we can access the parameters
   const [url, axiosParams] = call;
