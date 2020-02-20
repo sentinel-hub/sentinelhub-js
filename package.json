@@ -6,9 +6,12 @@
   "browser": "dist/sentinelHub.umd.js",
   "dependencies": {
     "@turf/helpers": "^6.1.4",
+    "@types/jest": "^25.1.2",
     "@types/xml2js": "^0.4.4",
     "axios": "^0.18.1",
+    "jest": "^25.1.0",
     "query-string": "^6.4.2",
+    "ts-jest": "^25.2.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -31,12 +34,26 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "node test/test.js",
-    "pretest": "npm run build",
+    "test": "jest",
     "lint": "eslint --max-warnings 0 --ext .ts,js src/",
     "prettier": "prettier --write \"{src,example}/**/*.{ts,js}\"",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "ts-jest"
+    },
+    "moduleDirectories": [
+      "node_modules",
+      "."
+    ],
+    "testRegex": "/__tests__/.*\\.(ts|tsx|js)$"
   },
   "types": "dist/index.d.ts",
   "files": [
