@@ -164,7 +164,13 @@ const hasCachedResponseExpired = (response: Response): boolean => {
 };
 
 const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
-  const cache = await caches.open(SENTINEL_HUB_CACHE);
+  let cache: Cache;
+  try {
+    cache = await caches.open(SENTINEL_HUB_CACHE);
+  } catch (err) {
+    return; // when running tests, `caches` is not defined
+  }
+
   const cacheKeys = await cache.keys();
   cacheKeys.forEach(async key => {
     const cachedResponse = await cache.match(key);
