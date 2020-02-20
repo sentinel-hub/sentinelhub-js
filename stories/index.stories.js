@@ -50,7 +50,6 @@ export const S2GetMapURL = () => {
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    maxCCPercent: 50,
   };
   const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -79,7 +78,6 @@ export const S2GetMapWMS = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -132,7 +130,6 @@ export const S2GetMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -213,7 +210,8 @@ export const WmsGetMap = () => {
 };
 
 export const S2FindTiles = () => {
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const maxCloudCoverPercent = 60;
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId, null, null, null, null, null, maxCloudCoverPercent);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 
@@ -227,8 +225,7 @@ export const S2FindTiles = () => {
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
-      null,
-      60,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };
@@ -253,7 +250,6 @@ export const S1GRDFindTiles = () => {
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       0,
-      'ASCENDING',
     );
 
     renderTilesList(containerEl, data.tiles);

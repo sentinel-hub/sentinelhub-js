@@ -33,7 +33,8 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+  const maxCloudCoverPercent = 0;
+  const layer = new Landsat5EOCloudLayer(instanceId, layerId, null, null, null, null, maxCloudCoverPercent);
 
   const getMapParams = {
     bbox: bbox,
@@ -88,7 +89,6 @@ export const getMapWMSLayersFactory = () => {
 
   const perform = async () => {
     const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
-
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
@@ -130,7 +130,6 @@ export const getMapWMSEvalscript = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -154,7 +153,7 @@ export const findTiles = () => {
       new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
-      null,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };
