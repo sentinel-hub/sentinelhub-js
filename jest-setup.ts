@@ -10,7 +10,7 @@ declare global {
 
 expect.extend({
   toHaveQueryParams(received, expectedParamsKeys) {
-    const { params } = breakUrl(received);
+    const { params } = parseUrl(received);
     for (let k of expectedParamsKeys) {
       if (params[k] === undefined) {
         return {
@@ -27,7 +27,7 @@ expect.extend({
   },
 
   toHaveQueryParamsValues(received, expectedParams) {
-    const { params } = breakUrl(received);
+    const { params } = parseUrl(received);
     for (let k in expectedParams) {
       if (String(params[k]) !== String(expectedParams[k])) {
         return {
@@ -44,7 +44,7 @@ expect.extend({
   },
 
   toHaveOrigin(received, expectedOrigin) {
-    const { origin } = breakUrl(received);
+    const { origin } = parseUrl(received);
     if (origin !== expectedOrigin) {
       return {
         message: () => `URL hostname should have value [${expectedOrigin}], instead it has value [${origin}]`,
@@ -60,7 +60,7 @@ expect.extend({
 
 /* ************************ */
 
-function breakUrl(urlWithQueryParams: string) {
+function parseUrl(urlWithQueryParams: string) {
   const url = new URL(urlWithQueryParams);
   let params: Record<string, string> = {};
   url.searchParams.forEach((value, key) => {
