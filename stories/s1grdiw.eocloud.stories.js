@@ -135,7 +135,6 @@ export const getMapWMSEvalscript = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
@@ -146,7 +145,17 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+  const layer = new S1GRDEOCloudLayer(
+    instanceId,
+    layerId,
+    null,
+    null,
+    null,
+    null,
+    AcquisitionMode.IW,
+    Polarization.DV,
+    OrbitDirection.ASCENDING,
+  );
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');

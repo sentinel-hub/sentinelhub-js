@@ -145,9 +145,12 @@ function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegac
     getMapParams.height = height;
   }
 
-  if (params.maxcc) {
-    getMapParams.maxCCPercent = parseInt(params.maxcc);
-  }
+  // Instead of dealing with maxCC at this point, we pass it through as an unknown parameter. In the
+  // future, it should be used to instantiate the layers instead.
+  // if (params.maxcc) {
+  //   getMapParams.maxCloudCoverPercent = parseInt(params.maxcc);
+  // }
+
   if (params.preview) {
     getMapParams.preview = previewFromParams(params);
   }
@@ -196,7 +199,7 @@ function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegac
     'srs',
     'srsname',
     'time',
-    'maxcc',
+    //'maxcc',
   ];
   const getMapParamsObjectKeys = Object.keys(getMapParams);
   let unknown: Record<string, string> = {};

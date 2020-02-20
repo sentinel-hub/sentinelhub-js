@@ -3,6 +3,7 @@ import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { OrbitDirection } from 'src';
+import { ProcessingPayload } from 'src/layer/processing';
 
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
@@ -12,6 +13,38 @@ type S3SLSTRFindTilesDatasetParameters = {
 
 export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3SLSTR;
+  protected maxCloudCoverPercent: number;
+  protected orbitDirection: OrbitDirection | null;
+  protected view: 'NADIR' | 'OBLIQUE';
+
+  public constructor(
+    instanceId: string | null,
+    layerId: string | null = null,
+    evalscript: string | null = null,
+    evalscriptUrl: string | null = null,
+    dataProduct: string | null = null,
+    title: string | null = null,
+    description: string | null = null,
+    maxCloudCoverPercent: number | null = 100,
+    orbitDirection: OrbitDirection | null = null,
+    view: 'NADIR' | 'OBLIQUE' = 'NADIR',
+  ) {
+    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+    this.maxCloudCoverPercent = maxCloudCoverPercent;
+    this.orbitDirection = orbitDirection;
+    this.view = view;
+  }
+
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    return payload;
+  }
+
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {
+      maxcc: this.maxCloudCoverPercent,
+    };
+  }
 
   public async findTiles(
     bbox: BBox,
@@ -19,14 +52,11 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
-    maxCloudCoverage?: number,
-    orbitDirection: OrbitDirection | null = OrbitDirection.DESCENDING,
-    view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
-      orbitDirection: orbitDirection,
-      view: view,
+      orbitDirection: this.orbitDirection,
+      view: this.view,
     };
     const response = await this.fetchTiles(
       bbox,
@@ -34,7 +64,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      maxCloudCoverage,
+      this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
     return {
