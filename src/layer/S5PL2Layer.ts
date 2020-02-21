@@ -30,7 +30,7 @@ type S5PL2FindTilesDatasetParameters = {
 export class S5PL2Layer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S5PL2;
   protected productType: ProductType;
-  protected maxCloudCoverPercent: number;
+  public maxCloudCoverPercent: number;
   protected minQa: number | null;
 
   public constructor(
