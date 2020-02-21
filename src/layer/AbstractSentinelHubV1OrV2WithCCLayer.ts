@@ -2,7 +2,7 @@ import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1O
 
 // same as AbstractSentinelHubV1OrV2Layer, but with maxCloudCoverPercent (useful for Landsat datasets)
 export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1OrV2Layer {
-  protected maxCloudCoverPercent: number;
+  public maxCloudCoverPercent: number;
 
   public constructor(
     instanceId: string,

@@ -11,12 +11,12 @@ import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/l
 export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   public readonly dataset = DATASET_EOCLOUD_S1GRD;
 
-  protected acquisitionMode: AcquisitionMode;
-  protected polarization: Polarization;
-  protected orthorectify: boolean | null = false;
-  protected backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
-  protected resolution: Resolution | null = null;
-  protected orbitDirection: OrbitDirection | null = null;
+  public acquisitionMode: AcquisitionMode;
+  public polarization: Polarization;
+  public resolution: Resolution | null = null;
+  public orbitDirection: OrbitDirection | null = null;
+  public orthorectify: boolean | null = false;
+  public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
   public constructor(
     instanceId: string | null,
