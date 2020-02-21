@@ -183,7 +183,7 @@ OAuth Client's secret is shown only before the creation process is finished so b
 Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-const { setAuthToken, requestAuthToken } = require('sentinelhub-js');
+import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
 
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
