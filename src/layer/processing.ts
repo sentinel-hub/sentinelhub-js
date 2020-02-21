@@ -33,7 +33,6 @@ export type ProcessingPayload = {
             from: string;
             to: string;
           };
-          maxCloudCoverage: number;
           previewMode?: PreviewMode;
           mosaickingOrder?: MosaickingOrder;
           [key: string]: any;
@@ -44,7 +43,7 @@ export type ProcessingPayload = {
           [key: string]: any;
         };
         type: string;
-      }
+      },
     ];
   };
   output: {
@@ -56,7 +55,7 @@ export type ProcessingPayload = {
         format: {
           type: MimeType;
         };
-      }
+      },
     ];
   };
   evalscript?: string;
@@ -87,7 +86,6 @@ export function createProcessingPayload(
               to: params.toTime.toISOString(),
             },
             mosaickingOrder: MosaickingOrder.MOST_RECENT,
-            maxCloudCoverage: params.maxCCPercent, // maximum allowable cloud coverage in percent
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,

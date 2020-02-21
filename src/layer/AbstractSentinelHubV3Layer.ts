@@ -99,14 +99,18 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         }
       }
 
-      // allow subclasses to update payload with their own parameters:
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
+      // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
 
       return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);
+  }
+
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {};
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {
@@ -118,7 +122,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const baseUrl = `${this.dataset.shServiceHostname}ogc/wms/${this.instanceId}`;
     const evalsource = this.dataset.shWmsEvalsource;
-    return wmsGetMapUrl(baseUrl, this.layerId, params, this.evalscript, this.evalscriptUrl, evalsource);
+    return wmsGetMapUrl(
+      baseUrl,
+      this.layerId,
+      params,
+      this.evalscript,
+      this.evalscriptUrl,
+      evalsource,
+      this.getWmsGetMapUrlAdditionalParameters(),
+    );
   }
 
   public setEvalscript(evalscript: string): void {
@@ -142,7 +154,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     maxCount: number = 1,
     offset: number = 0,
-    maxCloudCoverage?: number | null,
+    maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
     if (!this.dataset.searchIndexUrl) {
@@ -161,10 +173,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         ],
       ],
     };
+    // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
+    // the tiles we get cloudCoverPercentage (0..100).
     const payload: any = {
       clipping: bboxPolygon,
       maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverage ? maxCloudCoverage / 100 : null,
+      maxCloudCoverage: maxCloudCoverPercent ? maxCloudCoverPercent / 100 : null,
       timeFrom: fromTime.toISOString(),
       timeTo: toTime.toISOString(),
       offset: offset,

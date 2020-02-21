@@ -53,6 +53,7 @@ export function wmsGetMapUrl(
   evalscript: string | null = null,
   evalscriptUrl: string | null = null,
   evalsource: string | null = null,
+  additionalParameters: Record<string, any> = {},
 ): string {
   const queryParams: OgcGetMapOptions = {
     version: OGC_SERVICES_IMPLEMENTED_VERSIONS[ServiceType.WMS],
@@ -65,10 +66,11 @@ export function wmsGetMapUrl(
     time: undefined,
     width: undefined,
     height: undefined,
-    showlogo: false,
-    transparent: true,
+    showlogo: undefined,
+    transparent: undefined,
     gain: undefined,
     gamma: undefined,
+    ...additionalParameters,
   };
 
   if (layers === null) {
@@ -87,10 +89,6 @@ export function wmsGetMapUrl(
   }
 
   queryParams.time = `${params.fromTime.toISOString()}/${params.toTime.toISOString()}`;
-
-  if (params.maxCCPercent) {
-    queryParams.maxcc = params.maxCCPercent;
-  }
 
   if (params.width && params.height) {
     queryParams.width = params.width;
@@ -164,7 +162,10 @@ export function wmsGetMapUrl(
   for (let k of validUnknownParamsKeys) {
     unknownParams[k] = params.unknown[k];
   }
-  const unknownParamsStr = unknownParams ? '&' + stringify(unknownParams, { sort: false }) : '';
+  const unknownParamsStr =
+    unknownParams && Object.keys(unknownParams).length > 0
+      ? '&' + stringify(unknownParams, { sort: false })
+      : '';
 
   return `${baseUrl}?${queryString}${unknownParamsStr}`;
 }

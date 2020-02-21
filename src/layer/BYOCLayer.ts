@@ -3,7 +3,7 @@ import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from './processing';
+import { ProcessingPayload } from 'src/layer/processing';
 
 type BYOCFindTilesDatasetParameters = {
   type: string;
