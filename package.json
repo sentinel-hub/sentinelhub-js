@@ -6,12 +6,9 @@
   "browser": "dist/sentinelHub.umd.js",
   "dependencies": {
     "@turf/helpers": "^6.1.4",
-    "@types/jest": "^25.1.2",
     "@types/xml2js": "^0.4.4",
     "axios": "^0.18.1",
-    "jest": "^25.1.0",
     "query-string": "^6.4.2",
-    "ts-jest": "^25.2.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -19,16 +16,19 @@
     "@storybook/html": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^1.9.0",
     "@typescript-eslint/parser": "^1.9.0",
+    "@types/jest": "^25.1.2",
     "babel-loader": "^8.0.6",
     "dotenv": "^8.2.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.1.0",
+    "jest": "^25.1.0",
     "prettier": "^1.17.1",
     "rollup": "^0.67.0",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-typescript2": "^0.20.1",
+    "ts-jest": "^25.2.0",
     "typescript": "^3.5.1"
   },
   "scripts": {
