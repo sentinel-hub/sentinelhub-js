@@ -40,7 +40,7 @@ The core data structure is `Layer`, which corresponds to a _layer_ as returned b
 Basic (WMS-capable) `Layer` can be initialized like this:
 
 ```javascript
-  import { WmsLayer } from 'sentinelhub-js';
+  import { WmsLayer } from '@sentinel-hub/sentinelhub-js';
 
   const layer = new WmsLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', 'Title', 'Description');
 ```
@@ -55,7 +55,7 @@ When it comes to Sentinel Hub layers, there are four ways to determine their con
 - by `dataProduct`: the structure which contains an ID of a pre-existing product
 
 ```javascript
-  import { S1GRDAWSEULayer } from 'sentinelhub-js';
+  import { S1GRDAWSEULayer } from '@sentinel-hub/sentinelhub-js';
 
   let layerS1;
   layerS1 = new S1GRDAWSEULayer(instanceId, '<layer-id>', null, null, null, 'Title', 'Description');
@@ -67,7 +67,7 @@ When it comes to Sentinel Hub layers, there are four ways to determine their con
 It is also possible to create layers as they are defined in Sentinel Hub configuration instance:
 
 ```javascript
-  import { LayersFactory } from 'sentinelhub-js';
+  import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
   const layers = LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>');
     // [ layer1, layer2, ... ] - a list of Layer objects
@@ -80,7 +80,7 @@ Depending on `baseUrl`, method `makeLayers()` tries to determine if a specific `
 
 Alternatively, the list can be filtered to include only some of the layers:
 ```javascript
-  import { LayersFactory, DATASET_S2L2A } from 'sentinelhub-js';
+  import { LayersFactory, DATASET_S2L2A } from '@sentinel-hub/sentinelhub-js';
 
   // this will return only a list of those S2L2A layers whose IDs start with "ABC_":
   const layers = LayersFactory.makeLayers(
@@ -92,7 +92,7 @@ Alternatively, the list can be filtered to include only some of the layers:
 Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
 
 ```javascript
-  import { isAuthTokenSet, setAuthToken } from 'sentinelhub-js';
+  import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
 
   const before = isAuthTokenSet(); // false
   setAuthToken(newAuthToken);
@@ -106,7 +106,7 @@ The process of getting the authentication token is described in [Authentication 
 Maps which correspond to these layers can be fetched via different protocols like WMS and Processing. Not all of the protocols can be used in all cases; for example, Processing can only render layers for which it has access to the `evalscript` and for which evalscript version 3 is used.
 
 ```javascript
-  import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from 'sentinelhub-js';
+  import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from '@sentinel-hub/sentinelhub-js';
 
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   const getMapParams = {
@@ -137,7 +137,7 @@ Searching for the data is a domain either of a _layer_ or its _dataset_ (if avai
 
 We can always use layer to search for data availability:
 ```typescript
-  import { OrbitDirection } from 'sentinelhub-js';
+  import { OrbitDirection } from '@sentinel-hub/sentinelhub-js';
 
   const maxCloudCoverPercent = 50;
   const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A', null, null, null, null, null, maxCloudCoverPercent);
@@ -183,7 +183,7 @@ OAuth Client's secret is shown only before the creation process is finished so b
 Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-const { setAuthToken, requestAuthToken } = require('sentinelhub-js');
+import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
 
 const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
 const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
