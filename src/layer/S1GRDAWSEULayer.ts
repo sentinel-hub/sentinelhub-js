@@ -42,12 +42,12 @@ type S1GRDFindTilesDatasetParameters = {
 export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_AWSEU_S1GRD;
 
-  protected acquisitionMode: AcquisitionMode;
-  protected polarization: Polarization;
-  protected orthorectify: boolean | null = false;
-  protected backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
-  protected resolution: Resolution | null = null;
-  protected orbitDirection: OrbitDirection | null = null;
+  public acquisitionMode: AcquisitionMode;
+  public polarization: Polarization;
+  public resolution: Resolution | null = null;
+  public orbitDirection: OrbitDirection | null = null;
+  public orthorectify: boolean | null = false;
+  public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
   public constructor(
     instanceId: string | null,
@@ -73,7 +73,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orbitDirection = orbitDirection;
   }
 
-  protected async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {
     if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
       return;
     }
