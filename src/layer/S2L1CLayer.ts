@@ -6,7 +6,7 @@ import { ProcessingPayload } from 'src/layer/processing';
 
 export class S2L1CLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S2L1C;
-  protected maxCloudCoverPercent: number;
+  public maxCloudCoverPercent: number;
 
   public constructor(
     instanceId: string | null,

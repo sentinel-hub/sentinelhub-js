@@ -13,9 +13,9 @@ type S3SLSTRFindTilesDatasetParameters = {
 
 export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3SLSTR;
-  protected maxCloudCoverPercent: number;
-  protected orbitDirection: OrbitDirection | null;
-  protected view: 'NADIR' | 'OBLIQUE';
+  public maxCloudCoverPercent: number;
+  public orbitDirection: OrbitDirection | null;
+  public view: 'NADIR' | 'OBLIQUE';
 
   public constructor(
     instanceId: string | null,

@@ -79,4 +79,6 @@ export class AbstractLayer {
     }
     return flyoverIntervals;
   }
+
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }
