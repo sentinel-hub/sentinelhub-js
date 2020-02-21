@@ -49,11 +49,11 @@ type GetCapabilitiesXml = {
                 Title: string[];
                 Abstract: string[];
                 Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
-              }
+              },
             ];
-          }
+          },
         ];
-      }
+      },
     ];
   };
 };
