@@ -73,7 +73,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orbitDirection = orbitDirection;
   }
 
-  protected async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {
     if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
       return;
     }
