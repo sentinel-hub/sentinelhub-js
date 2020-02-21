@@ -43,7 +43,7 @@ export type ProcessingPayload = {
           [key: string]: any;
         };
         type: string;
-      }
+      },
     ];
   };
   output: {
@@ -55,7 +55,7 @@ export type ProcessingPayload = {
         format: {
           type: MimeType;
         };
-      }
+      },
     ];
   };
   evalscript?: string;

@@ -92,9 +92,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       return 'S1_EW_SH';
     }
     throw new Error(
-      `This combination of acquisition mode and polarization (${this.acquisitionMode} / ${
-        this.polarization
-      }) is not available on EO Cloud`,
+      `This combination of acquisition mode and polarization (${this.acquisitionMode} / ${this.polarization}) is not available on EO Cloud`,
     );
   }
 
