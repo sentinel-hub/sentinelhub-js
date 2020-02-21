@@ -11,7 +11,6 @@ export type GetMapParams = {
   width?: number;
   height?: number;
   // optional additional parameters:
-  maxCCPercent?: number;
   preview?: number;
   geometry?: string;
   quality?: number;

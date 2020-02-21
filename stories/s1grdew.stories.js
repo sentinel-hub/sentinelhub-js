@@ -125,7 +125,6 @@ export const getMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -178,7 +177,6 @@ export const getMapProcessingWithoutInstance = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -238,8 +236,7 @@ export const findTiles = () => {
       new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
       new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       5,
-      null,
-      null,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };

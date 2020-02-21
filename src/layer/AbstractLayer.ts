@@ -88,4 +88,6 @@ export class AbstractLayer {
   ): Promise<Date[]> {
     throw new Error('Not implemented yet');
   }
+  
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }

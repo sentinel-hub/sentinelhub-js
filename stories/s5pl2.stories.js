@@ -157,7 +157,6 @@ export const getMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -207,7 +206,6 @@ export const getMapProcessingWithoutInstance = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      maxCCPercent: 100,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
@@ -252,7 +250,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S5PL2Layer(instanceId, layerId);
+  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, "SO2");
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -265,8 +263,7 @@ export const findTiles = () => {
       new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
       new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       5,
-      null,
-      null,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };
