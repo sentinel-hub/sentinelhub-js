@@ -308,7 +308,7 @@ export const findFlyovers = () => {
       0,
     );
 
-    const flyovers = layer.findFlyoverIntervals(bbox, tiles);
+    const flyovers = layer.findFlyovers(bbox, tiles);
     flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
 
     // prepare an image to show that the number makes sense:
