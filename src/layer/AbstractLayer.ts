@@ -6,7 +6,7 @@ import { Dataset } from 'src/layer/dataset';
 import { RequestConfig } from 'src/utils/axiosInterceptors';
 import intersect from '@turf/intersect';
 import area from '@turf/area';
-import union from '@turf/union';  // @turf/union is missing types definitions, we supply them separately
+import union from '@turf/union'; // @turf/union is missing types definitions, we supply them separately
 
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
