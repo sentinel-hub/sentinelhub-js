@@ -8,6 +8,9 @@
     "outDir": "./dist",
     "target": "es2016",
     "moduleResolution": "node",
+    "typeRoots": [
+      "src/customTypings/@types/union"
+    ],
     "esModuleInterop": true
   },
   "include": ["src/**/*"],
