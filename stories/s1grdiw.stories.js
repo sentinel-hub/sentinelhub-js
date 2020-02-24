@@ -266,6 +266,7 @@ export const findTiles = () => {
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const data = await layer.findTiles(
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -274,6 +275,53 @@ export const findTiles = () => {
       0,
     );
     renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findFlyovers = () => {
+  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const bbox = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const fromTime = new Date(Date.UTC(2020, 1 - 1, 15, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
+    const { tiles } = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      50,
+      0,
+    );
+
+    const flyovers = layer.findFlyoverIntervals(bbox, tiles);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 
