@@ -49,7 +49,7 @@ export class AbstractLayer {
     throw new Error('Not implemented yet');
   }
 
-  public findFlyoverIntervals(bbox: BBox, tiles: Tile[]): FlyoverInterval[] {
+  public findFlyovers(bbox: BBox, tiles: Tile[]): FlyoverInterval[] {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
