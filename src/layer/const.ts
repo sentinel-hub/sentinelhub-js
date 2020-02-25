@@ -63,6 +63,7 @@ export type FlyoverInterval = {
   fromTime: Date;
   toTime: Date;
   coveragePercent: number;
+  meta: Record<string, any>;
 };
 
 export type MimeType =
