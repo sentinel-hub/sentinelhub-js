@@ -62,6 +62,7 @@ export type PaginatedTiles = {
 export type FlyoverInterval = {
   fromTime: Date;
   toTime: Date;
+  coveragePercent: number;
 };
 
 export type MimeType =
