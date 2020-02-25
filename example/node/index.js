@@ -116,25 +116,37 @@ async function run() {
     getMapParams.toTime,
     20,
     0,
-    100,
   );
   printOut('tiles for S2 L2A:', tilesS2L2A);
   printOut('hasMore:', hasMore);
-  const flyoversS2L2A = layerS2L2A.findFlyovers(bbox, tilesS2L2A);
+
+  const flyoversS2L2A = await layerS2L2A.findFlyovers(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    10,
+    50,
+  );
   printOut('flyovers for S2 L2A:', flyoversS2L2A);
 
   // get tiles and flyover intervals for S1 GRD Layer
-  const { tiles: tilesS1GRD, hasMoreS1 } = await layerS1.findTiles(
+  const { tiles: tilesS1GRD, hasMore: hasMoreS1 } = await layerS1.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
     10,
     0,
-    OrbitDirection.ASCENDING,
   );
   printOut('tiles for S1 GRD:', tilesS1GRD);
   printOut('hasMore for S1:', hasMoreS1);
-  const flyoversS1GRD = layerS1.findFlyovers(bbox, tilesS1GRD);
+
+  const flyoversS1GRD = await layerS1.findFlyovers(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+    10,
+    50,
+  );
   printOut('flyovers for S1 GRD:', flyoversS1GRD);
 
   // finally, display the image:

@@ -300,15 +300,13 @@ export const findFlyovers = () => {
     await setAuthTokenWithOAuthCredentials();
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 15, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
-    const { tiles } = await layer.findTiles(
+    const flyovers = await layer.findFlyovers(
       bbox,
       fromTime,
       toTime,
+      20,
       50,
-      0,
     );
-
-    const flyovers = layer.findFlyovers(bbox, tiles);
     flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
 
     // prepare an image to show that the number makes sense:
