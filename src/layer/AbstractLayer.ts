@@ -9,6 +9,7 @@ import area from '@turf/area';
 import union from '@turf/union'; // @turf/union is missing types definitions, we supply them separately
 
 import { Polygon, MultiPolygon } from '@turf/helpers';
+import { CRS_EPSG4326 } from 'src/crs';
 
 export class AbstractLayer {
   public title: string | null = null;
@@ -58,6 +59,10 @@ export class AbstractLayer {
   ): Promise<FlyoverInterval[]> {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+    }
+
+    if (bbox.crs !== CRS_EPSG4326) {
+      throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
     let tiles: Tile[] = [];
