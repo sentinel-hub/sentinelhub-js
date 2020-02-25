@@ -256,9 +256,35 @@ export const getMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
+export const findTilesEPSG3857 = () => {
   const layer = new S1GRDAWSEULayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+  const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
+  const bbox4326 = new BBox(CRS_EPSG4326, 13.359375, 43.0688878, 14.0625, 43.5803908);
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findTiles</h2>";
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const data = await layer.findTiles(
+      bbox,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findTilesEPSG4326 = () => {
+  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const bbox = new BBox(CRS_EPSG4326, 13.359375, 43.0688878, 14.0625, 43.5803908);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
