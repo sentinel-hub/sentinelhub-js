@@ -49,9 +49,35 @@ export class AbstractLayer {
     throw new Error('Not implemented yet');
   }
 
-  public findFlyovers(bbox: BBox, tiles: Tile[]): FlyoverInterval[] {
+  public async findFlyovers(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxFindTilesRequests: number = 50,
+    tilesPerRequest: number = 50,
+  ): Promise<FlyoverInterval[]> {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+    }
+
+    let tiles: Tile[] = [];
+    for (let i = 0; i < maxFindTilesRequests; i++) {
+      const { tiles: partialTiles, hasMore } = await this.findTiles(
+        bbox,
+        fromTime,
+        toTime,
+        tilesPerRequest,
+        i * tilesPerRequest,
+      );
+      tiles = tiles.concat(partialTiles);
+      if (!hasMore) {
+        break;
+      }
+      if (i + 1 === maxFindTilesRequests) {
+        throw new Error(
+          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
+        );
+      }
     }
 
     tiles.sort((a, b) => a.sensingTime.getTime() - b.sensingTime.getTime());
