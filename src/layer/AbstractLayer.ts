@@ -91,14 +91,19 @@ export class AbstractLayer {
 
     let flyoverIndex = 0;
     let currentFlyoverGeometry = null;
+    let nTilesInFlyover = 0;
+    let sumCloudCoverPercent = undefined;
     for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
       if (tileIndex === 0) {
         flyoverIntervals[flyoverIndex] = {
           fromTime: tiles[tileIndex].sensingTime,
           toTime: tiles[tileIndex].sensingTime,
           coveragePercent: 0,
+          meta: {},
         };
         currentFlyoverGeometry = tiles[tileIndex].geometry;
+        sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+        nTilesInFlyover = 1;
         continue;
       }
 
@@ -109,18 +114,31 @@ export class AbstractLayer {
       if (diffMS < orbitTimeMS) {
         flyoverIntervals[flyoverIndex].toTime = tiles[tileIndex].sensingTime;
         currentFlyoverGeometry = union(currentFlyoverGeometry, tiles[tileIndex].geometry);
+        sumCloudCoverPercent =
+          sumCloudCoverPercent !== undefined
+            ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
+            : undefined;
+        nTilesInFlyover++;
       } else {
         flyoverIntervals[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
           bbox,
           currentFlyoverGeometry,
         );
+        if (sumCloudCoverPercent !== undefined) {
+          flyoverIntervals[flyoverIndex].meta.averageCloudCoverPercent =
+            sumCloudCoverPercent / nTilesInFlyover;
+        }
+
         flyoverIndex++;
         flyoverIntervals[flyoverIndex] = {
           fromTime: tiles[tileIndex].sensingTime,
           toTime: tiles[tileIndex].sensingTime,
           coveragePercent: 0,
+          meta: {},
         };
         currentFlyoverGeometry = tiles[tileIndex].geometry;
+        sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+        nTilesInFlyover = 1;
       }
     }
     if (flyoverIntervals.length > 0) {
@@ -128,6 +146,9 @@ export class AbstractLayer {
         bbox,
         currentFlyoverGeometry,
       );
+      if (sumCloudCoverPercent !== undefined) {
+        flyoverIntervals[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+      }
     }
     return flyoverIntervals;
   }
