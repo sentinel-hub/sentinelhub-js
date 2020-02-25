@@ -76,20 +76,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
-    const bboxPolygon = {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: bbox.crs.urn } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
-      ],
-    };
-    const payload = bboxPolygon;
+    const payload = bbox.toGeoJSON();
     const params = {
       expand: 'true',
       timefrom: fromTime.toISOString(),
