@@ -154,18 +154,7 @@ export class AbstractLayer {
   }
 
   private calculateCoveragePercent(bbox: BBox, flyoverGeometry: Polygon | MultiPolygon): number {
-    const bboxGeometry: Polygon = {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
-      ],
-    };
+    const bboxGeometry: Polygon = bbox.toGeoJSON();
     const bboxedFlyoverGeometry = intersect(bboxGeometry, flyoverGeometry);
     return (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
   }
