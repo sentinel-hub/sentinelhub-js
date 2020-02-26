@@ -20,4 +20,22 @@ export class BBox {
     this.minY = minY;
     this.maxY = maxY;
   }
+
+  // Note that Turf's Polygon type (which is basically what we are returning) doesn't
+  // allow 'crs' property, so we must return type :any.
+  public toGeoJSON(): any {
+    return {
+      type: 'Polygon',
+      crs: { type: 'name', properties: { name: this.crs.urn } },
+      coordinates: [
+        [
+          [this.minX, this.minY],
+          [this.maxX, this.minY],
+          [this.maxX, this.maxY],
+          [this.minX, this.maxY],
+          [this.minX, this.minY],
+        ],
+      ],
+    };
+  }
 }
