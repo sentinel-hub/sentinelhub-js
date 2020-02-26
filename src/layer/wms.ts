@@ -132,7 +132,7 @@ export function wmsGetMapUrl(
   if (params.nicename) {
     queryParams.nicename = params.nicename;
   }
-  if (params.showlogo) {
+  if (params.showlogo !== undefined) {
     queryParams.showlogo = params.showlogo;
   }
   if (params.bgcolor) {
