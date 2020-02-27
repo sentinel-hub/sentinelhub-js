@@ -60,105 +60,11 @@ export class AbstractLayer {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
-
     if (bbox.crs !== CRS_EPSG4326) {
       throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
-    let tiles: Tile[] = [];
-    for (let i = 0; i < maxFindTilesRequests; i++) {
-      const { tiles: partialTiles, hasMore } = await this.findTiles(
-        bbox,
-        fromTime,
-        toTime,
-        tilesPerRequest,
-        i * tilesPerRequest,
-      );
-      tiles = tiles.concat(partialTiles);
-      if (!hasMore) {
-        break;
-      }
-      if (i + 1 === maxFindTilesRequests) {
-        throw new Error(
-          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
-        );
-      }
-    }
-
-    tiles.sort((a, b) => a.sensingTime.getTime() - b.sensingTime.getTime());
-    let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
-    let flyoverIntervals: FlyoverInterval[] = [];
-
-    let flyoverIndex = 0;
-    let currentFlyoverGeometry = null;
-    let nTilesInFlyover = 0;
-    let sumCloudCoverPercent = undefined;
-    for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
-      if (tileIndex === 0) {
-        flyoverIntervals[flyoverIndex] = {
-          fromTime: tiles[tileIndex].sensingTime,
-          toTime: tiles[tileIndex].sensingTime,
-          coveragePercent: 0,
-          meta: {},
-        };
-        currentFlyoverGeometry = tiles[tileIndex].geometry;
-        sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-        nTilesInFlyover = 1;
-        continue;
-      }
-
-      const prevDateMS = tiles[tileIndex - 1].sensingTime.getTime();
-      const currDateMS = tiles[tileIndex].sensingTime.getTime();
-      const diffMS = Math.abs(prevDateMS - currDateMS);
-
-      if (diffMS < orbitTimeMS) {
-        flyoverIntervals[flyoverIndex].toTime = tiles[tileIndex].sensingTime;
-        try {
-          currentFlyoverGeometry = this.convertFromFeature(union(currentFlyoverGeometry, tiles[tileIndex].geometry));
-        } catch (ex) {
-          console.error({ex, currentFlyoverGeometry, g2: tiles[tileIndex].geometry})
-          throw ex;
-        }
-        sumCloudCoverPercent =
-          sumCloudCoverPercent !== undefined
-            ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
-            : undefined;
-        nTilesInFlyover++;
-      } else {
-        flyoverIntervals[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-          bbox,
-          currentFlyoverGeometry,
-        );
-        if (sumCloudCoverPercent !== undefined) {
-          flyoverIntervals[flyoverIndex].meta.averageCloudCoverPercent =
-            sumCloudCoverPercent / nTilesInFlyover;
-        }
-
-        flyoverIndex++;
-        flyoverIntervals[flyoverIndex] = {
-          fromTime: tiles[tileIndex].sensingTime,
-          toTime: tiles[tileIndex].sensingTime,
-          coveragePercent: 0,
-          meta: {},
-        };
-        currentFlyoverGeometry = tiles[tileIndex].geometry;
-        sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-        nTilesInFlyover = 1;
-      }
-    }
-    if (flyoverIntervals.length > 0) {
-      flyoverIntervals[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-        bbox,
-        currentFlyoverGeometry,
-      );
-      if (sumCloudCoverPercent !== undefined) {
-        flyoverIntervals[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
-      }
-    }
-    return flyoverIntervals;
-  }
-
-  private calculateCoveragePercent(bbox: BBox, flyoverGeometry: Polygon | MultiPolygon): number {
+    const orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
     const bboxGeometry: Polygon = {
       type: 'Polygon',
       coordinates: [
@@ -171,24 +77,116 @@ export class AbstractLayer {
         ],
       ],
     };
+
+    let flyovers: FlyoverInterval[] = [];
+    let flyoverIndex = 0;
+    let currentFlyoverGeometry: Polygon | MultiPolygon | null = null;
+    let nTilesInFlyover;
+    let sumCloudCoverPercent;
+    for (let i = 0; i < maxFindTilesRequests; i++) {
+      // grab new batch of tiles:
+      const { tiles, hasMore } = await this.findTiles(
+        bbox,
+        fromTime,
+        toTime,
+        tilesPerRequest,
+        i * tilesPerRequest,
+      );
+
+      // apply each tile to the flyover to calculate coverage:
+      for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
+        // first tile ever? just add its info and continue:
+        if (flyovers.length === 0) {
+          flyovers[flyoverIndex] = {
+            fromTime: tiles[tileIndex].sensingTime,
+            toTime: tiles[tileIndex].sensingTime,
+            coveragePercent: 0,
+            meta: {},
+          };
+          currentFlyoverGeometry = this.deFeature(tiles[tileIndex].geometry);
+          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+          nTilesInFlyover = 1;
+          continue;
+        }
+
+        // append the tile to flyovers:
+        const prevDateMS = flyovers[flyoverIndex].fromTime.getTime();
+        const currDateMS = tiles[tileIndex].sensingTime.getTime();
+        const diffMS = Math.abs(prevDateMS - currDateMS);
+        if (diffMS > orbitTimeMS || !hasMore) {
+          // finish the old flyover:
+          try {
+            flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+              bboxGeometry,
+              currentFlyoverGeometry,
+            );
+          } catch (err) {
+            flyovers[flyoverIndex].coveragePercent = null;
+          }
+          if (sumCloudCoverPercent !== undefined) {
+            flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+          }
+
+          // and start a new one:
+          if (diffMS > orbitTimeMS) {
+            flyoverIndex++;
+            flyovers[flyoverIndex] = {
+              fromTime: tiles[tileIndex].sensingTime,
+              toTime: tiles[tileIndex].sensingTime,
+              coveragePercent: 0,
+              meta: {},
+            };
+            currentFlyoverGeometry = this.deFeature(tiles[tileIndex].geometry);
+            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            nTilesInFlyover = 1;
+          }
+        } else {
+          // the same flyover:
+          flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
+          currentFlyoverGeometry = this.deFeature(
+            union(currentFlyoverGeometry, this.deFeature(tiles[tileIndex].geometry)),
+          );
+          sumCloudCoverPercent =
+            sumCloudCoverPercent !== undefined
+              ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
+              : undefined;
+          nTilesInFlyover++;
+        }
+      }
+
+      // make sure we exit when there are no more tiles:
+      if (!hasMore) {
+        break;
+      }
+      if (i + 1 === maxFindTilesRequests) {
+        throw new Error(
+          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
+        );
+      }
+    }
+    return flyovers;
+  }
+
+  private calculateCoveragePercent(bboxGeometry: Polygon, flyoverGeometry: Polygon | MultiPolygon): number {
     let bboxedFlyoverGeometry;
     try {
       bboxedFlyoverGeometry = intersect(bboxGeometry, flyoverGeometry);
     } catch (ex) {
-      console.error({msg: "Turf.js intersect() failed", ex, bboxGeometry, flyoverGeometry})
+      console.error({ msg: 'Turf.js intersect() failed', ex, bboxGeometry, flyoverGeometry });
       throw ex;
     }
     try {
-      return (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
+      const result = (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
+      return result;
     } catch (ex) {
-      console.error({msg: "Turf.js area() division failed", ex, bboxedFlyoverGeometry, flyoverGeometry})
+      console.error({ msg: 'Turf.js area() division failed', ex, bboxedFlyoverGeometry, flyoverGeometry });
       throw ex;
     }
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 
-  private convertFromFeature(f: Feature<Polygon | MultiPolygon> | Polygon | MultiPolygon): Polygon | MultiPolygon {
-    return f.type === "Feature" ? (f as Feature<Polygon | MultiPolygon>).geometry : f;
+  private deFeature(f: Feature<Polygon | MultiPolygon> | Polygon | MultiPolygon): Polygon | MultiPolygon {
+    return f.type === 'Feature' ? (f as Feature<Polygon | MultiPolygon>).geometry : f;
   }
 }
