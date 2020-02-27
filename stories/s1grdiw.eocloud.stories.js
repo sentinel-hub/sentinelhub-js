@@ -227,7 +227,6 @@ export const findFlyovers = () => {
   wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
 
   const perform = async () => {
-    console.log({layerId})
     const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
 
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
