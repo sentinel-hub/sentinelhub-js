@@ -8,7 +8,7 @@ import intersect from '@turf/intersect';
 import area from '@turf/area';
 import union from '@turf/union'; // @turf/union is missing types definitions, we supply them separately
 
-import { Polygon, MultiPolygon } from '@turf/helpers';
+import { Polygon, MultiPolygon, Feature } from '@turf/helpers';
 import { CRS_EPSG4326 } from 'src/crs';
 
 export class AbstractLayer {
@@ -113,7 +113,12 @@ export class AbstractLayer {
 
       if (diffMS < orbitTimeMS) {
         flyoverIntervals[flyoverIndex].toTime = tiles[tileIndex].sensingTime;
-        currentFlyoverGeometry = union(currentFlyoverGeometry, tiles[tileIndex].geometry);
+        try {
+          currentFlyoverGeometry = this.convertFromFeature(union(currentFlyoverGeometry, tiles[tileIndex].geometry));
+        } catch (ex) {
+          console.error({ex, currentFlyoverGeometry, g2: tiles[tileIndex].geometry})
+          throw ex;
+        }
         sumCloudCoverPercent =
           sumCloudCoverPercent !== undefined
             ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
@@ -166,9 +171,24 @@ export class AbstractLayer {
         ],
       ],
     };
-    const bboxedFlyoverGeometry = intersect(bboxGeometry, flyoverGeometry);
-    return (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
+    let bboxedFlyoverGeometry;
+    try {
+      bboxedFlyoverGeometry = intersect(bboxGeometry, flyoverGeometry);
+    } catch (ex) {
+      console.error({msg: "Turf.js intersect() failed", ex, bboxGeometry, flyoverGeometry})
+      throw ex;
+    }
+    try {
+      return (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
+    } catch (ex) {
+      console.error({msg: "Turf.js area() division failed", ex, bboxedFlyoverGeometry, flyoverGeometry})
+      throw ex;
+    }
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
+
+  private convertFromFeature(f: Feature<Polygon | MultiPolygon> | Polygon | MultiPolygon): Polygon | MultiPolygon {
+    return f.type === "Feature" ? (f as Feature<Polygon | MultiPolygon>).geometry : f;
+  }
 }
