@@ -113,7 +113,7 @@ export class AbstractLayer {
 
       if (diffMS < orbitTimeMS) {
         flyoverIntervals[flyoverIndex].toTime = tiles[tileIndex].sensingTime;
-        currentFlyoverGeometry = union(currentFlyoverGeometry, tiles[tileIndex].geometry);
+        currentFlyoverGeometry = union(currentFlyoverGeometry, tiles[tileIndex].geometry).geometry;
         sumCloudCoverPercent =
           sumCloudCoverPercent !== undefined
             ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
