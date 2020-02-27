@@ -244,6 +244,7 @@ export const S1GRDFindTiles = () => {
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const data = await layerS1.findTiles(
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
