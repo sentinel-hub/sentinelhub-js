@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
 import { fetchCached } from 'src/layer/utils';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -146,6 +146,24 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       headers: { 'Accept-CRS': 'EPSG:4326' },
     };
     return requestConfig;
+  }
+
+  public async findTiles(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount?: number,
+    offset?: number,
+  ): Promise<PaginatedTiles> {
+    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset);
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: new Date(tile.sensingTime),
+        meta: {},
+      })),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected fetchTiles(
