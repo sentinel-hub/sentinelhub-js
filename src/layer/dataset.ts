@@ -125,7 +125,7 @@ export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
   shProcessingApiDatasourceAbbreviation: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
-  orbitTimeMinutes: 101,
+  orbitTimeMinutes: 100.16,
 };
 
 export const DATASET_MODIS: Dataset = {
