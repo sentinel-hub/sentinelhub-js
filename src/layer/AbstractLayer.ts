@@ -1,14 +1,12 @@
 import axios from 'axios';
 
-import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
 import { RequestConfig } from 'src/utils/axiosInterceptors';
-import intersect from '@turf/intersect';
 import area from '@turf/area';
-import union from '@turf/union'; // @turf/union is missing types definitions, we supply them separately
+import { union, intersection, Geom } from 'polygon-clipping';
 
-import { Polygon, MultiPolygon, Feature } from '@turf/helpers';
 import { CRS_EPSG4326 } from 'src/crs';
 
 export class AbstractLayer {
@@ -65,22 +63,19 @@ export class AbstractLayer {
     }
 
     const orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
-    const bboxGeometry: Polygon = {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
+    const bboxGeometry: Geom = this.roundCoordinates([
+      [
+        [bbox.minX, bbox.minY],
+        [bbox.maxX, bbox.minY],
+        [bbox.maxX, bbox.maxY],
+        [bbox.minX, bbox.maxY],
+        [bbox.minX, bbox.minY],
       ],
-    };
+    ]);
 
     let flyovers: FlyoverInterval[] = [];
     let flyoverIndex = 0;
-    let currentFlyoverGeometry: Polygon | MultiPolygon | null = null;
+    let currentFlyoverGeometry: Geom = null;
     let nTilesInFlyover;
     let sumCloudCoverPercent;
     for (let i = 0; i < maxFindTilesRequests; i++) {
@@ -103,7 +98,7 @@ export class AbstractLayer {
             coveragePercent: 0,
             meta: {},
           };
-          currentFlyoverGeometry = this.deFeature(tiles[tileIndex].geometry);
+          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
           sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
           nTilesInFlyover = 1;
           continue;
@@ -136,15 +131,16 @@ export class AbstractLayer {
               coveragePercent: 0,
               meta: {},
             };
-            currentFlyoverGeometry = this.deFeature(tiles[tileIndex].geometry);
+            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
             sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
             nTilesInFlyover = 1;
           }
         } else {
           // the same flyover:
           flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
-          currentFlyoverGeometry = this.deFeature(
-            union(currentFlyoverGeometry, this.deFeature(tiles[tileIndex].geometry)),
+          currentFlyoverGeometry = union(
+            this.roundCoordinates(currentFlyoverGeometry),
+            this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
           );
           sumCloudCoverPercent =
             sumCloudCoverPercent !== undefined
@@ -167,16 +163,27 @@ export class AbstractLayer {
     return flyovers;
   }
 
-  private calculateCoveragePercent(bboxGeometry: Polygon, flyoverGeometry: Polygon | MultiPolygon): number {
+  private calculateCoveragePercent(bboxGeometry: Geom, flyoverGeometry: Geom): number {
     let bboxedFlyoverGeometry;
     try {
-      bboxedFlyoverGeometry = intersect(bboxGeometry, flyoverGeometry);
+      bboxedFlyoverGeometry = intersection(
+        this.roundCoordinates(bboxGeometry),
+        this.roundCoordinates(flyoverGeometry),
+      );
     } catch (ex) {
-      console.error({ msg: 'Turf.js intersect() failed', ex, bboxGeometry, flyoverGeometry });
+      console.error({ msg: 'intersection() failed', ex, bboxGeometry, flyoverGeometry });
       throw ex;
     }
     try {
-      const result = (area(bboxedFlyoverGeometry) / area(bboxGeometry)) * 100;
+      const coveredArea = area({
+        type: 'MultiPolygon',
+        coordinates: bboxedFlyoverGeometry,
+      });
+      const bboxArea = area({
+        type: 'Polygon',
+        coordinates: bboxGeometry,
+      });
+      const result = (coveredArea / bboxArea) * 100;
       return result;
     } catch (ex) {
       console.error({ msg: 'Turf.js area() division failed', ex, bboxedFlyoverGeometry, flyoverGeometry });
@@ -186,7 +193,11 @@ export class AbstractLayer {
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 
-  private deFeature(f: Feature<Polygon | MultiPolygon> | Polygon | MultiPolygon): Polygon | MultiPolygon {
-    return f.type === 'Feature' ? (f as Feature<Polygon | MultiPolygon>).geometry : f;
+  private roundCoordinates(geometry: any): any {
+    if (typeof geometry === 'number') {
+      const shift = 1000000;
+      return Math.round(geometry * shift) / shift;
+    }
+    return geometry.map((x: any) => this.roundCoordinates(x));
   }
 }
