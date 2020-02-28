@@ -214,6 +214,49 @@ export const findTilesEPSG4326 = () => {
   return wrapperEl;
 };
 
+export const findFlyovers = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+
+    const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
+    const flyovers = await layer.findFlyovers(
+      bbox4326,
+      fromTime,
+      toTime,
+      20,
+      50,
+    );
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 function renderTilesList(containerEl, list) {
   list.forEach(tile => {
     const ul = document.createElement('ul');
