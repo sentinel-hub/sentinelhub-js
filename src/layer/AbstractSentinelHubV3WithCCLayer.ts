@@ -2,7 +2,7 @@ import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 
-// this class provides any SHv3-specific functionality to the subclasses:
+// same as AbstractSentinelHubV3Layer, but with maxCloudCoverPercent (for layers which support it)
 export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer {
   public maxCloudCoverPercent: number;
 

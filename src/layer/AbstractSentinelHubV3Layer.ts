@@ -178,19 +178,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
-    const bboxPolygon = {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: bbox.crs.urn } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.maxY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.maxX, bbox.minY],
-          [bbox.minX, bbox.minY],
-          [bbox.minX, bbox.maxY],
-        ],
-      ],
-    };
+    const bboxPolygon = bbox.toGeoJSON();
     // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
     // the tiles we get cloudCoverPercentage (0..100).
     const payload: any = {
