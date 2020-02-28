@@ -72,6 +72,10 @@ export class AbstractLayer {
         [bbox.minX, bbox.minY],
       ],
     ]);
+    const bboxArea = area({
+      type: 'Polygon',
+      coordinates: bboxGeometry,
+    });
 
     let flyovers: FlyoverInterval[] = [];
     let flyoverIndex = 0;
@@ -108,14 +112,16 @@ export class AbstractLayer {
         const prevDateMS = flyovers[flyoverIndex].fromTime.getTime();
         const currDateMS = tiles[tileIndex].sensingTime.getTime();
         const diffMS = Math.abs(prevDateMS - currDateMS);
-        if (diffMS > orbitTimeMS || !hasMore) {
+        if (diffMS > orbitTimeMS) {
           // finish the old flyover:
           try {
             flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
               bboxGeometry,
+              bboxArea,
               currentFlyoverGeometry,
             );
           } catch (err) {
+            // if anything goes wrong, play it safe and set coveragePercent to null:
             flyovers[flyoverIndex].coveragePercent = null;
           }
           if (sumCloudCoverPercent !== undefined) {
@@ -123,18 +129,16 @@ export class AbstractLayer {
           }
 
           // and start a new one:
-          if (diffMS > orbitTimeMS) {
-            flyoverIndex++;
-            flyovers[flyoverIndex] = {
-              fromTime: tiles[tileIndex].sensingTime,
-              toTime: tiles[tileIndex].sensingTime,
-              coveragePercent: 0,
-              meta: {},
-            };
-            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
-            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-            nTilesInFlyover = 1;
-          }
+          flyoverIndex++;
+          flyovers[flyoverIndex] = {
+            fromTime: tiles[tileIndex].sensingTime,
+            toTime: tiles[tileIndex].sensingTime,
+            coveragePercent: 0,
+            meta: {},
+          };
+          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+          nTilesInFlyover = 1;
         } else {
           // the same flyover:
           flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
@@ -160,10 +164,28 @@ export class AbstractLayer {
         );
       }
     }
+
+    // if needed, finish the last flyover:
+    if (flyovers.length > 0) {
+      try {
+        flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+          bboxGeometry,
+          bboxArea,
+          currentFlyoverGeometry,
+        );
+      } catch (err) {
+        // if anything goes wrong, play it safe and set coveragePercent to null:
+        flyovers[flyoverIndex].coveragePercent = null;
+      }
+      if (sumCloudCoverPercent !== undefined) {
+        flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+      }
+    }
+
     return flyovers;
   }
 
-  private calculateCoveragePercent(bboxGeometry: Geom, flyoverGeometry: Geom): number {
+  private calculateCoveragePercent(bboxGeometry: Geom, bboxArea: number, flyoverGeometry: Geom): number {
     let bboxedFlyoverGeometry;
     try {
       bboxedFlyoverGeometry = intersection(
@@ -179,20 +201,15 @@ export class AbstractLayer {
         type: 'MultiPolygon',
         coordinates: bboxedFlyoverGeometry,
       });
-      const bboxArea = area({
-        type: 'Polygon',
-        coordinates: bboxGeometry,
-      });
-      const result = (coveredArea / bboxArea) * 100;
-      return result;
+      return (coveredArea / bboxArea) * 100;
     } catch (ex) {
       console.error({ msg: 'Turf.js area() division failed', ex, bboxedFlyoverGeometry, flyoverGeometry });
       throw ex;
     }
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
-
+  // Because of the bug in polygon-clipping, we need to round coordinates or union() will fail:
+  // https://github.com/mfogel/polygon-clipping/issues/93
   private roundCoordinates(geometry: any): any {
     if (typeof geometry === 'number') {
       const shift = 1000000;
@@ -200,4 +217,6 @@ export class AbstractLayer {
     }
     return geometry.map((x: any) => this.roundCoordinates(x));
   }
+
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }
