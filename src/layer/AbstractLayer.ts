@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Moment } from 'moment';
 
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
@@ -40,8 +41,8 @@ export class AbstractLayer {
 
   public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
@@ -50,8 +51,8 @@ export class AbstractLayer {
 
   public async findFlyovers(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxFindTilesRequests: number = 50,
     tilesPerRequest: number = 50,
   ): Promise<FlyoverInterval[]> {
@@ -62,7 +63,7 @@ export class AbstractLayer {
       throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
-    const orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
+    const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
     const bboxGeometry: Geom = this.roundCoordinates([
       [
         [bbox.minX, bbox.minY],
@@ -109,10 +110,10 @@ export class AbstractLayer {
         }
 
         // append the tile to flyovers:
-        const prevDateMS = flyovers[flyoverIndex].fromTime.getTime();
-        const currDateMS = tiles[tileIndex].sensingTime.getTime();
-        const diffMS = Math.abs(prevDateMS - currDateMS);
-        if (diffMS > orbitTimeMS) {
+        const prevDateS = flyovers[flyoverIndex].fromTime.unix();
+        const currDateS = tiles[tileIndex].sensingTime.unix();
+        const diffS = Math.abs(prevDateS - currDateS);
+        if (diffS > orbitTimeS) {
           // finish the old flyover:
           try {
             flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
