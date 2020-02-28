@@ -26,12 +26,12 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     title: string | null = null,
     description: string | null = null,
     maxCloudCoverPercent: number | null = 100,
-    orbitDirection: OrbitDirection | null = null,
     view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
     this.maxCloudCoverPercent = maxCloudCoverPercent;
-    this.orbitDirection = orbitDirection;
+    // images that are not DESCENDING are blank, so we can hardcode this:
+    this.orbitDirection = OrbitDirection.DESCENDING;
     this.view = view;
   }
 
