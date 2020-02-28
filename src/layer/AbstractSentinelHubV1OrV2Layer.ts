@@ -88,7 +88,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
     const response = await axios.post(url, payload, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-CRS': 'EPSG:4326',
+      },
     });
 
     const responseTiles: any[] = response.data.tiles;
