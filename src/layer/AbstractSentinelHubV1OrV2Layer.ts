@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { stringify } from 'query-string';
+import moment, { Moment } from 'moment';
 
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
@@ -68,8 +69,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount: number = 50,
     offset: number = 0,
   ): Promise<PaginatedTiles> {
@@ -98,7 +99,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {
       tiles: responseTiles.map(tile => ({
         geometry: tile.tileDrawRegionGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: this.extractFindTilesMeta(tile),
       })),
       hasMore: response.data.hasMore,
