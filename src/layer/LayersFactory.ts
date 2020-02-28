@@ -17,6 +17,7 @@ import {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_EOCLOUD_ENVISAT_MERIS,
   Dataset,
 } from 'src/layer/dataset';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -35,6 +36,7 @@ import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
 import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
+import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
 
 type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -81,6 +83,7 @@ export class LayersFactory {
     [DATASET_S3OLCI.shJsonGetCapabilitiesDataset]: DATASET_S3OLCI,
     [DATASET_S5PL2.shJsonGetCapabilitiesDataset]: DATASET_S5PL2,
     [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
+    [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
   };
@@ -92,6 +95,7 @@ export class LayersFactory {
     L5: DATASET_EOCLOUD_LANDSAT5,
     L7: DATASET_EOCLOUD_LANDSAT7,
     L8: DATASET_EOCLOUD_LANDSAT8,
+    ENV: DATASET_EOCLOUD_ENVISAT_MERIS,
   };
 
   private static readonly LAYER_FROM_DATASET_V3 = {
@@ -112,6 +116,7 @@ export class LayersFactory {
     [DATASET_EOCLOUD_LANDSAT5.id]: Landsat5EOCloudLayer,
     [DATASET_EOCLOUD_LANDSAT7.id]: Landsat7EOCloudLayer,
     [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
+    [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
   private static async parseXml(xmlString: string): Promise<GetCapabilitiesXml> {

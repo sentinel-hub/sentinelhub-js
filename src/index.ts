@@ -5,6 +5,7 @@ import { ApiType, MimeTypes } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
 import {
+  DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
   DATASET_S2L2A,
@@ -16,6 +17,7 @@ import {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
 } from 'src/layer/dataset';
@@ -27,6 +29,7 @@ import { S2L1CLayer } from 'src/layer/S2L1CLayer';
 import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
 import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { S5PL2Layer } from 'src/layer/S5PL2Layer';
+import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from 'src/layer/MODISLayer';
 import { DEMLayer } from 'src/layer/DEMLayer';
 import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
@@ -43,6 +46,7 @@ registerAxiosCacheRetryInterceptors();
 
 export {
   LayersFactory,
+  DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
   DATASET_S2L2A,
@@ -54,6 +58,7 @@ export {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   // layers:
@@ -65,6 +70,7 @@ export {
   S3SLSTRLayer,
   S3OLCILayer,
   S5PL2Layer,
+  EnvisatMerisEOCloudLayer,
   MODISLayer,
   DEMLayer,
   Landsat5EOCloudLayer,

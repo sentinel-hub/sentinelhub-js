@@ -118,6 +118,16 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   orbitTimeMinutes: 99,
 };
 
+export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
+  id: 'EOC_ENVISAT_MERIS',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: 'ENV',
+  shProcessingApiDatasourceAbbreviation: null,
+  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
+  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
+  orbitTimeMinutes: 101,
+};
+
 export const DATASET_MODIS: Dataset = {
   id: 'AWS_MODIS',
   shJsonGetCapabilitiesDataset: 'MODIS',
