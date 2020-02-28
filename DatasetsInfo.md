@@ -24,7 +24,7 @@ Consists of 2 satellites: Sentinel-1A, Sentinel-1B
   - Period: 98.6 min / 2 = **‭49.3 min**
   - Revisit time (of the same area): 12 days / 2 = 6 days
 
-- info sources: 
+- info sources:
   - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-1/Facts_and_figures
   - https://sentinel.esa.int/web/sentinel/missions/sentinel-1/satellite-description/orbit
 
@@ -43,7 +43,7 @@ Consists of 2 satellites: Sentinel-2A, Sentinel-2B
   - Period: 100.6 min / 2 = **50.3 min**
   - Revisit time (of the same area): 10 days / 2 = 5 days
 
-- info sources: 
+- info sources:
   - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-2/Facts_and_figures
   - https://sentinel.esa.int/web/sentinel/missions/sentinel-2/satellite-description/orbit
 
@@ -61,7 +61,7 @@ Consists of 2 satellites: Sentinel-3A, Sentinel-3B
 - Both satellites:
   - Period: 100.99 min / 2 = **50.495 min**
 
-- info sources: 
+- info sources:
   - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-3/Facts_and_figures
   - https://sentinel.esa.int/web/sentinel/missions/sentinel-3/satellite-description/orbit
 
@@ -77,7 +77,7 @@ Consists of 1 satellite
   - Period (time to circle the Earth 1 time = 1 orbit): **101 min**
   - Revisit time (of the same area) on the equator: ???
 
-- info sources: 
+- info sources:
   - https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-5P/Facts_and_figures
   - https://sentinel.esa.int/web/sentinel/missions/sentinel-5p/orbit
   - https://www.esa.int/Enabling_Support/Operations/Sentinel-5P_operations
@@ -92,7 +92,7 @@ Consists of 1 satellite
   - Period (time to circle the Earth 1 time = 1 orbit): **99 min**
   - Revisit time (of the same area) at the equator: 16 days
 
-- info sources: 
+- info sources:
   - https://www.usgs.gov/land-resources/nli/landsat/landsat-5
 
 ## Landsat 7
@@ -103,7 +103,7 @@ Consists of 1 satellite
   - Period (time to circle the Earth 1 time = 1 orbit): **99 min**
   - Revisit time (of the same area) at the equator: 16 days
 
-- info sources: 
+- info sources:
   - https://www.usgs.gov/land-resources/nli/landsat/landsat-7
 
 
@@ -115,7 +115,7 @@ Consists of 1 satellite
   - Period (time to circle the Earth 1 time = 1 orbit): **99 min**
   - Revisit time (of the same area) at the equator: 16 days
 
-- info sources: 
+- info sources:
   - https://www.usgs.gov/land-resources/nli/landsat/landsat-8
 
 # Other
@@ -127,8 +127,18 @@ Consists of 1 satellite
 - 1 satellite:
   - Period (time to circle the Earth 1 time = 1 orbit): **99 min**
 
-- info sources: 
+- info sources:
   - https://sos.noaa.gov/datasets/polar-orbiting-aqua-satellite-and-modis-swath/
+
+## Envisat Meris
+
+Consists of 1 satellite
+
+- 1 satellite:
+  - Period (time to circle the Earth 1 time = 1 orbit): **100.16 min**
+
+- info sources:
+  - https://en.wikipedia.org/wiki/Envisat
 
 ## DEM
 
