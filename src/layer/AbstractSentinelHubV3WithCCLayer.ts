@@ -1,3 +1,5 @@
+import moment, { Moment } from 'moment';
+
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -22,8 +24,8 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -38,7 +40,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: {
           cloudCoverPercent: tile.cloudCoverPercentage,
         },

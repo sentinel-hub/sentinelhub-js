@@ -1,4 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
+import moment, { Moment } from 'moment';
+
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
@@ -51,8 +53,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -78,7 +80,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => {
         return {
           geometry: tile.dataGeometry,
-          sensingTime: tile.sensingTime,
+          sensingTime: moment.utc(tile.sensingTime),
           meta: {
             cloudCoverPercent: tile.cloudCoverPercentage,
           },
