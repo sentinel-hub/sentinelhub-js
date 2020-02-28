@@ -1,3 +1,5 @@
+import moment, { Moment } from 'moment';
+
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S3OLCI } from 'src/layer/dataset';
@@ -8,8 +10,8 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -17,7 +19,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: {},
       })),
       hasMore: response.data.hasMore,

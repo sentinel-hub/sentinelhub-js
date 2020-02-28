@@ -1,3 +1,5 @@
+import moment, { Moment } from 'moment';
+
 import { BBox } from 'src/bbox';
 import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -108,8 +110,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -135,7 +137,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: {
           orbitDirection: tile.orbitDirection,
           polarization: tile.polarization,

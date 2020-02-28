@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import moment, { Moment } from 'moment';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
@@ -150,8 +151,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -159,7 +160,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: {},
       })),
       hasMore: response.data.hasMore,
@@ -168,8 +169,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected fetchTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount: number = 1,
     offset: number = 0,
     maxCloudCoverPercent?: number | null,
