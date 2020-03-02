@@ -168,8 +168,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S3SLSTRLayer(instanceId, layerId, null, null, null, null, null,
-     60, OrbitDirection.DESCENDING, 'OBLIQUE');
+  const layer = new S3SLSTRLayer(instanceId, layerId, null, null, null, null, null, 60, 'NADIR');
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 

@@ -3,6 +3,7 @@ import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import moment, { Moment } from 'moment';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching
@@ -63,8 +64,8 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -89,7 +90,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => {
         return {
           geometry: tile.tileDrawRegionGeometry,
-          sensingTime: tile.sensingTime,
+          sensingTime: moment.utc(tile.sensingTime),
           meta: {},
         };
       }),

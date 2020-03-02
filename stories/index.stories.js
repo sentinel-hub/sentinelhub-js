@@ -268,6 +268,7 @@ export const S1GRDFindTiles = () => {
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const data = await layerS1.findTiles(
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
@@ -283,6 +284,52 @@ export const S1GRDFindTiles = () => {
   return wrapperEl;
 };
 
+export const findFlyovers = () => {
+  const layer = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const bbox = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
+    const flyovers = await layer.findFlyovers(
+      bbox,
+      fromTime,
+      toTime,
+      20,
+      50,
+    );
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+
 export const S1GRDFindDates = () => {
   const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
@@ -297,7 +344,7 @@ export const S1GRDFindDates = () => {
       bbox,
       new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      {orbitDirection: 'ASCENDING'},
+      { orbitDirection: 'ASCENDING' },
     );
 
     containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";

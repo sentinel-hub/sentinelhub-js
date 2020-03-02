@@ -231,6 +231,7 @@ export const findTiles = () => {
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const data = await layer.findTiles(
       bbox,
       new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),

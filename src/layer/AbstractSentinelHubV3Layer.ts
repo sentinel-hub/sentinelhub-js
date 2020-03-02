@@ -1,8 +1,9 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import moment, { Moment } from 'moment';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
 import { fetchCached } from 'src/layer/utils';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -148,10 +149,28 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return requestConfig;
   }
 
+  public async findTiles(
+    bbox: BBox,
+    fromTime: Moment,
+    toTime: Moment,
+    maxCount?: number,
+    offset?: number,
+  ): Promise<PaginatedTiles> {
+    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset);
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime),
+        meta: {},
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   protected fetchTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount: number = 1,
     offset: number = 0,
     maxCloudCoverPercent?: number | null,
@@ -160,19 +179,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
-    const bboxPolygon = {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: bbox.crs.urn } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.maxY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.maxX, bbox.minY],
-          [bbox.minX, bbox.minY],
-          [bbox.minX, bbox.maxY],
-        ],
-      ],
-    };
+    const bboxPolygon = bbox.toGeoJSON();
     // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
     // the tiles we get cloudCoverPercentage (0..100).
     const payload: any = {

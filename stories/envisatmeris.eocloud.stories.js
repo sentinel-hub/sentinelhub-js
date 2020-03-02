@@ -1,10 +1,10 @@
 import {
-  Landsat7EOCloudLayer,
+  EnvisatMerisEOCloudLayer,
   CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
-  DATASET_EOCLOUD_LANDSAT5,
+  DATASET_EOCLOUD_ENVISAT_MERIS,
   LayersFactory,
   CRS_EPSG4326,
 } from '../dist/sentinelHub.esm';
@@ -13,16 +13,16 @@ if (!process.env.EOC_INSTANCE_ID) {
   throw new Error("EOC_INSTANCE_ID environment variable is not defined!");
 };
 
-if (!process.env.EOC_LANDSAT7_LAYER_ID) {
-  throw new Error("EOC_LANDSAT7_LAYER_ID environment variable is not defined!");
+if (!process.env.EOC_ENVISATMERIS_LAYER_ID) {
+  throw new Error("EOC_ENVISATMERIS_LAYER_ID environment variable is not defined!");
 };
 
 const instanceId = process.env.EOC_INSTANCE_ID;
-const layerId = process.env.EOC_LANDSAT7_LAYER_ID;
+const layerId = process.env.EOC_ENVISATMERIS_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 
 export default {
-  title: 'Landsat 7 - EOCloud',
+  title: 'Envisat Meris - EOCloud',
 };
 
 export const getMapURL = () => {
@@ -34,12 +34,12 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
   wrapperEl.insertAdjacentElement("beforeend", img);
 
-  const layer = new Landsat7EOCloudLayer(instanceId, layerId);
+  const layer = new EnvisatMerisEOCloudLayer(instanceId, layerId);
 
   const getMapParams = {
     bbox: bbox,
-    fromTime: new Date(Date.UTC(2000, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2000, 12 - 1, 22, 23, 59, 59)),
+    fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
@@ -60,12 +60,12 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new Landsat7EOCloudLayer(instanceId, layerId);
+    const layer = new EnvisatMerisEOCloudLayer(instanceId, layerId);
 
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2000, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2000, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -88,12 +88,12 @@ export const getMapWMSLayersFactory = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_ENVISAT_MERIS.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
 
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2000, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2000, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -116,7 +116,7 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement("beforeend", img);
 
   const perform = async () => {
-    const layer = new Landsat7EOCloudLayer(
+    const layer = new EnvisatMerisEOCloudLayer(
       instanceId,
       layerId,
       `
@@ -126,8 +126,8 @@ export const getMapWMSEvalscript = () => {
 
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2000, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2000, 12 - 1, 22, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -141,7 +141,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new Landsat7EOCloudLayer(instanceId, layerId);
+  const layer = new EnvisatMerisEOCloudLayer(instanceId, layerId);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -151,7 +151,7 @@ export const findTiles = () => {
   const perform = async () => {
     const data = await layer.findTiles(
       bbox,
-      new Date(Date.UTC(1990, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       0,
@@ -163,8 +163,9 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
+
 export const findFlyovers = () => {
-  const layer = new Landsat7EOCloudLayer(instanceId, layerId);
+  const layer = new EnvisatMerisEOCloudLayer(instanceId, layerId);
   const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
   const wrapperEl = document.createElement('div');
@@ -178,8 +179,8 @@ export const findFlyovers = () => {
   const flyoversContainerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
 
-  const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+  const fromTime = new Date(Date.UTC(2006, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2008, 1 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
     const flyovers = await layer.findFlyovers(
