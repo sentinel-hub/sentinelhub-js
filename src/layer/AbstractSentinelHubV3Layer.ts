@@ -208,19 +208,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('This dataset does not support searching for dates');
     }
 
-    const bboxPolygon = {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: bbox.crs.urn } },
-      coordinates: [
-        [
-          [bbox.minY, bbox.maxX],
-          [bbox.maxY, bbox.maxX],
-          [bbox.maxY, bbox.minX],
-          [bbox.minY, bbox.minX],
-          [bbox.minY, bbox.maxX],
-        ],
-      ],
-    };
+    const bboxPolygon = bbox.toGeoJSON();
     const payload: any = {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
