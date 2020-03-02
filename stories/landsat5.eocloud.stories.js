@@ -6,6 +6,7 @@ import {
   ApiType,
   DATASET_EOCLOUD_LANDSAT5,
   LayersFactory,
+  CRS_EPSG4326,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.EOC_INSTANCE_ID) {
@@ -156,6 +157,51 @@ export const findTiles = () => {
       0,
     );
     renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findFlyovers = () => {
+  const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+  const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+
+  const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+
+  const perform = async () => {
+    const flyovers = await layer.findFlyovers(
+      bbox4326,
+      fromTime,
+      toTime,
+      20,
+      50,
+    );
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 

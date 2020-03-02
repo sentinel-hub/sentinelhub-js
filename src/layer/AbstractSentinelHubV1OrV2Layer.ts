@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { stringify } from 'query-string';
+import moment, { Moment } from 'moment';
 
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
@@ -68,28 +69,15 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount: number = 50,
     offset: number = 0,
   ): Promise<PaginatedTiles> {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
-    const bboxPolygon = {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: bbox.crs.urn } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
-      ],
-    };
-    const payload = bboxPolygon;
+    const payload = bbox.toGeoJSON();
     const params = {
       expand: 'true',
       timefrom: fromTime.toISOString(),
@@ -101,14 +89,17 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
     const response = await axios.post(url, payload, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-CRS': 'EPSG:4326',
+      },
     });
 
     const responseTiles: any[] = response.data.tiles;
     return {
       tiles: responseTiles.map(tile => ({
         geometry: tile.tileDrawRegionGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: this.extractFindTilesMeta(tile),
       })),
       hasMore: response.data.hasMore,

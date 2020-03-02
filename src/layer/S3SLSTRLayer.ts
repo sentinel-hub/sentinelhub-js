@@ -4,6 +4,7 @@ import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { OrbitDirection } from 'src';
 import { ProcessingPayload } from 'src/layer/processing';
+import moment, { Moment } from 'moment';
 
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
@@ -26,12 +27,12 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     title: string | null = null,
     description: string | null = null,
     maxCloudCoverPercent: number | null = 100,
-    orbitDirection: OrbitDirection | null = null,
     view: 'NADIR' | 'OBLIQUE' = 'NADIR',
   ) {
     super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
     this.maxCloudCoverPercent = maxCloudCoverPercent;
-    this.orbitDirection = orbitDirection;
+    // images that are not DESCENDING are blank, so we can hardcode this:
+    this.orbitDirection = OrbitDirection.DESCENDING;
     this.view = view;
   }
 
@@ -48,8 +49,8 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -70,7 +71,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: new Date(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime),
         meta: {
           cloudCoverPercent: tile.cloudCoverPercentage,
           orbitDirection: tile.orbitDirection,

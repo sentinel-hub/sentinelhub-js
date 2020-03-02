@@ -29,10 +29,9 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {
-      cloudCoverPercent: tile.cloudCoverPercent,
+      cloudCoverPercent: tile.cloudCoverPercentage,
     };
   }
 }

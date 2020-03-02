@@ -1,9 +1,14 @@
 import axios from 'axios';
+import { Moment } from 'moment';
 
-import { GetMapParams, ApiType, Tile, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
 import { RequestConfig } from 'src/utils/axiosInterceptors';
+import area from '@turf/area';
+import { union, intersection, Geom } from 'polygon-clipping';
+
+import { CRS_EPSG4326 } from 'src/crs';
 
 export class AbstractLayer {
   public title: string | null = null;
@@ -36,48 +41,182 @@ export class AbstractLayer {
 
   public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not implemented yet');
   }
 
-  public findFlyoverIntervals(tiles: Tile[]): FlyoverInterval[] {
+  public async findFlyovers(
+    bbox: BBox,
+    fromTime: Moment,
+    toTime: Moment,
+    maxFindTilesRequests: number = 50,
+    tilesPerRequest: number = 50,
+  ): Promise<FlyoverInterval[]> {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
     }
+    if (bbox.crs !== CRS_EPSG4326) {
+      throw new Error('Currently, only EPSG:4326 in findFlyovers');
+    }
 
-    tiles.sort((a, b) => a.sensingTime.getTime() - b.sensingTime.getTime());
-    let orbitTimeMS = this.dataset.orbitTimeMinutes * 60 * 1000;
-    let flyoverIntervals: FlyoverInterval[] = [];
+    const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
+    const bboxGeometry: Geom = this.roundCoordinates([
+      [
+        [bbox.minX, bbox.minY],
+        [bbox.maxX, bbox.minY],
+        [bbox.maxX, bbox.maxY],
+        [bbox.minX, bbox.maxY],
+        [bbox.minX, bbox.minY],
+      ],
+    ]);
+    const bboxArea = area({
+      type: 'Polygon',
+      coordinates: bboxGeometry,
+    });
 
-    let j = 0;
-    for (let i = 0; i < tiles.length; i++) {
-      if (i === 0) {
-        flyoverIntervals[j] = {
-          fromTime: tiles[i].sensingTime,
-          toTime: tiles[i].sensingTime,
-        };
-        continue;
+    let flyovers: FlyoverInterval[] = [];
+    let flyoverIndex = 0;
+    let currentFlyoverGeometry: Geom = null;
+    let nTilesInFlyover;
+    let sumCloudCoverPercent;
+    for (let i = 0; i < maxFindTilesRequests; i++) {
+      // grab new batch of tiles:
+      const { tiles, hasMore } = await this.findTiles(
+        bbox,
+        fromTime,
+        toTime,
+        tilesPerRequest,
+        i * tilesPerRequest,
+      );
+
+      // apply each tile to the flyover to calculate coverage:
+      for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
+        // first tile ever? just add its info and continue:
+        if (flyovers.length === 0) {
+          flyovers[flyoverIndex] = {
+            fromTime: tiles[tileIndex].sensingTime,
+            toTime: tiles[tileIndex].sensingTime,
+            coveragePercent: 0,
+            meta: {},
+          };
+          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+          nTilesInFlyover = 1;
+          continue;
+        }
+
+        // append the tile to flyovers:
+        const prevDateS = flyovers[flyoverIndex].fromTime.unix();
+        const currDateS = tiles[tileIndex].sensingTime.unix();
+        const diffS = Math.abs(prevDateS - currDateS);
+        if (diffS > orbitTimeS) {
+          // finish the old flyover:
+          try {
+            flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+              bboxGeometry,
+              bboxArea,
+              currentFlyoverGeometry,
+            );
+          } catch (err) {
+            // if anything goes wrong, play it safe and set coveragePercent to null:
+            flyovers[flyoverIndex].coveragePercent = null;
+          }
+          if (sumCloudCoverPercent !== undefined) {
+            flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+          }
+
+          // and start a new one:
+          flyoverIndex++;
+          flyovers[flyoverIndex] = {
+            fromTime: tiles[tileIndex].sensingTime,
+            toTime: tiles[tileIndex].sensingTime,
+            coveragePercent: 0,
+            meta: {},
+          };
+          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+          nTilesInFlyover = 1;
+        } else {
+          // the same flyover:
+          flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
+          currentFlyoverGeometry = union(
+            this.roundCoordinates(currentFlyoverGeometry),
+            this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
+          );
+          sumCloudCoverPercent =
+            sumCloudCoverPercent !== undefined
+              ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
+              : undefined;
+          nTilesInFlyover++;
+        }
       }
 
-      const prevDateMS = tiles[i - 1].sensingTime.getTime();
-      const currDateMS = tiles[i].sensingTime.getTime();
-      const diffMS = Math.abs(prevDateMS - currDateMS);
-
-      if (diffMS < orbitTimeMS) {
-        flyoverIntervals[j].toTime = tiles[i].sensingTime;
-      } else {
-        j++;
-        flyoverIntervals[j] = {
-          fromTime: tiles[i].sensingTime,
-          toTime: tiles[i].sensingTime,
-        };
+      // make sure we exit when there are no more tiles:
+      if (!hasMore) {
+        break;
+      }
+      if (i + 1 === maxFindTilesRequests) {
+        throw new Error(
+          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
+        );
       }
     }
-    return flyoverIntervals;
+
+    // if needed, finish the last flyover:
+    if (flyovers.length > 0) {
+      try {
+        flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+          bboxGeometry,
+          bboxArea,
+          currentFlyoverGeometry,
+        );
+      } catch (err) {
+        // if anything goes wrong, play it safe and set coveragePercent to null:
+        flyovers[flyoverIndex].coveragePercent = null;
+      }
+      if (sumCloudCoverPercent !== undefined) {
+        flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+      }
+    }
+
+    return flyovers;
+  }
+
+  private calculateCoveragePercent(bboxGeometry: Geom, bboxArea: number, flyoverGeometry: Geom): number {
+    let bboxedFlyoverGeometry;
+    try {
+      bboxedFlyoverGeometry = intersection(
+        this.roundCoordinates(bboxGeometry),
+        this.roundCoordinates(flyoverGeometry),
+      );
+    } catch (ex) {
+      console.error({ msg: 'intersection() failed', ex, bboxGeometry, flyoverGeometry });
+      throw ex;
+    }
+    try {
+      const coveredArea = area({
+        type: 'MultiPolygon',
+        coordinates: bboxedFlyoverGeometry,
+      });
+      return (coveredArea / bboxArea) * 100;
+    } catch (ex) {
+      console.error({ msg: 'Turf.js area() division failed', ex, bboxedFlyoverGeometry, flyoverGeometry });
+      throw ex;
+    }
+  }
+
+  // Because of the bug in polygon-clipping, we need to round coordinates or union() will fail:
+  // https://github.com/mfogel/polygon-clipping/issues/93
+  private roundCoordinates(geometry: any): any {
+    if (typeof geometry === 'number') {
+      const shift = 1000000;
+      return Math.round(geometry * shift) / shift;
+    }
+    return geometry.map((x: any) => this.roundCoordinates(x));
   }
 
   public async findDates(
@@ -88,6 +227,6 @@ export class AbstractLayer {
   ): Promise<Date[]> {
     throw new Error('Not implemented yet');
   }
-  
+
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }

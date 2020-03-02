@@ -7,6 +7,8 @@ import {
   BBox,
   MimeTypes,
   ApiType,
+  DATASET_S3OLCI,
+  LayersFactory,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -183,6 +185,51 @@ export const findTiles = () => {
       0,
     );
     renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+
+export const findFlyoversLinearRingError = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  const bbox = new BBox(CRS_EPSG4326, -2, -2, 2, 2);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(`${DATASET_S3OLCI.shServiceHostname}ogc/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+
+    const fromTime = new Date(Date.UTC(2016, 1 - 1, 1, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 2 - 1, 15, 6, 59, 59));
+    const flyovers = await layer.findFlyovers(
+      bbox,
+      fromTime,
+      toTime,
+      50,
+      200,
+    );
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 
