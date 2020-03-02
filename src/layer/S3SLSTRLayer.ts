@@ -83,14 +83,14 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
 
   public async findDates(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     datasetSpecificParameters: {
       maxCloudCoverage?: number;
       orbitDirection: OrbitDirection | null;
       view: 'NADIR' | 'OBLIQUE';
     } = { orbitDirection: OrbitDirection.DESCENDING, view: 'NADIR' },
-  ): Promise<Date[]> {
+  ): Promise<Moment[]> {
     const findDatesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
       orbitDirection: datasetSpecificParameters.orbitDirection,

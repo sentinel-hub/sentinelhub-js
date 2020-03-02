@@ -1,3 +1,5 @@
+import { Moment } from 'moment';
+
 import { DATASET_S2L1C } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -19,12 +21,12 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
 
   public async findDates(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     datasetSpecificParameters?: {
       maxCloudCoverage?: number;
     },
-  ): Promise<Date[]> {
+  ): Promise<Moment[]> {
     return super.findDates(bbox, fromTime, toTime, {
       maxCloudCoverage: datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage,
     });
