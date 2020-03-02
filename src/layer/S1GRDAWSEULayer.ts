@@ -151,10 +151,10 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
 
   public async findDates(
     bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
+    fromTime: Moment,
+    toTime: Moment,
     datasetSpecificParameters?: { orbitDirection?: OrbitDirection },
-  ): Promise<Date[]> {
+  ): Promise<Moment[]> {
     const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
