@@ -160,9 +160,10 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
       resolution: this.resolution,
-      orbitDirection: datasetSpecificParameters && datasetSpecificParameters.orbitDirection 
-        ? datasetSpecificParameters.orbitDirection 
-        : undefined,
+      orbitDirection:
+        datasetSpecificParameters && datasetSpecificParameters.orbitDirection
+          ? datasetSpecificParameters.orbitDirection
+          : undefined,
     };
 
     return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });

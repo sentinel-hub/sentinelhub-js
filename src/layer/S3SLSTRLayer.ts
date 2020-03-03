@@ -97,9 +97,10 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       view: datasetSpecificParameters.view,
     };
 
-    const maxCC = datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
-      ? datasetSpecificParameters.maxCloudCoverage
-      : undefined;
+    const maxCC =
+      datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
+        ? datasetSpecificParameters.maxCloudCoverage
+        : undefined;
 
     return super.findDates(bbox, fromTime, toTime, {
       maxCloudCoverage: maxCC,

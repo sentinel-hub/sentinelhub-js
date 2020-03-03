@@ -105,4 +105,32 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       hasMore: response.data.hasMore,
     };
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
+  public async findDates(bbox: BBox, fromTime: Moment, toTime: Moment): Promise<Moment[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const payload = bbox.toGeoJSON();
+    const params = {
+      expand: 'true', // is it necessary?
+      timefrom: fromTime.toISOString(),
+      timeto: toTime.toISOString(),
+      ...this.getFindDatesAdditionalParameters(),
+    };
+
+    const url = `${this.dataset.findDatesUrl}?${stringify(params, { sort: false })}`;
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-CRS': 'EPSG:4326',
+      },
+    });
+
+    return response.data.map((d: string) => moment.utc(d));
+  }
 }

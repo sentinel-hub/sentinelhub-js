@@ -30,7 +30,7 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   datasetParametersType: 'S1GRD',
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
-  findDatesUrl: null,
+  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
   orbitTimeMinutes: 49.3,
 };
 
@@ -114,7 +114,7 @@ export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
-  findDatesUrl: null,
+  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -126,7 +126,7 @@ export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
-  findDatesUrl: null,
+  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -138,7 +138,7 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
-  findDatesUrl: null,
+  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -150,7 +150,7 @@ export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
-  findDatesUrl: null,
+  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/finddates',
   orbitTimeMinutes: 100.16,
 };
 
