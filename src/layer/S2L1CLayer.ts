@@ -27,9 +27,10 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
       maxCloudCoverage?: number;
     },
   ): Promise<Moment[]> {
-    const maxCC = datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
-      ? datasetSpecificParameters.maxCloudCoverage
-      : undefined;
+    const maxCC =
+      datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
+        ? datasetSpecificParameters.maxCloudCoverage
+        : undefined;
 
     return super.findDates(bbox, fromTime, toTime, {
       maxCloudCoverage: maxCC,

@@ -106,9 +106,10 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
   ): Promise<Moment[]> {
     const findDatesDatasetParameters: S5PL2FindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
-      productType: datasetSpecificParameters && datasetSpecificParameters.productType
-        ? datasetSpecificParameters.productType
-        : undefined,
+      productType:
+        datasetSpecificParameters && datasetSpecificParameters.productType
+          ? datasetSpecificParameters.productType
+          : undefined,
     };
 
     return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
