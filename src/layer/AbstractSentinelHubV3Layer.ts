@@ -202,12 +202,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  public async findDates(
-    bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
-    // datasetSpecificParameters?: Record<string, any> | null,
-  ): Promise<Moment[]> {
+  public async findDates(bbox: BBox, fromTime: Moment, toTime: Moment): Promise<Moment[]> {
     if (!this.dataset.findDatesUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
@@ -219,19 +214,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       to: toTime.toISOString(),
       ...this.getFindDatesAdditionalParameters(),
     };
-
-    // if (datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage) {
-    //   payload.maxCloudCoverage = datasetSpecificParameters.maxCloudCoverage;
-    // }
-
-    // if (datasetSpecificParameters && datasetSpecificParameters.datasetParameters) {
-    //   payload.datasetParameters = datasetSpecificParameters.datasetParameters;
-    // }
-
     const response = await axios.post(this.dataset.findDatesUrl, payload);
-
-    console.log('AbstractSentinelHubV3Layer', { payload, response });
-
     return response.data.map((date: string) => moment.utc(date));
   }
 }

@@ -117,7 +117,6 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const payload = bbox.toGeoJSON();
     const params = {
-      expand: 'true', // is it necessary?
       timefrom: fromTime.toISOString(),
       timeto: toTime.toISOString(),
       ...this.getFindDatesAdditionalParameters(),
