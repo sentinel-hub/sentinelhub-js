@@ -14,12 +14,12 @@ import {
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.EOC_INSTANCE_ID) {
-  throw new Error("EOC_INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('EOC_INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.EOC_S1GRDIW_LAYER_ID) {
-  throw new Error("EOC_S1GRDIW_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('EOC_S1GRDIW_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.EOC_INSTANCE_ID;
 const layerId = process.env.EOC_S1GRDIW_LAYER_ID;
@@ -36,10 +36,20 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+  const layer = new S1GRDEOCloudLayer(
+    instanceId,
+    layerId,
+    null,
+    null,
+    null,
+    null,
+    AcquisitionMode.IW,
+    Polarization.DV,
+    Resolution.HIGH,
+  );
 
   const getMapParams = {
     bbox: bbox,
@@ -61,11 +71,21 @@ export const getMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(instanceId, layerId, null, null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH);
+    const layer = new S1GRDEOCloudLayer(
+      instanceId,
+      layerId,
+      null,
+      null,
+      null,
+      null,
+      AcquisitionMode.IW,
+      Polarization.DV,
+      Resolution.HIGH,
+    );
 
     const getMapParams = {
       bbox: bbox,
@@ -89,11 +109,16 @@ export const getMapWMSLayersFactory = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -117,8 +142,8 @@ export const getMapWMSEvalscript = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS - evalscript</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS - evalscript</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new S1GRDEOCloudLayer(
@@ -127,7 +152,12 @@ export const getMapWMSEvalscript = () => {
       `
         return [2.5 * VV, 1.5 * VV, 0.5 * VV];
       `,
-      null, null, null, AcquisitionMode.IW, Polarization.DV, Resolution.HIGH
+      null,
+      null,
+      null,
+      AcquisitionMode.IW,
+      Polarization.DV,
+      Resolution.HIGH,
     );
 
     const getMapParams = {
@@ -161,8 +191,8 @@ export const findTilesEPSG3857 = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles - BBox in EPSG:3857</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles - BBox in EPSG:3857</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
@@ -170,8 +200,7 @@ export const findTilesEPSG3857 = () => {
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
-      null,
-      OrbitDirection.ASCENDING,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };
@@ -195,8 +224,8 @@ export const findTilesEPSG4326 = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles - BBox in EPSG:4326</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles - BBox in EPSG:4326</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
@@ -204,8 +233,7 @@ export const findTilesEPSG4326 = () => {
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
-      null,
-      OrbitDirection.ASCENDING,
+      0,
     );
     renderTilesList(containerEl, data.tiles);
   };
@@ -216,29 +244,28 @@ export const findTilesEPSG4326 = () => {
 
 export const findFlyovers = () => {
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const flyoversContainerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
-    const flyovers = await layer.findFlyovers(
-      bbox4326,
-      fromTime,
-      toTime,
-      20,
-      50,
-    );
-    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {

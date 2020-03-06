@@ -10,16 +10,17 @@ import {
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.EOC_INSTANCE_ID) {
-  throw new Error("EOC_INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('EOC_INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.EOC_LANDSAT8_LAYER_ID) {
-  throw new Error("EOC_LANDSAT8_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('EOC_LANDSAT8_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.EOC_INSTANCE_ID;
 const layerId = process.env.EOC_LANDSAT8_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Landsat 8 - EOCloud',
@@ -31,8 +32,8 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layer = new Landsat8EOCloudLayer(instanceId, layerId);
 
@@ -56,8 +57,8 @@ export const getMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new Landsat8EOCloudLayer(instanceId, layerId);
@@ -84,11 +85,16 @@ export const getMapWMSLayersFactory = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_EOCLOUD_LANDSAT8.shServiceHostname}v1/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_LANDSAT8.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -112,8 +118,8 @@ export const getMapWMSEvalscript = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS - evalscript</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS - evalscript</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new Landsat8EOCloudLayer(
@@ -145,8 +151,8 @@ export const findTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
@@ -163,34 +169,26 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-
 export const findFlyovers = () => {
   const layer = new Landsat8EOCloudLayer(instanceId, layerId);
-  const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const flyoversContainerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
   const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
-    const flyovers = await layer.findFlyovers(
-      bbox4326,
-      fromTime,
-      toTime,
-      20,
-      50,
-    );
-    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
