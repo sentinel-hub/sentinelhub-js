@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
   S1GRDAWSEULayer,
   setAuthToken,
@@ -266,26 +268,41 @@ function renderTilesList(containerEl, list) {
 
 export const findDates = () => {
   const layer = new S1GRDAWSEULayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
-  const containerEl = document.createElement('pre');
+  const bbox4326 = new BBox(CRS_EPSG4326, 13.359375, 43.0688878, 14.0625, 43.5803908);
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = "<h2>findDates</h2>" +
     "from: " + new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) + "<br />" +
     "to: " + new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+
+  const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
 
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
   const perform = async () => {
-    const data = await layer.findDates(
-      bbox,
+    const dates = await layer.findDates(
+      bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      {
-        orbitDirection: OrbitDirection.ASCENDING
-      },
     );
 
-    containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: moment(dates[0]).startOf('day'),
+      toTime: moment(dates[0]).endOf('day'),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => { });
 

@@ -81,30 +81,49 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  public async findDates(
-    bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
-    datasetSpecificParameters: {
-      maxCloudCoverage?: number;
-      orbitDirection: OrbitDirection | null;
-      view: 'NADIR' | 'OBLIQUE';
-    } = { orbitDirection: OrbitDirection.DESCENDING, view: 'NADIR' },
-  ): Promise<Moment[]> {
-    const findDatesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      orbitDirection: datasetSpecificParameters.orbitDirection,
-      view: datasetSpecificParameters.view,
+  // public async findDates(
+  //   bbox: BBox,
+  //   fromTime: Moment,
+  //   toTime: Moment,
+  //   datasetSpecificParameters: {
+  //     maxCloudCoverage?: number;
+  //     orbitDirection: OrbitDirection | null;
+  //     view: 'NADIR' | 'OBLIQUE';
+  //   } = { orbitDirection: OrbitDirection.DESCENDING, view: 'NADIR' },
+  // ): Promise<Moment[]> {
+  //   const findDatesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
+  //     type: this.dataset.datasetParametersType,
+  //     orbitDirection: datasetSpecificParameters.orbitDirection,
+  //     view: datasetSpecificParameters.view,
+  //   };
+
+  //   const maxCC =
+  //     datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
+  //       ? datasetSpecificParameters.maxCloudCoverage
+  //       : undefined;
+
+  //   return super.findDates(bbox, fromTime, toTime, {
+  //     maxCloudCoverage: maxCC,
+  //     datasetParameters: findDatesDatasetParameters,
+  //   });
+  // }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        view: this.view,
+      },
     };
+    if (this.orbitDirection !== null) {
+      result.datasetParameters.orbitDirection = this.orbitDirection;
+    }
 
-    const maxCC =
-      datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
-        ? datasetSpecificParameters.maxCloudCoverage
-        : undefined;
+    if (this.maxCloudCoverPercent !== null) {
+      result.maxCloudCoverage = this.maxCloudCoverPercent / 100;
+    }
 
-    return super.findDates(bbox, fromTime, toTime, {
-      maxCloudCoverage: maxCC,
-      datasetParameters: findDatesDatasetParameters,
-    });
+    console.log('S3SLSTR getFindDatesAdditionalParameters', { result });
+    return result;
   }
 }

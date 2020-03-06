@@ -149,23 +149,40 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  public async findDates(
-    bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
-    datasetSpecificParameters?: { orbitDirection?: OrbitDirection },
-  ): Promise<Moment[]> {
-    const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      acquisitionMode: this.acquisitionMode,
-      polarization: this.polarization,
-      resolution: this.resolution,
-      orbitDirection:
-        datasetSpecificParameters && datasetSpecificParameters.orbitDirection
-          ? datasetSpecificParameters.orbitDirection
-          : undefined,
-    };
+  // public async findDates(
+  //   bbox: BBox,
+  //   fromTime: Moment,
+  //   toTime: Moment,
+  //   datasetSpecificParameters?: { orbitDirection?: OrbitDirection },
+  // ): Promise<Moment[]> {
+  //   const findDatesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+  //     type: this.dataset.datasetParametersType,
+  //     acquisitionMode: this.acquisitionMode,
+  //     polarization: this.polarization,
+  //     resolution: this.resolution,
+  //     orbitDirection:
+  //       datasetSpecificParameters && datasetSpecificParameters.orbitDirection
+  //         ? datasetSpecificParameters.orbitDirection
+  //         : undefined,
+  //   };
 
-    return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
+  //   return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
+  // }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        acquisitionMode: this.acquisitionMode,
+        polarization: this.polarization,
+        resolution: this.resolution,
+      },
+    };
+    if (this.orbitDirection !== null) {
+      result.datasetParameters.orbitDirection = this.orbitDirection;
+    }
+
+    console.log('S1GRDAWSEULayer getFindDatesAdditionalParameters', { result });
+    return result;
   }
 }

@@ -19,21 +19,21 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
     };
   }
 
-  public async findDates(
-    bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
-    datasetSpecificParameters?: {
-      maxCloudCoverage?: number;
-    },
-  ): Promise<Moment[]> {
-    const maxCC =
-      datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
-        ? datasetSpecificParameters.maxCloudCoverage
-        : undefined;
+  // public async findDates(
+  //   bbox: BBox,
+  //   fromTime: Moment,
+  //   toTime: Moment,
+  //   datasetSpecificParameters?: {
+  //     maxCloudCoverage?: number;
+  //   },
+  // ): Promise<Moment[]> {
+  //   const maxCC =
+  //     datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage
+  //       ? datasetSpecificParameters.maxCloudCoverage
+  //       : undefined;
 
-    return super.findDates(bbox, fromTime, toTime, {
-      maxCloudCoverage: maxCC,
-    });
-  }
+  //   return super.findDates(bbox, fromTime, toTime, {
+  //     maxCloudCoverage: maxCC,
+  //   });
+  // }
 }

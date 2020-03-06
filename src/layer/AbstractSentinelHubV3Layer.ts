@@ -198,11 +198,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
   public async findDates(
     bbox: BBox,
     fromTime: Moment,
     toTime: Moment,
-    datasetSpecificParameters?: Record<string, any> | null,
+    // datasetSpecificParameters?: Record<string, any> | null,
   ): Promise<Moment[]> {
     if (!this.dataset.findDatesUrl) {
       throw new Error('This dataset does not support searching for dates');
@@ -213,18 +217,21 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
       to: toTime.toISOString(),
+      ...this.getFindDatesAdditionalParameters(),
     };
 
-    if (datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage) {
-      payload.maxCloudCoverage = datasetSpecificParameters.maxCloudCoverage;
-    }
+    // if (datasetSpecificParameters && datasetSpecificParameters.maxCloudCoverage) {
+    //   payload.maxCloudCoverage = datasetSpecificParameters.maxCloudCoverage;
+    // }
 
-    if (datasetSpecificParameters && datasetSpecificParameters.datasetParameters) {
-      payload.datasetParameters = datasetSpecificParameters.datasetParameters;
-    }
+    // if (datasetSpecificParameters && datasetSpecificParameters.datasetParameters) {
+    //   payload.datasetParameters = datasetSpecificParameters.datasetParameters;
+    // }
 
     const response = await axios.post(this.dataset.findDatesUrl, payload);
 
-    return response.data.map((date: string) => moment(date));
+    console.log('AbstractSentinelHubV3Layer', { payload, response });
+
+    return response.data.map((date: string) => moment.utc(date));
   }
 }
