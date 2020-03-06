@@ -98,20 +98,38 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  public async findDates(
-    bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
-    datasetSpecificParameters?: { productType?: ProductType },
-  ): Promise<Moment[]> {
-    const findDatesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      productType:
-        datasetSpecificParameters && datasetSpecificParameters.productType
-          ? datasetSpecificParameters.productType
-          : undefined,
-    };
+  // public async findDates(
+  //   bbox: BBox,
+  //   fromTime: Moment,
+  //   toTime: Moment,
+  //   datasetSpecificParameters?: { productType?: ProductType },
+  // ): Promise<Moment[]> {
+  //   const findDatesDatasetParameters: S5PL2FindTilesDatasetParameters = {
+  //     type: this.dataset.datasetParametersType,
+  //     productType:
+  //       datasetSpecificParameters && datasetSpecificParameters.productType
+  //         ? datasetSpecificParameters.productType
+  //         : undefined,
+  //   };
 
-    return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
+  //   return super.findDates(bbox, fromTime, toTime, { datasetParameters: findDatesDatasetParameters });
+  // }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+      },
+    };
+    if (this.productType !== null) {
+      result.datasetParameters.productType = this.productType;
+    }
+
+    if (this.maxCloudCoverPercent !== null) {
+      result.maxCloudCoverage = this.maxCloudCoverPercent / 100;
+    }
+
+    console.log('S5PL2 getFindDatesAdditionalParameters', { result });
+    return result;
   }
 }

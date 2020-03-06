@@ -372,7 +372,7 @@ function renderTilesList(containerEl, list) {
 
 export const findDates = () => {
   const layer = new S1GRDAWSEULayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19); // WRONG ORDER!!!
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
