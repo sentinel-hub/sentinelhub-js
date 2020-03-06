@@ -234,30 +234,6 @@ export const S2FindTiles = () => {
   return wrapperEl;
 };
 
-export const S2FindDates = () => {
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
-  const containerEl = document.createElement('pre');
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
-
-  const perform = async () => {
-    const data = await layerS2L2A.findDates(
-      bbox,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      {maxCloudCoverage: 60},
-    );
-    containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";
-  };
-  perform().then(() => { });
-
-  return wrapperEl;
-};
-
-
 export const S1GRDFindTiles = () => {
   const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
   const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
@@ -325,31 +301,6 @@ export const findFlyovers = () => {
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
-
-  return wrapperEl;
-};
-
-
-export const S1GRDFindDates = () => {
-  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
-  const containerEl = document.createElement('pre');
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-1 GRD</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
-
-  const perform = async () => {
-    const data = await layerS1.findDates(
-      bbox,
-      new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      { orbitDirection: 'ASCENDING' },
-    );
-
-    containerEl.innerHTML = "<ul>" + data.map(d => "<li>" + d + "</li>").join("") + "</ul>";
-  };
-  perform().then(() => { });
 
   return wrapperEl;
 };
