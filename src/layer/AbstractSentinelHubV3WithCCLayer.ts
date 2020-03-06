@@ -50,7 +50,6 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   }
 
   protected getFindDatesAdditionalParameters(): Record<string, any> {
-    console.log('AbstractSHLAyerV3CC', this.maxCloudCoverPercent);
     return {
       maxCloudCoverage: this.maxCloudCoverPercent / 100,
     };

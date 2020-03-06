@@ -186,6 +186,6 @@ export const DATASET_BYOC: Dataset = {
   datasetParametersType: 'BYOC',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex',
-  findDatesUrl: null,
+  findDatesUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
   orbitTimeMinutes: null,
 };

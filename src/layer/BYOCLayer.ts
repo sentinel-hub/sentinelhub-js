@@ -93,4 +93,19 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {
     return {};
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    if (!this.collectionId) {
+      throw Error('Please provide collection id when creating a BYOC layer.');
+    }
+
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        collectionId: this.collectionId,
+      },
+    };
+
+    return result;
+  }
 }
