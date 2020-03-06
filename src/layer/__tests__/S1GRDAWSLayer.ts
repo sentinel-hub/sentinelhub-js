@@ -11,7 +11,10 @@ import {
   OrbitDirection,
 } from 'src';
 
-test('S1GRDLayer.findTiles returns correct data', async () => {
+test.each([
+  [true],
+  [false],
+])('S1GRDLayer.findTiles returns correct data - hasMore %p', async (hasMoreFixture) => {
   const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
   const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
@@ -29,6 +32,7 @@ test('S1GRDLayer.findTiles returns correct data', async () => {
   );
 
   // mock a single-tile response:
+  axios.post.mockReset();
   axios.post.mockImplementation(() =>
     Promise.resolve({
       data: {
@@ -75,7 +79,7 @@ test('S1GRDLayer.findTiles returns correct data', async () => {
             sliceNumber: 5,
           },
         ],
-        hasMore: false,
+        hasMore: hasMoreFixture,
         maxOrderKey: '2020-02-02T08:17:57Z;1295159',
       },
     }),
@@ -84,7 +88,7 @@ test('S1GRDLayer.findTiles returns correct data', async () => {
   const { tiles, hasMore } = await layer.findTiles(bbox, fromTime, toTime, 5, 0);
 
   expect(axios.post).toHaveBeenCalledTimes(1);
-  expect(hasMore).toBe(false);
+  expect(hasMore).toBe(hasMoreFixture);
   expect(tiles).toStrictEqual([
     {
       geometry: {
