@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
   BYOCLayer,
   setAuthToken,
@@ -232,6 +234,103 @@ export const findTilesAuth = () => {
 
   return wrapperEl;
 };
+
+export const findDates = () => {
+  if (!process.env.BYOC_COLLECTION_ID) {
+    throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
+  }
+  const layer = new BYOCLayer(
+    instanceId,
+    layerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    process.env.BYOC_COLLECTION_ID,
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findDates (with collectionId)</h2>';
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    const dates = await layer.findDates(
+      bbox,
+      new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    );
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: moment(dates[0]).startOf('day'),
+      toTime: moment(dates[0]).endOf('day'),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
+
+export const findDatesAuth = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+  const layer = new BYOCLayer(instanceId, layerId);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findDates (without collectionId)</h2>';
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const dates = await layer.findDates(
+      bbox,
+      new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    );
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: moment(dates[0]).startOf('day'),
+      toTime: moment(dates[0]).endOf('day'),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
+
 
 function renderTilesList(containerEl, list) {
   list.forEach(tile => {

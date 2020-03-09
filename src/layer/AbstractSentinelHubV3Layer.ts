@@ -197,4 +197,24 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
     return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const bboxPolygon = bbox.toGeoJSON();
+    const payload: any = {
+      queryArea: bboxPolygon,
+      from: fromTime.toISOString(),
+      to: toTime.toISOString(),
+      ...this.getFindDatesAdditionalParameters(),
+    };
+    const response = await axios.post(this.dataset.findDatesUrl, payload);
+    return response.data.map((date: string) => moment.utc(date).toDate());
+  }
 }

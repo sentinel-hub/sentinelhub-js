@@ -1,6 +1,9 @@
+import moment from 'moment';
+
 import {
   Landsat8AWSLayer,
   CRS_EPSG3857,
+  CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
@@ -20,6 +23,7 @@ if (!process.env.LANDSAT8_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.LANDSAT8_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
 
 export default {
   title: 'Landsat 8 - AWS',
@@ -162,6 +166,48 @@ export const findTiles = () => {
 
   return wrapperEl;
 };
+
+export const findDates = () => {
+  const maxCC = 40;
+  const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCC);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS with max cloud coverage of ${maxCC}</h2>`;
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  const perform = async () => {
+    const dates = await layer.findDates(
+      bbox,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59)),
+    );
+
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: moment(dates[0]).startOf('day'),
+      toTime: moment(dates[0]).endOf('day'),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
+
 
 function renderTilesList(containerEl, list) {
   list.forEach(tile => {

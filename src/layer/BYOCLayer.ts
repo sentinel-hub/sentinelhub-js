@@ -1,5 +1,5 @@
+import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
-import { AxiosRequestConfig } from 'axios';
 
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
@@ -92,5 +92,38 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {
     return {};
+  }
+
+  protected async getFindDatesAdditionalParameters(): Promise<Record<string, any>> {
+    if (this.shouldFetchAdditionalParams()) {
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+      this.collectionId = layerParams['collectionId'];
+    }
+
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        collectionId: this.collectionId,
+      },
+    };
+
+    return result;
+  }
+
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const additionalFindDatesParameters = await this.getFindDatesAdditionalParameters();
+    const bboxPolygon = bbox.toGeoJSON();
+    const payload: any = {
+      queryArea: bboxPolygon,
+      from: fromTime.toISOString(),
+      to: toTime.toISOString(),
+      ...additionalFindDatesParameters,
+    };
+    const response = await axios.post(this.dataset.findDatesUrl, payload);
+    return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }
