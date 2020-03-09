@@ -172,7 +172,7 @@ export const findDates = () => {
   const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCC);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findTiles for Landsat 8 on AWS with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS with max cloud coverage of ${maxCC}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement("beforeend", containerEl);

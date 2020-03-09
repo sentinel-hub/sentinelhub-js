@@ -110,7 +110,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  public async findDates(bbox: BBox, fromTime: Moment, toTime: Moment): Promise<Moment[]> {
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
     if (!this.dataset.findDatesUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
@@ -126,10 +126,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     const response = await axios.post(url, payload, {
       headers: {
         'Content-Type': 'application/json',
-        'Accept-CRS': 'EPSG:4326',
       },
     });
 
-    return response.data.map((d: string) => moment.utc(d));
+    return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }
