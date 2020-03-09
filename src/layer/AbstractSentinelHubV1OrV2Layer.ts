@@ -1,5 +1,5 @@
 import axios from 'axios';
-import dayjs from 'dayjs';
+import moment from 'moment';
 import { stringify } from 'query-string';
 
 import { BBox } from 'src/bbox';
@@ -99,7 +99,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {
       tiles: responseTiles.map(tile => ({
         geometry: tile.tileDrawRegionGeometry,
-        sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: this.extractFindTilesMeta(tile),
       })),
       hasMore: response.data.hasMore,

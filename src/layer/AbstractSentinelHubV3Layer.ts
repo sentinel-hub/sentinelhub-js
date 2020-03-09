@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
@@ -160,7 +160,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {},
       })),
       hasMore: response.data.hasMore,

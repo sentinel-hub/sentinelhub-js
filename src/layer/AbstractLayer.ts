@@ -1,5 +1,5 @@
 import axios from 'axios';
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
@@ -110,8 +110,8 @@ export class AbstractLayer {
         }
 
         // append the tile to flyovers:
-        const prevDateS = dayjs.utc(flyovers[flyoverIndex].fromTime).unix();
-        const currDateS = dayjs.utc(tiles[tileIndex].sensingTime).unix();
+        const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
+        const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
         const diffS = Math.abs(prevDateS - currDateS);
         if (diffS > orbitTimeS) {
           // finish the old flyover:

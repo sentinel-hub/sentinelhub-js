@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 import { AxiosRequestConfig } from 'axios';
 
 import { BBox } from 'src/bbox';
@@ -80,7 +80,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => {
         return {
           geometry: tile.dataGeometry,
-          sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
           meta: {
             cloudCoverPercent: tile.cloudCoverPercentage,
           },
