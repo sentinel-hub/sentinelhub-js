@@ -1,9 +1,10 @@
+import moment from 'moment';
+
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
-import moment, { Moment } from 'moment';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching
@@ -64,8 +65,8 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -73,7 +74,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       throw new Error('Parameter productType must be specified!');
     }
     const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       productType: this.productType,
       // minQa: this.minQa,
     };
@@ -90,11 +91,28 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => {
         return {
           geometry: tile.tileDrawRegionGeometry,
-          sensingTime: moment.utc(tile.sensingTime),
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
           meta: {},
         };
       }),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+      },
+    };
+    if (this.productType !== null) {
+      result.datasetParameters.productType = this.productType;
+    }
+
+    if (this.maxCloudCoverPercent !== null) {
+      result.maxCloudCoverage = this.maxCloudCoverPercent / 100;
+    }
+
+    return result;
   }
 }

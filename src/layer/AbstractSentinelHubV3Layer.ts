@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
@@ -151,8 +151,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -160,7 +160,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {},
       })),
       hasMore: response.data.hasMore,
@@ -169,8 +169,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected fetchTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount: number = 1,
     offset: number = 0,
     maxCloudCoverPercent?: number | null,
@@ -196,5 +196,25 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
 
     return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const bboxPolygon = bbox.toGeoJSON();
+    const payload: any = {
+      queryArea: bboxPolygon,
+      from: fromTime.toISOString(),
+      to: toTime.toISOString(),
+      ...this.getFindDatesAdditionalParameters(),
+    };
+    const response = await axios.post(this.dataset.findDatesUrl, payload);
+    return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }

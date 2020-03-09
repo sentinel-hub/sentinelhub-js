@@ -108,13 +108,16 @@ async function run() {
   };
   printOut('GetMapParams:', getMapParams);
 
-  // get tiles and flyover intervals for S2 L2A layer
+  const maxCount = 20;
+  printOut('maximum number of returned tiles is:', maxCount);
+
+  // get tiles, flyover intervals and dates for S2 L2A layer
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
   const { tiles: tilesS2L2A, hasMore } = await layerS2L2A.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    20,
+    maxCount,
     0,
   );
   printOut('tiles for S2 L2A:', tilesS2L2A);
@@ -129,12 +132,19 @@ async function run() {
   );
   printOut('flyovers for S2 L2A:', flyoversS2L2A);
 
-  // get tiles and flyover intervals for S1 GRD Layer
+  const datesS2L2A = await layerS2L2A.findDates(
+    getMapParams.bbox,
+    getMapParams.fromTime,
+    getMapParams.toTime,
+  );
+  printOut('dates for S2 L2A', datesS2L2A);
+
+  // get tiles, flyover intervals and dates for S1 GRD Layer
   const { tiles: tilesS1GRD, hasMore: hasMoreS1 } = await layerS1.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    10,
+    maxCount,
     0,
   );
   printOut('tiles for S1 GRD:', tilesS1GRD);
@@ -148,6 +158,9 @@ async function run() {
     50,
   );
   printOut('flyovers for S1 GRD:', flyoversS1GRD);
+
+  const datesS1GRD = await layerS1.findDates(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime);
+  printOut('dates for S1 GRD', datesS1GRD);
 
   // finally, display the image:
   const imageUrl = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);

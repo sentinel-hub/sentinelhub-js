@@ -1,6 +1,6 @@
 import axios from 'axios';
+import moment from 'moment';
 import { stringify } from 'query-string';
-import moment, { Moment } from 'moment';
 
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
@@ -69,8 +69,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount: number = 50,
     offset: number = 0,
   ): Promise<PaginatedTiles> {
@@ -99,10 +99,36 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {
       tiles: responseTiles.map(tile => ({
         geometry: tile.tileDrawRegionGeometry,
-        sensingTime: moment.utc(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: this.extractFindTilesMeta(tile),
       })),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const payload = bbox.toGeoJSON();
+    const params = {
+      timefrom: fromTime.toISOString(),
+      timeto: toTime.toISOString(),
+      ...this.getFindDatesAdditionalParameters(),
+    };
+
+    const url = `${this.dataset.findDatesUrl}?${stringify(params, { sort: false })}`;
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }
