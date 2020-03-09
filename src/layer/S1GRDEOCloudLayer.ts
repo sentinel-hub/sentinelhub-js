@@ -107,4 +107,16 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     }
     return result;
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      productType: 'GRD',
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+    };
+    if (this.orbitDirection !== null) {
+      result.orbitDirection = this.orbitDirection;
+    }
+    return result;
+  }
 }

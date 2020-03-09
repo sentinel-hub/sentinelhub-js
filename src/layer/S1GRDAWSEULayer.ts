@@ -1,4 +1,4 @@
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
@@ -110,15 +110,15 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded();
 
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
       orbitDirection: this.orbitDirection,
@@ -137,7 +137,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {
           orbitDirection: tile.orbitDirection,
           polarization: tile.polarization,
@@ -147,5 +147,20 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       })),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        acquisitionMode: this.acquisitionMode,
+        polarization: this.polarization,
+        resolution: this.resolution,
+      },
+    };
+    if (this.orbitDirection !== null) {
+      result.datasetParameters.orbitDirection = this.orbitDirection;
+    }
+    return result;
   }
 }

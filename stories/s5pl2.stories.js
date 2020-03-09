@@ -1,9 +1,12 @@
+import moment from 'moment';
+
 import {
   S5PL2Layer,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
   CRS_EPSG3857,
+  CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
@@ -26,6 +29,7 @@ const bbox = new BBox(
   1487158.8223163893,
   5165920.119625352,
 );
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Sentinel 5P L2',
@@ -273,6 +277,48 @@ export const findTiles = () => {
       0,
     );
     renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findDates = () => {
+  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, 'NO2', 60);
+
+  const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59));
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>findDates</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    const dates = await layer.findDates(bbox4326, fromTime, toTime);
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 

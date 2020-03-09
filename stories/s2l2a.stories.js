@@ -1,79 +1,79 @@
 import moment from 'moment';
 
 import {
-  Landsat8EOCloudLayer,
-  CRS_EPSG3857,
+  S2L2ALayer,
+  setAuthToken,
+  isAuthTokenSet,
+  requestAuthToken,
+  CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
-  DATASET_EOCLOUD_LANDSAT8,
-  LayersFactory,
-  CRS_EPSG4326,
 } from '../dist/sentinelHub.esm';
 
-if (!process.env.EOC_INSTANCE_ID) {
-  throw new Error('EOC_INSTANCE_ID environment variable is not defined!');
+if (!process.env.INSTANCE_ID) {
+  throw new Error('INSTANCE_ID environment variable is not defined!');
 }
 
-if (!process.env.EOC_LANDSAT8_LAYER_ID) {
-  throw new Error('EOC_LANDSAT8_LAYER_ID environment variable is not defined!');
+if (!process.env.S2L2A_LAYER_ID) {
+  throw new Error('S2L2A_LAYER_ID environment variable is not defined!');
 }
 
-const instanceId = process.env.EOC_INSTANCE_ID;
-const layerId = process.env.EOC_LANDSAT8_LAYER_ID;
-const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
+const instanceId = process.env.INSTANCE_ID;
+const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
-  title: 'Landsat 8 - EOCloud',
+  title: 'Sentinel 2 L2A',
 };
 
-export const getMapURL = () => {
+export const GetMapURL = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new Landsat8EOCloudLayer(instanceId, layerId);
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
   const getMapParams = {
-    bbox: bbox,
+    bbox: bbox4326,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
     toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
   };
-  const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
+  const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
 
   return wrapperEl;
 };
 
-export const getMapWMS = () => {
+export const GetMapWMS = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
+  // getMap is async:
   const perform = async () => {
-    const layer = new Landsat8EOCloudLayer(instanceId, layerId);
+    const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -81,66 +81,50 @@ export const getMapWMS = () => {
   return wrapperEl;
 };
 
-export const getMapWMSLayersFactory = () => {
+export const GetMapProcessing = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
+  // getMap is async:
   const perform = async () => {
-    const layer = (
-      await LayersFactory.makeLayers(
-        `${DATASET_EOCLOUD_LANDSAT8.shServiceHostname}v1/wms/${instanceId}`,
-        (lId, datasetId) => layerId === lId,
-      )
-    )[0];
+    await setAuthTokenWithOAuthCredentials();
 
-    const getMapParams = {
-      bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
-
-export const getMapWMSEvalscript = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with WMS - evalscript</h2>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-
-  const perform = async () => {
-    const layer = new Landsat8EOCloudLayer(
+    const layerS2L2A = new S2L2ALayer(
       instanceId,
-      layerId,
+      s2l2aLayerId,
       `
-        return [2.5 * B04, 1.5 * B03, 0.5 * B02];
-      `,
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+      }
+    `,
     );
 
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -148,18 +132,73 @@ export const getMapWMSEvalscript = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
-  const layer = new Landsat8EOCloudLayer(instanceId, layerId);
+export const GetMapWMSMaxCC20vs60 = () => {
+  const layerS2L2A20 = new S2L2ALayer(instanceId, s2l2aLayerId, null, null, null, null, null, 20);
+  const layerS2L2A60 = new S2L2ALayer(instanceId, s2l2aLayerId, null, null, null, null, null, 60);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `
+  <h2>GetMap: maxCC=20 vs maxCC=60</h2>
+  <p>top left part of left image should be white (cc of the tile is above 20)</p>
+  `;
+
+  const img20 = document.createElement('img');
+  img20.width = '512';
+  img20.height = '512';
+  img20.style.border = '2px solid green';
+  img20.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img20);
+
+  const img60 = document.createElement('img');
+  img60.width = '512';
+  img60.height = '512';
+  img60.style.border = '2px solid blue';
+  img60.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img60);
+
+  const perform = async () => {
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: moment('2020-01-14').startOf('day'),
+      toTime: moment('2020-01-14').endOf('day'),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const imageBlob20 = await layerS2L2A20.getMap(getMapParams, ApiType.WMS);
+    img20.src = URL.createObjectURL(imageBlob20);
+
+    const imageBlob60 = await layerS2L2A60.getMap(getMapParams, ApiType.WMS);
+    img60.src = URL.createObjectURL(imageBlob60);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const FindTiles = () => {
+  const maxCloudCoverPercent = 60;
+  const layerS2L2A = new S2L2ALayer(
+    instanceId,
+    s2l2aLayerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+  );
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
-    const data = await layer.findTiles(
-      bbox,
-      new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0)),
+    const data = await layerS2L2A.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       0,
@@ -172,7 +211,7 @@ export const findTiles = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new Landsat8EOCloudLayer(instanceId, layerId);
+  const layer = new S2L2ALayer(instanceId, s2l2aLayerId);
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -185,10 +224,10 @@ export const findFlyovers = () => {
   const flyoversContainerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
-  const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
-
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
     const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
     flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
@@ -209,12 +248,12 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDatesEPSG3857 = () => {
-  const maxCloudCoverPercent = 0;
-  const layer = new Landsat8EOCloudLayer(instanceId, layerId, null, null, null, null, maxCloudCoverPercent);
+export const findDates = () => {
+  const maxCC = 60;
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId, null, null, null, null, null, maxCC);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:3857</h2>';
+  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A with max cloud coverage of ${maxCC}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -224,24 +263,25 @@ export const findDatesEPSG3857 = () => {
   img.height = '512';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
-
   const perform = async () => {
-    const dates = await layer.findDates(bbox, fromTime, toTime);
+    const dates = await layerS2L2A.findDates(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    );
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: moment(dates[0]).startOf('day'),
       toTime: moment(dates[0]).endOf('day'),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -265,4 +305,16 @@ function renderTilesList(containerEl, list) {
       li.innerHTML = `${key} : ${text}`;
     }
   });
+}
+
+async function setAuthTokenWithOAuthCredentials() {
+  if (isAuthTokenSet()) {
+    console.log('Auth token is already set.');
+    return;
+  }
+  const clientId = process.env.CLIENT_ID;
+  const clientSecret = process.env.CLIENT_SECRET;
+  const authToken = await requestAuthToken(clientId, clientSecret);
+  setAuthToken(authToken);
+  console.log('Auth token retrieved and set successfully');
 }

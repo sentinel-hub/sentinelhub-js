@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Moment } from 'moment';
+import moment from 'moment';
 
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
@@ -41,8 +41,8 @@ export class AbstractLayer {
 
   public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: Moment, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
@@ -51,8 +51,8 @@ export class AbstractLayer {
 
   public async findFlyovers(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxFindTilesRequests: number = 50,
     tilesPerRequest: number = 50,
   ): Promise<FlyoverInterval[]> {
@@ -110,8 +110,8 @@ export class AbstractLayer {
         }
 
         // append the tile to flyovers:
-        const prevDateS = flyovers[flyoverIndex].fromTime.unix();
-        const currDateS = tiles[tileIndex].sensingTime.unix();
+        const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
+        const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
         const diffS = Math.abs(prevDateS - currDateS);
         if (diffS > orbitTimeS) {
           // finish the old flyover:
@@ -217,6 +217,15 @@ export class AbstractLayer {
       return Math.round(geometry * shift) / shift;
     }
     return geometry.map((x: any) => this.roundCoordinates(x));
+  }
+
+  public async findDates(
+    bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    // any additional
+  ): Promise<Date[]> {
+    throw new Error('Not implemented yet');
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}

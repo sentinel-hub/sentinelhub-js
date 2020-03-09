@@ -34,4 +34,10 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
       cloudCoverPercent: tile.cloudCoverPercentage,
     };
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    return {
+      maxcc: this.maxCloudCoverPercent / 100,
+    };
+  }
 }
