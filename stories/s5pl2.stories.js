@@ -316,8 +316,8 @@ export const findDates = () => {
   const perform = async () => {
     const dates = await layer.findDates(
       bbox4326,
-      moment(fromTime),
-      moment(toTime),
+      fromTime,
+      toTime,
     );
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
