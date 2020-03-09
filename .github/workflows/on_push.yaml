@@ -23,7 +23,5 @@ jobs:
           npm run lint
 
       - name: Run tests
-        env:
-          TZ: Europe/Ljubljana
         run: |
           npm run test
