@@ -4,6 +4,7 @@ import {
   isAuthTokenSet,
   requestAuthToken,
   CRS_EPSG3857,
+  CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
@@ -23,6 +24,7 @@ if (!process.env.S1GRDEW_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S1GRDEW_LAYER_ID;
 const bbox3857 = new BBox(CRS_EPSG3857, -2035059.4, 15497760.4, -1956787.9, 15576031.8);
+const bbox4326 = new BBox(CRS_EPSG4326, -26, 68, -20, 72);
 
 export default {
   title: 'Sentinel 1 GRD EW - AWS',
@@ -239,6 +241,44 @@ export const findTiles = () => {
       0,
     );
     renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findFlyovers = () => {
+  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const fromTime = new Date(Date.UTC(2020, 1 - 1, 0, 0, 0, 0));
+    const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: fromTime,
+      toTime: toTime,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 

@@ -39,7 +39,7 @@
     "dev": "rollup -c -w",
     "test": "jest",
     "lint": "eslint --max-warnings 0 --ext .ts,js src/",
-    "prettier": "prettier --write \"{src,example}/**/*.{ts,js}\"",
+    "prettier": "prettier --write \"{src,example,stories}/**/*.{ts,js}\"",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
