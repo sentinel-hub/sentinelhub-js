@@ -13,7 +13,7 @@ import {
 
 test('timezone should NOT be UTC', () => {
   // We are testing correctness in case of local timezones, so it doesn't make sense to
-  // run these tests in UTC timezone. Jest global setup should take care of that, but we
+  // run these tests in UTC timezone. Env var in package.json should take care of that, but we
   // check here just to be sure.
   expect(new Date().getTimezoneOffset()).not.toBe(0);
 });
