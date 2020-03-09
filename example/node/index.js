@@ -136,7 +136,6 @@ async function run() {
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
-    { maxCloudCoverage: 100 },
   );
   printOut('dates for S2 L2A', datesS2L2A);
 
@@ -160,9 +159,7 @@ async function run() {
   );
   printOut('flyovers for S1 GRD:', flyoversS1GRD);
 
-  const datesS1GRD = await layerS1.findDates(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime, {
-    orbitDirection: OrbitDirection.ASCENDING,
-  });
+  const datesS1GRD = await layerS1.findDates(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime);
   printOut('dates for S1 GRD', datesS1GRD);
 
   // finally, display the image:
