@@ -219,5 +219,14 @@ export class AbstractLayer {
     return geometry.map((x: any) => this.roundCoordinates(x));
   }
 
+  public async findDates(
+    bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    // any additional
+  ): Promise<Date[]> {
+    throw new Error('Not implemented yet');
+  }
+
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }

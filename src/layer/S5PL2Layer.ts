@@ -74,7 +74,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       throw new Error('Parameter productType must be specified!');
     }
     const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       productType: this.productType,
       // minQa: this.minQa,
     };
@@ -97,5 +97,22 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       }),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+      },
+    };
+    if (this.productType !== null) {
+      result.datasetParameters.productType = this.productType;
+    }
+
+    if (this.maxCloudCoverPercent !== null) {
+      result.maxCloudCoverage = this.maxCloudCoverPercent / 100;
+    }
+
+    return result;
   }
 }

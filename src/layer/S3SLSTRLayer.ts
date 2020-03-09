@@ -81,4 +81,22 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       hasMore: response.data.hasMore,
     };
   }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        view: this.view,
+      },
+    };
+    if (this.orbitDirection !== null) {
+      result.datasetParameters.orbitDirection = this.orbitDirection;
+    }
+
+    if (this.maxCloudCoverPercent !== null) {
+      result.maxCloudCoverage = this.maxCloudCoverPercent / 100;
+    }
+
+    return result;
+  }
 }

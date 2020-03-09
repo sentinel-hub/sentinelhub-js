@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import {
   WmsLayer,
   S3SLSTRLayer,
@@ -8,7 +10,6 @@ import {
   BBox,
   MimeTypes,
   ApiType,
-  OrbitDirection,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -208,6 +209,58 @@ function renderTilesList(containerEl, list) {
     }
   });
 }
+
+
+export const findDates = () => {
+  const layer = new S3SLSTRLayer(instanceId, layerId);
+  // const bbox4326 = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+  const bbox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
+
+  const fromTime = new Date(Date.UTC(2018, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2018, 2 - 1, 1, 23, 59, 59));
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = "<h2>findDates</h2>" +
+    "from: " + fromTime.toISOString() + "<br />" +
+    "to: " + toTime.toISOString();
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement("beforeend", img);
+
+  console.log('date, moment', { date: fromTime, moment: moment(fromTime) });
+
+  const perform = async () => {
+    const dates = await layer.findDates(
+      bbox4326,
+      fromTime,
+      toTime,
+    );
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999))
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
 
 async function setAuthTokenWithOAuthCredentials () {
   if (isAuthTokenSet()) {

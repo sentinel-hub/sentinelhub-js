@@ -118,7 +118,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     await this.updateLayerFromServiceIfNeeded();
 
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      type: this.dataset.datasetParametersType,
       acquisitionMode: this.acquisitionMode,
       polarization: this.polarization,
       orbitDirection: this.orbitDirection,
@@ -147,5 +147,20 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       })),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getFindDatesAdditionalParameters(): Record<string, any> {
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        acquisitionMode: this.acquisitionMode,
+        polarization: this.polarization,
+        resolution: this.resolution,
+      },
+    };
+    if (this.orbitDirection !== null) {
+      result.datasetParameters.orbitDirection = this.orbitDirection;
+    }
+    return result;
   }
 }
