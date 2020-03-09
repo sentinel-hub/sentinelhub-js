@@ -1,4 +1,3 @@
-import { Moment } from 'moment';
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
@@ -52,7 +51,7 @@ export enum BackscatterCoeff {
 
 export type Tile = {
   geometry: Polygon | MultiPolygon;
-  sensingTime: Moment;
+  sensingTime: Date;
   meta: Record<string, any>;
 };
 
@@ -62,8 +61,8 @@ export type PaginatedTiles = {
 };
 
 export type FlyoverInterval = {
-  fromTime: Moment;
-  toTime: Moment;
+  fromTime: Date;
+  toTime: Date;
   coveragePercent: number;
   meta: Record<string, any>;
 };
