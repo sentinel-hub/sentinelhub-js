@@ -3,6 +3,9 @@ export default {
     // axios.get() response:
     return Promise.resolve({ data: {} });
   }),
+  post: jest.fn(() => {
+    return Promise.resolve({ data: {} });
+  }),
   interceptors: {
     request: {
       use: () => {},
