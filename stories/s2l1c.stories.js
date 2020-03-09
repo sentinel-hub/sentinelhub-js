@@ -251,7 +251,7 @@ export const findDates = () => {
   const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, maxCC);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A with max cloud coverage of ${maxCC}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement("beforeend", containerEl);
