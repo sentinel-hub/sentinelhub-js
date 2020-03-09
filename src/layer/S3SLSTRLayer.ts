@@ -1,10 +1,11 @@
+import moment from 'moment';
+
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { OrbitDirection } from 'src';
 import { ProcessingPayload } from 'src/layer/processing';
-import moment, { Moment } from 'moment';
 
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
@@ -49,8 +50,8 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Moment,
-    toTime: Moment,
+    fromTime: Date,
+    toTime: Date,
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
@@ -71,7 +72,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {
           cloudCoverPercent: tile.cloudCoverPercentage,
           orbitDirection: tile.orbitDirection,
