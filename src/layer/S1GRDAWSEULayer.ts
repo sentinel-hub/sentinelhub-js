@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
@@ -137,7 +137,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {
           orbitDirection: tile.orbitDirection,
           polarization: tile.polarization,

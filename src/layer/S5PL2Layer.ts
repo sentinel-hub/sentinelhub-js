@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
@@ -91,7 +91,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => {
         return {
           geometry: tile.tileDrawRegionGeometry,
-          sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
           meta: {},
         };
       }),

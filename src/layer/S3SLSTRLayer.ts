@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
@@ -72,7 +72,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
-        sensingTime: dayjs.utc(tile.sensingTime).toDate(),
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {
           cloudCoverPercent: tile.cloudCoverPercentage,
           orbitDirection: tile.orbitDirection,

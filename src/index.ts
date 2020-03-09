@@ -42,11 +42,6 @@ import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromPara
 import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 
-// load dayjs UTC plugin:
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-dayjs.extend(utc);
-
 registerAxiosCacheRetryInterceptors();
 
 export {
