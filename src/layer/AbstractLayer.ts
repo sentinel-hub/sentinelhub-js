@@ -36,7 +36,7 @@ export class AbstractLayer {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getMapUrl(params: GetMapParams, api: ApiType): string {
-    throw new Error('Not implemented');
+    throw new Error('getMapUrl() not implemented yet.');
   }
 
   public async findTiles(
@@ -46,7 +46,7 @@ export class AbstractLayer {
     maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
-    throw new Error('Not implemented yet');
+    throw new Error('findTiles() not implemented yet.');
   }
 
   public async findFlyovers(
@@ -225,7 +225,7 @@ export class AbstractLayer {
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     // any additional
   ): Promise<Date[]> {
-    throw new Error('Not implemented yet');
+    throw new Error('findDates() not implemented yet');
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
