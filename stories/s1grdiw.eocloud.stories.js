@@ -115,12 +115,10 @@ export const getMapWMSLayersFactory = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (
-      await LayersFactory.makeLayers(
-        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
-        (lId, datasetId) => layerId === lId,
-      )
-    )[0];
+    const layer = (await LayersFactory.makeLayers(
+      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+      (lId, datasetId) => layerId === lId,
+    ))[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -257,12 +255,10 @@ export const findFlyovers = () => {
   wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
-    const layer = (
-      await LayersFactory.makeLayers(
-        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
-        (lId, datasetId) => layerId === lId,
-      )
-    )[0];
+    const layer = (await LayersFactory.makeLayers(
+      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+      (lId, datasetId) => layerId === lId,
+    ))[0];
 
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
@@ -382,6 +378,26 @@ export const findDatesEPSG3857 = () => {
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const supportsProcessingAPI = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Supports Processing API</h2>';
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(
+      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+      (lId, datasetId) => layerId === lId,
+    ))[0];
+    const supportsProcessingAPI = layer.supportsApiType(ApiType.PROCESSING);
+    containerEl.innerHTML = JSON.stringify(supportsProcessingAPI, null, true);
   };
   perform().then(() => {});
 

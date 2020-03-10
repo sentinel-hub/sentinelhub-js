@@ -20,7 +20,6 @@ export class AbstractLayer {
     this.description = description;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
@@ -32,6 +31,10 @@ export class AbstractLayer {
         const className = this.constructor.name;
         throw new Error(`API type "${api}" not supported in ${className}`);
     }
+  }
+
+  public supportsApiType(api: ApiType): boolean {
+    return api === ApiType.WMS;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

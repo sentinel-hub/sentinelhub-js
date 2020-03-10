@@ -122,13 +122,22 @@ Maps which correspond to these layers can be fetched via different protocols lik
   const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
 ```
 
-Note that in theory both images should be _exactly_ the same. If there are any (minor) differences, they are a consequence of how service processes requests, not because of different interpretation of getMapParams on the side of this library.
+Note that both of the images above should be _exactly_ the same.
 
 In some cases we can retrieve just the image URL instead of a blob:
 
 ```javascript
   const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
   const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
+```
+
+It is also possible to determine whether a layer supports a specific ApiType:
+```javascript
+  if (layer.supportsApiType(ApiType.PROCESSING)) {
+    imageUrl = await layer.getMapUrl(getMapParams, ApiType.PROCESSING);
+  } else {
+    imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
+  };
 ```
 
 ## Searching for data
