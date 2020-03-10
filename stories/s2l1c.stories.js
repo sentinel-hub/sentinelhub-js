@@ -1,15 +1,6 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import {
-  S2L1CLayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
-  CRS_EPSG4326,
-  BBox,
-  MimeTypes,
-  ApiType,
-} from '../dist/sentinelHub.esm';
+import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -159,8 +150,8 @@ export const GetMapWMSMaxCC20vs60 = () => {
   const perform = async () => {
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment('2020-01-14').startOf('day'),
-      toTime: moment('2020-01-14').endOf('day'),
+      fromTime: new Date(Date.UTC(2014, 1 - 1, 14, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2014, 1 - 1, 14, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -249,11 +240,20 @@ export const findFlyovers = () => {
 };
 
 export const findDates = () => {
-  const maxCC = 60;
-  const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, maxCC);
+  const maxCloudCoverPercent = 60;
+  const layerS2L1C = new S2L1CLayer(
+    instanceId,
+    s2l1cLayerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+  );
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -272,11 +272,14 @@ export const findDates = () => {
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -288,33 +291,3 @@ export const findDates = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

@@ -1,10 +1,7 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
 import {
   S1GRDAWSEULayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
   CRS_EPSG4326,
   CRS_EPSG3857,
   BBox,
@@ -13,6 +10,7 @@ import {
   AcquisitionMode,
   Polarization,
   Resolution,
+  OrbitDirection,
   DATASET_AWSEU_S1GRD,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
@@ -351,7 +349,6 @@ export const findFlyovers = () => {
 };
 
 export const findDatesEPSG4326 = () => {
-  const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
   const layer = new S1GRDAWSEULayer(
     instanceId,
     layerId,
@@ -388,11 +385,14 @@ export const findDatesEPSG4326 = () => {
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -404,33 +404,3 @@ export const findDatesEPSG4326 = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

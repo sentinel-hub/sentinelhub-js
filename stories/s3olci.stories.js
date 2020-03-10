@@ -1,10 +1,7 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
 import {
   S3OLCILayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -23,7 +20,7 @@ if (!process.env.S3OLCI_LAYER_ID) {
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S3OLCI_LAYER_ID;
-const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.34, 42.19);
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Sentinel 3 OLCI',
@@ -235,7 +232,6 @@ export const findFlyoversLinearRingError = () => {
 
 export const findDates = () => {
   const layer = new S3OLCILayer(instanceId, layerId);
-  const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
@@ -262,11 +258,14 @@ export const findDates = () => {
     );
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -279,33 +278,3 @@ export const findDates = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

@@ -1,15 +1,6 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import {
-  S3SLSTRLayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
-  CRS_EPSG4326,
-  BBox,
-  MimeTypes,
-  ApiType,
-} from '../dist/sentinelHub.esm';
+import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -228,8 +219,7 @@ export const findFlyovers = () => {
 
 export const findDates = () => {
   const layer = new S3SLSTRLayer(instanceId, layerId);
-  // const bbox4326 = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-  const bbox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
+  const specialBBox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
 
   const fromTime = new Date(Date.UTC(2018, 1 - 1, 1, 0, 0, 0));
   const toTime = new Date(Date.UTC(2018, 2 - 1, 1, 23, 59, 59));
@@ -246,10 +236,8 @@ export const findDates = () => {
   img.height = '512';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  console.log('date, moment', { date: fromTime, moment: moment(fromTime) });
-
   const perform = async () => {
-    const dates = await layer.findDates(bbox4326, fromTime, toTime);
+    const dates = await layer.findDates(specialBBox4326, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
@@ -257,7 +245,7 @@ export const findDates = () => {
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
-      bbox: bbox4326,
+      bbox: specialBBox4326,
       fromTime: resDateStartOfDay,
       toTime: resDateEndOfDay,
       width: 512,
@@ -271,33 +259,3 @@ export const findDates = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}
