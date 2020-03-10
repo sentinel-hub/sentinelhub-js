@@ -1,10 +1,9 @@
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+
 import {
   WmsLayer,
   S1GRDAWSEULayer,
   S2L2ALayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -219,7 +218,7 @@ export const S2FindTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles for Sentinel-2 L2A</h2>';
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -262,11 +261,11 @@ export const S1GRDFindTiles = () => {
   return wrapperEl;
 };
 
-export const findFlyovers = () => {
-  const layer = new S2L2ALayer(instanceId, s2l2aLayerId);
+export const S2FindFlyovers = () => {
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
+  wrapperEl.innerHTML = '<h2>findFlyovers for Sentinel-2 L2A</h2>';
 
   const img = document.createElement('img');
   img.width = '512';
@@ -280,7 +279,7 @@ export const findFlyovers = () => {
     await setAuthTokenWithOAuthCredentials();
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
-    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    const flyovers = await layerS2L2A.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
     flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
@@ -292,40 +291,10 @@ export const findFlyovers = () => {
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

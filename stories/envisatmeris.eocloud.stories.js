@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { renderTilesList } from './storiesUtils';
 
 import {
   EnvisatMerisEOCloudLayer,
@@ -210,11 +210,11 @@ export const findFlyovers = () => {
 };
 
 export const findDatesEPSG3857 = () => {
-  const maxCloudCoverPercent = 0;
+  const maxCloudCoverPercent = 60;
   const layer = new EnvisatMerisEOCloudLayer(instanceId, layerId);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:3857</h2>';
+  wrapperEl.innerHTML = `<h2>findDates - BBox in EPSG:3857; maxcc = ${maxCloudCoverPercent} </h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -232,11 +232,14 @@ export const findDatesEPSG3857 = () => {
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -248,21 +251,3 @@ export const findDatesEPSG3857 = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { renderTilesList } from './storiesUtils';
 
 import {
   Landsat8AWSLayer,
@@ -23,7 +23,6 @@ const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.LANDSAT8_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
-// const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
 
 export default {
   title: 'Landsat 8 - AWS',
@@ -211,11 +210,11 @@ export const findFlyovers = () => {
 };
 
 export const findDates = () => {
-  const maxCC = 40;
-  const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCC);
+  const maxCloudCoverPercent = 40;
+  const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCloudCoverPercent);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS; maxcc = ${maxCloudCoverPercent}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -232,11 +231,14 @@ export const findDates = () => {
     const dates = await layer.findDates(bbox, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: fromTime,
-      toTime: toTime,
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -248,21 +250,3 @@ export const findDates = () => {
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
