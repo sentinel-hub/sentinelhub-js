@@ -35,36 +35,57 @@ $ npm install @sentinel-hub/sentinelhub-js
 
 ## Layers
 
-The core data structure is `Layer`, which corresponds to a _layer_ as returned by OGC WMS GetCapabilities request. If the URL matches one of the Sentinel Hub service URLs, additional capabilities are unlocked.
-
-Basic (WMS-capable) `Layer` can be initialized like this:
+The core data structure is `Layer`, which corresponds to a _layer_ as returned by OGC WMS GetCapabilities request. Basic (WMS-capable) `Layer` can be initialized like this:
 
 ```javascript
   import { WmsLayer } from '@sentinel-hub/sentinelhub-js';
 
-  const layer = new WmsLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', 'Title', 'Description');
+  const layer = new WmsLayer({
+    url: 'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+    layerId: '<layer-id>',
+  });
 ```
 
-Such layer would only allow WMS requests. However, `Layer` is also a superclass for multiple dataset-specific subclasses (like `S1GRDAWSEULayer` - Sentinel-1 GRD data on AWS eu-central-1 Sentinel Hub endpoint) which can be instantiated with their own specific parameters and thus unlock additional powers.
+Such layer would only allow WMS requests. However, `Layer` is also a superclass for multiple dataset-specific subclasses (like `S1GRDAWSEULayer` - Sentinel-1 GRD data on AWS eu-central-1 Sentinel Hub endpoint) which can be instantiated with their own specific parameters and thus have additional capabilities.
 
 When it comes to Sentinel Hub layers, there are four ways to determine their content:
 
-- by `layerId`: ID of the layer, as used by OGC WMS and SentinelHub Configurator
+- by `instanceId` and `layerId`: ID of the layer, as used by OGC WMS and SentinelHub Configurator
 - by `evalscript`: custom (javascript) code that will be executed by the service per each pixel and will calculate the (usually RGB/RGBA) values
 - by `evalscriptUrl`: the URL from which the evalscript can be downloaded from
-- by `dataProduct`: the structure which contains an ID of a pre-existing product
+- by `dataProduct`: the ID of a pre-existing data product
 
 ```javascript
   import { S1GRDAWSEULayer } from '@sentinel-hub/sentinelhub-js';
 
   let layerS1;
-  layerS1 = new S1GRDAWSEULayer(instanceId, '<layer-id>', null, null, null, 'Title', 'Description');
-  layerS1 = new S1GRDAWSEULayer(null, null, myEvalscript, null, null, 'Title', 'Description', 'IW', 'DV', 'HIGH');
-  layerS1 = new S1GRDAWSEULayer(null, null, null, myEvalscriptUrl, null, 'Title', 'Description', 'IW', 'DV', 'HIGH');
-  layerS1 = new S1GRDAWSEULayer(null, null, null, null, '<data-product-id>', 'Title', 'Description', 'EW', 'DH', 'MEDIUM');
+  layerS1 = new S1GRDAWSEULayer({
+    instanceId: '<my-instance-id>',
+    layerId: '<layer-id>',
+  );
+  layerS1 = new S1GRDAWSEULayer({
+    evalscript: myEvalscript,
+    title: 'Title',
+    description: 'Description',
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
+  layerS1 = new S1GRDAWSEULayer({
+    evalscriptUrl: myEvalscriptUrl,
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
+  layerS1 = new S1GRDAWSEULayer({
+    dataProduct: '<data-product-id>',
+    acquisitionMode: AcquisitionMode.EW,
+    polarization: Polarization.DH,
+    resolution: Resolution.MEDIUM,
+  });
 ```
 
-It is also possible to create layers as they are defined in Sentinel Hub configuration instance:
+It is also possible to create layers by importing their definitions from the Sentinel Hub configuration instance:
 
 ```javascript
   import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
@@ -103,23 +124,32 @@ The process of getting the authentication token is described in [Authentication 
 
 ## Fetching images
 
-Maps which correspond to these layers can be fetched via different protocols like WMS and Processing. Not all of the protocols can be used in all cases; for example, Processing can only render layers for which it has access to the `evalscript` and for which evalscript version 3 is used.
+Maps which correspond to these layers can be fetched via different protocols like WMS and Processing. Not all of the protocols can be used in all cases; for example, Processing can only render layers for which it has `evalscript` available and for which evalscript version 3 is used.
 
 ```javascript
   import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from '@sentinel-hub/sentinelhub-js';
 
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
-  const getMapParams = {
+  const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
+  const imageBlob = await layer.getMap({
     bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    fromTime: fromTime,
+    toTime: toTime,
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-  };
-
-  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-  const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    api: ApiType.WMS,
+  });
+  const imageBlob2 = await layer.getMap({
+    bbox: bbox,
+    fromTime: fromTime,
+    toTime: toTime,
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    api: ApiType.PROCESSING,
+  });
 ```
 
 Note that both of the images above should be _exactly_ the same.
@@ -127,8 +157,16 @@ Note that both of the images above should be _exactly_ the same.
 In some cases we can retrieve just the image URL instead of a blob:
 
 ```javascript
-  const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
-  const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
+  const imageBlob = await layer.getMapUrl({
+    bbox: bbox,
+    fromTime: fromTime,
+    toTime: toTime,
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    api: ApiType.WMS,
+  });
+  // for ApiType.PROCESSING, exception would be thrown - Processing API does not support HTTP GET method
 ```
 
 It is also possible to determine whether a layer supports a specific ApiType:
@@ -148,17 +186,22 @@ We can always use layer to search for data availability:
 ```typescript
   import { OrbitDirection } from '@sentinel-hub/sentinelhub-js';
 
-  const maxCloudCoverPercent = 50;
-  const layerS2L2A = new S2L2ALayer(instanceId, 'S2L2A', null, null, null, null, null, maxCloudCoverPercent);
+  const layerS2L2A = new S2L2ALayer({
+    instanceId: '<my-instance-id>',
+    layerId: 'LAYER_S2L2A',
+    maxCloudCoverPercent: 50,
+  });
   const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
   const flyoversS2L2A = await layerS2L2A.findFlyovers(bbox, fromTime, toTime);
   const datesS2L2A = await layerS2L2A.findDates(bbox, fromTime, toTime);
 
-  const layerS1 = new S1GRDAWSEULayer(
-    instanceId, 'LayerS1GRD',
-    null, null, null, null, null, null, null, null,
-    true, BackscatterCoeff.GAMMA0_ELLIPSOID, OrbitDirection.ASCENDING
-  );
+  const layerS1 = new S1GRDAWSEULayer({
+    instanceId: '<my-instance-id>',
+    layerId: 'LAYER_S1GRD',
+    orthorectify: true,
+    backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
   const { tiles: tilesS1 } = await layerS1.findTiles(bbox, fromTime, toTime, maxCount, offset);
   const flyoversS1 = await layerS1.findFlyovers(bbox, fromTime, toTime);
   const datesS1 = await layerS1.findDates(bbox, fromTime, toTime);
