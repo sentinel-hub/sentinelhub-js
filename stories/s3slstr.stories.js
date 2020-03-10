@@ -156,12 +156,24 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S3SLSTRLayer(instanceId, layerId, null, null, null, null, null, 60, 'NADIR');
+  const maxCloudCoverPercent = 60;
+  const view = 'NADIR';
+  const layer = new S3SLSTRLayer(
+    instanceId,
+    layerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+    view,
+  );
 
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.innerHTML = `<h2>findTiles; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {

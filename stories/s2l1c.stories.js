@@ -183,7 +183,7 @@ export const FindTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles for Sentinel-2 L2A</h2>';
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
