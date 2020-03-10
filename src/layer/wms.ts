@@ -74,7 +74,7 @@ export function wmsGetMapUrl(
   };
 
   if (layers === null) {
-    throw new Error('LayerId must be provided for WMS even if we are only using evalscript / dataProduct');
+    throw new Error('LayerId must be provided for WMS even if only evalscript or dataProduct is used');
   }
   queryParams.layers = layers;
 
