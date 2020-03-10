@@ -29,7 +29,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     super(title, description);
     if (layerId === null && evalscript === null && evalscriptUrl === null && dataProduct === null) {
       throw new Error(
-        'At least one of the layerId / evalscript / evalscriptUrl / dataProduct must be specified!',
+        'At least one of these parameters (layerId, evalscript, evalscriptUrl, dataProduct) must be specified!',
       );
     }
     this.instanceId = instanceId;
