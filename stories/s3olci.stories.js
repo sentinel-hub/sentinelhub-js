@@ -1,10 +1,7 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
 import {
   S3OLCILayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -14,15 +11,16 @@ import {
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
-  throw new Error("INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.S3OLCI_LAYER_ID) {
-  throw new Error("S3OLCI_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('S3OLCI_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S3OLCI_LAYER_ID;
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Sentinel 3 OLCI',
@@ -34,14 +32,13 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layer = new S3OLCILayer(instanceId, layerId);
 
-  const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   const getMapParams = {
-    bbox: bbox,
+    bbox: bbox4326,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
     toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
     width: 512,
@@ -60,15 +57,14 @@ export const getMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new S3OLCILayer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -93,8 +89,8 @@ export const getMapProcessing = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -117,9 +113,8 @@ export const getMapProcessing = () => {
     `,
     );
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -144,17 +139,16 @@ export const getMapProcessingFromLayer = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
     const layer = new S3OLCILayer(instanceId, layerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -171,16 +165,16 @@ export const getMapProcessingFromLayer = () => {
 
 export const findTiles = () => {
   const layer = new S3OLCILayer(instanceId, layerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
-      bbox,
+      bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
@@ -193,33 +187,31 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-
 export const findFlyoversLinearRingError = () => {
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
   const bbox = new BBox(CRS_EPSG4326, -2, -2, 2, 2);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const flyoversContainerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_S3OLCI.shServiceHostname}ogc/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_S3OLCI.shServiceHostname}ogc/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const fromTime = new Date(Date.UTC(2016, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 2 - 1, 15, 6, 59, 59));
-    const flyovers = await layer.findFlyovers(
-      bbox,
-      fromTime,
-      toTime,
-      50,
-      200,
-    );
-    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+    const flyovers = await layer.findFlyovers(bbox, fromTime, toTime, 50, 200);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
@@ -238,40 +230,25 @@ export const findFlyoversLinearRingError = () => {
   return wrapperEl;
 };
 
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
 export const findDates = () => {
   const layer = new S3OLCILayer(instanceId, layerId);
-  const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findDates</h2>" +
-    "from: " + new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) + "<br />" +
-    "to: " + new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
-  
+  wrapperEl.innerHTML =
+    '<h2>findDates</h2>' +
+    'from: ' +
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) +
+    '<br />' +
+    'to: ' +
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+
   const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const dates = await layer.findDates(
@@ -281,11 +258,14 @@ export const findDates = () => {
     );
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -294,19 +274,7 @@ export const findDates = () => {
     console.log('imgblob', imageBlob);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
-
-async function setAuthTokenWithOAuthCredentials () {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

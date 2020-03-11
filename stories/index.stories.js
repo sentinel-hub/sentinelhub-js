@@ -1,10 +1,9 @@
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+
 import {
   WmsLayer,
   S1GRDAWSEULayer,
   S2L2ALayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -12,20 +11,21 @@ import {
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
-  throw new Error("INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.S2L2A_LAYER_ID) {
-  throw new Error("S2L2A_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('S2L2A_LAYER_ID environment variable is not defined!');
+}
 
 if (!process.env.S1GRDIW_LAYER_ID) {
-  throw new Error("S1GRDIW_LAYER_ID environment variable is not defined!");
+  throw new Error('S1GRDIW_LAYER_ID environment variable is not defined!');
 }
 
 const instanceId = process.env.INSTANCE_ID;
 const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Demo',
@@ -37,14 +37,13 @@ export const S2GetMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
-  const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
   const getMapParams = {
-    bbox: bbox,
+    bbox: bbox4326,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
     toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
     width: 512,
@@ -63,16 +62,15 @@ export const S2GetMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
     const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -97,8 +95,8 @@ export const S2GetMapProcessing = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
@@ -122,9 +120,8 @@ export const S2GetMapProcessing = () => {
     `,
     );
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -149,8 +146,8 @@ export const S1GetMapProcessingFromLayer = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-1 GRD</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-1 GRD</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
@@ -158,9 +155,8 @@ export const S1GetMapProcessingFromLayer = () => {
 
     const layer = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 512,
@@ -181,9 +177,8 @@ export const WmsGetMap = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS for generic WMS layer</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
-
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for generic WMS layer</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
@@ -192,9 +187,8 @@ export const WmsGetMap = () => {
       'PROBAV_S1_TOA_333M',
     );
 
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)), // 2020-01-10/2020-01-10
       toTime: new Date(Date.UTC(2020, 1 - 1, 10, 23, 59, 59)),
       width: 512,
@@ -211,17 +205,25 @@ export const WmsGetMap = () => {
 
 export const S2FindTiles = () => {
   const maxCloudCoverPercent = 60;
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId, null, null, null, null, null, maxCloudCoverPercent);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
+  const layerS2L2A = new S2L2ALayer(
+    instanceId,
+    s2l2aLayerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+  );
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layerS2L2A.findTiles(
-      bbox,
+      bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
@@ -236,17 +238,16 @@ export const S2FindTiles = () => {
 
 export const S1GRDFindTiles = () => {
   const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 12.34, 42.05, 42.19);
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-1 GRD</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles for Sentinel-1 GRD</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
     const data = await layerS1.findTiles(
-      bbox,
+      bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
@@ -260,77 +261,40 @@ export const S1GRDFindTiles = () => {
   return wrapperEl;
 };
 
-export const findFlyovers = () => {
-  const layer = new S2L2ALayer(instanceId, s2l2aLayerId);
-  const bbox = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+export const S2FindFlyovers = () => {
+  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  wrapperEl.innerHTML = '<h2>findFlyovers for Sentinel-2 L2A</h2>';
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const flyoversContainerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
-    const flyovers = await layer.findFlyovers(
-      bbox,
-      fromTime,
-      toTime,
-      20,
-      50,
-    );
-    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+    const flyovers = await layerS2L2A.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
-      bbox: bbox,
+      bbox: bbox4326,
       fromTime: fromTime,
       toTime: toTime,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials () {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}
