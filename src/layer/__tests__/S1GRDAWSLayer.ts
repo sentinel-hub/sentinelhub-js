@@ -28,18 +28,13 @@ test.each([
     const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
     const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
     const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-    const layer = new S1GRDAWSEULayer(
-      'INSTANCE_ID',
-      'LAYER_ID',
-      null,
-      null,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    });
 
     // mock a single-tile response:
     axios.post.mockReset();

@@ -233,15 +233,15 @@ export class LayersFactory {
       if (!SHLayerClass) {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
       }
-      return new SHLayerClass(
-        LayersFactory.parseSHInstanceId(baseUrl),
+      return new SHLayerClass({
+        instanceId: LayersFactory.parseSHInstanceId(baseUrl),
         layerId,
-        null,
-        null,
-        null,
+        evalscript: null,
+        evalscriptUrl: null,
+        dataProduct: null,
         title,
         description,
-      );
+      });
     });
   }
 

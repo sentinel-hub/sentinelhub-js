@@ -33,6 +33,22 @@ export enum Resolution {
   MEDIUM = 'MEDIUM',
 }
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+  acquisitionMode?: AcquisitionMode | null;
+  polarization?: Polarization | null;
+  resolution?: Resolution | null;
+  orthorectify?: boolean | null;
+  backscatterCoeff?: BackscatterCoeff | null;
+  orbitDirection?: OrbitDirection | null;
+}
+
 type S1GRDFindTilesDatasetParameters = {
   type: string;
   acquisitionMode: AcquisitionMode;
@@ -51,22 +67,22 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public orthorectify: boolean | null = false;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    acquisitionMode: AcquisitionMode | null = null,
-    polarization: Polarization | null = null,
-    resolution: Resolution | null = null,
-    orthorectify: boolean | null = false,
-    backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID,
-    orbitDirection: OrbitDirection | null = null,
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+    acquisitionMode = null,
+    polarization = null,
+    resolution = null,
+    orthorectify = false,
+    backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
+    orbitDirection = null,
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
     this.resolution = resolution;

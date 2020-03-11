@@ -7,6 +7,18 @@ import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer
 import { OrbitDirection } from 'src';
 import { ProcessingPayload } from 'src/layer/processing';
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+  maxCloudCoverPercent?: number | null;
+  view?: 'NADIR' | 'OBLIQUE';
+}
+
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
   orbitDirection?: OrbitDirection;
@@ -19,18 +31,18 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   public orbitDirection: OrbitDirection | null;
   public view: 'NADIR' | 'OBLIQUE';
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    maxCloudCoverPercent: number | null = 100,
-    view: 'NADIR' | 'OBLIQUE' = 'NADIR',
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+    maxCloudCoverPercent = 100,
+    view = 'NADIR',
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     // images that are not DESCENDING appear empty:
     this.orbitDirection = OrbitDirection.DESCENDING;

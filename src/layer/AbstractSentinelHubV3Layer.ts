@@ -9,6 +9,16 @@ import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+}
+
 // this class provides any SHv3-specific functionality to the subclasses:
 export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected instanceId: string | null;
@@ -17,16 +27,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-  ) {
-    super(title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+  }: ConstructorParameters) {
+    super({ title, description });
     if (layerId === null && evalscript === null && evalscriptUrl === null && dataProduct === null) {
       throw new Error(
         'At least one of these parameters (layerId, evalscript, evalscriptUrl, dataProduct) must be specified!',

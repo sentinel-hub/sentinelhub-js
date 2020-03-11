@@ -14,6 +14,13 @@ export class EnvisatMerisEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     title: string | null,
     description: string | null,
   ): EnvisatMerisEOCloudLayer {
-    return new EnvisatMerisEOCloudLayer(instanceId, layerId, evalscript, evalscriptUrl, title, description);
+    return new EnvisatMerisEOCloudLayer({
+      instanceId,
+      layerId,
+      evalscript,
+      evalscriptUrl,
+      title,
+      description,
+    });
   }
 }
