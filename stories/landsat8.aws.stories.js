@@ -1,4 +1,4 @@
-import moment from 'moment';
+import { renderTilesList } from './storiesUtils';
 
 import {
   Landsat8AWSLayer,
@@ -7,23 +7,22 @@ import {
   BBox,
   MimeTypes,
   ApiType,
-  DATASET_EOCLOUD_LANDSAT8,
   LayersFactory,
   DATASET_AWS_L8L1C,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
-  throw new Error("INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.LANDSAT8_LAYER_ID) {
-  throw new Error("LANDSAT8_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('LANDSAT8_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.LANDSAT8_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
-const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
+const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
   title: 'Landsat 8 - AWS',
@@ -35,8 +34,8 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layer = new Landsat8AWSLayer(instanceId, layerId);
 
@@ -60,8 +59,8 @@ export const getMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new Landsat8AWSLayer(instanceId, layerId);
@@ -88,11 +87,16 @@ export const getMapWMSLayersFactory = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(`${DATASET_AWS_L8L1C.shServiceHostname}ogc/wms/${instanceId}`, (lId, datasetId) => (layerId === lId)))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_AWS_L8L1C.shServiceHostname}ogc/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -116,8 +120,8 @@ export const getMapWMSEvalscript = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS - evalscript</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS - evalscript</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new Landsat8AWSLayer(
@@ -149,8 +153,8 @@ export const findTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
@@ -167,35 +171,32 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
-  const maxCC = 40;
-  const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCC);
+export const findFlyovers = () => {
+  const layer = new Landsat8AWSLayer(instanceId, layerId);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
 
-  const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  const flyoversContainerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
-    const dates = await layer.findDates(
-      bbox,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59)),
-    );
-
-    containerEl.innerHTML = JSON.stringify(dates, null, true);
+    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 50, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
-      bbox: bbox,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      bbox: bbox4326,
+      fromTime: fromTime,
+      toTime: toTime,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -203,26 +204,49 @@ export const findDates = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
 
+export const findDates = () => {
+  const maxCloudCoverPercent = 40;
+  const layer = new Landsat8AWSLayer(instanceId, layerId, null, null, null, null, null, maxCloudCoverPercent);
 
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS; maxcc = ${maxCloudCoverPercent}</h2>`;
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
+
+  const perform = async () => {
+    const dates = await layer.findDates(bbox, fromTime, toTime);
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

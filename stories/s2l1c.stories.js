@@ -1,28 +1,18 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import {
-  S2L1CLayer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
-  CRS_EPSG4326,
-  BBox,
-  MimeTypes,
-  ApiType,
-} from '../dist/sentinelHub.esm';
+import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
-  throw new Error("INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.S2L1C_LAYER_ID) {
-  throw new Error("S2L1C_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('S2L1C_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.INSTANCE_ID;
 const s2l1cLayerId = process.env.S2L1C_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
-
 
 export default {
   title: 'Sentinel 2 L1C',
@@ -34,8 +24,8 @@ export const GetMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId);
 
@@ -59,8 +49,8 @@ export const GetMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
@@ -77,7 +67,7 @@ export const GetMapWMS = () => {
     const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
@@ -92,8 +82,8 @@ export const GetMapProcessing = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
   const perform = async () => {
@@ -128,7 +118,7 @@ export const GetMapProcessing = () => {
     const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
@@ -146,22 +136,22 @@ export const GetMapWMSMaxCC20vs60 = () => {
   const img20 = document.createElement('img');
   img20.width = '512';
   img20.height = '512';
-  img20.style.border='2px solid green';
+  img20.style.border = '2px solid green';
   img20.style.margin = '10px';
-  wrapperEl.insertAdjacentElement("beforeend", img20);
+  wrapperEl.insertAdjacentElement('beforeend', img20);
 
   const img60 = document.createElement('img');
   img60.width = '512';
   img60.height = '512';
   img60.style.border = '2px solid blue';
   img60.style.margin = '10px';
-  wrapperEl.insertAdjacentElement("beforeend", img60);
+  wrapperEl.insertAdjacentElement('beforeend', img60);
 
   const perform = async () => {
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment('2020-01-14').startOf('day'),
-      toTime: moment('2020-01-14').endOf('day'),
+      fromTime: new Date(Date.UTC(2014, 1 - 1, 14, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2014, 1 - 1, 14, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -173,19 +163,28 @@ export const GetMapWMSMaxCC20vs60 = () => {
     const imageBlob60 = await layerS2L1C60.getMap(getMapParams, ApiType.WMS);
     img60.src = URL.createObjectURL(imageBlob60);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
 
 export const FindTiles = () => {
   const maxCloudCoverPercent = 60;
-  const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, maxCloudCoverPercent);
+  const layerS2L1C = new S2L1CLayer(
+    instanceId,
+    s2l1cLayerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+  );
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles for Sentinel-2 L2A</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layerS2L1C.findTiles(
@@ -197,7 +196,7 @@ export const FindTiles = () => {
     );
     renderTilesList(containerEl, data.tiles);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
@@ -206,28 +205,22 @@ export const findFlyovers = () => {
   const layer = new S2L1CLayer(instanceId, s2l1cLayerId);
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findFlyovers</h2>";
+  wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const flyoversContainerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", flyoversContainerEl);
+  wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
-    const flyovers = await layer.findFlyovers(
-      bbox4326,
-      fromTime,
-      toTime,
-      20,
-      50,
-    );
-    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true)
+    const flyovers = await layer.findFlyovers(bbox4326, fromTime, toTime, 20, 50);
+    flyoversContainerEl.innerHTML = JSON.stringify(flyovers, null, true);
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
@@ -241,25 +234,34 @@ export const findFlyovers = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
 
 export const findDates = () => {
-  const maxCC = 60;
-  const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, maxCC);
+  const maxCloudCoverPercent = 60;
+  const layerS2L1C = new S2L1CLayer(
+    instanceId,
+    s2l1cLayerId,
+    null,
+    null,
+    null,
+    null,
+    null,
+    maxCloudCoverPercent,
+  );
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A with max cloud coverage of ${maxCC}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
 
   const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const dates = await layerS2L1C.findDates(
@@ -270,11 +272,14 @@ export const findDates = () => {
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: moment(dates[0]).startOf('day'),
-      toTime: moment(dates[0]).endOf('day'),
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -282,37 +287,7 @@ export const findDates = () => {
     const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
-
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
-async function setAuthTokenWithOAuthCredentials() {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}

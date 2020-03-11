@@ -1,28 +1,24 @@
-import moment from 'moment';
+import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import {
-  S5PL2Layer,
-  setAuthToken,
-  isAuthTokenSet,
-  requestAuthToken,
-  CRS_EPSG3857,
-  CRS_EPSG4326,
-  BBox,
-  MimeTypes,
-  ApiType,
-} from '../dist/sentinelHub.esm';
+import { S5PL2Layer, CRS_EPSG3857, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
-  throw new Error("INSTANCE_ID environment variable is not defined!");
-};
+  throw new Error('INSTANCE_ID environment variable is not defined!');
+}
 
 if (!process.env.S5PL2_LAYER_ID) {
-  throw new Error("S5PL2_LAYER_ID environment variable is not defined!");
-};
+  throw new Error('S5PL2_LAYER_ID environment variable is not defined!');
+}
 
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S5PL2_LAYER_ID;
-const bbox = new BBox(CRS_EPSG3857, 1408887.3053523689,5087648.602661333,1487158.8223163893,5165920.119625352);
+const bbox = new BBox(
+  CRS_EPSG3857,
+  1408887.3053523689,
+  5087648.602661333,
+  1487158.8223163893,
+  5165920.119625352,
+);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
@@ -35,8 +31,8 @@ export const getMapURL = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMapUrl (WMS)</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const layer = new S5PL2Layer(instanceId, layerId);
 
@@ -44,7 +40,7 @@ export const getMapURL = () => {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
-  width: 512,
+    width: 512,
     height: 512,
     format: MimeTypes.JPEG,
   };
@@ -60,8 +56,8 @@ export const getMapWMS = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new S5PL2Layer(instanceId, layerId);
@@ -87,8 +83,8 @@ export const getMapWMSEvalscript = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with WMS using evalscript v1</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with WMS using evalscript v1</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     const layer = new S5PL2Layer(
@@ -130,8 +126,8 @@ export const getMapProcessing = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -180,8 +176,8 @@ export const getMapProcessingWithoutInstance = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -201,7 +197,8 @@ export const getMapProcessingWithoutInstance = () => {
       function evaluatePixel(sample) {
         return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
-    `);
+    `,
+    );
 
     const getMapParams = {
       bbox: bbox,
@@ -229,8 +226,8 @@ export const getMapProcessingFromLayer = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>GetMap with Processing</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.innerHTML = '<h2>GetMap with Processing</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -254,12 +251,12 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, "SO2");
+  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, 'SO2');
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findTiles</h2>";
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
     const data = await layer.findTiles(
@@ -276,24 +273,6 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-function renderTilesList(containerEl, list) {
-  list.forEach(tile => {
-    const ul = document.createElement('ul');
-    containerEl.appendChild(ul);
-    for (let key in tile) {
-      const li = document.createElement('li');
-      ul.appendChild(li);
-      let text;
-      if (tile[key] instanceof Object) {
-        text = JSON.stringify(tile[key]);
-      } else {
-        text = tile[key];
-      }
-      li.innerHTML = `${key} : ${text}`;
-    }
-  });
-}
-
 export const findDates = () => {
   const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, 'NO2', 60);
 
@@ -301,28 +280,23 @@ export const findDates = () => {
   const toTime = new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59));
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = "<h2>findDates</h2>" +
-    "from: " + fromTime.toISOString() + "<br />" +
-    "to: " + toTime.toISOString();
+  wrapperEl.innerHTML =
+    '<h2>findDates</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
 
   const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement("beforeend", containerEl);
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
-  wrapperEl.insertAdjacentElement("beforeend", img);
+  wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(
-      bbox4326,
-      fromTime,
-      toTime,
-    );
+    const dates = await layer.findDates(bbox4326, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999))
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
@@ -336,19 +310,7 @@ export const findDates = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
-
-async function setAuthTokenWithOAuthCredentials () {
-  if (isAuthTokenSet()) {
-    console.log('Auth token is already set.');
-    return;
-  }
-  const clientId = process.env.CLIENT_ID;
-  const clientSecret = process.env.CLIENT_SECRET;
-  const authToken = await requestAuthToken(clientId, clientSecret);
-  setAuthToken(authToken);
-  console.log('Auth token retrieved and set successfully');
-}
