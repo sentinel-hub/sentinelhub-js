@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import { renderTilesList } from './storiesUtils';
 
 import {
