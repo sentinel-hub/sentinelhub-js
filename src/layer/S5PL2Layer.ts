@@ -23,6 +23,19 @@ export enum ProductType {
   CH4 = 'CH4',
 }
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+  productType?: ProductType | null;
+  maxCloudCoverPercent?: number | null;
+  minQa?: number | null;
+}
+
 type S5PL2FindTilesDatasetParameters = {
   type: string;
   productType: ProductType;
@@ -35,19 +48,19 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
   public maxCloudCoverPercent: number;
   public minQa: number | null;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    productType: ProductType | null = null,
-    maxCloudCoverPercent: number | null = 100,
-    minQa: number | null = null,
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+    productType = null,
+    maxCloudCoverPercent = 100,
+    minQa = null,
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.productType = productType;
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     this.minQa = minQa;

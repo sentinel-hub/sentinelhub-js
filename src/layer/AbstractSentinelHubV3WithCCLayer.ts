@@ -4,21 +4,32 @@ import { BBox } from 'src/bbox';
 import { PaginatedTiles } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+  maxCloudCoverPercent?: number | null;
+}
+
 // same as AbstractSentinelHubV3Layer, but with maxCloudCoverPercent (for layers which support it)
 export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer {
   public maxCloudCoverPercent: number;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    maxCloudCoverPercent: number | null = 100,
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+    maxCloudCoverPercent = 100,
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 
