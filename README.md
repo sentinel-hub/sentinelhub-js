@@ -130,26 +130,17 @@ Maps which correspond to these layers can be fetched via different protocols lik
   import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from '@sentinel-hub/sentinelhub-js';
 
   const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
-  const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
-  const imageBlob = await layer.getMap({
+  const getMapParams = {
     bbox: bbox,
-    fromTime: fromTime,
-    toTime: toTime,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    api: ApiType.WMS,
-  });
-  const imageBlob2 = await layer.getMap({
-    bbox: bbox,
-    fromTime: fromTime,
-    toTime: toTime,
-    width: 512,
-    height: 512,
-    format: MimeTypes.JPEG,
-    api: ApiType.PROCESSING,
-  });
+  };
+
+  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
 ```
 
 Note that both of the images above should be _exactly_ the same.
@@ -157,16 +148,8 @@ Note that both of the images above should be _exactly_ the same.
 In some cases we can retrieve just the image URL instead of a blob:
 
 ```javascript
-  const imageBlob = await layer.getMapUrl({
-    bbox: bbox,
-    fromTime: fromTime,
-    toTime: toTime,
-    width: 512,
-    height: 512,
-    format: MimeTypes.JPEG,
-    api: ApiType.WMS,
-  });
-  // for ApiType.PROCESSING, exception would be thrown - Processing API does not support HTTP GET method
+  const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
+  const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
 ```
 
 It is also possible to determine whether a layer supports a specific ApiType:
