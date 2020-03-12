@@ -37,9 +37,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     description = null,
   }: ConstructorParameters) {
     super({ title, description });
-    if (layerId === null && evalscript === null && evalscriptUrl === null && dataProduct === null) {
+    if (
+      (layerId === null || instanceId === null) &&
+      evalscript === null &&
+      evalscriptUrl === null &&
+      dataProduct === null
+    ) {
       throw new Error(
-        'At least one of these parameters (layerId, evalscript, evalscriptUrl, dataProduct) must be specified!',
+        'At least one of these parameters (instanceId + layerId, evalscript, evalscriptUrl, dataProduct) must be specified!',
       );
     }
     this.instanceId = instanceId;
