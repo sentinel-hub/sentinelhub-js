@@ -110,6 +110,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return super.getMap(params, api);
   }
 
+  public supportsApiType(api: ApiType): boolean {
+    return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
+  }
+
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
     return {};
   }
