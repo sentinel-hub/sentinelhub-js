@@ -6,10 +6,10 @@ import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer } from 'src';
 test('WmsLayer.getMapUrl returns an URL', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
   const layerId = 'PROBAV_S1_TOA_333M';
-  const layer = new WmsLayer(
-    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+  const layer = new WmsLayer({
+    baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
     layerId,
-  );
+  });
 
   const getMapParams = {
     bbox: bbox,
@@ -41,10 +41,10 @@ test('WmsLayer.getMapUrl returns an URL', () => {
 test('WmsLayer.getMap makes an appropriate request', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
   const layerId = 'PROBAV_S1_TOA_333M';
-  const layer = new WmsLayer(
-    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+  const layer = new WmsLayer({
+    baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
     layerId,
-  );
+  });
 
   const getMapParams = {
     bbox: bbox,
