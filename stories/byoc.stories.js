@@ -34,7 +34,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new BYOCLayer(instanceId, layerId);
+  const layer = new BYOCLayer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox,
@@ -60,7 +60,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new BYOCLayer(instanceId, layerId);
+    const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -94,10 +94,10 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new BYOCLayer(
+    const layer = new BYOCLayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -110,7 +110,7 @@ export const getMapProcessing = () => {
         return [sample.IR/255, sample.G/255, sample.B/255];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -144,7 +144,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new BYOCLayer(instanceId, layerId);
+    const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -166,16 +166,11 @@ export const findTiles = () => {
   if (!process.env.BYOC_COLLECTION_ID) {
     throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
   }
-  const layer = new BYOCLayer(
+  const layer = new BYOCLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    null,
-    process.env.BYOC_COLLECTION_ID,
-  );
+    collectionId: process.env.BYOC_COLLECTION_ID,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -210,7 +205,7 @@ export const findTilesAuth = () => {
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
-    const layer = new BYOCLayer(instanceId, layerId);
+    const layer = new BYOCLayer({ instanceId, layerId });
 
     const data = await layer.findTiles(
       bbox,
@@ -230,16 +225,11 @@ export const findDates = () => {
   if (!process.env.BYOC_COLLECTION_ID) {
     throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
   }
-  const layer = new BYOCLayer(
+  const layer = new BYOCLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    null,
-    process.env.BYOC_COLLECTION_ID,
-  );
+    collectionId: process.env.BYOC_COLLECTION_ID,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates (with collectionId)</h2>';
@@ -284,7 +274,7 @@ export const findDatesAuth = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
-  const layer = new BYOCLayer(instanceId, layerId);
+  const layer = new BYOCLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates (without collectionId)</h2>';
