@@ -259,9 +259,11 @@ export class LayersFactory {
         throw new Error(`Unknown dataset for layer ${layerId} (${layerInfo.settings.datasourceName})`);
       }
 
-      const keepLayer = Boolean(filterLayers(layerId, dataset));
-      if (!keepLayer) {
-        continue;
+      if (filterLayers) {
+        const keepLayer = Boolean(filterLayers(layerId, dataset));
+        if (!keepLayer) {
+          continue;
+        }
       }
 
       const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
