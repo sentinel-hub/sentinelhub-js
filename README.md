@@ -41,7 +41,7 @@ The core data structure is `Layer`, which corresponds to a _layer_ as returned b
   import { WmsLayer } from '@sentinel-hub/sentinelhub-js';
 
   const layer = new WmsLayer({
-    url: 'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+    baseUrl: 'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
     layerId: '<layer-id>',
   });
 ```
