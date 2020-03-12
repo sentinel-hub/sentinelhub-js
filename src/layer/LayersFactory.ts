@@ -226,7 +226,7 @@ export class LayersFactory {
 
     return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
       if (!dataset) {
-        return new WmsLayer(baseUrl, layerId, title, description);
+        return new WmsLayer({ baseUrl, layerId, title, description });
       }
 
       const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
@@ -300,7 +300,7 @@ export class LayersFactory {
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
-      ({ layerId, title, description }) => new WmsLayer(baseUrl, layerId, title, description),
+      ({ layerId, title, description }) => new WmsLayer({ baseUrl, layerId, title, description }),
     );
   }
 }
