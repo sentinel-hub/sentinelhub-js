@@ -14,12 +14,7 @@ export class WmsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
 
-  public constructor(
-    baseUrl: string,
-    layerId: string,
-    title: string | null = null,
-    description: string | null = null,
-  ) {
+  public constructor({ baseUrl, layerId, title = null, description = null }: ConstructorParameters) {
     super({ title, description });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
