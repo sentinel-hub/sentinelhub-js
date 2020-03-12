@@ -40,7 +40,7 @@ export const S2GetMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
 
   const getMapParams = {
     bbox: bbox4326,
@@ -67,7 +67,7 @@ export const S2GetMapWMS = () => {
 
   // getMap is async:
   const perform = async () => {
-    const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -102,10 +102,10 @@ export const S2GetMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layerS2L2A = new S2L2ALayer(
+    const layerS2L2A = new S2L2ALayer({
       instanceId,
-      s2l2aLayerId,
-      `
+      layerId: s2l2aLayerId,
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -118,7 +118,7 @@ export const S2GetMapProcessing = () => {
         return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -153,7 +153,7 @@ export const S1GetMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
+    const layer = new S1GRDAWSEULayer({ instanceId, layerId: s1grdLayerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -182,10 +182,10 @@ export const WmsGetMap = () => {
 
   // getMap is async:
   const perform = async () => {
-    const layer = new WmsLayer(
-      'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
-      'PROBAV_S1_TOA_333M',
-    );
+    const layer = new WmsLayer({
+      baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+      layerId: 'PROBAV_S1_TOA_333M',
+    });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -205,16 +205,11 @@ export const WmsGetMap = () => {
 
 export const S2FindTiles = () => {
   const maxCloudCoverPercent = 60;
-  const layerS2L2A = new S2L2ALayer(
+  const layerS2L2A = new S2L2ALayer({
     instanceId,
-    s2l2aLayerId,
-    null,
-    null,
-    null,
-    null,
-    null,
+    layerId: s2l2aLayerId,
     maxCloudCoverPercent,
-  );
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -237,7 +232,7 @@ export const S2FindTiles = () => {
 };
 
 export const S1GRDFindTiles = () => {
-  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
+  const layerS1 = new S1GRDAWSEULayer({ instanceId, layerId: s1grdLayerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -262,7 +257,7 @@ export const S1GRDFindTiles = () => {
 };
 
 export const S2FindFlyovers = () => {
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers for Sentinel-2 L2A</h2>';

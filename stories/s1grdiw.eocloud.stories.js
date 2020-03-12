@@ -41,17 +41,13 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    Resolution.HIGH,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
 
   const getMapParams = {
     bbox: bbox,
@@ -77,17 +73,13 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(
+    const layer = new S1GRDEOCloudLayer({
       instanceId,
       layerId,
-      null,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -146,19 +138,16 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(
+    const layer = new S1GRDEOCloudLayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
         return [2.5 * VV, 1.5 * VV, 0.5 * VV];
       `,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -177,17 +166,13 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTilesEPSG3857 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: OrbitDirection.ASCENDING,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -210,17 +195,13 @@ export const findTilesEPSG3857 = () => {
 };
 
 export const findTilesEPSG4326 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: OrbitDirection.ASCENDING,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -283,17 +264,13 @@ export const findFlyovers = () => {
 };
 
 export const findDatesEPSG4326 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: OrbitDirection.ASCENDING,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:4326</h2>';
@@ -335,17 +312,13 @@ export const findDatesEPSG4326 = () => {
 };
 
 export const findDatesEPSG3857 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: OrbitDirection.ASCENDING,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:3857</h2>';

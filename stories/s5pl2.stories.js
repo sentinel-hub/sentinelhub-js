@@ -34,7 +34,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S5PL2Layer(instanceId, layerId);
+  const layer = new S5PL2Layer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox,
@@ -60,7 +60,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S5PL2Layer(instanceId, layerId);
+    const layer = new S5PL2Layer({ instanceId, layerId });
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -87,10 +87,10 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S5PL2Layer(
+    const layer = new S5PL2Layer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       var val = CLOUD_BASE_PRESSURE;
       var minVal = 10000.0;
       var maxVal = 110000.0;
@@ -99,7 +99,7 @@ export const getMapWMSEvalscript = () => {
       var colors = [[0, 0, 0.5], [0, 0, 1], [0, 1, 1], [1, 1, 0], [1, 0, 0], [0.5, 0, 0]];
       return colorBlend(val, limits, colors);
       `,
-    );
+    });
     const getMapParams = {
       bbox: bbox,
       fromTime: new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
@@ -132,10 +132,10 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S5PL2Layer(
+    const layer = new S5PL2Layer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -148,7 +148,7 @@ export const getMapProcessing = () => {
         return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -182,10 +182,8 @@ export const getMapProcessingWithoutInstance = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S5PL2Layer(
-      null,
-      null,
-      `
+    const layer = new S5PL2Layer({
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -198,7 +196,7 @@ export const getMapProcessingWithoutInstance = () => {
         return [2.5 * sample.CO, 2.5 * sample.CO, 2.5 * sample.CO];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -232,7 +230,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S5PL2Layer(instanceId, layerId);
+    const layer = new S5PL2Layer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -251,7 +249,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, 'SO2');
+  const layer = new S5PL2Layer({ instanceId, layerId, productType: 'SO2' });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -274,7 +272,7 @@ export const findTiles = () => {
 };
 
 export const findDates = () => {
-  const layer = new S5PL2Layer(instanceId, layerId, null, null, null, null, null, 'NO2', 60);
+  const layer = new S5PL2Layer({ instanceId, layerId, productType: 'NO2', maxCloudCoverPercent: 60 });
 
   const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
   const toTime = new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59));

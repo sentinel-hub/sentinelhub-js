@@ -42,7 +42,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox3857,
@@ -68,7 +68,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDAWSEULayer(instanceId, layerId);
+    const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox3857,
@@ -133,10 +133,10 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(
+    const layer = new S1GRDAWSEULayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -149,7 +149,7 @@ export const getMapProcessing = () => {
         return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox3857,
@@ -183,10 +183,8 @@ export const getMapProcessingWithoutInstance = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(
-      null,
-      null,
-      `
+    const layer = new S1GRDAWSEULayer({
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -199,14 +197,10 @@ export const getMapProcessingWithoutInstance = () => {
         return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
       }
     `,
-      null,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    });
 
     const getMapParams = {
       bbox: bbox3857,
@@ -240,7 +234,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer(instanceId, layerId);
+    const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox3857,
@@ -259,7 +253,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTilesEPSG3857 = () => {
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
   const containerEl = document.createElement('pre');
 
@@ -284,7 +278,7 @@ export const findTilesEPSG3857 = () => {
 };
 
 export const findTilesEPSG4326 = () => {
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
   const containerEl = document.createElement('pre');
 
@@ -309,7 +303,7 @@ export const findTilesEPSG4326 = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new S1GRDAWSEULayer(instanceId, layerId);
+  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -347,21 +341,13 @@ export const findFlyovers = () => {
 };
 
 export const findDatesEPSG4326 = () => {
-  const layer = new S1GRDAWSEULayer(
+  const layer = new S1GRDAWSEULayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    null,
-    null,
-    null,
-    OrbitDirection.DESCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.DESCENDING,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:4326</h2>';
