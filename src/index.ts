@@ -1,7 +1,7 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
-import { ApiType, MimeTypes } from 'src/layer/const';
+import { ApiType, MimeTypes, OrbitDirection } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
 import {
@@ -39,7 +39,7 @@ import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
-import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 
 registerAxiosCacheRetryInterceptors();

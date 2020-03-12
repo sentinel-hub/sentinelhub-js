@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { BackscatterCoeff, PaginatedTiles } from 'src/layer/const';
+import { BackscatterCoeff, PaginatedTiles, OrbitDirection } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
 
@@ -21,11 +21,6 @@ export enum Polarization {
   SH = 'SH',
   DH = 'DH',
   SV = 'SV',
-}
-
-export enum OrbitDirection {
-  ASCENDING = 'ASCENDING',
-  DESCENDING = 'DESCENDING',
 }
 
 export enum Resolution {
