@@ -11,7 +11,6 @@ import {
   OrbitDirection,
   AcquisitionMode,
   Polarization,
-  Resolution,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -46,7 +45,7 @@ export const getMapURL = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    resolution: Resolution.HIGH,
+    orbitDirection: OrbitDirection.ASCENDING,
   });
 
   const getMapParams = {
@@ -78,7 +77,7 @@ export const getMapWMS = () => {
       layerId,
       acquisitionMode: AcquisitionMode.IW,
       polarization: Polarization.DV,
-      resolution: Resolution.HIGH,
+      orbitDirection: OrbitDirection.ASCENDING,
     });
 
     const getMapParams = {
@@ -148,7 +147,7 @@ export const getMapWMSEvalscript = () => {
       `,
       acquisitionMode: AcquisitionMode.IW,
       polarization: Polarization.DV,
-      resolution: Resolution.HIGH,
+      orbitDirection: OrbitDirection.ASCENDING,
     });
 
     const getMapParams = {
@@ -173,7 +172,7 @@ export const findTilesEPSG3857 = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    resolution: OrbitDirection.ASCENDING,
+    orbitDirection: OrbitDirection.ASCENDING,
   });
   const containerEl = document.createElement('pre');
 
@@ -202,7 +201,7 @@ export const findTilesEPSG4326 = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    resolution: OrbitDirection.ASCENDING,
+    orbitDirection: OrbitDirection.ASCENDING,
   });
   const containerEl = document.createElement('pre');
 
@@ -273,7 +272,7 @@ export const findDatesEPSG4326 = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    resolution: OrbitDirection.ASCENDING,
+    orbitDirection: OrbitDirection.ASCENDING,
   });
 
   const wrapperEl = document.createElement('div');
@@ -321,7 +320,7 @@ export const findDatesEPSG3857 = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    resolution: OrbitDirection.ASCENDING,
+    orbitDirection: OrbitDirection.ASCENDING,
   });
 
   const wrapperEl = document.createElement('div');
