@@ -52,6 +52,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
+    payload.input.data[0].processing.view = this.view;
     return payload;
   }
 
