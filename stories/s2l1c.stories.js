@@ -125,7 +125,7 @@ export const GetMapProcessing = () => {
 
 export const GetMapWMSMaxCC20vs60 = () => {
   const layerS2L1C20 = new S2L1CLayer({ instanceId, layerId, maxCloudCoverPercent: 20 });
-  const layerS2L1C60 = new S2L1CLayer({ instanceId, layerId, maxCloudCoverPercent: 100 });
+  const layerS2L1C60 = new S2L1CLayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `
