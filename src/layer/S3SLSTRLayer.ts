@@ -1,10 +1,9 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { OrbitDirection } from 'src';
 import { ProcessingPayload } from 'src/layer/processing';
 
 interface ConstructorParameters {
