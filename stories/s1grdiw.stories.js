@@ -96,12 +96,10 @@ export const getMapWMSLayersFactory = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (
-      await LayersFactory.makeLayers(
-        `${DATASET_AWSEU_S1GRD.shServiceHostname}ogc/wms/${instanceId}`,
-        (lId, datasetId) => layerId === lId,
-      )
-    )[0];
+    const layer = (await LayersFactory.makeLayers(
+      `${DATASET_AWSEU_S1GRD.shServiceHostname}ogc/wms/${instanceId}`,
+      (lId, datasetId) => layerId === lId,
+    ))[0];
 
     const getMapParams = {
       bbox: bbox3857,
@@ -399,6 +397,26 @@ export const findDatesEPSG4326 = () => {
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const supportsProcessingAPI = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Supports Processing API</h2>';
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(
+      `${DATASET_AWSEU_S1GRD.shServiceHostname}ogc/wms/${instanceId}`,
+      (lId, datasetId) => layerId === lId,
+    ))[0];
+    const supportsProcessingAPI = layer.supportsApiType(ApiType.PROCESSING);
+    containerEl.innerHTML = JSON.stringify(supportsProcessingAPI, null, true);
   };
   perform().then(() => {});
 
