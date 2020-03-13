@@ -15,20 +15,25 @@ interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
   maxCloudCoverPercent?: number | null;
-  view?: 'NADIR' | 'OBLIQUE';
+  view?: S3SLSTRView | null;
+}
+
+export enum S3SLSTRView {
+  NADIR = 'NADIR',
+  OBLIQUE = 'OBLIQUE',
 }
 
 type S3SLSTRFindTilesDatasetParameters = {
   type?: string;
   orbitDirection?: OrbitDirection;
-  view: 'NADIR' | 'OBLIQUE';
+  view: S3SLSTRView;
 };
 
 export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3SLSTR;
   public maxCloudCoverPercent: number;
   public orbitDirection: OrbitDirection | null;
-  public view: 'NADIR' | 'OBLIQUE';
+  public view: S3SLSTRView;
 
   public constructor({
     instanceId = null,
@@ -39,7 +44,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     title = null,
     description = null,
     maxCloudCoverPercent = 100,
-    view = 'NADIR',
+    view = S3SLSTRView.NADIR,
   }: ConstructorParameters) {
     super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.maxCloudCoverPercent = maxCloudCoverPercent;
