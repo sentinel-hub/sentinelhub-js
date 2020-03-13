@@ -186,7 +186,7 @@ export const findTiles = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new S3SLSTRLayer({ instanceId, layerId, maxCloudCoverPercent: 60, view: 'NADIR' });
+  const layer = new S3SLSTRLayer({ instanceId, layerId, maxCloudCoverPercent: 60, view: S3SLSTRView.NADIR });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
