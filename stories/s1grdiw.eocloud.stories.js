@@ -11,7 +11,6 @@ import {
   OrbitDirection,
   AcquisitionMode,
   Polarization,
-  Resolution,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
@@ -41,17 +40,13 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    Resolution.HIGH,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
 
   const getMapParams = {
     bbox: bbox,
@@ -77,17 +72,13 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(
+    const layer = new S1GRDEOCloudLayer({
       instanceId,
       layerId,
-      null,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      orbitDirection: OrbitDirection.ASCENDING,
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -115,10 +106,12 @@ export const getMapWMSLayersFactory = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(
-      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
-      (lId, datasetId) => layerId === lId,
-    ))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const getMapParams = {
       bbox: bbox,
@@ -146,19 +139,16 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S1GRDEOCloudLayer(
+    const layer = new S1GRDEOCloudLayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
         return [2.5 * VV, 1.5 * VV, 0.5 * VV];
       `,
-      null,
-      null,
-      null,
-      AcquisitionMode.IW,
-      Polarization.DV,
-      Resolution.HIGH,
-    );
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      orbitDirection: OrbitDirection.ASCENDING,
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -177,17 +167,13 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTilesEPSG3857 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -210,17 +196,13 @@ export const findTilesEPSG3857 = () => {
 };
 
 export const findTilesEPSG4326 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -255,10 +237,12 @@ export const findFlyovers = () => {
   wrapperEl.insertAdjacentElement('beforeend', flyoversContainerEl);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(
-      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
-      (lId, datasetId) => layerId === lId,
-    ))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
 
     const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
     const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59));
@@ -283,17 +267,13 @@ export const findFlyovers = () => {
 };
 
 export const findDatesEPSG4326 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:4326</h2>';
@@ -335,17 +315,13 @@ export const findDatesEPSG4326 = () => {
 };
 
 export const findDatesEPSG3857 = () => {
-  const layer = new S1GRDEOCloudLayer(
+  const layer = new S1GRDEOCloudLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    AcquisitionMode.IW,
-    Polarization.DV,
-    OrbitDirection.ASCENDING,
-  );
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:3857</h2>';
@@ -392,10 +368,12 @@ export const supportsProcessingAPI = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(
-      `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
-      (lId, datasetId) => layerId === lId,
-    ))[0];
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_S1GRD.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+      )
+    )[0];
     const supportsProcessingAPI = layer.supportsApiType(ApiType.PROCESSING);
     containerEl.innerHTML = JSON.stringify(supportsProcessingAPI, null, true);
   };

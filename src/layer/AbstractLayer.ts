@@ -10,12 +10,17 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { CRS_EPSG4326 } from 'src/crs';
 
+interface ConstructorParameters {
+  title?: string | null;
+  description?: string | null;
+}
+
 export class AbstractLayer {
   public title: string | null = null;
   public description: string | null = null;
   public readonly dataset: Dataset | null = null;
 
-  public constructor(title: string | null = null, description: string | null = null) {
+  public constructor({ title = null, description = null }: ConstructorParameters) {
     this.title = title;
     this.description = description;
   }

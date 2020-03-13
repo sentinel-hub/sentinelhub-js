@@ -22,7 +22,7 @@ export async function legacyGetMapFromUrl(
 
 export function legacyGetMapWmsUrlFromParams(baseUrl: string, wmsParams: Record<string, any>): string {
   const { layers, getMapParams } = parseLegacyWmsGetMapParams(wmsParams);
-  const layer = new WmsLayer(baseUrl, layers);
+  const layer = new WmsLayer({ baseUrl, layerId: layers });
   return layer.getMapUrl(getMapParams, ApiType.WMS);
 }
 
@@ -39,7 +39,7 @@ export async function legacyGetMapFromParams(
   let layer;
   switch (api) {
     case ApiType.WMS:
-      layer = new WmsLayer(baseUrl, layers);
+      layer = new WmsLayer({ baseUrl, layerId: layers });
       return layer.getMap(getMapParams, api);
 
     case ApiType.PROCESSING:

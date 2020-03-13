@@ -11,7 +11,7 @@ if (!process.env.S2L1C_LAYER_ID) {
 }
 
 const instanceId = process.env.INSTANCE_ID;
-const s2l1cLayerId = process.env.S2L1C_LAYER_ID;
+const layerId = process.env.S2L1C_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
 
 export default {
@@ -27,7 +27,7 @@ export const GetMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId);
+  const layerS2L1C = new S2L1CLayer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox4326,
@@ -54,7 +54,7 @@ export const GetMapWMS = () => {
 
   // getMap is async:
   const perform = async () => {
-    const layerS2L1C = new S2L1CLayer(instanceId, s2l1cLayerId);
+    const layerS2L1C = new S2L1CLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -89,10 +89,10 @@ export const GetMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layerS2L1C = new S2L1CLayer(
+    const layerS2L1C = new S2L1CLayer({
       instanceId,
-      s2l1cLayerId,
-      `
+      layerId,
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -105,7 +105,7 @@ export const GetMapProcessing = () => {
         return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -124,13 +124,14 @@ export const GetMapProcessing = () => {
 };
 
 export const GetMapWMSMaxCC20vs60 = () => {
-  const layerS2L1C20 = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, 20);
-  const layerS2L1C60 = new S2L1CLayer(instanceId, s2l1cLayerId, null, null, null, null, null, 100);
+  const layerS2L1C20 = new S2L1CLayer({ instanceId, layerId, maxCloudCoverPercent: 20 });
+  const layerS2L1C60 = new S2L1CLayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `
   <h2>GetMap: maxCC=20 vs maxCC=60</h2>
   <p>top left part of left image should be white (cc of the tile is above 20)</p>
+  <p>TODO: this story doesn't work because there is no data for S-2 in 2014 available; should be fixed.</p>
   `;
 
   const img20 = document.createElement('img');
@@ -170,16 +171,11 @@ export const GetMapWMSMaxCC20vs60 = () => {
 
 export const FindTiles = () => {
   const maxCloudCoverPercent = 60;
-  const layerS2L1C = new S2L1CLayer(
+  const layerS2L1C = new S2L1CLayer({
     instanceId,
-    s2l1cLayerId,
-    null,
-    null,
-    null,
-    null,
-    null,
+    layerId,
     maxCloudCoverPercent,
-  );
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -202,7 +198,7 @@ export const FindTiles = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new S2L1CLayer(instanceId, s2l1cLayerId);
+  const layer = new S2L1CLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -241,16 +237,11 @@ export const findFlyovers = () => {
 
 export const findDates = () => {
   const maxCloudCoverPercent = 60;
-  const layerS2L1C = new S2L1CLayer(
+  const layerS2L1C = new S2L1CLayer({
     instanceId,
-    s2l1cLayerId,
-    null,
-    null,
-    null,
-    null,
-    null,
+    layerId,
     maxCloudCoverPercent,
-  );
+  });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;

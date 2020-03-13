@@ -35,7 +35,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S3OLCILayer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox4326,
@@ -61,7 +61,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S3OLCILayer(instanceId, layerId);
+    const layer = new S3OLCILayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -95,10 +95,10 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(
+    const layer = new S3OLCILayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -111,7 +111,7 @@ export const getMapProcessing = () => {
         return [2.5 * sample.B08, 2.5 * sample.B06, 2.5 * sample.B04];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -145,7 +145,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3OLCILayer(instanceId, layerId);
+    const layer = new S3OLCILayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -164,7 +164,7 @@ export const getMapProcessingFromLayer = () => {
 };
 
 export const findTiles = () => {
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S3OLCILayer({ instanceId, layerId });
 
   const containerEl = document.createElement('pre');
 
@@ -231,7 +231,7 @@ export const findFlyoversLinearRingError = () => {
 };
 
 export const findDates = () => {
-  const layer = new S3OLCILayer(instanceId, layerId);
+  const layer = new S3OLCILayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
