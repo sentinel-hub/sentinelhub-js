@@ -265,14 +265,18 @@ export const findTilesEPSG3857 = () => {
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
-    const data = await layer.findTiles(
-      bbox3857,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-      5,
-      0,
-    );
-    renderTilesList(containerEl, data.tiles);
+    try {
+      const data = await layer.findTiles(
+        bbox3857,
+        new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+        new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+        5,
+        0,
+      );
+      renderTilesList(containerEl, data.tiles);
+    } catch (ex) {
+      containerEl.innerHTML = String(ex);
+    }
   };
   perform().then(() => {});
 

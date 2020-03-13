@@ -1,6 +1,8 @@
+import axios from 'axios';
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
+import { CRS_EPSG4326 } from 'src/crs';
 import { BackscatterCoeff, PaginatedTiles, OrbitDirection } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
@@ -129,35 +131,60 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded();
 
-    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      acquisitionMode: this.acquisitionMode,
-      polarization: this.polarization,
-      orbitDirection: this.orbitDirection,
-      resolution: this.resolution,
-    };
+    if (!this.dataset.searchIndexUrl) {
+      throw new Error('This dataset does not support searching for tiles');
+    }
+    if (bbox.crs !== CRS_EPSG4326) {
+      throw new Error('Currently, only EPSG:4326 is supported when using findTiles with this dataset');
+    }
 
-    const response = await this.fetchTiles(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      null,
-      findTilesDatasetParameters,
-    );
+    // https://git.sinergise.com/sentinel-core/java/-/wikis/Catalog
+    const payload: any = {
+      bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
+      datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
+      collections: ['sentinel-1-grd'],
+      limit: maxCount,
+      query: {
+        'sar:instrument_mode': {
+          eq: this.acquisitionMode,
+        },
+        // "sar:polarizations" (with trailing "s") is an array (as per specs) and can't be searched for. Instead,
+        // we use "sar:polarization" which is a string with 4 possible values ("SH", "SV", "DV" and "DH") and
+        // which allows searching:
+        's1:polarization': {
+          eq: this.polarization,
+        },
+      },
+    };
+    if (this.orbitDirection !== null) {
+      payload.query['sar:pass_direction'] = {
+        eq: this.orbitDirection,
+      };
+    }
+    //TODO: add resolution:
+    // if (this.resolution !== null) {
+    //   payload.query["s1:resolution"] = {
+    //     eq: this.resolution,
+    //   };
+    // }
+    if (offset > 0) {
+      payload.next = offset;
+    }
+
+    const response = await axios.post(this.dataset.searchIndexUrl, payload);
+
     return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
+      tiles: response.data.features.map((feature: Record<string, any>) => ({
+        geometry: feature.geometry,
+        sensingTime: moment.utc(feature.properties.datetime),
         meta: {
-          orbitDirection: tile.orbitDirection,
-          polarization: tile.polarization,
-          acquisitionMode: tile.acquisitionMode,
-          resolution: tile.resolution,
+          orbitDirection: feature.properties['sat:orbit_state'].toUpperCase(),
+          polarization: feature.properties['s1:polarization'],
+          acquisitionMode: feature.properties['sar:instrument_mode'],
+          //TODO: resolution: ...,
         },
       })),
-      hasMore: response.data.hasMore,
+      hasMore: response.data['search:metadata'].next ? true : false,
     };
   }
 

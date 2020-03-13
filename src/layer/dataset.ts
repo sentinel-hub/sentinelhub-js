@@ -17,7 +17,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
   datasetParametersType: 'S1GRD',
   shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+  searchIndexUrl: 'https://demo.sentinel-hub.com/catalog/v1/search',
   findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
 };
@@ -41,7 +41,7 @@ export const DATASET_S2L2A: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L2A',
   datasetParametersType: 'S2',
   shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
+  searchIndexUrl: 'https://demo.sentinel-hub.com/catalog/v1/search',
   findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
   orbitTimeMinutes: 50.3,
 };
@@ -53,7 +53,7 @@ export const DATASET_S2L1C: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'S2L1C',
   datasetParametersType: 'S2',
   shServiceHostname: 'https://services.sentinel-hub.com/',
-  searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
+  searchIndexUrl: 'https://demo.sentinel-hub.com/catalog/v1/search',
   findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
   orbitTimeMinutes: 50.3,
 };

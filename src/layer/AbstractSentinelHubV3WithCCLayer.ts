@@ -12,7 +12,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
-  maxCloudCoverPercent?: number | null;
+  maxCloudCoverPercent?: number;
 }
 
 // same as AbstractSentinelHubV3Layer, but with maxCloudCoverPercent (for layers which support it)
