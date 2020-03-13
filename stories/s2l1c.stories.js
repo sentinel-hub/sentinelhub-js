@@ -54,7 +54,7 @@ export const GetMapWMS = () => {
 
   // getMap is async:
   const perform = async () => {
-    const layerS2L1C = new S2L1CLayer({ instanceId, layerId: layerId });
+    const layerS2L1C = new S2L1CLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
