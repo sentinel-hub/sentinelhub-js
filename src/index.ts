@@ -26,7 +26,7 @@ import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
-import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
+import { S3SLSTRLayer, S3SLSTRView } from 'src/layer/S3SLSTRLayer';
 import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
@@ -93,6 +93,7 @@ export {
   Polarization,
   Resolution,
   OrbitDirection,
+  S3SLSTRView,
   BBox,
   // legacy:
   legacyGetMapFromUrl,

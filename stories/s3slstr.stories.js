@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, S3SLSTRView } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -157,12 +157,11 @@ export const getMapProcessingFromLayer = () => {
 
 export const findTiles = () => {
   const maxCloudCoverPercent = 60;
-  const view = 'NADIR';
   const layer = new S3SLSTRLayer({
     instanceId,
     layerId,
     maxCloudCoverPercent,
-    view,
+    view: S3SLSTRView.NADIR,
   });
 
   const containerEl = document.createElement('pre');
