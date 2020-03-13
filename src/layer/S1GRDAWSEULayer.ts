@@ -157,8 +157,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       },
     };
     if (this.orbitDirection !== null) {
-      payload.query['sar:pass_direction'] = {
-        eq: this.orbitDirection,
+      payload.query['sat:orbit_state'] = {
+        eq: this.orbitDirection.toLowerCase(),
       };
     }
     //TODO: add resolution:
