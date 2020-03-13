@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, S3SLSTRView } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -27,7 +27,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new S3SLSTRLayer(instanceId, layerId);
+  const layer = new S3SLSTRLayer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox4326,
@@ -53,7 +53,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new S3SLSTRLayer(instanceId, layerId);
+    const layer = new S3SLSTRLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -87,10 +87,10 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3SLSTRLayer(
+    const layer = new S3SLSTRLayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
       //VERSION=3
       function setup() {
         return {
@@ -103,7 +103,7 @@ export const getMapProcessing = () => {
         return [1.1 * sample.S3, 1.1 * sample.S2, 1.1 * sample.S1];
       }
     `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -137,7 +137,7 @@ export const getMapProcessingFromLayer = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S3SLSTRLayer(instanceId, layerId);
+    const layer = new S3SLSTRLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox4326,
@@ -157,18 +157,12 @@ export const getMapProcessingFromLayer = () => {
 
 export const findTiles = () => {
   const maxCloudCoverPercent = 60;
-  const view = 'NADIR';
-  const layer = new S3SLSTRLayer(
+  const layer = new S3SLSTRLayer({
     instanceId,
     layerId,
-    null,
-    null,
-    null,
-    null,
-    null,
     maxCloudCoverPercent,
-    view,
-  );
+    view: S3SLSTRView.NADIR,
+  });
 
   const containerEl = document.createElement('pre');
 
@@ -192,7 +186,7 @@ export const findTiles = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new S3SLSTRLayer(instanceId, layerId, null, null, null, null, null, 60, 'NADIR');
+  const layer = new S3SLSTRLayer({ instanceId, layerId, maxCloudCoverPercent: 60, view: S3SLSTRView.NADIR });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -230,7 +224,7 @@ export const findFlyovers = () => {
 };
 
 export const findDates = () => {
-  const layer = new S3SLSTRLayer(instanceId, layerId);
+  const layer = new S3SLSTRLayer({ instanceId, layerId });
   const specialBBox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
 
   const fromTime = new Date(Date.UTC(2018, 1 - 1, 1, 0, 0, 0));

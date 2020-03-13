@@ -226,22 +226,22 @@ export class LayersFactory {
 
     return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
       if (!dataset) {
-        return new WmsLayer(baseUrl, layerId, title, description);
+        return new WmsLayer({ baseUrl, layerId, title, description });
       }
 
       const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
       if (!SHLayerClass) {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
       }
-      return new SHLayerClass(
-        LayersFactory.parseSHInstanceId(baseUrl),
+      return new SHLayerClass({
+        instanceId: LayersFactory.parseSHInstanceId(baseUrl),
         layerId,
-        null,
-        null,
-        null,
+        evalscript: null,
+        evalscriptUrl: null,
+        dataProduct: null,
         title,
         description,
-      );
+      });
     });
   }
 
@@ -300,7 +300,7 @@ export class LayersFactory {
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
-      ({ layerId, title, description }) => new WmsLayer(baseUrl, layerId, title, description),
+      ({ layerId, title, description }) => new WmsLayer({ baseUrl, layerId, title, description }),
     );
   }
 }

@@ -14,7 +14,7 @@ export class Landsat8EOCloudLayer extends AbstractSentinelHubV1OrV2WithCCLayer {
     description: string | null,
   ): Landsat8EOCloudLayer {
     const maxCloudCoverPercent = layerInfo.settings.maxCC;
-    return new Landsat8EOCloudLayer(
+    return new Landsat8EOCloudLayer({
       instanceId,
       layerId,
       evalscript,
@@ -22,6 +22,6 @@ export class Landsat8EOCloudLayer extends AbstractSentinelHubV1OrV2WithCCLayer {
       title,
       description,
       maxCloudCoverPercent,
-    );
+    });
   }
 }

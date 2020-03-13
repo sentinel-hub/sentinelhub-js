@@ -43,6 +43,11 @@ export enum ApiType {
   PROCESSING = 'processing',
 }
 
+export enum OrbitDirection {
+  ASCENDING = 'ASCENDING',
+  DESCENDING = 'DESCENDING',
+}
+
 export enum BackscatterCoeff {
   BETA0 = 'BETA0',
   GAMMA0_ELLIPSOID = 'GAMMA0_ELLIPSOID',

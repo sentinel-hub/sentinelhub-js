@@ -1,7 +1,7 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
-import { ApiType, MimeTypes } from 'src/layer/const';
+import { ApiType, MimeTypes, OrbitDirection } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
 import {
@@ -26,7 +26,7 @@ import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from 'src/layer/S2L2ALayer';
 import { S2L1CLayer } from 'src/layer/S2L1CLayer';
-import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
+import { S3SLSTRLayer, S3SLSTRView } from 'src/layer/S3SLSTRLayer';
 import { S3OLCILayer } from 'src/layer/S3OLCILayer';
 import { S5PL2Layer } from 'src/layer/S5PL2Layer';
 import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
@@ -39,7 +39,7 @@ import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
-import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 
 registerAxiosCacheRetryInterceptors();
@@ -93,6 +93,7 @@ export {
   Polarization,
   Resolution,
   OrbitDirection,
+  S3SLSTRView,
   BBox,
   // legacy:
   legacyGetMapFromUrl,

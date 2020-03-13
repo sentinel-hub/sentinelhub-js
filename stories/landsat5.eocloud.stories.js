@@ -38,7 +38,7 @@ export const getMapURL = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const maxCloudCoverPercent = 0;
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId, null, null, null, null, maxCloudCoverPercent);
+  const layer = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent });
 
   const getMapParams = {
     bbox: bbox,
@@ -64,7 +64,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+    const layer = new Landsat5EOCloudLayer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -124,13 +124,13 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat5EOCloudLayer(
+    const layer = new Landsat5EOCloudLayer({
       instanceId,
       layerId,
-      `
+      evalscript: `
         return [2.5 * B04, 1.5 * B03, 0.5 * B02];
       `,
-    );
+    });
 
     const getMapParams = {
       bbox: bbox,
@@ -149,7 +149,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTiles = () => {
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+  const layer = new Landsat5EOCloudLayer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -172,7 +172,7 @@ export const findTiles = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId);
+  const layer = new Landsat5EOCloudLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -211,7 +211,7 @@ export const findFlyovers = () => {
 
 export const findDatesEPSG3857 = () => {
   const maxCloudCoverPercent = 60;
-  const layer = new Landsat5EOCloudLayer(instanceId, layerId, null, null, null, null, maxCloudCoverPercent);
+  const layer = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>findDates - BBox in EPSG:3857; maxcc = ${maxCloudCoverPercent}</h2>`;

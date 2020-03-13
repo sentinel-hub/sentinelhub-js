@@ -7,6 +7,15 @@ import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  title?: string | null;
+  description?: string | null;
+}
+
 // this class provides any SHv1- or SHv2-specific (EO Cloud) functionality to the subclasses:
 export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   protected instanceId: string;
@@ -14,15 +23,15 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
 
-  public constructor(
-    instanceId: string,
-    layerId: string,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-  ) {
-    super(title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    title = null,
+    description = null,
+  }: ConstructorParameters) {
+    super({ title, description });
     if (!layerId || !instanceId) {
       throw new Error('Parameters instanceId and layerId must be specified!');
     }

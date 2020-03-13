@@ -7,6 +7,17 @@ import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  dataProduct?: string | null;
+  title?: string | null;
+  description?: string | null;
+  collectionId?: string | null;
+}
+
 type BYOCFindTilesDatasetParameters = {
   type: string;
   collectionId: string;
@@ -16,17 +27,17 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_BYOC;
   protected collectionId: string;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    dataProduct: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    collectionId: string | null = null,
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    dataProduct = null,
+    title = null,
+    description = null,
+    collectionId = null,
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.collectionId = collectionId;
   }
 

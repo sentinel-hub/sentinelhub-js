@@ -1,35 +1,44 @@
-import { BackscatterCoeff } from 'src/layer/const';
 import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
-import { AcquisitionMode, Polarization, Resolution, OrbitDirection } from 'src/layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization } from 'src/layer/S1GRDAWSEULayer';
+import { OrbitDirection } from 'src/layer/const';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
 */
+
+interface ConstructorParameters {
+  instanceId?: string | null;
+  layerId?: string | null;
+  evalscript?: string | null;
+  evalscriptUrl?: string | null;
+  title?: string | null;
+  description?: string | null;
+  acquisitionMode?: AcquisitionMode | null;
+  polarization?: Polarization | null;
+  orbitDirection?: OrbitDirection | null;
+}
 
 export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   public readonly dataset = DATASET_EOCLOUD_S1GRD;
 
   public acquisitionMode: AcquisitionMode;
   public polarization: Polarization;
-  public resolution: Resolution | null = null;
   public orbitDirection: OrbitDirection | null = null;
-  public orthorectify: boolean | null = false;
-  public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
-  public constructor(
-    instanceId: string | null,
-    layerId: string | null = null,
-    evalscript: string | null = null,
-    evalscriptUrl: string | null = null,
-    title: string | null = null,
-    description: string | null = null,
-    acquisitionMode: AcquisitionMode | null = null,
-    polarization: Polarization | null = null,
-    orbitDirection: OrbitDirection | null = null,
-  ) {
-    super(instanceId, layerId, evalscript, evalscriptUrl, title, description);
+  public constructor({
+    instanceId = null,
+    layerId = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    title = null,
+    description = null,
+    acquisitionMode = null,
+    polarization = null,
+    orbitDirection = null,
+  }: ConstructorParameters) {
+    super({ instanceId, layerId, evalscript, evalscriptUrl, title, description });
     // it is not possible to determine these parameters by querying the service, because there
     // is no endpoint which would return them:
     if ((evalscript || evalscriptUrl) && (!acquisitionMode || !polarization)) {
@@ -67,7 +76,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       default:
         throw new Error(`Unknown datasourceName (${layerInfo.settings.datasourceName})`);
     }
-    return new S1GRDEOCloudLayer(
+    return new S1GRDEOCloudLayer({
       instanceId,
       layerId,
       evalscript,
@@ -76,7 +85,8 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       description,
       acquisitionMode,
       polarization,
-    );
+      orbitDirection: null,
+    });
   }
 
   protected getEvalsource(): string {
