@@ -176,7 +176,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return {
       tiles: response.data.features.map((feature: Record<string, any>) => ({
         geometry: feature.geometry,
-        sensingTime: moment.utc(feature.properties.datetime),
+        sensingTime: moment.utc(feature.properties.datetime).toDate(),
         meta: {
           orbitDirection: feature.properties['sat:orbit_state'].toUpperCase(),
           polarization: feature.properties['s1:polarization'],

@@ -58,7 +58,7 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
     return {
       tiles: response.data.features.map((feature: Record<string, any>) => ({
         geometry: feature.geometry,
-        sensingTime: moment.utc(feature.properties.datetime),
+        sensingTime: moment.utc(feature.properties.datetime).toDate(),
         meta: {
           cloudCoverPercent: feature.properties['eo:cloud_cover'],
         },

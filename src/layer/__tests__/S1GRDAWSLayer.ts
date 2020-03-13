@@ -41,51 +41,72 @@ test.each([
     axios.post.mockImplementation(() =>
       Promise.resolve({
         data: {
-          tiles: [
+          type: 'FeatureCollection',
+          features: [
             {
-              type: 'S1',
-              id: 1293846,
-              originalId: 'S1A_EW_GRDM_1SDH_20200202T180532_20200202T180632_031077_03921C_E6C8',
-              dataUri:
-                's3://sentinel-s1-l1c/GRD/2020/2/2/EW/DH/S1A_EW_GRDM_1SDH_20200202T180532_20200202T180632_031077_03921C_E6C8',
-              dataGeometry: {
+              stac_version: '0.9.0', // eslint-disable-line @typescript-eslint/camelcase
+              id: 'S1A_IW_GRDH_1SDV_20200115T170610_20200115T170635_030814_0388F3_11A7',
+              geometry: {
                 type: 'MultiPolygon',
-                crs: {
-                  type: 'name',
-                  properties: {
-                    name: 'urn:ogc:def:crs:EPSG::4326',
-                  },
-                },
+                crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:OGC::CRS84' } },
                 coordinates: [
                   [
                     [
-                      [-28.958387727765576, 77.22089053106154],
-                      [-28.454271377131395, 77.28385150034897],
-                      [-27.718918346651687, 77.37243188785827],
-                      [-26.974008583323926, 77.45890918854761],
-                      [-26.217031402559755, 77.54352656462356],
-                      [-25.447186512415197, 77.62630504330521],
-                      [-24.667542862300945, 77.7068623880844],
-                      [-28.958387727765576, 77.22089053106154],
+                      [10.747405608925893, 42.43932544098019],
+                      [11.174559661855323, 42.49948950981189],
+                      [11.48636468315132, 42.542316684293304],
+                      [11.954861073590815, 42.60496680037157],
+                      [12.267707233856488, 42.64566963277932],
+                      [10.747405608925893, 42.43932544098019],
                     ],
                   ],
                 ],
               },
-              sensingTime: sensingTimeFixture,
-              rasterWidth: 10459,
-              rasterHeight: 9992,
-              polarization: 'DV',
-              resolution: 'HIGH',
-              orbitDirection: 'ASCENDING',
-              acquisitionMode: 'IW',
-              timeliness: 'NRT3h',
-              additionalData: {},
-              missionDatatakeId: 234012,
-              sliceNumber: 5,
+              bbox: [10.35502790347227, 42.43932544098019, 13.762200171216843, 44.327853749919164],
+              stac_extensions: ['sar'], // eslint-disable-line @typescript-eslint/camelcase
+              type: 'Feature',
+              properties: {
+                datetime: sensingTimeFixture,
+                'sar:frequency_band': 'C',
+                'sar:instrument_mode': 'IW',
+                's1:polarization': 'DV',
+                'sar:center_frequency': 5.405,
+                'sar:product_type': 'GRD',
+                'sat:orbit_state': 'ascending',
+                'sar:polarizations': ['VV', 'VH'],
+              },
+              links: [
+                {
+                  href:
+                    'https://test.sentinel-hub.com/catalog/v1/collections/sentinel-1-grd/items/S1A_IW_GRDH_1SDV_20200115T170610_20200115T170635_030814_0388F3_11A7',
+                  rel: 'self',
+                  type: 'application/json',
+                },
+                {
+                  href: 'https://test.sentinel-hub.com/catalog/v1/collections/sentinel-1-grd',
+                  rel: 'parent',
+                },
+              ],
+              assets: {},
             },
           ],
-          hasMore: hasMoreFixture,
-          maxOrderKey: '2020-02-02T08:17:57Z;1295159',
+          links: [
+            {
+              href: 'https://demo.sentinel-hub.com/catalog/v1/search',
+              rel: 'self',
+              type: 'application/json',
+            },
+            {
+              href: 'https://test.sentinel-hub.com/catalog/v1/search',
+              rel: 'next',
+              type: 'application/json',
+              title: 'Next set of results',
+              method: 'POST',
+              body: { next: 5 },
+              merge: true,
+            },
+          ],
+          'search:metadata': { next: hasMoreFixture ? '1' : undefined, limit: 1, returned: 1 },
         },
       }),
     );
@@ -98,23 +119,16 @@ test.each([
       {
         geometry: {
           type: 'MultiPolygon',
-          crs: {
-            type: 'name',
-            properties: {
-              name: 'urn:ogc:def:crs:EPSG::4326',
-            },
-          },
+          crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:OGC::CRS84' } },
           coordinates: [
             [
               [
-                [-28.958387727765576, 77.22089053106154],
-                [-28.454271377131395, 77.28385150034897],
-                [-27.718918346651687, 77.37243188785827],
-                [-26.974008583323926, 77.45890918854761],
-                [-26.217031402559755, 77.54352656462356],
-                [-25.447186512415197, 77.62630504330521],
-                [-24.667542862300945, 77.7068623880844],
-                [-28.958387727765576, 77.22089053106154],
+                [10.747405608925893, 42.43932544098019],
+                [11.174559661855323, 42.49948950981189],
+                [11.48636468315132, 42.542316684293304],
+                [11.954861073590815, 42.60496680037157],
+                [12.267707233856488, 42.64566963277932],
+                [10.747405608925893, 42.43932544098019],
               ],
             ],
           ],
@@ -123,7 +137,7 @@ test.each([
         meta: {
           acquisitionMode: AcquisitionMode.IW,
           polarization: Polarization.DV,
-          resolution: Resolution.HIGH,
+          //resolution: Resolution.HIGH, // TODO - resolution is missing in service
           orbitDirection: OrbitDirection.ASCENDING,
         },
       },
