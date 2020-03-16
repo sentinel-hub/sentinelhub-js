@@ -1,6 +1,10 @@
+import moment from 'moment';
+
+import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
+import { LayersFactory } from 'src/layer/LayersFactory';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -25,5 +29,41 @@ export class WmsLayer extends AbstractLayer {
       throw new Error('Only WMS is supported on this layer');
     }
     return wmsGetMapUrl(this.baseUrl, this.layerId, params);
+  }
+
+  public async findDates(
+    bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    // any additional
+  ): Promise<Date[]> {
+    // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
+    const capabilities = await LayersFactory.fetchGetCapabilitiesXml(this.baseUrl);
+    const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
+      layerInfo => this.layerId === layerInfo.Name[0],
+    );
+    if (!layer) {
+      throw new Error('Layer not found');
+    }
+    if (!layer.Dimension) {
+      throw new Error('Layer does not supply time information (no Dimension field)');
+    }
+    const timeDimension = layer.Dimension.find(d => d['$'].name === 'time');
+    if (!timeDimension) {
+      throw new Error("Layer does not supply time information (no Dimension field with name === 'time')");
+    }
+    // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#date_time
+    if (timeDimension['$'].units !== 'ISO8601') {
+      throw new Error('Layer time information is not in ISO8601 format, parsing not supported');
+    }
+    const times = timeDimension['_'];
+    if (!times.includes(',')) {
+      throw new Error(
+        'Currently only time lists of length > 1 are supported (valid time values separated by comma)',
+      );
+    }
+
+    const result = times.split(',').map((t: string) => moment.utc(t).toDate());
+    return result;
   }
 }
