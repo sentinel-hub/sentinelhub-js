@@ -4,7 +4,7 @@ import { BBox } from 'src/bbox';
 
 export type GetMapParams = {
   bbox: BBox;
-  fromTime: Date;
+  fromTime: Date | null;
   toTime: Date;
   format: MimeType;
   resx?: string; // either resx + resy or width + height must be specified
