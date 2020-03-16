@@ -1,5 +1,5 @@
 import { stringify } from 'query-string';
-import { parseString } from 'xml2js';
+import { parseStringPromise } from 'xml2js';
 
 import { fetchCached } from 'src/layer/utils';
 import {
@@ -119,17 +119,6 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
-  private static async parseXml(xmlString: string): Promise<GetCapabilitiesXml> {
-    return new Promise((resolve, reject) => {
-      parseString(xmlString, (err: object, result: GetCapabilitiesXml) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(result);
-      });
-    });
-  }
-
   private static async fetchGetCapabilitiesXml(
     baseUrl: string,
     forceFetch = false,
@@ -142,7 +131,7 @@ export class LayersFactory {
     const queryString = stringify(query, { sort: false });
     const url = `${baseUrl}?${queryString}`;
     const res = await fetchCached(url, { responseType: 'text' }, forceFetch);
-    const parsedXml = await LayersFactory.parseXml(res.data);
+    const parsedXml = await parseStringPromise(res.data);
     return parsedXml;
   }
 
