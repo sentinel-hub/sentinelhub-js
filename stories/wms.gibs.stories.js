@@ -10,13 +10,14 @@ import {
   LayersFactory,
 } from '../dist/sentinelHub.esm';
 
-const baseUrl = 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows';
-const layerId = 'PROBAV_S5_TOA_100M';
+const baseUrl = 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi';
+// const layerId = 'AIRS_L2_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Night';
+const layerId = 'MODIS_Terra_SurfaceReflectance_Bands721';
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
-  title: 'WMS - ProbaV',
+  title: 'WMS - GIBS',
 };
 
 export const getMapURL = () => {
@@ -31,9 +32,9 @@ export const getMapURL = () => {
   const layer = new WmsLayer({ baseUrl, layerId });
 
   const getMapParams = {
-    bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    bbox: bbox4326,
+    fromTime: null,
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22)),
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
@@ -58,8 +59,8 @@ export const getMapWMS = () => {
 
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: null,
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -86,8 +87,8 @@ export const getMapWmsLayersFactory = () => {
 
     const getMapParams = {
       bbox: bbox,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      fromTime: null,
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,

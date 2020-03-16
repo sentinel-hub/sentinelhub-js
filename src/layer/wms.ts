@@ -1,4 +1,5 @@
 import { stringify } from 'query-string';
+import moment from 'moment';
 
 import { CRS_EPSG4326, CRS_IDS } from 'src/crs';
 import { GetMapParams, MimeTypes, MimeType } from 'src/layer/const';
@@ -88,7 +89,13 @@ export function wmsGetMapUrl(
     queryParams.format = params.format;
   }
 
-  queryParams.time = `${params.fromTime.toISOString()}/${params.toTime.toISOString()}`;
+  if (params.fromTime === null) {
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
+  } else {
+    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+      .utc(params.toTime)
+      .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+  }
 
   if (params.width && params.height) {
     queryParams.width = params.width;
