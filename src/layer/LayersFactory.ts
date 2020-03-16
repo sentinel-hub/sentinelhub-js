@@ -51,6 +51,7 @@ type GetCapabilitiesXml = {
                 Title: string[];
                 Abstract: string[];
                 Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
+                Dimension?: any[];
               },
             ];
           },
@@ -119,7 +120,7 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
-  private static async fetchGetCapabilitiesXml(
+  public static async fetchGetCapabilitiesXml(
     baseUrl: string,
     forceFetch = false,
   ): Promise<GetCapabilitiesXml> {
