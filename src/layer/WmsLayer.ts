@@ -4,7 +4,7 @@ import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { LayersFactory } from 'src/layer/LayersFactory';
+import { fetchGetCapabilitiesXml } from './utils';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -38,7 +38,7 @@ export class WmsLayer extends AbstractLayer {
     // any additional
   ): Promise<Date[]> {
     // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
-    const capabilities = await LayersFactory.fetchGetCapabilitiesXml(this.baseUrl);
+    const capabilities = await fetchGetCapabilitiesXml(this.baseUrl);
     const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
       layerInfo => this.layerId === layerInfo.Name[0],
     );

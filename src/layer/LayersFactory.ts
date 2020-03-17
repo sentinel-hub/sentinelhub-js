@@ -1,7 +1,8 @@
-import { stringify } from 'query-string';
-import { parseStringPromise } from 'xml2js';
-
-import { fetchCached } from 'src/layer/utils';
+import {
+  fetchGetCapabilitiesXml,
+  fetchGetCapabilitiesJsonV1,
+  fetchGetCapabilitiesJson,
+} from 'src/layer/utils';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -37,29 +38,6 @@ import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
-
-type GetCapabilitiesXml = {
-  WMS_Capabilities: {
-    Service: [];
-    Capability: [
-      {
-        Layer: [
-          {
-            Layer: [
-              {
-                Name: string[];
-                Title: string[];
-                Abstract: string[];
-                Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
-                Dimension?: any[];
-              },
-            ];
-          },
-        ];
-      },
-    ];
-  };
-};
 
 export class LayersFactory {
   /*
@@ -120,40 +98,6 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
-  public static async fetchGetCapabilitiesXml(
-    baseUrl: string,
-    forceFetch = false,
-  ): Promise<GetCapabilitiesXml> {
-    const query = {
-      service: 'wms',
-      request: 'GetCapabilities',
-      format: 'text/xml',
-    };
-    const queryString = stringify(query, { sort: false });
-    const url = `${baseUrl}?${queryString}`;
-    const res = await fetchCached(url, { responseType: 'text' }, forceFetch);
-    const parsedXml = await parseStringPromise(res.data);
-    return parsedXml;
-  }
-
-  private static async fetchGetCapabilitiesJson(baseUrl: string, forceFetch = false): Promise<any[]> {
-    const query = {
-      request: 'GetCapabilities',
-      format: 'application/json',
-    };
-    const queryString = stringify(query, { sort: false });
-    const url = `${baseUrl}?${queryString}`;
-    const res = await fetchCached(url, { responseType: 'json' }, forceFetch);
-    return res.data.layers;
-  }
-
-  private static async fetchGetCapabilitiesJsonV1(baseUrl: string, forceFetch = false): Promise<any[]> {
-    const instanceId = this.parseSHInstanceId(baseUrl);
-    const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
-    const res = await fetchCached(url, { responseType: 'json' }, forceFetch);
-    return res.data.layers;
-  }
-
   private static parseSHInstanceId(baseUrl: string): string {
     const INSTANCE_ID_LENGTH = 36;
     // AWS:
@@ -200,7 +144,7 @@ export class LayersFactory {
     baseUrl: string,
     filterLayers: Function | null,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await LayersFactory.fetchGetCapabilitiesJson(baseUrl);
+    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl);
     const layersInfos = getCapabilitiesJson.map(layerInfo => ({
       layerId: layerInfo.id,
       title: layerInfo.name,
@@ -239,7 +183,7 @@ export class LayersFactory {
     baseUrl: string,
     filterLayers: Function | null,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJsonV1 = await LayersFactory.fetchGetCapabilitiesJsonV1(baseUrl);
+    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl);
 
     const result: AbstractLayer[] = [];
     for (let layerInfo of getCapabilitiesJsonV1) {
@@ -278,7 +222,7 @@ export class LayersFactory {
     baseUrl: string,
     filterLayers: Function | null,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await LayersFactory.fetchGetCapabilitiesXml(baseUrl);
+    const parsedXml = await fetchGetCapabilitiesXml(baseUrl);
     const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
