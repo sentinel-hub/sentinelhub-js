@@ -4,7 +4,7 @@ import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { LayersFactory } from 'src/layer/LayersFactory';
+import { fetchGetCapabilitiesXml } from './utils';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -38,7 +38,7 @@ export class WmsLayer extends AbstractLayer {
     // any additional
   ): Promise<Date[]> {
     // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
-    const capabilities = await LayersFactory.fetchGetCapabilitiesXml(this.baseUrl);
+    const capabilities = await fetchGetCapabilitiesXml(this.baseUrl);
     const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
       layerInfo => this.layerId === layerInfo.Name[0],
     );
@@ -56,14 +56,27 @@ export class WmsLayer extends AbstractLayer {
     if (timeDimension['$'].units !== 'ISO8601') {
       throw new Error('Layer time information is not in ISO8601 format, parsing not supported');
     }
-    const times = timeDimension['_'];
-    if (!times.includes(',')) {
-      throw new Error(
-        'Currently only time lists of length > 1 are supported (valid time values separated by comma)',
-      );
-    }
 
-    const result = times.split(',').map((t: string) => moment.utc(t).toDate());
+    let result = [];
+    const times = timeDimension['_'].split(',');
+    for (let i = 0; i < times.length; i++) {
+      const timeParts = times[i].split('/');
+      switch (timeParts.length) {
+        case 1:
+          result.push(moment.utc(timeParts[0]).toDate());
+          break;
+        case 3:
+          const [fromTime, toTime, interval] = timeParts;
+          const intervalDuration = moment.duration(interval);
+          const toTimeMoment = moment.utc(toTime);
+          for (let t = moment.utc(fromTime); t.isSameOrBefore(toTimeMoment); t.add(intervalDuration)) {
+            result.push(t.toDate());
+          }
+          break;
+        default:
+          throw new Error('Unable to parse time information');
+      }
+    }
     return result;
   }
 }

@@ -1,4 +1,5 @@
 import { stringify } from 'query-string';
+import moment from 'moment';
 
 import { CRS_EPSG4326, CRS_IDS } from 'src/crs';
 import { GetMapParams, MimeTypes, MimeType } from 'src/layer/const';
@@ -13,7 +14,8 @@ type OgcGetMapOptions = {
   version: string;
   service: ServiceType;
   request: string;
-  crs: CRS_IDS;
+  // crs: CRS_IDS; // if using WMS >= 1.3.0
+  srs: CRS_IDS; // if using WMS <= 1.1.1
   format: MimeType;
   transparent: boolean | number;
   layers: string;
@@ -60,7 +62,7 @@ export function wmsGetMapUrl(
     service: ServiceType.WMS,
     request: 'GetMap',
     format: MimeTypes.JPEG,
-    crs: CRS_EPSG4326.authId,
+    srs: CRS_EPSG4326.authId,
     layers: undefined,
     bbox: undefined,
     time: undefined,
@@ -82,13 +84,19 @@ export function wmsGetMapUrl(
     throw new Error('No bbox provided');
   }
   queryParams.bbox = `${params.bbox.minX},${params.bbox.minY},${params.bbox.maxX},${params.bbox.maxY}`;
-  queryParams.crs = params.bbox.crs.authId;
+  queryParams.srs = params.bbox.crs.authId;
 
   if (params.format) {
     queryParams.format = params.format;
   }
 
-  queryParams.time = `${params.fromTime.toISOString()}/${params.toTime.toISOString()}`;
+  if (params.fromTime === null) {
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
+  } else {
+    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+      .utc(params.toTime)
+      .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+  }
 
   if (params.width && params.height) {
     queryParams.width = params.width;
