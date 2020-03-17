@@ -28,9 +28,9 @@ test('WmsLayer.getMapUrl returns an URL', () => {
     request: 'GetMap',
     format: 'image/jpeg',
     layers: layerId,
-    crs: 'EPSG:4326',
+    srs: 'EPSG:4326',
     bbox: '19,20,20,21',
-    time: '2020-01-10T00:00:00.000Z/2020-01-10T23:59:59.000Z',
+    time: '2020-01-10T00:00:00Z/2020-01-10T23:59:59Z',
     width: '512',
     height: '512',
   });
@@ -68,9 +68,9 @@ test('WmsLayer.getMap makes an appropriate request', () => {
     request: 'GetMap',
     format: 'image/jpeg',
     layers: layerId,
-    crs: 'EPSG:4326',
+    srs: 'EPSG:4326',
     bbox: '19,20,20,21',
-    time: '2020-01-10T00:00:00.000Z/2020-01-10T23:59:59.000Z',
+    time: '2020-01-10T00:00:00Z/2020-01-10T23:59:59Z',
     width: '512',
     height: '512',
   });
