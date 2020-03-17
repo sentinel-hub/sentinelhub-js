@@ -2,9 +2,14 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
 
+/**
+ * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
+ */
 export type GetMapParams = {
   bbox: BBox;
+  /** Start of the time interval for which the images are fetched. If null, only `toTime` parameter will be used. */
   fromTime: Date | null;
+  /** End of the time interval for which the images are fetched. If `fromTime` is null, only this parameter will be used to set time. */
   toTime: Date;
   format: MimeType;
   resx?: string; // either resx + resy or width + height must be specified
