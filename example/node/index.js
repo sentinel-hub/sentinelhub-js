@@ -70,8 +70,6 @@ async function run() {
   const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
   const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
 
-  printOut('JSON GetCapabilities', await LayersFactory.fetchGetCapabilitiesJson(baseUrl));
-
   // get the list of all of the layers:
   const layers = await LayersFactory.makeLayers(baseUrl);
   printOut(`Layers:`, layers);
