@@ -183,14 +183,13 @@ export const findDates = () => {
     const dates = await layer.findDates(bbox, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
-    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+    const resDateStartOfDay = new Date(new Date(dates[5]).setUTCHours(0, 0, 0, 0));
 
     // prepare an image to show that the number makes sense:
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: resDateStartOfDay,
-      toTime: resDateEndOfDay,
+      fromTime: null,
+      toTime: resDateStartOfDay,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
