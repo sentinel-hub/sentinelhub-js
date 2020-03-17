@@ -11,7 +11,6 @@ import {
 } from '../dist/sentinelHub.esm';
 
 const baseUrl = 'https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi';
-// const layerId = 'AIRS_L2_Carbon_Monoxide_500hPa_Volume_Mixing_Ratio_Night';
 const layerId = 'MODIS_Terra_SurfaceReflectance_Bands721';
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
