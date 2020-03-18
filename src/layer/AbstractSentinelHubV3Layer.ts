@@ -4,7 +4,6 @@ import moment from 'moment';
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
-import { fetchCached } from 'src/layer/utils';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -72,7 +71,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
-    const res = await fetchCached(url, { responseType: 'json', headers: headers }, false);
+    const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: true });
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
