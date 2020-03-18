@@ -221,7 +221,7 @@ export const findTilesAuth = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   if (!process.env.BYOC_COLLECTION_ID) {
     throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
   }
@@ -232,7 +232,7 @@ export const findDates = () => {
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDates (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -243,7 +243,7 @@ export const findDates = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(
+    const dates = await layer.findDatesUTC(
       bbox,
       new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
@@ -270,14 +270,14 @@ export const findDates = () => {
   return wrapperEl;
 };
 
-export const findDatesAuth = () => {
+export const findDatesUTCAuth = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
   const layer = new BYOCLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDates (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -289,7 +289,7 @@ export const findDatesAuth = () => {
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
-    const dates = await layer.findDates(
+    const dates = await layer.findDatesUTC(
       bbox,
       new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),

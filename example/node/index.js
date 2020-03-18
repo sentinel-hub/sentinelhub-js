@@ -129,7 +129,7 @@ async function run() {
   );
   printOut('flyovers for S2 L2A:', flyoversS2L2A);
 
-  const datesS2L2A = await layerS2L2A.findDates(
+  const datesS2L2A = await layerS2L2A.findDatesUTC(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
@@ -156,7 +156,7 @@ async function run() {
   );
   printOut('flyovers for S1 GRD:', flyoversS1GRD);
 
-  const datesS1GRD = await layerS1.findDates(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime);
+  const datesS1GRD = await layerS1.findDatesUTC(getMapParams.bbox, getMapParams.fromTime, getMapParams.toTime);
   printOut('dates for S1 GRD', datesS1GRD);
 
   // finally, display the image:

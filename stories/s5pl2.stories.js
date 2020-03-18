@@ -271,7 +271,7 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   const layer = new S5PL2Layer({ instanceId, layerId, productType: 'NO2', maxCloudCoverPercent: 60 });
 
   const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
@@ -279,7 +279,7 @@ export const findDates = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
-    '<h2>findDates</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
+    '<h2>findDatesUTC</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -290,7 +290,7 @@ export const findDates = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(bbox4326, fromTime, toTime);
+    const dates = await layer.findDatesUTC(bbox4326, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
