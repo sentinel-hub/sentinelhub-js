@@ -88,7 +88,7 @@ async function run() {
 
   await setAuthTokenWithOAuthCredentials();
 
-  const layerS1 = new S1GRDAWSEULayer(instanceId, s1grdLayerId);
+  const layerS1 = new S1GRDAWSEULayer({ instanceId, layerId: s1grdLayerId });
   printOut('Layer:', { layerId: layerS1.layerId, title: layerS1.title });
   printOut('Orthorectify & backscatter:', { o: layerS1.orthorectify, b: layerS1.backscatterCoeff });
 
@@ -110,7 +110,7 @@ async function run() {
   printOut('maximum number of returned tiles is:', maxCount);
 
   // get tiles, flyover intervals and dates for S2 L2A layer
-  const layerS2L2A = new S2L2ALayer(instanceId, s2l2aLayerId);
+  const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
   const { tiles: tilesS2L2A, hasMore } = await layerS2L2A.findTiles(
     getMapParams.bbox,
     getMapParams.fromTime,
@@ -176,4 +176,7 @@ run()
   .then(() => {
     console.log('Done.');
   })
-  .catch(ex => console.error(ex));
+  .catch(ex => {
+    console.error(ex);
+    process.exit(1);
+  });
