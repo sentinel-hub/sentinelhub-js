@@ -2,7 +2,9 @@ import {
   fetchGetCapabilitiesXml,
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
+  parseSHInstanceId,
 } from 'src/layer/utils';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -45,14 +47,6 @@ export class LayersFactory {
     baseUrl). It needs to be aware of various services so it can fetch information from them and
     instantiate appropriate layers.
   */
-
-  public static readonly SH_SERVICE_HOSTNAMES_V1_OR_V2: string[] = ['https://eocloud.sentinel-hub.com/'];
-
-  public static readonly SH_SERVICE_HOSTNAMES_V3: string[] = [
-    'https://services.sentinel-hub.com/',
-    'https://services-uswest2.sentinel-hub.com/',
-    'https://creodias.sentinel-hub.com/',
-  ];
 
   private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
     [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
@@ -98,40 +92,17 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
-  private static parseSHInstanceId(baseUrl: string): string {
-    const INSTANCE_ID_LENGTH = 36;
-    // AWS:
-    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V3) {
-      const prefix = `${hostname}ogc/wms/`;
-      if (!baseUrl.startsWith(prefix)) {
-        continue;
-      }
-      const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
-      return instanceId;
-    }
-    // EOCloud:
-    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-      const prefix = `${hostname}v1/wms/`;
-      if (!baseUrl.startsWith(prefix)) {
-        continue;
-      }
-      const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
-      return instanceId;
-    }
-    throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
-  }
-
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
   ): Promise<AbstractLayer[]> {
-    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V3) {
+    for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
       if (baseUrl.startsWith(hostname)) {
         return await this.makeLayersSHv3(baseUrl, filterLayers);
       }
     }
 
-    for (let hostname of LayersFactory.SH_SERVICE_HOSTNAMES_V1_OR_V2) {
+    for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
       if (baseUrl.startsWith(hostname)) {
         return await this.makeLayersSHv12(baseUrl, filterLayers);
       }
@@ -168,7 +139,7 @@ export class LayersFactory {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
       }
       return new SHLayerClass({
-        instanceId: LayersFactory.parseSHInstanceId(baseUrl),
+        instanceId: parseSHInstanceId(baseUrl),
         layerId,
         evalscript: null,
         evalscriptUrl: null,
@@ -206,7 +177,7 @@ export class LayersFactory {
       }
       const layer = SH12LayerClass.makeLayer(
         layerInfo,
-        LayersFactory.parseSHInstanceId(baseUrl),
+        parseSHInstanceId(baseUrl),
         layerId,
         layerInfo.settings.evalJSScript || null,
         null,
