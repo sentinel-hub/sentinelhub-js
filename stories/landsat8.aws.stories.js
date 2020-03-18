@@ -209,12 +209,12 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   const maxCloudCoverPercent = 40;
   const layer = new Landsat8AWSLayer({ instanceId, layerId, maxCloudCoverPercent });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Landsat 8 on AWS; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDatesUTC for Landsat 8 on AWS; maxcc = ${maxCloudCoverPercent}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -228,7 +228,7 @@ export const findDates = () => {
   const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
-    const dates = await layer.findDates(bbox, fromTime, toTime);
+    const dates = await layer.findDatesUTC(bbox, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));

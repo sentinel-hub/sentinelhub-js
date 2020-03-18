@@ -227,13 +227,20 @@ export class AbstractLayer {
     return geometry.map((x: any) => this.roundCoordinates(x));
   }
 
-  public async findDates(
+  public async findDatesUTC(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    // any additional
   ): Promise<Date[]> {
-    throw new Error('findDates() not implemented yet');
+    throw new Error('findDatesUTC() not implemented yet');
+  }
+
+  /**
+   * @deprecated Please use findDatesUTC() instead.
+   */
+  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    console.warn('Method findDates() is deprecated and will be removed, please use findDatesUTC() instead');
+    return await this.findDatesUTC(bbox, fromTime, toTime);
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
