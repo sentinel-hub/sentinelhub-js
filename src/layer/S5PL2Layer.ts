@@ -112,7 +112,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected getFindDatesAdditionalParameters(): Record<string, any> {
+  protected getFindDatesUTCAdditionalParameters(): Record<string, any> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,

@@ -217,7 +217,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 
-  protected getFindDatesAdditionalParameters(): Record<string, any> {
+  protected getFindDatesUTCAdditionalParameters(): Record<string, any> {
     return {};
   }
 
@@ -231,7 +231,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
       to: toTime.toISOString(),
-      ...this.getFindDatesAdditionalParameters(),
+      ...this.getFindDatesUTCAdditionalParameters(),
     };
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
     return response.data.map((date: string) => moment.utc(date).toDate());
