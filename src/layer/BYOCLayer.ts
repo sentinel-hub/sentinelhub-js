@@ -105,7 +105,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return {};
   }
 
-  protected async getFindDatesAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
     if (this.shouldFetchAdditionalParams()) {
       const layerParams = await this.fetchLayerParamsFromSHServiceV3();
       this.collectionId = layerParams['collectionId'];
@@ -121,20 +121,20 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return result;
   }
 
-  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    if (!this.dataset.findDatesUrl) {
+  public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
 
-    const additionalFindDatesParameters = await this.getFindDatesAdditionalParameters();
+    const additionalFindDatesUTCParameters = await this.getFindDatesUTCAdditionalParameters();
     const bboxPolygon = bbox.toGeoJSON();
     const payload: any = {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
       to: toTime.toISOString(),
-      ...additionalFindDatesParameters,
+      ...additionalFindDatesUTCParameters,
     };
-    const response = await axios.post(this.dataset.findDatesUrl, payload);
+    const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }

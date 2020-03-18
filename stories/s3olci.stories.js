@@ -230,12 +230,12 @@ export const findFlyoversLinearRingError = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   const layer = new S3OLCILayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
-    '<h2>findDates</h2>' +
+    '<h2>findDatesUTC</h2>' +
     'from: ' +
     new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) +
     '<br />' +
@@ -251,7 +251,7 @@ export const findDates = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(
+    const dates = await layer.findDatesUTC(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),

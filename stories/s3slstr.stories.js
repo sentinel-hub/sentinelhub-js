@@ -223,7 +223,7 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   const layer = new S3SLSTRLayer({ instanceId, layerId });
   const specialBBox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
 
@@ -232,7 +232,7 @@ export const findDates = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
-    '<h2>findDates</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
+    '<h2>findDatesUTC</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -243,7 +243,7 @@ export const findDates = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(specialBBox4326, fromTime, toTime);
+    const dates = await layer.findDatesUTC(specialBBox4326, fromTime, toTime);
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 
     const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));

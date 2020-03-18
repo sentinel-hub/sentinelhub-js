@@ -209,12 +209,12 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDatesEPSG3857 = () => {
+export const findDatesUTCEPSG3857 = () => {
   const maxCloudCoverPercent = 60;
   const layer = new EnvisatMerisEOCloudLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates - BBox in EPSG:3857; maxcc = ${maxCloudCoverPercent} </h2>`;
+  wrapperEl.innerHTML = `<h2>findDatesUTC - BBox in EPSG:3857; maxcc = ${maxCloudCoverPercent} </h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -228,7 +228,7 @@ export const findDatesEPSG3857 = () => {
   const toTime = new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
-    const dates = await layer.findDates(bbox, fromTime, toTime);
+    const dates = await layer.findDatesUTC(bbox, fromTime, toTime);
 
     containerEl.innerHTML = JSON.stringify(dates, null, true);
 

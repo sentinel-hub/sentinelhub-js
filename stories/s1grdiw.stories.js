@@ -342,7 +342,7 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDatesEPSG4326 = () => {
+export const findDatesUTCEPSG4326 = () => {
   const layer = new S1GRDAWSEULayer({
     instanceId,
     layerId,
@@ -352,7 +352,7 @@ export const findDatesEPSG4326 = () => {
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDates - BBox in EPSG:4326</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC - BBox in EPSG:4326</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -363,7 +363,7 @@ export const findDatesEPSG4326 = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layer.findDates(
+    const dates = await layer.findDatesUTC(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
