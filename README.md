@@ -1,14 +1,4 @@
 
------
-
->
-> Warning!!!
->
-> The interface of the library is not final yet - expect breaking changes.
->
-
------
-
 - [Installation](#installation)
 - [Usage](#usage)
   - [Layers](#layers)
