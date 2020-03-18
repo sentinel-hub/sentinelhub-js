@@ -6,7 +6,7 @@ export type Dataset = {
   datasetParametersType: string | null;
   shServiceHostname: string;
   searchIndexUrl: string;
-  findDatesUrl: string;
+  findDatesUTCUrl: string;
   orbitTimeMinutes: number;
 };
 
@@ -18,7 +18,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   datasetParametersType: 'S1GRD',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
-  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
+  findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
 };
 
@@ -30,7 +30,7 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   datasetParametersType: 'S1GRD',
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
-  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
+  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
   orbitTimeMinutes: 49.3,
 };
 
@@ -42,7 +42,7 @@ export const DATASET_S2L2A: Dataset = {
   datasetParametersType: 'S2',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
-  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
+  findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
   orbitTimeMinutes: 50.3,
 };
 
@@ -54,7 +54,7 @@ export const DATASET_S2L1C: Dataset = {
   datasetParametersType: 'S2',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
-  findDatesUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
+  findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
   orbitTimeMinutes: 50.3,
 };
 
@@ -66,7 +66,7 @@ export const DATASET_S3SLSTR: Dataset = {
   datasetParametersType: 'S3SLSTR',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
-  findDatesUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/findAvailableData',
+  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/findAvailableData',
   orbitTimeMinutes: 50.495,
 };
 
@@ -78,7 +78,7 @@ export const DATASET_S3OLCI: Dataset = {
   datasetParametersType: 'S3',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
-  findDatesUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/findAvailableData',
+  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/findAvailableData',
   orbitTimeMinutes: 50.495,
 };
 
@@ -90,7 +90,7 @@ export const DATASET_S5PL2: Dataset = {
   datasetParametersType: 'S5PL2',
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex',
-  findDatesUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/findAvailableData',
+  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/findAvailableData',
   orbitTimeMinutes: 101,
 };
 
@@ -102,7 +102,7 @@ export const DATASET_AWS_L8L1C: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/searchIndex',
-  findDatesUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/findAvailableData',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/findAvailableData',
   orbitTimeMinutes: 99,
 };
 
@@ -114,7 +114,7 @@ export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
-  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/dates',
+  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -126,7 +126,7 @@ export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
-  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
+  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -138,7 +138,7 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
-  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/dates',
+  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/dates',
   orbitTimeMinutes: 99,
 };
 
@@ -150,7 +150,7 @@ export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://eocloud.sentinel-hub.com/',
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
-  findDatesUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/finddates',
+  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/finddates',
   orbitTimeMinutes: 100.16,
 };
 
@@ -162,7 +162,7 @@ export const DATASET_MODIS: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/searchIndex',
-  findDatesUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/findAvailableData',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/findAvailableData',
   orbitTimeMinutes: 99,
 };
 
@@ -174,7 +174,7 @@ export const DATASET_AWS_DEM: Dataset = {
   datasetParametersType: null,
   shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
   searchIndexUrl: null,
-  findDatesUrl: null,
+  findDatesUTCUrl: null,
   orbitTimeMinutes: null,
 };
 
@@ -186,6 +186,6 @@ export const DATASET_BYOC: Dataset = {
   datasetParametersType: 'BYOC',
   shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex',
-  findDatesUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
+  findDatesUTCUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
   orbitTimeMinutes: null,
 };

@@ -235,7 +235,7 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDates = () => {
+export const findDatesUTC = () => {
   const maxCloudCoverPercent = 60;
   const layerS2L1C = new S2L1CLayer({
     instanceId,
@@ -244,7 +244,7 @@ export const findDates = () => {
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDates for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.innerHTML = `<h2>findDatesUTC for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -255,7 +255,7 @@ export const findDates = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const dates = await layerS2L1C.findDates(
+    const dates = await layerS2L1C.findDatesUTC(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),

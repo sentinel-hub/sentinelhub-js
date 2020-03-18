@@ -166,7 +166,7 @@ We can always use layer to search for data availability:
   });
   const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
   const flyoversS2L2A = await layerS2L2A.findFlyovers(bbox, fromTime, toTime);
-  const datesS2L2A = await layerS2L2A.findDates(bbox, fromTime, toTime);
+  const datesS2L2A = await layerS2L2A.findDatesUTC(bbox, fromTime, toTime);
 
   const layerS1 = new S1GRDAWSEULayer({
     instanceId: '<my-instance-id>',
@@ -177,7 +177,7 @@ We can always use layer to search for data availability:
   });
   const { tiles: tilesS1 } = await layerS1.findTiles(bbox, fromTime, toTime, maxCount, offset);
   const flyoversS1 = await layerS1.findFlyovers(bbox, fromTime, toTime);
-  const datesS1 = await layerS1.findDates(bbox, fromTime, toTime);
+  const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
 
 ## Backwards compatibility

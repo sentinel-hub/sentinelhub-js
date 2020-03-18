@@ -121,8 +121,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return result;
   }
 
-  public async findDates(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    if (!this.dataset.findDatesUrl) {
+  public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+    if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
 
@@ -134,7 +134,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       to: toTime.toISOString(),
       ...additionalFindDatesParameters,
     };
-    const response = await axios.post(this.dataset.findDatesUrl, payload);
+    const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }

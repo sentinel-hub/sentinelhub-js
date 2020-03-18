@@ -31,11 +31,10 @@ export class WmsLayer extends AbstractLayer {
     return wmsGetMapUrl(this.baseUrl, this.layerId, params);
   }
 
-  public async findDates(
+  public async findDatesUTC(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    // any additional
   ): Promise<Date[]> {
     // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
     const capabilities = await fetchGetCapabilitiesXml(this.baseUrl);
