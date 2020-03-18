@@ -82,7 +82,7 @@ async function run() {
 
   // layer can also be constructed directly:
   const layerId = layers[0].layerId; // take a layer that we know exists
-  const layer = new WmsLayer(baseUrl, layerId, 'My title', 'My desc');
+  const layer = new WmsLayer({ baseUrl, layerId, title: 'My title', description: 'My desc' });
   printOut(`Layer title:`, layer.title);
   printOut('Layer description:', layer.description);
 
