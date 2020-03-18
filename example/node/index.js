@@ -5,7 +5,6 @@ const {
   WmsLayer,
   S1GRDAWSEULayer,
   S2L2ALayer,
-  OrbitDirection,
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
