@@ -33,8 +33,8 @@ export class WmsLayer extends AbstractLayer {
 
   public async findDatesUTC(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
-    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date,
+    toTime: Date,
   ): Promise<Date[]> {
     // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
     const capabilities = await fetchGetCapabilitiesXml(this.baseUrl);
@@ -56,26 +56,30 @@ export class WmsLayer extends AbstractLayer {
       throw new Error('Layer time information is not in ISO8601 format, parsing not supported');
     }
 
-    let result = [];
+    let allTimesUTC = [];
     const times = timeDimension['_'].split(',');
     for (let i = 0; i < times.length; i++) {
       const timeParts = times[i].split('/');
       switch (timeParts.length) {
         case 1:
-          result.push(moment.utc(timeParts[0]).toDate());
+          allTimesUTC.push(moment.utc(timeParts[0]));
           break;
         case 3:
-          const [fromTime, toTime, interval] = timeParts;
-          const intervalDuration = moment.duration(interval);
-          const toTimeMoment = moment.utc(toTime);
-          for (let t = moment.utc(fromTime); t.isSameOrBefore(toTimeMoment); t.add(intervalDuration)) {
-            result.push(t.toDate());
+          const [timePartFromTime, timePartToTime, timePartInterval] = timeParts;
+          const fromTimeMoment = moment.utc(timePartFromTime);
+          const toTimeMoment = moment.utc(timePartToTime);
+          const intervalDuration = moment.duration(timePartInterval);
+          for (let t = fromTimeMoment; t.isSameOrBefore(toTimeMoment); t.add(intervalDuration)) {
+            allTimesUTC.push(t.clone());
           }
           break;
         default:
           throw new Error('Unable to parse time information');
       }
     }
-    return result;
+
+    return allTimesUTC
+      .filter(t => t.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'))
+      .map(t => t.toDate());
   }
 }
