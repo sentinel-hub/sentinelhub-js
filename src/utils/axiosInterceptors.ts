@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
