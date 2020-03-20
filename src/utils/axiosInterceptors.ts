@@ -19,7 +19,7 @@ declare module 'axios' {
 export const registerAxiosCacheRetryInterceptors = (): any => {
   findAndDeleteExpiredCachedItems();
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
-  axios.interceptors.response.use(setCacheResponse, retryRequests);
+  axios.interceptors.response.use(setCacheResponse, error => retryRequests(error));
 };
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
