@@ -2,15 +2,10 @@ import axios from 'axios';
 import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
-import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator, PreviewMode } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { RequestConfig } from 'src/utils/axiosInterceptors';
 
-enum PreviewMode {
-  DETAIL = 'DETAIL',
-  PREVIEW = 'PREVIEW',
-  EXTENDED_PREVIEW = 'EXTENDED_PREVIEW',
-}
 enum MosaickingOrder {
   MOST_RECENT = 'mostRecent',
   LEAST_RECENT = 'leastRecent',
