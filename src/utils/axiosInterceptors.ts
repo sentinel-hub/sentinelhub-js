@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
@@ -19,7 +19,7 @@ declare module 'axios' {
 export const registerAxiosCacheRetryInterceptors = (): any => {
   findAndDeleteExpiredCachedItems();
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
-  axios.interceptors.response.use(setCacheResponse, error => retryRequests(error));
+  axios.interceptors.response.use(saveCacheResponse, error => retryRequests(error));
 };
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
@@ -27,20 +27,9 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
-  let cacheKey;
-  switch (request.method) {
-    // post requests are not supported, so we mimic a get request, by formatting the body/params to sha256, and constructing a key/url
-    // idea taken from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
-    case 'post':
-      const body = JSON.stringify(request.data);
-      const hash = await sha256(body);
-      cacheKey = generateCacheKey(request.url, hash);
-      break;
-    case 'get':
-      cacheKey = generateCacheKey(request.url, stringify(request.params));
-      break;
-    default:
-      return request;
+  const cacheKey = await generateCacheKey(request);
+  if (cacheKey === null) {
+    return request;
   }
 
   let cache;
@@ -56,6 +45,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
+  // serve from cache:
   request.adapter = async () => {
     // response from cache api follows the same structure as the fetch api, hence this hack
     // could be better if the caller handles the response (response.blob) instead of the caching function?
@@ -80,43 +70,46 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
       request: request,
       config: request,
       responseType: request.responseType,
+      isFromCache: true,
     });
   };
 
   return request;
 };
 
-const setCacheResponse = async (response: any): Promise<any> => {
-  if (response.config && response.config.useCache) {
-    let cache;
-    try {
-      cache = await caches.open(SENTINEL_HUB_CACHE);
-    } catch (err) {
-      console.warn('Caching failed', err);
-      return response;
-    }
+const saveCacheResponse = async (response: any): Promise<any> => {
+  // not using cache?
+  if (!response.config.useCache) {
+    return response;
+  }
+  // if we are serving from cache, there is no need to save the response to cache: (it came from there)
+  if (response.isFromCache) {
+    return response;
+  }
+  // resource not cacheable?
+  const cacheKey = await generateCacheKey(response.config);
+  if (cacheKey === null) {
+    return response;
+  }
+  // Cache API not supported?
+  let cache;
+  try {
+    cache = await caches.open(SENTINEL_HUB_CACHE);
+  } catch (err) {
+    console.debug('Cache API not supported, not caching', err);
+    return response;
+  }
 
-    let cacheKey;
+  // before saving response, set an artificial header that tells when it should expire:
+  const expiresMs = new Date().getTime() + EXPIRES_IN_SECONDS * 1000;
+  response.headers = {
+    ...response.headers,
+    [EXPIRY_HEADER_KEY]: expiresMs,
+  };
 
-    const expiresMs = new Date().getTime() + EXPIRES_IN_SECONDS * 1000;
-    response.headers = {
-      ...response.headers,
-      [EXPIRY_HEADER_KEY]: expiresMs,
-    };
-
-    if (response.config.method === 'get') {
-      cacheKey = generateCacheKey(response.config.url, stringify(response.config.params));
-    }
-    if (response.config.method === 'post') {
-      const body = response.config.data;
-      const hash = await sha256(body);
-      cacheKey = generateCacheKey(response.config.url, hash);
-    }
-
-    const hasCache = await cache.match(cacheKey);
-    if (!hasCache) {
-      cache.put(cacheKey, new Response(response.data, response));
-    }
+  const hasCache = await cache.match(cacheKey);
+  if (!hasCache) {
+    cache.put(cacheKey, new Response(response.data, response));
   }
   return response;
 };
@@ -137,7 +130,20 @@ const retryRequests = (err: any): any => {
   return Promise.reject(err);
 };
 
-const generateCacheKey = (url: any, params = ''): string => url + '?' + params;
+const generateCacheKey = async (request: AxiosRequestConfig): Promise<string | null> => {
+  switch (request.method) {
+    // post requests are not supported, so we mimic a get request, by formatting the body/params to sha256, and constructing a key/url
+    // idea taken from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
+    case 'post':
+      const body = JSON.stringify(request.data);
+      const hash = await sha256(body);
+      return `${request.url}?${hash}`;
+    case 'get':
+      return `${request.url}?${stringify(request.params)}`;
+    default:
+      return null;
+  }
+};
 
 //https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
 // example from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
