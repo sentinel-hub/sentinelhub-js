@@ -47,8 +47,8 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 
   // serve from cache:
   request.adapter = async () => {
-    // response from cache api follows the same structure as the fetch api, hence this hack
-    // could be better if the caller handles the response (response.blob) instead of the caching function?
+    // when we get data from cache, we want to return it in the same form as the original axios request
+    // (without cache) would, so we convert it appropriately:
     let responseData;
     switch (request.responseType) {
       case 'blob':
@@ -70,7 +70,6 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
       request: request,
       config: request,
       responseType: request.responseType,
-      isFromCache: true,
     });
   };
 
@@ -80,10 +79,6 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 const saveCacheResponse = async (response: any): Promise<any> => {
   // not using cache?
   if (!response.config.useCache) {
-    return response;
-  }
-  // if we are serving from cache, there is no need to save the response to cache: (it came from there)
-  if (response.isFromCache) {
     return response;
   }
   // resource not cacheable?
@@ -107,10 +102,24 @@ const saveCacheResponse = async (response: any): Promise<any> => {
     [EXPIRY_HEADER_KEY]: expiresMs,
   };
 
-  const hasCache = await cache.match(cacheKey);
-  if (!hasCache) {
-    cache.put(cacheKey, new Response(response.data, response));
+  const request = response.config;
+  // axios has already converted the response data according to responseType, which means that for example with
+  // json, we have an object. We must convert data back to original form before saving to cache:
+  let responseData;
+  switch (request.responseType) {
+    case 'blob':
+    case 'text':
+      // usual response types are strings, so we can save them as they are:
+      responseData = response.data;
+      break;
+    case 'json':
+      // but json was converted by axios to an object - and we want to save a string:
+      responseData = JSON.stringify(response.data);
+      break;
+    default:
+      throw new Error('Unsupported response type: ' + request.responseType);
   }
+  cache.put(cacheKey, new Response(responseData, response));
   return response;
 };
 
