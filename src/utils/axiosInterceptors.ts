@@ -68,7 +68,6 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
         responseData = await cachedResponse.text();
         break;
       case 'json':
-      case undefined:
         responseData = await cachedResponse.json();
         break;
       default:
