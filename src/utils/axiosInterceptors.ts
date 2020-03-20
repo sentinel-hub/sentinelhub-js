@@ -26,7 +26,11 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
   if (!(request && request.useCache)) {
     return request;
   }
-
+  // do not perform caching if Cache API is not supported:
+  if (typeof window === 'undefined' || !window.caches) {
+    return request;
+  }
+  // resource not cacheable? It couldn't have been saved to cache:
   const cacheKey = await generateCacheKey(request);
   if (cacheKey === null) {
     return request;
@@ -81,6 +85,10 @@ const saveCacheResponse = async (response: any): Promise<any> => {
   if (!response.config.useCache) {
     return response;
   }
+  // do not perform caching if Cache API is not supported:
+  if (typeof window === 'undefined' || !window.caches) {
+    return response;
+  }
   // resource not cacheable?
   const cacheKey = await generateCacheKey(response.config);
   if (cacheKey === null) {
@@ -91,7 +99,7 @@ const saveCacheResponse = async (response: any): Promise<any> => {
   try {
     cache = await caches.open(SENTINEL_HUB_CACHE);
   } catch (err) {
-    console.debug('Cache API not supported, not caching', err);
+    console.warn('Caching failed', err);
     return response;
   }
 
