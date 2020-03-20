@@ -1,7 +1,7 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
-import { ApiType, MimeTypes, OrbitDirection } from 'src/layer/const';
+import { ApiType, MimeTypes, OrbitDirection, PreviewMode } from 'src/layer/const';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
 import {
@@ -93,6 +93,7 @@ export {
   Polarization,
   Resolution,
   OrbitDirection,
+  PreviewMode,
   S3SLSTRView,
   BBox,
   // legacy:
