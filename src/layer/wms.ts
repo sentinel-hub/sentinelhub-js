@@ -116,7 +116,12 @@ export function wmsGetMapUrl(
   }
 
   if (evalscript) {
-    queryParams.evalscript = btoa(evalscript);
+    if (typeof window !== 'undefined' && window.btoa) {
+      queryParams.evalscript = btoa(evalscript);
+    } else {
+      // node.js doesn't support btoa:
+      queryParams.evalscript = Buffer.from(evalscript).toString('base64');
+    }
   }
   if (evalscriptUrl) {
     queryParams.evalscripturl = evalscriptUrl;
