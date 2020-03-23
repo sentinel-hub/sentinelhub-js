@@ -91,3 +91,11 @@ export const MimeTypes: Record<string, MimeType> = {
   JPEG: 'image/jpeg',
   PNG: 'image/png',
 };
+
+export const SH_SERVICE_HOSTNAMES_V1_OR_V2: string[] = ['https://eocloud.sentinel-hub.com/'];
+
+export const SH_SERVICE_HOSTNAMES_V3: string[] = [
+  'https://services.sentinel-hub.com/',
+  'https://services-uswest2.sentinel-hub.com/',
+  'https://creodias.sentinel-hub.com/',
+];
