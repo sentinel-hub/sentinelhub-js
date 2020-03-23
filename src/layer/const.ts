@@ -17,7 +17,7 @@ export type GetMapParams = {
   width?: number;
   height?: number;
   // optional additional parameters:
-  preview?: number;
+  preview?: PreviewMode;
   geometry?: string;
   quality?: number;
   gain?: number;
@@ -38,9 +38,9 @@ export type GetMapParams = {
 export type Interpolator = 'BILINEAR' | 'BICUBIC' | 'LANCZOS' | 'BOX' | 'NEAREST';
 
 export enum PreviewMode {
-  DETAIL = 'DETAIL',
-  PREVIEW = 'PREVIEW',
-  EXTENDED_PREVIEW = 'EXTENDED_PREVIEW',
+  DETAIL = 0,
+  PREVIEW = 1,
+  EXTENDED_PREVIEW = 2,
 }
 
 export enum ApiType {
