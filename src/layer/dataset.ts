@@ -36,7 +36,7 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
   orbitTimeMinutes: 49.3,
-  minDate: new Date(Date.UTC(2014, 4 - 1, 3, 0, 0, 0)),
+  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 0, 0)),
   maxDate: null,
 };
 
