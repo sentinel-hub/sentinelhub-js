@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
-import { MimeType, GetMapParams, Interpolator, PreviewMode } from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { RequestConfig } from 'src/utils/axiosInterceptors';
 
@@ -11,6 +11,13 @@ enum MosaickingOrder {
   LEAST_RECENT = 'leastRecent',
   LEAST_CC = 'leastCC',
 }
+
+enum PreviewModeString {
+  DETAIL = 'DETAIL',
+  PREVIEW = 'PREVIEW',
+  EXTENDED_PREVIEW = 'EXTENDED_PREVIEW',
+}
+
 export type ProcessingPayload = {
   input: {
     bounds: {
@@ -28,7 +35,7 @@ export type ProcessingPayload = {
             from: string;
             to: string;
           };
-          previewMode?: PreviewMode;
+          previewMode?: PreviewModeString;
           mosaickingOrder?: MosaickingOrder;
           [key: string]: any;
         };
@@ -118,16 +125,17 @@ export function createProcessingPayload(
     //   - 3 -> EXTENDED_PREVIEW (used, but not officially supported)
     switch (params.preview) {
       case 0:
-        payload.input.data[0].dataFilter.previewMode = PreviewMode.DETAIL;
+        payload.input.data[0].dataFilter.previewMode = PreviewModeString.DETAIL;
         break;
       case 1:
-        payload.input.data[0].dataFilter.previewMode = PreviewMode.PREVIEW;
+        payload.input.data[0].dataFilter.previewMode = PreviewModeString.PREVIEW;
         break;
       case 2:
       case 3:
-      default:
-        payload.input.data[0].dataFilter.previewMode = PreviewMode.EXTENDED_PREVIEW;
+        payload.input.data[0].dataFilter.previewMode = PreviewModeString.EXTENDED_PREVIEW;
         break;
+      default:
+        throw new Error('Preview mode does not exist, options are "DETAIL", "PREVIEW" or "EXTENDED_PREVIEW"');
     }
   }
 
