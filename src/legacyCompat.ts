@@ -60,7 +60,13 @@ export async function legacyGetMapFromParams(
           throw new Error('Processing API is only possible with SH V3 layers');
         }
         if (evalscript) {
-          const decodedEvalscript = atob(evalscript);
+          let decodedEvalscript;
+          if (typeof window !== 'undefined' && window.atob) {
+            decodedEvalscript = atob(evalscript);
+          } else {
+            // node.js doesn't support atob:
+            decodedEvalscript = Buffer.from(evalscript, 'base64').toString('utf8');
+          }
           if (!decodedEvalscript.startsWith('//VERSION=3')) {
             throw new Error(
               "To avoid possible bugs, legacy functions only allow evalscripts explicitly marked with '//VERSION=3' comment with Processing API",
