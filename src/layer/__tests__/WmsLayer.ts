@@ -1,7 +1,7 @@
 import 'jest-setup';
 import axios from 'src/layer/__mocks__/axios';
 
-import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer } from 'src';
+import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer, setAuthToken } from 'src';
 
 test('WmsLayer.getMapUrl returns an URL', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
@@ -76,6 +76,38 @@ test('WmsLayer.getMap makes an appropriate request', () => {
   });
   expect(axiosParams).toEqual({
     responseType: 'blob',
+    useCache: true,
+  });
+});
+
+test('WmsLayer.findDates should not include auth token in GetCapabilities request', () => {
+  axios.get.mockReset();
+  const layerId = 'PROBAV_S1_TOA_333M';
+  const layer = new WmsLayer({
+    baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+    layerId,
+  });
+  const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+  const fromTime = new Date(Date.UTC(2020, 1 - 1, 10, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2020, 1 - 1, 10, 23, 59, 59));
+
+  setAuthToken('asdf1234'); // this should not have any effect
+
+  layer.findDatesUTC(bbox, fromTime, toTime);
+
+  expect(axios.get).toHaveBeenCalledTimes(1);
+
+  const call: any = axios.get.mock.calls[0]; // cast to `any` so we can access the parameters
+  const [url, axiosParams] = call;
+
+  expect(url).toHaveOrigin('https://proba-v-mep.esa.int');
+  expect(url).toHaveQueryParamsValues({
+    service: 'wms',
+    request: 'GetCapabilities',
+    format: 'text/xml',
+  });
+  expect(axiosParams).toEqual({
+    responseType: 'text',
     useCache: true,
   });
 });

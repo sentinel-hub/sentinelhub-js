@@ -1,10 +1,9 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { BBox } from 'src/bbox';
 import { Dataset } from 'src/layer/dataset';
-import { RequestConfig } from 'src/utils/axiosInterceptors';
 import area from '@turf/area';
 import { union, intersection, Geom } from 'polygon-clipping';
 
@@ -29,7 +28,7 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
-        const requestConfig: RequestConfig = { responseType: 'blob', useCache: true };
+        const requestConfig: AxiosRequestConfig = { responseType: 'blob', useCache: true };
         const response = await axios.get(url, requestConfig);
         return response.data;
       default:

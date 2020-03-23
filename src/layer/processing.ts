@@ -1,10 +1,9 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-import { RequestConfig } from 'src/utils/axiosInterceptors';
 
 enum PreviewMode {
   DETAIL = 'DETAIL',
@@ -154,7 +153,7 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
-  const requestConfig: RequestConfig = {
+  const requestConfig: AxiosRequestConfig = {
     headers: {
       Authorization: 'Bearer ' + authToken,
       'Content-Type': 'application/json',
