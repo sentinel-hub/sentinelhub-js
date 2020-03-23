@@ -3,7 +3,7 @@ import { stringify } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
 
 let fetchCache: Record<string, Promise<AxiosResponse>> = {};
 
