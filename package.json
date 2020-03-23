@@ -59,7 +59,10 @@
       "."
     ],
     "testRegex": "/__tests__/.*\\.(ts|tsx|js)$",
-    "testPathIgnorePatterns": ["/node_modules/", "/dist/"]
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ]
   },
   "types": "dist/index.d.ts",
   "files": [
