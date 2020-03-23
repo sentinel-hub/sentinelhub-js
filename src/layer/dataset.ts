@@ -8,6 +8,8 @@ export type Dataset = {
   searchIndexUrl: string;
   findDatesUTCUrl: string;
   orbitTimeMinutes: number;
+  minDate: Date | null;
+  maxDate: Date | null;
 };
 
 export const DATASET_AWSEU_S1GRD: Dataset = {
@@ -20,6 +22,8 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
+  minDate: new Date(Date.UTC(2017, 1 - 1, 1, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_EOCLOUD_S1GRD: Dataset = {
@@ -32,6 +36,8 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
   orbitTimeMinutes: 49.3,
+  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_S2L2A: Dataset = {
@@ -44,6 +50,8 @@ export const DATASET_S2L2A: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
   orbitTimeMinutes: 50.3,
+  minDate: new Date(Date.UTC(2017, 3 - 1, 28, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_S2L1C: Dataset = {
@@ -56,6 +64,8 @@ export const DATASET_S2L1C: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
   orbitTimeMinutes: 50.3,
+  minDate: new Date(Date.UTC(2015, 6 - 1, 17, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_S3SLSTR: Dataset = {
@@ -68,6 +78,8 @@ export const DATASET_S3SLSTR: Dataset = {
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex',
   findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/findAvailableData',
   orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 1, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_S3OLCI: Dataset = {
@@ -80,6 +92,8 @@ export const DATASET_S3OLCI: Dataset = {
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
   findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/findAvailableData',
   orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 2 - 1, 1, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_S5PL2: Dataset = {
@@ -92,6 +106,8 @@ export const DATASET_S5PL2: Dataset = {
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex',
   findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/findAvailableData',
   orbitTimeMinutes: 101,
+  minDate: new Date(Date.UTC(2017, 10 - 1, 13, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
@@ -104,6 +120,8 @@ export const DATASET_AWS_L8L1C: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/findAvailableData',
   orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 2 - 1, 1, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
@@ -116,6 +134,8 @@ export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/dates',
   orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(1984, 1 - 1, 1, 0, 0, 0)),
+  maxDate: new Date(Date.UTC(2013, 5 - 1, 1, 23, 59, 59)),
 };
 
 export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
@@ -128,6 +148,8 @@ export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
   orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(1999, 1 - 1, 1, 0, 0, 0)),
+  maxDate: new Date(Date.UTC(2003, 12 - 1, 1, 23, 59, 59)),
 };
 
 export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
@@ -140,6 +162,8 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/dates',
   orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 1 - 1, 1, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
@@ -152,6 +176,8 @@ export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/finddates',
   orbitTimeMinutes: 100.16,
+  minDate: new Date(Date.UTC(2002, 1 - 1, 1, 0, 0, 0)),
+  maxDate: new Date(Date.UTC(2012, 5 - 1, 1, 23, 59, 59)),
 };
 
 export const DATASET_MODIS: Dataset = {
@@ -164,6 +190,8 @@ export const DATASET_MODIS: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/findAvailableData',
   orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2000, 2 - 1, 24, 0, 0, 0)),
+  maxDate: null,
 };
 
 export const DATASET_AWS_DEM: Dataset = {
@@ -176,6 +204,8 @@ export const DATASET_AWS_DEM: Dataset = {
   searchIndexUrl: null,
   findDatesUTCUrl: null,
   orbitTimeMinutes: null,
+  minDate: null,
+  maxDate: null,
 };
 
 export const DATASET_BYOC: Dataset = {
@@ -188,4 +218,6 @@ export const DATASET_BYOC: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
   orbitTimeMinutes: null,
+  minDate: null,
+  maxDate: null,
 };
