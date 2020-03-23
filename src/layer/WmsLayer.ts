@@ -56,21 +56,25 @@ export class WmsLayer extends AbstractLayer {
       throw new Error('Layer time information is not in ISO8601 format, parsing not supported');
     }
 
-    let allTimesUTC = [];
+    let allTimesMomentUTC = [];
     const times = timeDimension['_'].split(',');
     for (let i = 0; i < times.length; i++) {
       const timeParts = times[i].split('/');
       switch (timeParts.length) {
         case 1:
-          allTimesUTC.push(moment.utc(timeParts[0]));
+          allTimesMomentUTC.push(moment.utc(timeParts[0]));
           break;
         case 3:
-          const [timePartFromTime, timePartToTime, timePartInterval] = timeParts;
-          const fromTimeMoment = moment.utc(timePartFromTime);
-          const toTimeMoment = moment.utc(timePartToTime);
-          const intervalDuration = moment.duration(timePartInterval);
-          for (let t = fromTimeMoment; t.isSameOrBefore(toTimeMoment); t.add(intervalDuration)) {
-            allTimesUTC.push(t.clone());
+          const [intervalFromTime, intervalToTime, intervalDuration] = timeParts;
+          const intervalFromTimeMoment = moment.utc(intervalFromTime);
+          const intervalToTimeMoment = moment.utc(intervalToTime);
+          const intervalDurationMoment = moment.duration(intervalDuration);
+          for (
+            let t = intervalFromTimeMoment;
+            t.isSameOrBefore(intervalToTimeMoment);
+            t.add(intervalDurationMoment)
+          ) {
+            allTimesMomentUTC.push(t.clone());
           }
           break;
         default:
@@ -78,7 +82,7 @@ export class WmsLayer extends AbstractLayer {
       }
     }
 
-    return allTimesUTC
+    return allTimesMomentUTC
       .filter(t => t.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'))
       .map(t => t.toDate());
   }
