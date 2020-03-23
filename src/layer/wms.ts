@@ -120,7 +120,7 @@ export function wmsGetMapUrl(
       queryParams.evalscript = btoa(evalscript);
     } else {
       // node.js doesn't support btoa:
-      queryParams.evalscript = Buffer.from(evalscript).toString('base64');
+      queryParams.evalscript = Buffer.from(evalscript, 'utf8').toString('base64');
     }
   }
   if (evalscriptUrl) {

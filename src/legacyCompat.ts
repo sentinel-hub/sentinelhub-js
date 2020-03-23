@@ -65,7 +65,7 @@ export async function legacyGetMapFromParams(
             decodedEvalscript = atob(evalscript);
           } else {
             // node.js doesn't support atob:
-            decodedEvalscript = Buffer.from(evalscript, 'base64').toString('ascii');
+            decodedEvalscript = Buffer.from(evalscript, 'base64').toString('utf8');
           }
           if (!decodedEvalscript.startsWith('//VERSION=3')) {
             throw new Error(
