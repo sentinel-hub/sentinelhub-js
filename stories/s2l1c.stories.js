@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, PreviewMode } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -36,6 +36,7 @@ export const GetMapURL = () => {
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
+    preview: PreviewMode.DETAIL,
   };
   const imageUrl = layerS2L1C.getMapUrl(getMapParams, ApiType.WMS);
   img.src = imageUrl;
@@ -114,6 +115,7 @@ export const GetMapProcessing = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
+      preview: PreviewMode.EXTENDED_PREVIEW,
     };
     const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
