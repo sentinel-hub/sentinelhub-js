@@ -126,8 +126,7 @@ export function wmsGetMapUrl(
   if (evalscriptUrl) {
     queryParams.evalscripturl = evalscriptUrl;
   }
-
-  if (params.preview) {
+  if (params.preview !== undefined) {
     queryParams.preview = params.preview;
   }
   if (params.geometry) {
