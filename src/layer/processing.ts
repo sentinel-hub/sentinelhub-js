@@ -113,6 +113,9 @@ export function createProcessingPayload(
   if (params.downsampling !== undefined) {
     payload.input.data[0].processing.downsampling = params.downsampling;
   }
+  if (params.geometry !== undefined) {
+    payload.input.bounds.geometry = params.geometry;
+  }
 
   if (params.preview !== undefined) {
     // WMS parameter description:
