@@ -13,6 +13,18 @@ if (!process.env.S2L2A_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S2L2A_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+const geometry = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [12.5, 43.0],
+      [12.9, 42.5],
+      [12.5, 42.0],
+      [12.0, 42.5],
+      [12.5, 43.0],
+    ],
+  ],
+};
 
 export default {
   title: 'Sentinel 2 L2A',
@@ -72,6 +84,36 @@ export const GetMapWMS = () => {
   return wrapperEl;
 };
 
+export const GetMapWMSWithGeometry = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      geometry: geometry,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const GetMapProcessing = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
@@ -111,6 +153,58 @@ export const GetMapProcessing = () => {
       bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapProcessingWithGeometry = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      evalscript: `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+      }
+    `,
+    });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      geometry: geometry,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,

@@ -18,7 +18,7 @@ export type GetMapParams = {
   height?: number;
   // optional additional parameters:
   preview?: PreviewMode;
-  geometry?: string;
+  geometry?: Polygon;
   quality?: number;
   gain?: number;
   gamma?: number;
