@@ -167,7 +167,11 @@ async function run() {
   const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL of S2 L2A image:', imageUrl);
 
-  const layerS2L2AWithEvalscript = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId, evalscript: 'return [B02, B03, B04];' });
+  const layerS2L2AWithEvalscript = new S2L2ALayer({
+    instanceId,
+    layerId: s2l2aLayerId,
+    evalscript: 'return [B02, B03, B04];',
+  });
   const imageUrl2 = layerS2L2AWithEvalscript.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL of S2 L2A image with evalscript:', imageUrl2);
 
