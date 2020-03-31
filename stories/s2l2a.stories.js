@@ -13,7 +13,7 @@ if (!process.env.S2L2A_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S2L2A_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
-const geometry = {
+const geometryPolygon = {
   type: 'Polygon',
   coordinates: [
     [
@@ -22,6 +22,20 @@ const geometry = {
       [12.5, 42.0],
       [12.0, 42.5],
       [12.5, 43.0],
+    ],
+  ],
+};
+const geometryMultiPolygon = {
+  type: 'MultiPolygon',
+  coordinates: [
+    [
+      [
+        [12.5, 43.0],
+        [12.9, 42.5],
+        [12.5, 42.0],
+        [12.0, 42.5],
+        [12.5, 43.0],
+      ],
     ],
   ],
 };
@@ -84,7 +98,7 @@ export const GetMapWMS = () => {
   return wrapperEl;
 };
 
-export const GetMapWMSWithGeometry = () => {
+export const GetMapWMSWithGeometryMultiPolygon = () => {
   const img = document.createElement('img');
   img.width = '512';
   img.height = '512';
@@ -101,7 +115,7 @@ export const GetMapWMSWithGeometry = () => {
       bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      geometry: geometry,
+      geometry: geometryMultiPolygon,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -165,7 +179,7 @@ export const GetMapProcessing = () => {
   return wrapperEl;
 };
 
-export const GetMapProcessingWithGeometry = () => {
+export const GetMapProcessingWithGeometryPolygon = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
@@ -204,7 +218,7 @@ export const GetMapProcessingWithGeometry = () => {
       bbox: bbox4326,
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      geometry: geometry,
+      geometry: geometryPolygon,
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,

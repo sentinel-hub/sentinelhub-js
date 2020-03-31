@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
+import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
@@ -21,7 +21,7 @@ export type ProcessingPayload = {
   input: {
     bounds: {
       bbox?: BBoxTurf;
-      geometry?: Polygon;
+      geometry?: Polygon | MultiPolygon;
       properties: {
         crs: string;
       };
