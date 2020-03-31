@@ -28,7 +28,7 @@ export type ProcessingPayload = {
     };
     data: [
       {
-        location?: string;
+        id?: string;
         dataFilter: {
           timeRange: {
             from: string;
