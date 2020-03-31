@@ -12,6 +12,7 @@
     "moment": "^2.24.0",
     "polygon-clipping": "^0.14.3",
     "query-string": "^6.4.2",
+    "terraformer-wkt-parser": "^1.2.1",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
