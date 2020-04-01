@@ -1,13 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
-
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
-import { BBox } from 'src/bbox';
-import { Dataset } from 'src/layer/dataset';
 import area from '@turf/area';
 import { union, intersection, Geom } from 'polygon-clipping';
 
+import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
+import { Dataset } from 'src/layer/dataset';
 
 interface ConstructorParameters {
   title?: string | null;
