@@ -251,3 +251,33 @@ export const findDatesUTCEPSG3857 = () => {
 
   return wrapperEl;
 };
+
+export const statsAndHistogram = () => {
+  const maxCloudCoverPercent = 60;
+  const layer = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent });
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStatsAndHistogram</h2>`;
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const fromTime = new Date(Date.UTC(2000, 1 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2000, 3 - 1, 15, 23, 59, 59));
+
+  const perform = async () => {
+    const payload = {
+      fromTime: fromTime,
+      toTime: toTime,
+      resolution: 100,
+      binAmount: 10,
+      geometry: bbox.toGeoJSON(),
+      crs: bbox.crs,
+    };
+    const stats = await layer.getStatsAndHistogram(payload);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
