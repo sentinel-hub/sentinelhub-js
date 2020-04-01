@@ -284,3 +284,54 @@ export const findDatesUTC = () => {
 
   return wrapperEl;
 };
+
+export const s2StatsAndHistogram = () => {
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+  });
+
+  const geometry = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [38.443522453308105, 29.97140509632656],
+        [38.44244956970215, 29.96954625480396],
+        [38.44292163848877, 29.967538666899472],
+        [38.44480991363525, 29.965865645995088],
+        [38.44686985015869, 29.96541950233024],
+        [38.44910144805908, 29.96564257441305],
+        [38.45056056976318, 29.966720749087546],
+        [38.451247215270996, 29.96861682100166],
+        [38.450989723205566, 29.97006673393574],
+        [38.450260162353516, 29.971330743333375],
+        [38.4486722946167, 29.97229732790467],
+        [38.44622611999512, 29.972446032388678],
+        [38.444252014160156, 29.971888389426],
+        [38.443522453308105, 29.97140509632656],
+      ],
+    ],
+  };
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStatsAndHistogram for S2L1C;</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const payload = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 10,
+    binAmount: 10,
+    histogramType: 'EQUALFREQUENCY',
+    geometry: geometry,
+    crs: CRS_EPSG4326,
+  };
+  const perform = async () => {
+    const stats = await layerS2L1C.getStatsAndHistogram(payload);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

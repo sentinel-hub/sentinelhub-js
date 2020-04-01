@@ -1,12 +1,23 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
+import WKT from 'terraformer-wkt-parser';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
+import {
+  GetMapParams,
+  ApiType,
+  PaginatedTiles,
+  StatsPerChannel,
+  HistogramType,
+  FisPayload,
+  GetStatsAndHistogramParams,
+  StatsAndHistogram,
+} from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
+import { CRS_EPSG4326 } from 'src';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -234,5 +245,44 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
     return response.data.map((date: string) => moment.utc(date).toDate());
+  }
+
+  public async getStatsAndHistogram(params: GetStatsAndHistogramParams): Promise<StatsAndHistogram> {
+    if (!params.geometry) {
+      throw new Error('Parameter "geometry" needs to be provided');
+    }
+    if (!params.crs) {
+      throw new Error('Parameter "crs" needs to be provided');
+    }
+    if (!params.resolution) {
+      throw new Error('Parameter "resolution" needs to be provided');
+    }
+
+    const payload: FisPayload = {
+      layer: this.layerId,
+      crs: params.crs.authId,
+      geometry: WKT.convert(params.geometry),
+      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+        .utc(params.toTime)
+        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+      resolution: undefined,
+      bins: params.binAmount || 5,
+      type: HistogramType.EQUALFREQUENCY,
+    };
+    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
+    if (params.crs.authId === CRS_EPSG4326.authId) {
+      payload.resolution = params.resolution + 'm';
+    } else {
+      payload.resolution = params.resolution;
+    }
+
+    const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
+    // convert date strings to Date objects
+    Object.keys(data).forEach(key => {
+      data[key].forEach((dailyStats: StatsPerChannel) => {
+        dailyStats.date = new Date(dailyStats.date);
+      });
+    });
+    return data;
   }
 }
