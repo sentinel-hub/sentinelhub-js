@@ -22,8 +22,8 @@ if (!process.env.S2L2A_LAYER_ID) {
 }
 
 const instanceId = process.env.INSTANCE_ID;
-const layerS2L1CId = process.env.S2L1C_LAYER_ID;
-const layerS2L2AId = process.env.S2L2A_LAYER_ID;
+const s2l1cLayerId = process.env.S2L1C_LAYER_ID;
+const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 const bbox = new BBox(
   CRS_EPSG3857,
   1761109.131690461,
@@ -52,8 +52,8 @@ export const getMapProcessing = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layerS2L1C = new S2L1CLayer({ instanceId, layerId: layerS2L1CId });
-    const layerS2L2A = new S2L2ALayer({ instanceId, layerId: layerS2L2AId });
+    const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2l1cLayerId });
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
     const layers = [
       {
         layer: layerS2L2A,
