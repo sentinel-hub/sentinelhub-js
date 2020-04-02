@@ -169,7 +169,8 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
       'Content-Type': 'application/json',
       Accept: '*/*',
     },
-    responseType: 'blob',
+    // 'blob' responseType does not work with Node.js:
+    responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);

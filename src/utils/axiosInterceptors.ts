@@ -51,12 +51,16 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 
   // serve from cache:
   request.adapter = async () => {
-    // when we get data from cache, we want to return it in the same form as the original axios request
-    // (without cache) would, so we convert it appropriately:
+    // when we get data (Response) from cache (Cache API), we want to return it in the
+    // same form as the original axios request (without cache) would, so we convert it
+    // appropriately:
     let responseData;
     switch (request.responseType) {
       case 'blob':
         responseData = await cachedResponse.blob();
+        break;
+      case 'arraybuffer':
+        responseData = await cachedResponse.arrayBuffer();
         break;
       case 'text':
         responseData = await cachedResponse.text();
@@ -115,8 +119,9 @@ const saveCacheResponse = async (response: any): Promise<any> => {
   let responseData;
   switch (request.responseType) {
     case 'blob':
+    case 'arraybuffer':
     case 'text':
-      // usual response types are strings, so we can save them as they are:
+      // we can save usual responses as they are:
       responseData = response.data;
       break;
     case 'json':
