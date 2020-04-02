@@ -108,6 +108,7 @@ export type GetStatsAndHistogramParams = {
   resolution: number;
   geometry: Polygon;
   binAmount?: number;
+  evalscript?: string;
 };
 
 export type FisPayload = {
@@ -118,6 +119,8 @@ export type FisPayload = {
   geometry?: string;
   type?: HistogramType;
   bins?: number;
+  evalscript?: string;
+  evalsource?: string;
 };
 
 export enum HistogramType {
