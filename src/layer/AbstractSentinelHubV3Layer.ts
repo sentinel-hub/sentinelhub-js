@@ -280,10 +280,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     } else {
       payload.resolution = params.resolution;
     }
-    // const additionalParams = this.getStatsAndHistogramAdditionalParameters();
-    // for (let key in additionalParams) {
-    //   payload[key] = additionalParams[key];
-    // }
 
     const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
     // convert date strings to Date objects
