@@ -185,6 +185,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     } else {
       payload.resolution = params.resolution;
     }
+    if (params.evalscript) {
+      payload.evalscript = params.evalscript;
+      payload.evalsource = this.getEvalsource();
+    }
 
     const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
       params: payload,
