@@ -175,12 +175,10 @@ async function run() {
   const imageUrl2 = layerS2L2AWithEvalscript.getMapUrl(getMapParams, ApiType.WMS);
   printOut('URL of S2 L2A image with evalscript:', imageUrl2);
 
-  // this doesn't work because node.js doesn't support Blob:
-  // const fs = require('fs');
-  // const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
-  // fs.writeFileSync('/tmp/imagewms.jpeg', Buffer.from(new Uint8Array(imageBlob)));
-  // const imageBlob2 = await layer.getMap(getMapParams, API_PROCESSING);
-  // fs.writeFileSync('/tmp/imageprocessing.jpeg', Buffer.from(new Uint8Array(imageBlob)));
+  // write the satellite image to JPG file:
+  const fs = require('fs');
+  const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
+  fs.writeFileSync('./image.jpeg', imageBlob, { encoding: null });
 }
 
 run()

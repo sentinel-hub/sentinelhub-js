@@ -27,7 +27,11 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
-        const requestConfig: AxiosRequestConfig = { responseType: 'blob', useCache: true };
+        const requestConfig: AxiosRequestConfig = {
+          // 'blob' responseType does not work with Node.js:
+          responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
+          useCache: true,
+        };
         const response = await axios.get(url, requestConfig);
         return response.data;
       default:
