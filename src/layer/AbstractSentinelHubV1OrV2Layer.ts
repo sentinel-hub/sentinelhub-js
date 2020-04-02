@@ -130,6 +130,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
+  protected getStatsAndHistogramAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
   public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
@@ -173,6 +177,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       resolution: undefined,
       bins: params.binAmount || 5,
       type: HistogramType.EQUALFREQUENCY,
+      ...this.getStatsAndHistogramAdditionalParameters(),
     };
     // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
     if (params.crs.authId === CRS_EPSG4326.authId) {

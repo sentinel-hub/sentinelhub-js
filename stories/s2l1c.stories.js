@@ -289,6 +289,7 @@ export const s2StatsAndHistogram = () => {
   const layerS2L1C = new S2L1CLayer({
     instanceId,
     layerId,
+    maxCloudCoverPercent: 20,
   });
 
   const geometry = {
