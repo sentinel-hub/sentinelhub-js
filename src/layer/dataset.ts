@@ -64,7 +64,7 @@ export const DATASET_S2L1C: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
   orbitTimeMinutes: 50.3,
-  minDate: new Date(Date.UTC(2015, 6 - 1, 27, 0, 25, 31)), // 2015-06-27T10:25:31Z
+  minDate: new Date(Date.UTC(2015, 6 - 1, 27, 10, 25, 31)), // 2015-06-27T10:25:31Z
   maxDate: null,
 };
 
