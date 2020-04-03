@@ -382,10 +382,10 @@ export const supportsProcessingAPI = () => {
   return wrapperEl;
 };
 
-export const s1StatsAndHistogram = () => {
+export const statsAndHistogram = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStatsAndHistogram for S1GRD work</h2>';
+  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const layer = new S1GRDEOCloudLayer({
@@ -437,10 +437,10 @@ export const s1StatsAndHistogram = () => {
 };
 
 
-export const s1StatsAndHistogramWithEvalscript = () => {
+export const statsAndHistogramWithEvalscript = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStatsAndHistogram for S1GRD work</h2>';
+  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const layer = new S1GRDEOCloudLayer({
