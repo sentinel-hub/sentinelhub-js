@@ -1,3 +1,6 @@
+import WKT from 'terraformer-wkt-parser';
+import { Polygon } from '@turf/helpers';
+
 import { BBox } from 'src/bbox';
 import { CRS_IDS, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { ApiType, MimeType, GetMapParams } from 'src/layer/const';
@@ -161,7 +164,7 @@ function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegac
     getMapParams.preview = previewFromParams(params);
   }
   if (params.geometry) {
-    getMapParams.geometry = params.geometry;
+    getMapParams.geometry = WKT.parse(params.geometry) as Polygon;
   }
   if (params.quality) {
     getMapParams.quality = parseInt(params.quality);

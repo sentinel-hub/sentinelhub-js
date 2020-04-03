@@ -1,11 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { Polygon, BBox as BBoxTurf } from '@turf/helpers';
+import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { PreviewMode } from 'src';
 
-enum MosaickingOrder {
+export enum MosaickingOrder {
   MOST_RECENT = 'mostRecent',
   LEAST_RECENT = 'leastRecent',
   LEAST_CC = 'leastCC',
@@ -21,31 +22,12 @@ export type ProcessingPayload = {
   input: {
     bounds: {
       bbox?: BBoxTurf;
-      geometry?: Polygon;
+      geometry?: Polygon | MultiPolygon;
       properties: {
         crs: string;
       };
     };
-    data: [
-      {
-        location?: string;
-        dataFilter: {
-          timeRange: {
-            from: string;
-            to: string;
-          };
-          previewMode?: PreviewModeString;
-          mosaickingOrder?: MosaickingOrder;
-          [key: string]: any;
-        };
-        processing?: {
-          upsampling?: Interpolator;
-          downsampling?: Interpolator;
-          [key: string]: any;
-        };
-        type: string;
-      },
-    ];
+    data: ProcessingPayloadDatasource[];
   };
   output: {
     width: number;
@@ -62,6 +44,48 @@ export type ProcessingPayload = {
   evalscript?: string;
   dataProduct?: string;
 };
+
+export type ProcessingPayloadDatasource = {
+  id?: string;
+  dataFilter: {
+    timeRange: {
+      from: string;
+      to: string;
+    };
+    previewMode?: PreviewModeString;
+    mosaickingOrder?: MosaickingOrder;
+    [key: string]: any;
+  };
+  processing?: {
+    upsampling?: Interpolator;
+    downsampling?: Interpolator;
+    [key: string]: any;
+  };
+  type: string;
+};
+
+export function convertPreviewToString(preview: PreviewMode): PreviewModeString {
+  // WMS parameter description:
+  //   https://www.sentinel-hub.com/develop/documentation/api/preview-modes
+  // In the Processing API the values are enums:
+  //   - 0 -> DETAIL
+  //   - 1 -> PREVIEW
+  //   - 2 -> EXTENDED_PREVIEW
+  //   - 3 -> EXTENDED_PREVIEW (used, but not officially supported)
+  switch (preview) {
+    case 0:
+      return PreviewModeString.DETAIL;
+    case 1:
+      return PreviewModeString.PREVIEW;
+    case 2:
+    case 3:
+      return PreviewModeString.EXTENDED_PREVIEW;
+    default:
+      throw new Error(
+        'Preview mode does not exist, options are 0 (DETAIL), 1 (PREVIEW) or 2/3 (EXTENDED_PREVIEW)',
+      );
+  }
+}
 
 export function createProcessingPayload(
   dataset: Dataset,
@@ -113,29 +137,12 @@ export function createProcessingPayload(
   if (params.downsampling !== undefined) {
     payload.input.data[0].processing.downsampling = params.downsampling;
   }
+  if (params.geometry !== undefined) {
+    payload.input.bounds.geometry = params.geometry;
+  }
 
   if (params.preview !== undefined) {
-    // WMS parameter description:
-    //   https://www.sentinel-hub.com/develop/documentation/api/preview-modes
-    // In the Processing API the values are enums:
-    //   - 0 -> DETAIL
-    //   - 1 -> PREVIEW
-    //   - 2 -> EXTENDED_PREVIEW
-    //   - 3 -> EXTENDED_PREVIEW (used, but not officially supported)
-    switch (params.preview) {
-      case 0:
-        payload.input.data[0].dataFilter.previewMode = PreviewModeString.DETAIL;
-        break;
-      case 1:
-        payload.input.data[0].dataFilter.previewMode = PreviewModeString.PREVIEW;
-        break;
-      case 2:
-      case 3:
-        payload.input.data[0].dataFilter.previewMode = PreviewModeString.EXTENDED_PREVIEW;
-        break;
-      default:
-        throw new Error('Preview mode does not exist, options are "DETAIL", "PREVIEW" or "EXTENDED_PREVIEW"');
-    }
+    payload.input.data[0].dataFilter.previewMode = convertPreviewToString(params.preview);
   }
 
   //dataProduct should not be set if evalscript is passed as parameter
@@ -162,7 +169,8 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
       'Content-Type': 'application/json',
       Accept: '*/*',
     },
-    responseType: 'blob',
+    // 'blob' responseType does not work with Node.js:
+    responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
