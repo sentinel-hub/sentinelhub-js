@@ -479,7 +479,7 @@ export const statsAndHistogramWithEvalscript = () => {
     binAmount: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
-    evalscript: btoa(`return [(4*VH)/(VV+VH)];`),
+    evalscript: `return [(4*VH)/(VV+VH)];`,
   };
 
   const perform = async () => {
