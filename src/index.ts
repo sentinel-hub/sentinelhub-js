@@ -37,6 +37,7 @@ import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
+import { ProcessingDataFusionLayer } from 'src/layer/ProcessingDataFusionLayer';
 
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
@@ -78,6 +79,7 @@ export {
   Landsat8EOCloudLayer,
   Landsat8AWSLayer,
   BYOCLayer,
+  ProcessingDataFusionLayer,
   // auth:
   setAuthToken,
   isAuthTokenSet,

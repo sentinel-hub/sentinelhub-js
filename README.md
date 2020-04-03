@@ -5,7 +5,7 @@
   - [Fetching images](#fetching-images)
   - [Searching for data](#searching-for-data)
   - [Backwards compatibility](#backwards-compatibility)
-- [Authentication for Processing API](#authentication-for-processing-api)
+  - [Authentication for Processing API](#authentication-for-processing-api)
 - [Examples](#examples)
   - [Preparation before running examples](#preparation-before-running-examples)
   - [Running examples](#running-examples)
@@ -219,7 +219,7 @@ If we already have a WMS GetMap URL, we can use it directly:
   const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
 
-# Authentication for Processing API
+## Authentication for Processing API
 
 Requests to Processing API need to be authenticated.
 Documentation about authentication is available at [Sentinel Hub documentation](https://docs.sentinel-hub.com/api/latest/#/API/authentication).
