@@ -80,3 +80,9 @@ export function parseSHInstanceId(baseUrl: string): string {
   }
   throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
 }
+
+export let debugEnabled = false;
+
+export function setDebugEnabled(value: boolean): void {
+  debugEnabled = value;
+}
