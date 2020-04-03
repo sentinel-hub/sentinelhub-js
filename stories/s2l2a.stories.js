@@ -432,11 +432,10 @@ export const statsAndHistogramWithEvalscript = () => {
     binAmount: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
-    evalscript: btoa(`
+    evalscript: `
       let ndvi = (B08 - B04) / (B08 + B04)
       return [ ndvi ]
-    
-  `),
+    `,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStatsAndHistogram(payload);

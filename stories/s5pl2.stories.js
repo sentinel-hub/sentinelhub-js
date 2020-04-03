@@ -328,11 +328,11 @@ export const statsAndHistogram = () => {
     binAmount: 10,
     geometry: bbox4326.toGeoJSON(),
     crs: CRS_EPSG4326,
-    evalscript: btoa(`
+    evalscript: `
     if (!isFinite(AER_AI_340_380)) {
       return [NaN];
     }
-    return[AER_AI_340_380];`),
+    return[AER_AI_340_380];`,
   };
 
   const perform = async () => {
