@@ -430,7 +430,6 @@ export const statsAndHistogramWithEvalscript = () => {
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
     binAmount: 10,
-    histogramType: 'EQUALFREQUENCY',
     geometry: geometry,
     crs: CRS_EPSG4326,
     evalscript: btoa(`
