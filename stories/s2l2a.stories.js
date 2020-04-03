@@ -391,7 +391,7 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const s2NdviStatsAndHistogramWithEvalscript = () => {
+export const statsAndHistogramWithEvalscript = () => {
   const layerS2L2A = new S2L2ALayer({
     instanceId,
     layerId,

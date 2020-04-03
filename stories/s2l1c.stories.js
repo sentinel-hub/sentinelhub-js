@@ -285,7 +285,7 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const s2StatsAndHistogram = () => {
+export const statsAndHistogram = () => {
   const layerS2L1C = new S2L1CLayer({
     instanceId,
     layerId,
