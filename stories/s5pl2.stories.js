@@ -312,3 +312,33 @@ export const findDatesUTC = () => {
 
   return wrapperEl;
 };
+
+export const statsAndHistogram = () => {
+  const wrapperEl = document.createElement('div');
+  const containerEl = document.createElement('pre');
+  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const layer = new S5PL2Layer({ instanceId, layerId, productType: 'NO2', maxCloudCoverPercent: 60});
+
+  const payload = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 3500,
+    binAmount: 10,
+    geometry: bbox4326.toGeoJSON(),
+    crs: CRS_EPSG4326,
+    evalscript: btoa(`
+    if (!isFinite(AER_AI_340_380)) {
+      return [NaN];
+    }
+    return[AER_AI_340_380];`),
+  };
+
+  const perform = async () => {
+    const stats = await layer.getStatsAndHistogram(payload);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+  return wrapperEl;
+};
