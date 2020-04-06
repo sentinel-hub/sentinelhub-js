@@ -391,10 +391,10 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const statsV3Script = () => {
+export const stats = () => {
   const layerS2L2A = new S2L2ALayer({
     instanceId,
-    layerId: 'S2L2A-EVAL',
+    layerId,
     maxCloudCoverPercent: 20,
   });
 
@@ -447,6 +447,10 @@ export const statsWithEvalscript = () => {
     instanceId,
     layerId,
     maxCloudCoverPercent: 20,
+    evalscript: `
+    let ndvi = (B08 - B04) / (B08 + B04)
+    return [ ndvi ]
+  `,
   });
 
   const geometry = {
@@ -483,10 +487,6 @@ export const statsWithEvalscript = () => {
     bins: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
-    evalscript: `
-      let ndvi = (B08 - B04) / (B08 + B04)
-      return [ ndvi ]
-    `,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);

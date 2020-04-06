@@ -285,7 +285,11 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new S3OLCILayer({ instanceId, layerId });
+  const layer = new S3OLCILayer({
+    instanceId,
+    layerId,
+    evalscript: `return [B18]`,
+  });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -294,10 +298,6 @@ export const stats = () => {
     bins: 10,
     geometry: bbox4326.toGeoJSON(),
     crs: CRS_EPSG4326,
-    evalscript: `
-    const OTCI = (B12 - B11) / (B11 - B10)
-    return [OTCI]
-    `
   };
 
   const perform = async () => {

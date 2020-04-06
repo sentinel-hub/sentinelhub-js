@@ -448,6 +448,7 @@ export const statsWithEvalscript = () => {
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
     orbitDirection: OrbitDirection.ASCENDING,
+    evalscript: `return [(4*VH)/(VV+VH)];`,
   });
 
   const geometry = {
@@ -479,7 +480,6 @@ export const statsWithEvalscript = () => {
     bins: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
-    evalscript: `return [(4*VH)/(VV+VH)];`,
   };
 
   const perform = async () => {

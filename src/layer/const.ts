@@ -108,7 +108,6 @@ export type GetStatsParams = {
   resolution: number;
   geometry: Polygon;
   bins?: number;
-  evalscript?: string;
 };
 
 export type FisPayload = {
