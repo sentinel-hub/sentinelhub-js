@@ -182,7 +182,7 @@ We can always use layer to search for data availability:
 
 ## Getting basic statistics and histogram
 
-Getting basic statistics(mean, min, max, standard deviation) and a histogram for a geometry(Polygon or MultiPolygon).
+Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).
 The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
 
 ```javascript

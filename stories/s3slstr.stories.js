@@ -274,7 +274,7 @@ export const statsAndHistogram = () => {
 
   const layer = new S3SLSTRLayer({ instanceId, layerId });
 
-  const payload = {
+  const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 350,
@@ -287,7 +287,7 @@ export const statsAndHistogram = () => {
   };
 
   const perform = async () => {
-    const stats = await layer.getStatsAndHistogram(payload);
+    const stats = await layer.getStatsAndHistogram(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

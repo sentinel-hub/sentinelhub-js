@@ -257,9 +257,9 @@ export const statsAndHistogram = () => {
   wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId, maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLayer({ instanceId, layerId:'L8-NDVI', maxCloudCoverPercent: 100 });
 
-  const payload = {
+  const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 350,
@@ -269,7 +269,7 @@ export const statsAndHistogram = () => {
   };
 
   const perform = async () => {
-    const stats = await layer.getStatsAndHistogram(payload);
+    const stats = await layer.getStatsAndHistogram(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
