@@ -382,10 +382,10 @@ export const supportsProcessingAPI = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogram = () => {
+export const stats = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
+  wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const layer = new S1GRDEOCloudLayer({
@@ -428,7 +428,7 @@ export const statsAndHistogram = () => {
   };
 
   const perform = async () => {
-    const stats = await layer.getStatsAndHistogram(params);
+    const stats = await layer.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
@@ -436,10 +436,10 @@ export const statsAndHistogram = () => {
 };
 
 
-export const statsAndHistogramWithEvalscript = () => {
+export const statsWithEvalscript = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
+  wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const layer = new S1GRDEOCloudLayer({
@@ -483,7 +483,7 @@ export const statsAndHistogramWithEvalscript = () => {
   };
 
   const perform = async () => {
-    const stats = await layer.getStatsAndHistogram(params);
+    const stats = await layer.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

@@ -51,7 +51,7 @@ export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1O
     };
   }
 
-  protected getStatsAndHistogramAdditionalParameters(): Record<string, any> {
+  protected getStatsAdditionalParameters(): Record<string, any> {
     return {
       maxcc: this.maxCloudCoverPercent,
     };

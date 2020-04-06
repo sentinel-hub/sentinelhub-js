@@ -252,12 +252,12 @@ export const findDatesUTCEPSG3857 = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogram = () => {
+export const stats = () => {
   const maxCloudCoverPercent = 60;
   const layer = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStatsAndHistogram</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats</h2>`;
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -274,7 +274,7 @@ export const statsAndHistogram = () => {
       geometry: bbox.toGeoJSON(),
       crs: bbox.crs,
     };
-    const stats = await layer.getStatsAndHistogram(payload);
+    const stats = await layer.getStats(payload);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

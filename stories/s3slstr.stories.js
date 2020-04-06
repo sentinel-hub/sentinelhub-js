@@ -266,10 +266,10 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogram = () => {
+export const stats = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStatsAndHistogram</h2>';
+  wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const layer = new S3SLSTRLayer({ instanceId, layerId });
@@ -287,7 +287,7 @@ export const statsAndHistogram = () => {
   };
 
   const perform = async () => {
-    const stats = await layer.getStatsAndHistogram(params);
+    const stats = await layer.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

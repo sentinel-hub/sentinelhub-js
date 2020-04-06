@@ -101,7 +101,7 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://creodias.sentinel-hub.com/',
 ];
 
-export type GetStatsAndHistogramParams = {
+export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
   crs: CRS;
@@ -148,6 +148,6 @@ export type StatsPerChannel = {
   };
 };
 
-export type StatsAndHistogram = {
+export type GetStats = {
   [key: string]: [StatsPerChannel];
 };

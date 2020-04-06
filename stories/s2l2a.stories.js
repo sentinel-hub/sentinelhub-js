@@ -391,7 +391,7 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogramV3Script = () => {
+export const statsV3Script = () => {
   const layerS2L2A = new S2L2ALayer({
     instanceId,
     layerId: 'S2L2A-EVAL',
@@ -422,7 +422,7 @@ export const statsAndHistogramV3Script = () => {
 
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStatsAndHistogram for S2L1C;</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const params = {
@@ -434,7 +434,7 @@ export const statsAndHistogramV3Script = () => {
     crs: CRS_EPSG4326,
   };
   const perform = async () => {
-    const stats = await layerS2L2A.getStatsAndHistogram(params);
+    const stats = await layerS2L2A.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
@@ -442,7 +442,7 @@ export const statsAndHistogramV3Script = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogramWithEvalscript = () => {
+export const statsWithEvalscript = () => {
   const layerS2L2A = new S2L2ALayer({
     instanceId,
     layerId,
@@ -473,7 +473,7 @@ export const statsAndHistogramWithEvalscript = () => {
 
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStatsAndHistogram for S2L1C;</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const params = {
@@ -489,7 +489,7 @@ export const statsAndHistogramWithEvalscript = () => {
     `,
   };
   const perform = async () => {
-    const stats = await layerS2L2A.getStatsAndHistogram(params);
+    const stats = await layerS2L2A.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
