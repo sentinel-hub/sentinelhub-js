@@ -125,8 +125,8 @@ export type FisPayload = {
 
 export enum HistogramType {
   EQUALFREQUENCY = 'EQUALFREQUENCY',
-  EQUIDISTANT = 'equidistant',
-  STREAMING = 'streaming',
+  // EQUIDISTANT = 'EQUIDISTANT',
+  // STREAMING = 'STREAMING',
 }
 
 export type StatsPerChannel = {
