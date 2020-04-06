@@ -429,7 +429,7 @@ export const statsV3Script = () => {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
-    binAmount: 10,
+    bins: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
   };
@@ -480,7 +480,7 @@ export const statsWithEvalscript = () => {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
-    binAmount: 10,
+    bins: 10,
     geometry: geometry,
     crs: CRS_EPSG4326,
     evalscript: `

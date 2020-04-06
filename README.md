@@ -198,7 +198,7 @@ const stats = await layerS2L2A.getStats({
   fromTime: fromTime, 
   toTime: toTime, 
   resolution: resolution,
-  binsAmount:10,
+  bins:10,
 });
 ```
 
