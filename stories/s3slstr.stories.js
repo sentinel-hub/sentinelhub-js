@@ -278,7 +278,7 @@ export const stats = () => {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 350,
-    binAmount: 10,
+    bins: 10,
     geometry: bbox4326.toGeoJSON(),
     crs: CRS_EPSG4326,
     evalscript: `

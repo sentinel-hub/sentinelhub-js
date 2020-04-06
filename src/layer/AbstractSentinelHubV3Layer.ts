@@ -273,7 +273,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         .utc(params.toTime)
         .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
       resolution: undefined,
-      bins: params.binAmount || 5,
+      bins: params.bins || 5,
       type: HistogramType.EQUALFREQUENCY,
       ...this.getStatsAdditionalParameters(),
     };

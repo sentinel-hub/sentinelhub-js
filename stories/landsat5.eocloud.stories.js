@@ -270,7 +270,7 @@ export const stats = () => {
       fromTime: fromTime,
       toTime: toTime,
       resolution: 100,
-      binAmount: 10,
+      bins: 10,
       geometry: bbox.toGeoJSON(),
       crs: bbox.crs,
     };

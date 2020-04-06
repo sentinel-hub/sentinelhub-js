@@ -107,7 +107,7 @@ export type GetStatsParams = {
   crs: CRS;
   resolution: number;
   geometry: Polygon;
-  binAmount?: number;
+  bins?: number;
   evalscript?: string;
 };
 
