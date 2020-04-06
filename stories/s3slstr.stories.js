@@ -272,7 +272,11 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new S3SLSTRLayer({ instanceId, layerId });
+  const layer = new S3SLSTRLayer({
+    instanceId,
+    layerId,
+    evalscript: `return [F2-273]`,
+  });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -281,9 +285,6 @@ export const stats = () => {
     bins: 10,
     geometry: bbox4326.toGeoJSON(),
     crs: CRS_EPSG4326,
-    evalscript: `
-    return [F2-273]
-    `,
   };
 
   const perform = async () => {

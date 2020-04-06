@@ -188,8 +188,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     } else {
       payload.resolution = params.resolution;
     }
-    if (params.evalscript) {
-      payload.evalscript = btoa(params.evalscript);
+    if (this.evalscript) {
+      payload.evalscript = btoa(this.evalscript);
       payload.evalsource = this.getEvalsource();
     }
 

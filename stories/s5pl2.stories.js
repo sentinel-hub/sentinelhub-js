@@ -319,7 +319,16 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new S5PL2Layer({ instanceId, layerId, productType: 'NO2', maxCloudCoverPercent: 60});
+  const layer = new S5PL2Layer({
+    instanceId,
+    layerId,
+    productType: 'NO2',
+    maxCloudCoverPercent: 60,
+    evalscript: `if (!isFinite(AER_AI_340_380)) {
+    return [NaN];
+  }
+  return[AER_AI_340_380];`,
+  });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -328,11 +337,6 @@ export const stats = () => {
     bins: 10,
     geometry: bbox4326.toGeoJSON(),
     crs: CRS_EPSG4326,
-    evalscript: `
-    if (!isFinite(AER_AI_340_380)) {
-      return [NaN];
-    }
-    return[AER_AI_340_380];`,
   };
 
   const perform = async () => {
