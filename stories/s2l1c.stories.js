@@ -285,7 +285,7 @@ export const findDatesUTC = () => {
   return wrapperEl;
 };
 
-export const statsAndHistogram = () => {
+export const stats = () => {
   const layerS2L1C = new S2L1CLayer({
     instanceId,
     layerId,
@@ -316,10 +316,10 @@ export const statsAndHistogram = () => {
 
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStatsAndHistogram for S2L1C;</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const payload = {
+  const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
@@ -328,7 +328,7 @@ export const statsAndHistogram = () => {
     crs: CRS_EPSG4326,
   };
   const perform = async () => {
-    const stats = await layerS2L1C.getStatsAndHistogram(payload);
+    const stats = await layerS2L1C.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

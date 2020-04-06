@@ -11,8 +11,8 @@ import {
   StatsPerChannel,
   HistogramType,
   FisPayload,
-  GetStatsAndHistogramParams,
-  StatsAndHistogram,
+  GetStatsParams,
+  GetStats,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -231,7 +231,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected getStatsAndHistogramAdditionalParameters(): Record<string, any> {
+  protected getStatsAdditionalParameters(): Record<string, any> {
     return {};
   }
 
@@ -251,7 +251,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 
-  public async getStatsAndHistogram(params: GetStatsAndHistogramParams): Promise<StatsAndHistogram> {
+  public async getStats(params: GetStatsParams): Promise<GetStats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -275,7 +275,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       resolution: undefined,
       bins: params.binAmount || 5,
       type: HistogramType.EQUALFREQUENCY,
-      ...this.getStatsAndHistogramAdditionalParameters(),
+      ...this.getStatsAdditionalParameters(),
     };
     // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
     if (params.crs.authId === CRS_EPSG4326.authId) {

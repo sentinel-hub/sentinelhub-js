@@ -129,7 +129,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return result;
   }
 
-  protected getStatsAndHistogramAdditionalParameters(): Record<string, any> {
+  protected getStatsAdditionalParameters(): Record<string, any> {
     return {
       maxcc: this.maxCloudCoverPercent,
     };

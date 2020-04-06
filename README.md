@@ -192,7 +192,7 @@ The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
     maxCloudCoverPercent: 100,
   });
 
-const stats = await layerS2L2A.getStatsAndHistogram({
+const stats = await layerS2L2A.getStats({
   geometry: geometry, 
   crs: CRS_EPSG4326, 
   fromTime: fromTime, 
