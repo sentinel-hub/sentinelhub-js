@@ -8,7 +8,6 @@ import {
   GetMapParams,
   ApiType,
   PaginatedTiles,
-  StatsPerChannel,
   HistogramType,
   FisPayload,
   GetStatsParams,
@@ -290,7 +289,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
     // convert date strings to Date objects
     for (let channel in data) {
-      data[channel] = data[channel].map((dailyStats: StatsPerChannel) => ({
+      data[channel] = data[channel].map((dailyStats: any) => ({
         ...dailyStats,
         date: new Date(dailyStats.date),
       }));
