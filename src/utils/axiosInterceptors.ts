@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 
-import { debugEnabled } from 'src/layer/utils';
+import { isDebugEnabled } from 'src/utils/debug';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
@@ -26,7 +26,7 @@ export const registerAxiosCacheRetryInterceptors = (): any => {
 };
 
 const logCurl = async (config: any): Promise<any> => {
-  if (debugEnabled) {
+  if (isDebugEnabled()) {
     // Headers are not represented in a very straighforward way in axios, so we must transform
     // them. This is the contents of axios' config.headers:
     //   {
