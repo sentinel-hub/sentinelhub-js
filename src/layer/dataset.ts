@@ -149,7 +149,7 @@ export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(1999, 7 - 1, 3, 19, 16, 17)), // 1999-07-03T19:16:17.163
-  maxDate: new Date(Date.UTC(2017, 1 - 1, 15, 23, 49, 14)), // 2017-01-15T23:49:14.495
+  maxDate: new Date(Date.UTC(2017, 1 - 1, 15, 23, 49, 15)), // 2017-01-15T23:49:14.495
 };
 
 export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
