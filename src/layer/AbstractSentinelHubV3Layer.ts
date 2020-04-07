@@ -283,7 +283,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.resolution = params.resolution;
     }
     if (this.evalscript) {
-      payload.evalscript = btoa(this.evalscript);
+      if (typeof window !== 'undefined' && window.btoa) {
+        payload.evalscript = btoa(this.evalscript);
+      } else {
+        payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+      }
     }
 
     const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
