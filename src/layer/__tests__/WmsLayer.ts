@@ -75,7 +75,7 @@ test('WmsLayer.getMap makes an appropriate request', () => {
     height: '512',
   });
   expect(axiosParams).toEqual({
-    responseType: 'blob',
+    responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
   });
 });
