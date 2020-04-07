@@ -12,6 +12,7 @@ const {
   BBox,
   MimeTypes,
   ApiType,
+  setDebugEnabled,
 } = require('../../dist/sentinelHub.cjs');
 
 function printOut(title, value) {
@@ -156,12 +157,17 @@ async function run() {
   );
   printOut('flyovers for S1 GRD:', flyoversS1GRD);
 
+  // from now on, write curl command of each request to console:
+  setDebugEnabled(true);
+
   const datesS1GRD = await layerS1.findDatesUTC(
     getMapParams.bbox,
     getMapParams.fromTime,
     getMapParams.toTime,
   );
   printOut('dates for S1 GRD', datesS1GRD);
+
+  setDebugEnabled(false);
 
   // finally, display the image:
   const imageUrl = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
