@@ -10,7 +10,6 @@ import {
   PaginatedTiles,
   GetStatsParams,
   GetStats,
-  StatsPerChannel,
   HistogramType,
   FisPayload,
 } from 'src/layer/const';
@@ -198,7 +197,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     });
     // convert date strings to Date objects
     for (let channel in data) {
-      data[channel] = data[channel].map((dailyStats: StatsPerChannel) => ({
+      data[channel] = data[channel].map((dailyStats: any) => ({
         ...dailyStats,
         date: new Date(dailyStats.date),
       }));
