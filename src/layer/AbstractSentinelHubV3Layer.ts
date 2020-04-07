@@ -261,7 +261,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('Parameter "resolution" needs to be provided');
     }
     if (!params.fromTime || !params.toTime) {
-      throw new Error('Parameters "fromTime" and "toTime" needs to be provided');
+      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
     }
 
     const payload: FisPayload = {
