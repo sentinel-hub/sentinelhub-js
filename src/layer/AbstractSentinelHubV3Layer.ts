@@ -289,11 +289,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
     const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
     // convert date strings to Date objects
-    Object.keys(data).forEach(key => {
-      data[key].forEach((dailyStats: StatsPerChannel) => {
-        dailyStats.date = new Date(dailyStats.date);
-      });
-    });
+    for (let channel in data) {
+      data[channel] = data[channel].map((dailyStats: StatsPerChannel) => ({
+        ...dailyStats,
+        date: new Date(dailyStats.date),
+      }));
+    }
     return data;
   }
 }
