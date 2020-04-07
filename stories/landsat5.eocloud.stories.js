@@ -266,7 +266,7 @@ export const stats = () => {
   const toTime = new Date(Date.UTC(2000, 3 - 1, 15, 23, 59, 59));
 
   const perform = async () => {
-    const payload = {
+    const params = {
       fromTime: fromTime,
       toTime: toTime,
       resolution: 100,
@@ -274,7 +274,7 @@ export const stats = () => {
       geometry: bbox.toGeoJSON(),
       crs: bbox.crs,
     };
-    const stats = await layer.getStats(payload);
+    const stats = await layer.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
