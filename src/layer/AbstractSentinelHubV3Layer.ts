@@ -235,4 +235,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
+
+  protected async convertEvalscriptToV3(evalscript: string): Promise<string> {
+    const authToken = getAuthToken();
+    const url = `https://services.sentinel-hub.com/api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+    const requestConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/ecmascript',
+      },
+      useCache: true,
+      responseType: 'text',
+    };
+    const res = await axios.post(url, evalscript, requestConfig);
+    return res.data;
+  }
 }
