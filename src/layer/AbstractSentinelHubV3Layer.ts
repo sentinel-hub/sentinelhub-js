@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
@@ -233,16 +233,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       ...this.getFindDatesUTCAdditionalParameters(),
     };
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
-    const result = response.data.map((date: string) => moment.utc(date).toDate());
+    const found: Moment[] = response.data.map((date: string) => moment.utc(date));
 
-    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
-    // Let's reverse it so that we return most recent results first:
-    if (result.length <= 1) {
-      return result;
+    if (found.length > 1) {
+      // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
+      // Let's sort the data so that we always return most recent results first:
+      found.sort((a, b) => b.unix() - a.unix());
     }
-    if (moment.utc(result[0]).isBefore(moment.utc(result[result.length - 1]))) {
-      result.reverse();
-    }
-    return result;
+    return found.map(m => m.toDate());
   }
 }
