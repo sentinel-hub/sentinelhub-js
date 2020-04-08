@@ -100,8 +100,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (!this.dataset) {
         throw new Error('This layer does not support Processing API (unknown dataset)');
       }
-      if (this.evalscriptUrl) {
-        throw new Error('EvalscriptUrl is not supported with Processing API');
+      if (this.evalscriptUrl && !this.evalscript) {
+        const response = await axios.get(this.evalscriptUrl);
+        const evalscriptV3 = await this.convertEvalscriptToV3(response.data);
+        this.evalscript = evalscriptV3;
       }
       if (!this.evalscript && !this.dataProduct) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3();
