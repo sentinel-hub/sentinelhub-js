@@ -233,6 +233,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       ...this.getFindDatesUTCAdditionalParameters(),
     };
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
-    return response.data.map((date: string) => moment.utc(date).toDate());
+    const result = response.data.map((date: string) => moment.utc(date).toDate());
+
+    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
+    // Let's reverse it so that we return most recent results first:
+    if (result.length <= 1) {
+      return result;
+    }
+    if (moment.utc(result[0]).isBefore(moment.utc(result[result.length - 1]))) {
+      result.reverse();
+    }
+    return result;
   }
 }
