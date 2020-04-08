@@ -128,7 +128,7 @@ export enum HistogramType {
   // STREAMING = 'STREAMING',
 }
 
-export type StatsPerChannel = {
+export type DailyChannelStats = {
   date: Date;
   basicStats: {
     min: number;
@@ -148,5 +148,5 @@ export type StatsPerChannel = {
 };
 
 export type GetStats = {
-  [key: string]: [StatsPerChannel];
+  [key: string]: [DailyChannelStats];
 };
