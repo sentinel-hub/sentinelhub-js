@@ -1,6 +1,14 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, PreviewMode } from '../dist/sentinelHub.esm';
+import {
+  S2L1CLayer,
+  CRS_EPSG4326,
+  CRS_EPSG3857,
+  BBox,
+  MimeTypes,
+  ApiType,
+  PreviewMode,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -13,6 +21,7 @@ if (!process.env.S2L1C_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S2L1C_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
+const bbox3857 = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 
 export default {
   title: 'Sentinel 2 L1C',
@@ -325,7 +334,34 @@ export const stats = () => {
     resolution: 10,
     bins: 10,
     geometry: geometry,
-    crs: CRS_EPSG4326,
+  };
+  const perform = async () => {
+    const stats = await layerS2L1C.getStats(params);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const statsBBOX3857 = () => {
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent: 20,
+  });
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const params = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 200,
+    bins: 10,
+    geometry: bbox3857.toGeoJSON(),
   };
   const perform = async () => {
     const stats = await layerS2L1C.getStats(params);

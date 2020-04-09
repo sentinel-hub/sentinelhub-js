@@ -15,7 +15,7 @@ import {
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { CRS_EPSG4326 } from 'src/crs';
+import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -159,9 +159,6 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
-    if (!params.crs) {
-      throw new Error('Parameter "crs" needs to be provided');
-    }
     if (!params.resolution) {
       throw new Error('Parameter "resolution" needs to be provided');
     }
@@ -171,7 +168,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const payload: FisPayload = {
       layer: this.layerId,
-      crs: params.crs.authId,
+      crs: CRS_EPSG4326.authId,
       geometry: WKT.convert(params.geometry),
       time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
         .utc(params.toTime)
@@ -181,8 +178,13 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       type: HistogramType.EQUALFREQUENCY,
       ...this.getStatsAdditionalParameters(),
     };
+
+    if (params.geometry.crs) {
+      const crsUrnName = params.geometry.crs.properties.name;
+      payload.crs = findCrsFromUrn(crsUrnName).authId;
+    }
     // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
-    if (params.crs.authId === CRS_EPSG4326.authId) {
+    if (payload.crs === CRS_EPSG4326.authId) {
       payload.resolution = params.resolution + 'm';
     } else {
       payload.resolution = params.resolution;
