@@ -284,7 +284,6 @@ export const stats = () => {
     resolution: 350,
     bins: 10,
     geometry: bbox4326.toGeoJSON(),
-    crs: CRS_EPSG4326,
   };
 
   const perform = async () => {

@@ -1,4 +1,5 @@
 import { CRS } from 'src/crs';
+import { Polygon } from '@turf/helpers';
 
 export class BBox {
   public crs: CRS;
@@ -23,7 +24,7 @@ export class BBox {
 
   // Note that Turf's Polygon type (which is basically what we are returning) doesn't
   // allow 'crs' property, so we must return type :any.
-  public toGeoJSON(): any {
+  public toGeoJSON(): Polygon {
     return {
       type: 'Polygon',
       crs: { type: 'name', properties: { name: this.crs.urn } },

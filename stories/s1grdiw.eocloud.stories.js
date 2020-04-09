@@ -424,7 +424,6 @@ export const stats = () => {
     resolution: 10,
     bins: 10,
     geometry: geometry,
-    crs: CRS_EPSG4326,
   };
 
   const perform = async () => {
@@ -434,7 +433,6 @@ export const stats = () => {
   perform().then(() => {});
   return wrapperEl;
 };
-
 
 export const statsWithEvalscript = () => {
   const wrapperEl = document.createElement('div');
@@ -479,7 +477,6 @@ export const statsWithEvalscript = () => {
     resolution: 10,
     bins: 10,
     geometry: geometry,
-    crs: CRS_EPSG4326,
   };
 
   const perform = async () => {

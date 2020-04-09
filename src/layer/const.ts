@@ -1,7 +1,7 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
-import { CRS_IDS, CRS } from 'src/crs';
+import { CRS_IDS } from 'src/crs';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -104,7 +104,6 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
 export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
-  crs: CRS;
   resolution: number;
   geometry: Polygon;
   bins?: number;

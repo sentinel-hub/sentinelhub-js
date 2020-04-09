@@ -418,6 +418,12 @@ export const stats = () => {
         [38.443522453308105, 29.97140509632656],
       ],
     ],
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:EPSG::4326',
+      },
+    },
   };
 
   const containerEl = document.createElement('pre');
@@ -431,7 +437,6 @@ export const stats = () => {
     resolution: 10,
     bins: 10,
     geometry: geometry,
-    crs: CRS_EPSG4326,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
@@ -486,7 +491,6 @@ export const statsWithEvalscript = () => {
     resolution: 10,
     bins: 10,
     geometry: geometry,
-    crs: CRS_EPSG4326,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
