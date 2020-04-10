@@ -8,7 +8,10 @@ export type CRS = {
 
 export type CRS_IDS = 'EPSG:3857' | 'CRS:84' | 'EPSG:4326';
 
-export type CRS_URN = 'urn:ogc:def:crs:EPSG::3857' | 'urn:ogc:def:crs:EPSG::4326';
+export type CRS_URN =
+  | 'urn:ogc:def:crs:EPSG::3857'
+  | 'urn:ogc:def:crs:EPSG::4326'
+  | 'urn:ogc:def:crs:OGC:1.3:CRS84';
 
 /**
  * The most common CRS for online maps, used by almost all free and commercial tile providers. Uses Spherical Mercator projection.
@@ -52,8 +55,14 @@ declare module '@turf/helpers' {
 }
 
 export function findCrsFromUrn(urn: CRS_URN): CRS {
-  const selectedCrsKey = Object.keys(SUPPORTED_CRS_OBJ).find(
-    (key: CRS_IDS) => SUPPORTED_CRS_OBJ[key].urn === urn,
-  );
-  return SUPPORTED_CRS_OBJ[selectedCrsKey];
+  switch (urn) {
+    case 'urn:ogc:def:crs:EPSG::3857':
+      return CRS_EPSG3857;
+    case 'urn:ogc:def:crs:EPSG::4326':
+      return CRS_EPSG4326;
+    case 'urn:ogc:def:crs:OGC:1.3:CRS84':
+      return CRS_WGS84;
+    default:
+      throw new Error('CRS not found');
+  }
 }

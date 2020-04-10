@@ -321,6 +321,12 @@ export const stats = () => {
         [38.443522453308105, 29.97140509632656],
       ],
     ],
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:OGC:1.3:CRS84',
+      },
+    },
   };
 
   const containerEl = document.createElement('pre');
