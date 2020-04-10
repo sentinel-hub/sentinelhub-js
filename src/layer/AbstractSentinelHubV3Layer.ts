@@ -102,7 +102,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
       if (this.evalscriptUrl && !this.evalscript) {
         const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
-        const evalscriptV3 = await this.convertEvalscriptToV3(response.data);
+        let evalscriptV3;
+        //Check version of fetched evalscript by checking if first line starts with //VERSION=3
+        if (response.data.startsWith('//VERSION=3')) {
+          evalscriptV3 = response.data;
+        } else {
+          evalscriptV3 = await this.convertEvalscriptToV3(response.data);
+        }
         this.evalscript = evalscriptV3;
       }
       if (!this.evalscript && !this.dataProduct) {
