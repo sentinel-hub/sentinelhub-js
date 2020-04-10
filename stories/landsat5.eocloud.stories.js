@@ -272,7 +272,6 @@ export const stats = () => {
       resolution: 100,
       bins: 10,
       geometry: bbox.toGeoJSON(),
-      crs: bbox.crs,
     };
     const stats = await layer.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
