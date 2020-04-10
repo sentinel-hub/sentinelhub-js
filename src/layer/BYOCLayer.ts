@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
@@ -119,22 +119,5 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     };
 
     return result;
-  }
-
-  public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    if (!this.dataset.findDatesUTCUrl) {
-      throw new Error('This dataset does not support searching for dates');
-    }
-
-    const additionalFindDatesUTCParameters = await this.getFindDatesUTCAdditionalParameters();
-    const bboxPolygon = bbox.toGeoJSON();
-    const payload: any = {
-      queryArea: bboxPolygon,
-      from: fromTime.toISOString(),
-      to: toTime.toISOString(),
-      ...additionalFindDatesUTCParameters,
-    };
-    const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
-    return response.data.map((date: string) => moment.utc(date).toDate());
   }
 }

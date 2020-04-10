@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 
+import { isDebugEnabled } from 'src/utils/debug';
+
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
 const EXPIRES_IN_SECONDS = 60 * 30;
@@ -18,9 +20,72 @@ declare module 'axios' {
 
 export const registerAxiosCacheRetryInterceptors = (): any => {
   findAndDeleteExpiredCachedItems();
+  axios.interceptors.request.use(logCurl, error => Promise.reject(error));
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
   axios.interceptors.response.use(saveCacheResponse, error => retryRequests(error));
 };
+
+const logCurl = async (config: any): Promise<any> => {
+  if (isDebugEnabled()) {
+    // Headers are not represented in a very straighforward way in axios, so we must transform
+    // them. This is the contents of axios' config.headers:
+    //   {
+    //     common: { Accept: 'application/json, text/plain, */*' },
+    //     delete: {},
+    //     get: {},
+    //     head: {},
+    //     post: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //     put: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //     patch: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    //     Authorization: 'Bearer eyJra...'
+    //   },
+    let headers = {
+      ...config.headers.common,
+      ...config.headers[config.method],
+    };
+    const addedHeadersKeys = Object.keys(config.headers).filter(k => typeof config.headers[k] === 'string');
+    addedHeadersKeys.forEach(k => (headers[k] = config.headers[k]));
+
+    // findDatesUTC on S1GRDAWSEULayer doesn't specify JSON Content-Type, but the request still works as if it was specified. On
+    // the other hand, when requesting auth token, we use Content-Type 'application/x-www-form-urlencoded'. This hack updates a
+    // Content-Type header to JSON whenever data is not a string:
+    if (typeof config.data !== 'string') {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    // we sometimes get both 'Content-Type' and 'content-type', making /oauth/token/ endpoint complain
+    let lowercaseHeaders: Record<string, string> = {};
+    for (let k in headers) {
+      lowercaseHeaders[k.toLowerCase()] = headers[k];
+    }
+
+    console.debug(
+      `${'*'.repeat(30)}\n${curlify(
+        config.url,
+        config.method.toUpperCase(),
+        config.data,
+        lowercaseHeaders,
+      )}\n\n`,
+    );
+  }
+  return config;
+};
+
+function curlify(
+  url: string,
+  method: string,
+  payload: any | null = null,
+  headers: Record<string, string> = {},
+): string {
+  let curl = `curl -X ${method} '${url}'`;
+  for (let h in headers) {
+    curl += ` -H '${h}: ${headers[h]}'`;
+  }
+  if (payload) {
+    curl += ` -d '${typeof payload === 'string' ? payload : JSON.stringify(payload)}'`;
+  }
+  return curl;
+}
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
   if (!(request && request.useCache)) {
