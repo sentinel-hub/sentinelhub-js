@@ -231,6 +231,95 @@ export const GetMapProcessingWithGeometryPolygon = () => {
   return wrapperEl;
 };
 
+export const GetMapProcessingEvalscripturl = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A by setting evalscriptUrl</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      evalscriptUrl:
+        'https://raw.githubusercontent.com/sentinel-hub/custom-scripts/master/sentinel-2/ulyssys_water_quality_viewer/src/script.js',
+    });
+
+    const getMapParams = {
+      bbox: new BBox(
+        CRS_EPSG4326,
+        17.416763305664066,
+        46.6560347296143,
+        18.06289672851563,
+        47.102849101370325,
+      ),
+      fromTime: new Date(Date.UTC(2019, 9 - 1, 5, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2019, 9 - 1, 5, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapProcessingEvalscripturlVersion2 = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>GetMap with Processing for Sentinel-2 L2A by setting evalscriptUrl with version2 script for ndwi</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      evalscriptUrl:
+        'https://gist.githubusercontent.com/dgostencnik/49a8620816d47d75a2bb8433eea03984/raw/6a478bc7d6e898f2720385738fb38889424f4483/s2-ndwi-v2',
+    });
+
+    const getMapParams = {
+      bbox: new BBox(
+        CRS_EPSG4326,
+        17.416763305664066,
+        46.6560347296143,
+        18.06289672851563,
+        47.102849101370325,
+      ),
+      fromTime: new Date(Date.UTC(2019, 9 - 1, 5, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2019, 9 - 1, 5, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const GetMapWMSMaxCC20vs60 = () => {
   const layerS2L2A20 = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 20 });
   const layerS2L2A60 = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
