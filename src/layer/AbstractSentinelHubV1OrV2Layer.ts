@@ -115,7 +115,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     };
   }
 
-  protected getFindDatesUTCAdditionalParameters(): Record<string, any> {
+  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
     return {};
   }
 
@@ -128,7 +128,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     const params = {
       timefrom: fromTime.toISOString(),
       timeto: toTime.toISOString(),
-      ...this.getFindDatesUTCAdditionalParameters(),
+      ...(await this.getFindDatesUTCAdditionalParameters()),
     };
 
     const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;

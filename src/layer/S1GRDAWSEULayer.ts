@@ -161,7 +161,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected getFindDatesUTCAdditionalParameters(): Record<string, any> {
+  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,
