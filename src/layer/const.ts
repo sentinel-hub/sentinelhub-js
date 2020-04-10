@@ -147,5 +147,5 @@ export type DailyChannelStats = {
 };
 
 export type GetStats = {
-  [key: string]: [DailyChannelStats];
+  [key: string]: DailyChannelStats[];
 };
