@@ -6,6 +6,7 @@
   - [Searching for data](#searching-for-data)
   - [Backwards compatibility](#backwards-compatibility)
   - [Authentication for Processing API](#authentication-for-processing-api)
+  - [Debugging](#debugging)
 - [Examples](#examples)
   - [Preparation before running examples](#preparation-before-running-examples)
   - [Running examples](#running-examples)
@@ -238,6 +239,20 @@ const clientSecret = /* OAuth client's secret, best to put it in .env file and u
 const authToken = await requestAuthToken(clientId, clientSecret);
 setAuthToken(authToken);
 ```
+
+## Debugging
+
+This library is an abstraction layer that provides nice interface for accessing the underlying services, which simplifies development - but when requests fail, it is sometimes difficult to understand why. To enable easier debugging, `setDebugEnabled` can be used:
+
+```javascript
+import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
+
+setDebugEnabled(true);
+// ... failing operation
+setDebugEnabled(false);
+```
+
+While debug mode is enabled, library will output any request it makes (even if the response comes from cache) to console in the form of a `curl` command.
 
 # Examples
 This project contains some examples to demonstrate how the library is used.

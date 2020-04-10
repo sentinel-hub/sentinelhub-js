@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 import { BBox } from 'src/bbox';
 import { GetMapParams, ApiType } from 'src/layer/const';
@@ -82,8 +82,10 @@ export class WmsLayer extends AbstractLayer {
       }
     }
 
-    return allTimesMomentUTC
-      .filter(t => t.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'))
-      .map(t => t.toDate());
+    const found: Moment[] = allTimesMomentUTC.filter(t =>
+      t.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'),
+    );
+    found.sort((a, b) => b.unix() - a.unix());
+    return found.map(m => m.toDate());
   }
 }

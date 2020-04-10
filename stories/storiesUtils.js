@@ -1,4 +1,7 @@
-import { setAuthToken, isAuthTokenSet, requestAuthToken } from '../dist/sentinelHub.esm';
+import { setAuthToken, isAuthTokenSet, requestAuthToken, setDebugEnabled } from '../dist/sentinelHub.esm';
+
+// in storybooks, always display curl commands in console:
+setDebugEnabled(true);
 
 export function renderTilesList(containerEl, list) {
   list.forEach(tile => {

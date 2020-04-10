@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
@@ -226,7 +226,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 
-  protected getFindDatesUTCAdditionalParameters(): Record<string, any> {
+  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
     return {};
   }
 
@@ -244,10 +244,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
       to: toTime.toISOString(),
-      ...this.getFindDatesUTCAdditionalParameters(),
+      ...(await this.getFindDatesUTCAdditionalParameters()),
     };
     const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
-    return response.data.map((date: string) => moment.utc(date).toDate());
+    const found: Moment[] = response.data.map((date: string) => moment.utc(date));
+
+    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
+    // Let's sort the data so that we always return most recent results first:
+    found.sort((a, b) => b.unix() - a.unix());
+    return found.map(m => m.toDate());
   }
 
   public async getStats(params: GetStatsParams): Promise<GetStats> {
