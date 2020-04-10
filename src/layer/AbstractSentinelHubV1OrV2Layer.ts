@@ -181,9 +181,6 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     if (params.geometry.crs) {
       const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
-      if (!selectedCrs) {
-        throw new Error('No supported CRS found');
-      }
       payload.crs = selectedCrs.authId;
     }
     // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
