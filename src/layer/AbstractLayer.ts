@@ -245,5 +245,10 @@ export class AbstractLayer {
     return await this.findDatesUTC(bbox, fromTime, toTime);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getStats(payload: any): Promise<any> {
+    throw new Error('getStats() not implemented for this dataset');
+  }
+
   public async updateLayerFromServiceIfNeeded(): Promise<void> {}
 }

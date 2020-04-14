@@ -1,12 +1,22 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
+import WKT from 'terraformer-wkt-parser';
 
 import { getAuthToken, isAuthTokenSet } from 'src/auth';
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
+import {
+  GetMapParams,
+  ApiType,
+  PaginatedTiles,
+  HistogramType,
+  FisPayload,
+  GetStatsParams,
+  GetStats,
+} from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -228,6 +238,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
+  protected getStatsAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
   public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
@@ -247,6 +261,59 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     // Let's sort the data so that we always return most recent results first:
     found.sort((a, b) => b.unix() - a.unix());
     return found.map(m => m.toDate());
+  }
+
+  public async getStats(params: GetStatsParams): Promise<GetStats> {
+    if (!params.geometry) {
+      throw new Error('Parameter "geometry" needs to be provided');
+    }
+    if (!params.resolution) {
+      throw new Error('Parameter "resolution" needs to be provided');
+    }
+    if (!params.fromTime || !params.toTime) {
+      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
+    }
+
+    const payload: FisPayload = {
+      layer: this.layerId,
+      crs: CRS_EPSG4326.authId,
+      geometry: WKT.convert(params.geometry),
+      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+        .utc(params.toTime)
+        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+      resolution: undefined,
+      bins: params.bins || 5,
+      type: HistogramType.EQUALFREQUENCY,
+      ...this.getStatsAdditionalParameters(),
+    };
+
+    if (params.geometry.crs) {
+      const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
+      payload.crs = selectedCrs.authId;
+    }
+    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
+    if (payload.crs === CRS_EPSG4326.authId) {
+      payload.resolution = params.resolution + 'm';
+    } else {
+      payload.resolution = params.resolution;
+    }
+    if (this.evalscript) {
+      if (typeof window !== 'undefined' && window.btoa) {
+        payload.evalscript = btoa(this.evalscript);
+      } else {
+        payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+      }
+    }
+
+    const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
+    // convert date strings to Date objects
+    for (let channel in data) {
+      data[channel] = data[channel].map((dailyStats: any) => ({
+        ...dailyStats,
+        date: new Date(dailyStats.date),
+      }));
+    }
+    return data;
   }
 
   protected async convertEvalscriptToV3(evalscript: string): Promise<string> {

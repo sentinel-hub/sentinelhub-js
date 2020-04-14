@@ -181,6 +181,28 @@ We can always use layer to search for data availability:
   const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
 
+## Getting basic statistics and histogram
+
+Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).
+The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
+
+```javascript
+  const layerS2L2A = new S2L2ALayer({
+    instanceId: '<my-instance-id>',
+    layerId: 'LAYER_S2L2A',
+    maxCloudCoverPercent: 100,
+  });
+
+const stats = await layerS2L2A.getStats({
+  geometry: geometry, 
+  fromTime: fromTime, 
+  toTime: toTime, 
+  resolution: resolution,
+  bins: 10,
+});
+```
+
+
 ## Backwards compatibility
 
 To make it easier to use this library with legacy code, there are two functions that are implemented on top of the library, which do not require instantiating a `Layer` subclass.

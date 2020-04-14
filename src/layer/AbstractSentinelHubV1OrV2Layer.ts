@@ -1,11 +1,21 @@
 import axios from 'axios';
 import moment from 'moment';
 import { stringify } from 'query-string';
+import WKT from 'terraformer-wkt-parser';
 
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType, PaginatedTiles } from 'src/layer/const';
+import {
+  GetMapParams,
+  ApiType,
+  PaginatedTiles,
+  GetStatsParams,
+  GetStats,
+  HistogramType,
+  FisPayload,
+} from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -119,6 +129,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
+  protected getStatsAdditionalParameters(): Record<string, any> {
+    return {};
+  }
+
   public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
@@ -139,5 +153,61 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     });
 
     return response.data.map((date: string) => moment.utc(date).toDate());
+  }
+
+  public async getStats(params: GetStatsParams): Promise<GetStats> {
+    if (!params.geometry) {
+      throw new Error('Parameter "geometry" needs to be provided');
+    }
+    if (!params.resolution) {
+      throw new Error('Parameter "resolution" needs to be provided');
+    }
+    if (!params.fromTime || !params.toTime) {
+      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
+    }
+
+    const payload: FisPayload = {
+      layer: this.layerId,
+      crs: CRS_EPSG4326.authId,
+      geometry: WKT.convert(params.geometry),
+      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+        .utc(params.toTime)
+        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+      resolution: undefined,
+      bins: params.bins || 5,
+      type: HistogramType.EQUALFREQUENCY,
+      ...this.getStatsAdditionalParameters(),
+    };
+
+    if (params.geometry.crs) {
+      const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
+      payload.crs = selectedCrs.authId;
+    }
+    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
+    if (payload.crs === CRS_EPSG4326.authId) {
+      payload.resolution = params.resolution + 'm';
+    } else {
+      payload.resolution = params.resolution;
+    }
+    if (this.evalscript) {
+      if (typeof window !== 'undefined' && window.btoa) {
+        payload.evalscript = btoa(this.evalscript);
+      } else {
+        payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+      }
+      payload.evalsource = this.getEvalsource();
+    }
+
+    const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
+      params: payload,
+    });
+    // convert date strings to Date objects
+    for (let channel in data) {
+      data[channel] = data[channel].map((dailyStats: any) => ({
+        ...dailyStats,
+        date: new Date(dailyStats.date),
+      }));
+    }
+    return data;
   }
 }

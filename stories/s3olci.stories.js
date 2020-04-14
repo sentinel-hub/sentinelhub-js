@@ -278,3 +278,31 @@ export const findDatesUTC = () => {
 
   return wrapperEl;
 };
+
+export const stats = () => {
+  const wrapperEl = document.createElement('div');
+  const containerEl = document.createElement('pre');
+  wrapperEl.innerHTML = '<h2>getStats</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const layer = new S3OLCILayer({
+    instanceId,
+    layerId,
+    evalscript: `return [B18]`,
+  });
+
+  const params = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 350,
+    bins: 10,
+    geometry: bbox4326.toGeoJSON(),
+  };
+
+  const perform = async () => {
+    const stats = await layer.getStats(params);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+  return wrapperEl;
+};

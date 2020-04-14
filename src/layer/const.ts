@@ -1,6 +1,7 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
+import { CRS_IDS } from 'src/crs';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -99,3 +100,52 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://services-uswest2.sentinel-hub.com/',
   'https://creodias.sentinel-hub.com/',
 ];
+
+export type GetStatsParams = {
+  fromTime: Date;
+  toTime: Date;
+  resolution: number;
+  geometry: Polygon;
+  bins?: number;
+};
+
+export type FisPayload = {
+  layer: string;
+  crs: CRS_IDS;
+  time: string;
+  resolution: number | string;
+  geometry?: string;
+  type?: HistogramType;
+  bins?: number;
+  evalscript?: string;
+  evalsource?: string;
+};
+
+export enum HistogramType {
+  EQUALFREQUENCY = 'EQUALFREQUENCY',
+  // EQUIDISTANT = 'EQUIDISTANT',
+  // STREAMING = 'STREAMING',
+}
+
+export type DailyChannelStats = {
+  date: Date;
+  basicStats: {
+    min: number;
+    max: number;
+    mean: number;
+    stDev: number;
+  };
+  histogram: {
+    bins: [
+      {
+        lowEdge: number;
+        mean: number;
+        count: number;
+      },
+    ];
+  };
+};
+
+export type GetStats = {
+  [key: string]: DailyChannelStats[];
+};
