@@ -110,8 +110,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (!this.dataset) {
         throw new Error('This layer does not support Processing API (unknown dataset)');
       }
-      if (this.evalscriptUrl) {
-        throw new Error('EvalscriptUrl is not supported with Processing API');
+      if (this.evalscriptUrl && !this.evalscript) {
+        const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
+        let evalscriptV3;
+        //Check version of fetched evalscript by checking if first line starts with //VERSION=3
+        if (response.data.startsWith('//VERSION=3')) {
+          evalscriptV3 = response.data;
+        } else {
+          evalscriptV3 = await this.convertEvalscriptToV3(response.data);
+        }
+        this.evalscript = evalscriptV3;
       }
       if (!this.evalscript && !this.dataProduct) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3();
@@ -306,5 +314,20 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }));
     }
     return data;
+  }
+
+  protected async convertEvalscriptToV3(evalscript: string): Promise<string> {
+    const authToken = getAuthToken();
+    const url = `https://services.sentinel-hub.com/api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+    const requestConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+        'Content-Type': 'application/ecmascript',
+      },
+      useCache: true,
+      responseType: 'text',
+    };
+    const res = await axios.post(url, evalscript, requestConfig);
+    return res.data;
   }
 }

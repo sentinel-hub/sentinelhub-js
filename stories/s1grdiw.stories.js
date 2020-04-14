@@ -254,6 +254,52 @@ export const getMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
+export const GetMapProcessingEvalscripturl = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing setting evalscriptUrl with v2 script</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layer = new S1GRDAWSEULayer({
+      instanceId,
+      layerId,
+      evalscriptUrl:
+        'https://raw.githubusercontent.com/sentinel-hub/custom-scripts/cf4930ae0dd6d155f80ff311d6d862ca28de412b/sentinel-1/sar_for_deforestation/script.js',
+    });
+
+    const getMapParams = {
+      bbox: new BBox(
+        CRS_EPSG4326,
+        12.089080810546877,
+        44.625908121970454,
+        12.250614166259767,
+        44.74210015957899,
+      ),
+      fromTime: new Date(Date.UTC(2018, 8 - 1, 28, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 8 - 1, 28, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const findTilesEPSG3857 = () => {
   const layer = new S1GRDAWSEULayer({ instanceId, layerId });
 
