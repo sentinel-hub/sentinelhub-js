@@ -1,6 +1,14 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L1CLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, PreviewMode } from '../dist/sentinelHub.esm';
+import {
+  S2L1CLayer,
+  CRS_EPSG4326,
+  CRS_EPSG3857,
+  BBox,
+  MimeTypes,
+  ApiType,
+  PreviewMode,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -13,6 +21,7 @@ if (!process.env.S2L1C_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S2L1C_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.2, 12.7, 43);
+const bbox3857 = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 
 export default {
   title: 'Sentinel 2 L1C',
@@ -279,6 +288,90 @@ export const findDatesUTC = () => {
     };
     const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const stats = () => {
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent: 20,
+  });
+
+  const geometry = {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [38.443522453308105, 29.97140509632656],
+        [38.44244956970215, 29.96954625480396],
+        [38.44292163848877, 29.967538666899472],
+        [38.44480991363525, 29.965865645995088],
+        [38.44686985015869, 29.96541950233024],
+        [38.44910144805908, 29.96564257441305],
+        [38.45056056976318, 29.966720749087546],
+        [38.451247215270996, 29.96861682100166],
+        [38.450989723205566, 29.97006673393574],
+        [38.450260162353516, 29.971330743333375],
+        [38.4486722946167, 29.97229732790467],
+        [38.44622611999512, 29.972446032388678],
+        [38.444252014160156, 29.971888389426],
+        [38.443522453308105, 29.97140509632656],
+      ],
+    ],
+    crs: {
+      type: 'name',
+      properties: {
+        name: 'urn:ogc:def:crs:OGC:1.3:CRS84',
+      },
+    },
+  };
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const params = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 10,
+    bins: 10,
+    geometry: geometry,
+  };
+  const perform = async () => {
+    const stats = await layerS2L1C.getStats(params);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const statsBBOX3857 = () => {
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent: 20,
+  });
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const params = {
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    resolution: 200,
+    bins: 10,
+    geometry: bbox3857.toGeoJSON(),
+  };
+  const perform = async () => {
+    const stats = await layerS2L1C.getStats(params);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
 
