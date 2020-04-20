@@ -226,12 +226,12 @@ OAuth Client's secret is shown only before the creation process is finished so b
 Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
+  import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
 
-const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
-const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
-const authToken = await requestAuthToken(clientId, clientSecret);
-setAuthToken(authToken);
+  const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
+  const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
+  const authToken = await requestAuthToken(clientId, clientSecret);
+  setAuthToken(authToken);
 ```
 
 ## Debugging
@@ -239,11 +239,11 @@ setAuthToken(authToken);
 This library is an abstraction layer that provides nice interface for accessing the underlying services, which simplifies development - but when requests fail, it is sometimes difficult to understand why. To enable easier debugging, `setDebugEnabled` can be used:
 
 ```javascript
-import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
+  import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
 
-setDebugEnabled(true);
-// ... failing operation
-setDebugEnabled(false);
+  setDebugEnabled(true);
+  // ... failing operation
+  setDebugEnabled(false);
 ```
 
 While debug mode is enabled, library will output any request it makes (even if the response comes from cache) to console in the form of a `curl` command.
