@@ -187,19 +187,13 @@ Getting basic statistics (mean, min, max, standard deviation) and a histogram fo
 The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
 
 ```javascript
-  const layerS2L2A = new S2L2ALayer({
-    instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S2L2A',
-    maxCloudCoverPercent: 100,
+  const stats = await layer.getStats({
+    geometry: bbox.toGeoJSON(),
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    resolution: resolution,
+    bins: 10,
   });
-
-const stats = await layerS2L2A.getStats({
-  geometry: geometry, 
-  fromTime: fromTime, 
-  toTime: toTime, 
-  resolution: resolution,
-  bins: 10,
-});
 ```
 
 
