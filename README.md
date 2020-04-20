@@ -162,7 +162,7 @@ We can always use layer to search for data availability:
 
   const layerS2L2A = new S2L2ALayer({
     instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S2L2A',
+    layerId: '<layer-id-S2L2A>',
     maxCloudCoverPercent: 50,
   });
   const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
@@ -171,7 +171,7 @@ We can always use layer to search for data availability:
 
   const layerS1 = new S1GRDAWSEULayer({
     instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S1GRD',
+    layerId: '<layer-id-S1GRD>',
     orthorectify: true,
     backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection: OrbitDirection.ASCENDING,
