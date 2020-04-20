@@ -22,6 +22,7 @@ import {
   DATASET_MODIS,
   DATASET_AWS_DEM,
 } from 'src/layer/dataset';
+import * as supportedDatasets from 'src/layer/dataset';
 import { WmsLayer } from 'src/layer/WmsLayer';
 import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
@@ -63,6 +64,7 @@ export {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  supportedDatasets,
   // layers:
   WmsLayer,
   S1GRDAWSEULayer,

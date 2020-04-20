@@ -8,6 +8,7 @@ import {
   BBox,
   MimeTypes,
   ApiType,
+  supportedDatasets,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -291,5 +292,21 @@ export const S2FindFlyovers = () => {
   };
   perform().then(() => {});
 
+  return wrapperEl;
+};
+
+export const listSupportedDatasets = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Supported datasets</h2>';
+
+  const listEl = document.createElement('ul');
+  wrapperEl.insertAdjacentElement('beforeend', listEl);
+
+  for (let dKey in supportedDatasets) {
+    const d = supportedDatasets[dKey]
+    const datasetEl = document.createElement('li');
+    datasetEl.innerHTML = `${d.id}: ${d.shServiceHostname}`;
+    listEl.insertAdjacentElement('beforeend', datasetEl);
+  }
   return wrapperEl;
 };
