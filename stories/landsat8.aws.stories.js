@@ -19,6 +19,10 @@ if (!process.env.LANDSAT8_LAYER_ID) {
   throw new Error('LANDSAT8_LAYER_ID environment variable is not defined!');
 }
 
+if (!process.env.LANDSAT8_NDVI_LAYER_ID) {
+  throw new Error('LANDSAT8_NDVI_LAYER_ID environment variable is not defined!');
+}
+
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.LANDSAT8_LAYER_ID;
 const layerIdNDVI = process.env.LANDSAT8_NDVI_LAYER_ID;
