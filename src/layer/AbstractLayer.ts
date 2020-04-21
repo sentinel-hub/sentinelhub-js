@@ -11,16 +11,19 @@ import { Dataset } from 'src/layer/dataset';
 interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 export class AbstractLayer {
   public title: string | null = null;
   public description: string | null = null;
   public readonly dataset: Dataset | null = null;
+  public legendUrl: string | null = null;
 
-  public constructor({ title = null, description = null }: ConstructorParameters) {
+  public constructor({ title = null, description = null, legendUrl = null }: ConstructorParameters) {
     this.title = title;
     this.description = description;
+    this.legendUrl = legendUrl;
   }
 
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
