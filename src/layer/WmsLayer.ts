@@ -11,6 +11,7 @@ interface ConstructorParameters {
   layerId?: string;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 export class WmsLayer extends AbstractLayer {
@@ -18,10 +19,17 @@ export class WmsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
 
-  public constructor({ baseUrl, layerId, title = null, description = null }: ConstructorParameters) {
+  public constructor({
+    baseUrl,
+    layerId,
+    title = null,
+    description = null,
+    legendUrl = null,
+  }: ConstructorParameters) {
     super({ title, description });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
+    this.legendUrl = legendUrl;
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {

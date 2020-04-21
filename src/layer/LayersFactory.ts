@@ -124,12 +124,13 @@ export class LayersFactory {
         layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
           ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
           : null,
+      legendUrl: layerInfo.legendUrl,
     }));
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
+    return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
       if (!dataset) {
         return new WmsLayer({ baseUrl, layerId, title, description });
       }
@@ -146,6 +147,7 @@ export class LayersFactory {
         dataProduct: null,
         title,
         description,
+        legendUrl,
       });
     });
   }
@@ -194,18 +196,25 @@ export class LayersFactory {
     filterLayers: Function | null,
   ): Promise<AbstractLayer[]> {
     const parsedXml = await fetchGetCapabilitiesXml(baseUrl);
+
     const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
       dataset: null,
+      legendUrl: layerInfo.Style
+        ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+        : layerInfo.Layer
+        ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+        : null,
     }));
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
-      ({ layerId, title, description }) => new WmsLayer({ baseUrl, layerId, title, description }),
+      ({ layerId, title, description, legendUrl }) =>
+        new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
     );
   }
 }

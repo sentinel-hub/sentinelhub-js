@@ -26,6 +26,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 // this class provides any SHv3-specific functionality to the subclasses:
@@ -35,6 +36,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
+  public legend?: any[] | null;
 
   public constructor({
     instanceId = null,
@@ -44,8 +46,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     dataProduct = null,
     title = null,
     description = null,
+    legendUrl = null,
   }: ConstructorParameters) {
-    super({ title, description });
+    super({ title, description, legendUrl });
     if (
       (layerId === null || instanceId === null) &&
       evalscript === null &&
@@ -82,11 +85,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       Authorization: `Bearer ${authToken}`,
     };
     const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: true });
+
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
       evalscript: l.styles[0].evalScript,
       dataProduct: l.styles[0].dataProduct,
+      legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
+        ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
+        : null,
     }));
 
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
@@ -329,5 +336,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
     const res = await axios.post(url, evalscript, requestConfig);
     return res.data;
+  }
+
+  public async updateLayerFromServiceIfNeeded(): Promise<void> {
+    if (this.instanceId === null || this.layerId === null) {
+      throw new Error(
+        "One or more of these parameters (polarization, acquisitionMode, resolution) \
+        are not set and can't be fetched from service because instanceId and layerId are not available",
+      );
+    }
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+    this.legend = layerParams['legend'] ? layerParams['legend'] : null;
   }
 }

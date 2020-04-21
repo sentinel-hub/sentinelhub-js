@@ -36,6 +36,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   acquisitionMode?: AcquisitionMode | null;
   polarization?: Polarization | null;
   resolution?: Resolution | null;
@@ -70,6 +71,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     dataProduct = null,
     title = null,
     description = null,
+    legendUrl = null,
     acquisitionMode = null,
     polarization = null,
     resolution = null,
@@ -77,7 +79,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
     this.resolution = resolution;

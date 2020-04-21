@@ -14,6 +14,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
   view?: S3SLSTRView | null;
 }
@@ -43,10 +44,11 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     dataProduct = null,
     title = null,
     description = null,
+    legendUrl = null,
     maxCloudCoverPercent = 100,
     view = S3SLSTRView.NADIR,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     // images that are not DESCENDING appear empty:
     this.orbitDirection = OrbitDirection.DESCENDING;
