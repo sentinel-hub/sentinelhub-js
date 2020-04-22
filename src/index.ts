@@ -40,7 +40,12 @@ import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
 import { BYOCLayer } from 'src/layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from 'src/layer/ProcessingDataFusionLayer';
 
-import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
+import {
+  legacyGetMapFromUrl,
+  legacyGetMapWmsUrlFromParams,
+  legacyGetMapFromParams,
+  parseLegacyWmsGetMapParams,
+} from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 
@@ -104,4 +109,5 @@ export {
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
+  parseLegacyWmsGetMapParams,
 };
