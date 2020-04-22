@@ -125,7 +125,7 @@ type ParsedLegacyWmsGetMapParams = {
   getMapParams: GetMapParams;
 };
 
-function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegacyWmsGetMapParams {
+export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegacyWmsGetMapParams {
   const params = convertKeysToLowercase(wmsParams);
 
   const layers = params.layers;
