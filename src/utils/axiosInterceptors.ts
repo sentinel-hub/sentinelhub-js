@@ -206,8 +206,8 @@ const retryRequests = (err: any): any => {
   }
   if (shouldRetry(err.response.status)) {
     err.config.retriesCount = err.config.retriesCount | 0;
-    const minRetries = err.config.retries || RETRIES;
-    const shouldRetry = err.config.retriesCount < minRetries;
+    const maxRetries = err.config.retries || RETRIES;
+    const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
       return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DELAY));
