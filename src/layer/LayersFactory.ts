@@ -59,6 +59,7 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
+    [DATASET_BYOC.shJsonGetCapabilitiesDataset]: DATASET_BYOC,
   };
 
   private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
