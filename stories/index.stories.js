@@ -4,6 +4,8 @@ import {
   WmsLayer,
   S1GRDAWSEULayer,
   S2L2ALayer,
+  DATASET_S2L2A,
+  LayersFactory,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
@@ -164,6 +166,36 @@ export const S1GetMapProcessingFromLayer = () => {
       format: MimeTypes.JPEG,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const S2GetMapMakeLayer = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A - makeLayer</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    const baseUrl = `${DATASET_S2L2A.shServiceHostname}ogc/wms/${instanceId}`;
+    const layerS2L2A = await LayersFactory.makeLayer(baseUrl, s2l2aLayerId);
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});

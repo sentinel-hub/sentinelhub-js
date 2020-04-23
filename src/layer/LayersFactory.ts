@@ -93,6 +93,14 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
+  public static async makeLayer(baseUrl: string, layerId: string): Promise<AbstractLayer> {
+    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId);
+    if (layers.length === 0) {
+      return null;
+    }
+    return layers[0];
+  }
+
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
