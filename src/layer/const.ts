@@ -19,6 +19,7 @@ export type GetMapParams = {
   height?: number;
   // optional additional parameters:
   preview?: PreviewMode;
+  mosaickingOrder?: MosaickingOrder;
   geometry?: Polygon | MultiPolygon;
   quality?: number;
   gain?: number;
@@ -42,6 +43,12 @@ export enum PreviewMode {
   DETAIL = 0,
   PREVIEW = 1,
   EXTENDED_PREVIEW = 2,
+}
+
+export enum MosaickingOrder {
+  MOST_RECENT = 'mostRecent',
+  LEAST_RECENT = 'leastRecent',
+  LEAST_CC = 'leastCC',
 }
 
 export enum ApiType {

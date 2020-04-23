@@ -2,14 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
-import { MimeType, GetMapParams, Interpolator, PreviewMode } from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-
-export enum MosaickingOrder {
-  MOST_RECENT = 'mostRecent',
-  LEAST_RECENT = 'leastRecent',
-  LEAST_CC = 'leastCC',
-}
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -142,6 +136,9 @@ export function createProcessingPayload(
 
   if (params.preview !== undefined) {
     payload.input.data[0].dataFilter.previewMode = convertPreviewToString(params.preview);
+  }
+  if (params.mosaickingOrder !== undefined) {
+    payload.input.data[0].dataFilter.mosaickingOrder = params.mosaickingOrder;
   }
 
   //dataProduct should not be set if evalscript is passed as parameter
