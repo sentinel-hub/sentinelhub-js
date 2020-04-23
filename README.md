@@ -81,7 +81,7 @@ It is also possible to create layers by importing their definitions from the Sen
 ```javascript
   import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
-  const layers = LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>');
+  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>');
     // [ layer1, layer2, ... ] - a list of Layer objects
 
   const layersIds = layers.map(l => l.layerId);
@@ -95,7 +95,7 @@ Alternatively, the list can be filtered to include only some of the layers:
   import { LayersFactory, DATASET_S2L2A } from '@sentinel-hub/sentinelhub-js';
 
   // this will return only a list of those S2L2A layers whose IDs start with "ABC_":
-  const layers = LayersFactory.makeLayers(
+  const layers = await LayersFactory.makeLayers(
     'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
     (layerId, dataset) => layerId.startsWith("ABC_") && dataset === DATASET_S2L2A,
   );
