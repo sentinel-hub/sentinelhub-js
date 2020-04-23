@@ -123,7 +123,9 @@ export class LayersFactory {
       dataset:
         layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
           ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          : layerInfo.dataset === 'CUSTOM' ? {id:'CUSTOM'} : null,
+          : layerInfo.dataset === 'CUSTOM' 
+            ? {id:'CUSTOM'} 
+            : null,
     }));
 
     const filteredLayersInfos =
