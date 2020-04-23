@@ -162,7 +162,7 @@ We can always use layer to search for data availability:
 
   const layerS2L2A = new S2L2ALayer({
     instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S2L2A',
+    layerId: '<layer-id-S2L2A>',
     maxCloudCoverPercent: 50,
   });
   const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
@@ -171,7 +171,7 @@ We can always use layer to search for data availability:
 
   const layerS1 = new S1GRDAWSEULayer({
     instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S1GRD',
+    layerId: '<layer-id-S1GRD>',
     orthorectify: true,
     backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection: OrbitDirection.ASCENDING,
@@ -187,19 +187,13 @@ Getting basic statistics (mean, min, max, standard deviation) and a histogram fo
 The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
 
 ```javascript
-  const layerS2L2A = new S2L2ALayer({
-    instanceId: '<my-instance-id>',
-    layerId: 'LAYER_S2L2A',
-    maxCloudCoverPercent: 100,
+  const stats = await layer.getStats({
+    geometry: bbox.toGeoJSON(),
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    resolution: resolution,
+    bins: 10,
   });
-
-const stats = await layerS2L2A.getStats({
-  geometry: geometry,
-  fromTime: fromTime,
-  toTime: toTime,
-  resolution: resolution,
-  bins: 10,
-});
 ```
 
 
@@ -232,12 +226,12 @@ OAuth Client's secret is shown only before the creation process is finished so b
 Getting the authentication token by calling `requestAuthToken()` with the OAuth Client's id and secret as its parameters and then setting the authentication token:
 
 ```javascript
-import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
+  import { setAuthToken, requestAuthToken } from '@sentinel-hub/sentinelhub-js';
 
-const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
-const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
-const authToken = await requestAuthToken(clientId, clientSecret);
-setAuthToken(authToken);
+  const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
+  const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
+  const authToken = await requestAuthToken(clientId, clientSecret);
+  setAuthToken(authToken);
 ```
 
 ## Debugging
@@ -245,11 +239,11 @@ setAuthToken(authToken);
 This library is an abstraction layer that provides nice interface for accessing the underlying services, which simplifies development - but when requests fail, it is sometimes difficult to understand why. To enable easier debugging, `setDebugEnabled` can be used:
 
 ```javascript
-import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
+  import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
 
-setDebugEnabled(true);
-// ... failing operation
-setDebugEnabled(false);
+  setDebugEnabled(true);
+  // ... failing operation
+  setDebugEnabled(false);
 ```
 
 While debug mode is enabled, library will output any request it makes (even if the response comes from cache) to console in the form of a `curl` command.
