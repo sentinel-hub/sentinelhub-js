@@ -8,6 +8,7 @@ import {
   ApiType,
   S2L1CLayer,
   S2L2ALayer,
+  MosaickingOrder,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -60,6 +61,7 @@ export const getMapProcessing = () => {
         id: 'l2a',
         fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 26, 0, 0, 0)),
+        mosaickingOrder: MosaickingOrder.LEAST_RECENT,
       },
       {
         layer: layerS2L1C,
@@ -100,6 +102,7 @@ export const getMapProcessing = () => {
       width: 300,
       height: 300,
       format: MimeTypes.JPEG,
+      mosaickingOrder: MosaickingOrder.LEAST_CC,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
