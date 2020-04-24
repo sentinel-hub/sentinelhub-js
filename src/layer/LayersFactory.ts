@@ -202,11 +202,12 @@ export class LayersFactory {
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
       dataset: null,
-      legendUrl: layerInfo.Style
-        ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-        : layerInfo.Layer
-        ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-        : null,
+      legendUrl:
+        layerInfo.Style && layerInfo.Style[0].LegendURL
+          ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
+          ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : null,
     }));
 
     const filteredLayersInfos =
