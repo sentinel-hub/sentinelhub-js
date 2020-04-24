@@ -339,12 +339,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(): Promise<void> {
-    if (this.instanceId === null || this.layerId === null) {
-      throw new Error(
-        "One or more of these parameters (polarization, acquisitionMode, resolution) \
-        are not set and can't be fetched from service because instanceId and layerId are not available",
-      );
-    }
     const layerParams = await this.fetchLayerParamsFromSHServiceV3();
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
   }
