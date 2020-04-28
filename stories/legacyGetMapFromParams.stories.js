@@ -155,6 +155,8 @@ export const WMSLegacyGetMapFromBasicParams = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams</h2>';
+  wrapperEl.innerHTML +=
+    '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
@@ -173,6 +175,8 @@ export const WMSLegacyGetMapFromParamsWithGain = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAIN</h2>';
+  wrapperEl.innerHTML +=
+    '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
@@ -195,6 +199,8 @@ export const WMSLegacyGetMapFromParamsWithGamma = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAMMA</h2>';
+  wrapperEl.innerHTML +=
+    '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
