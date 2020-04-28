@@ -19,15 +19,9 @@ export async function manipulateGamma(originalBlob: Blob, newGamma: number) {
 
   // change the values according to the algorithm
   if (newGamma != 1.0) {
-    for (let i in newRedValues) {
-      newRedValues[i] = Math.pow(newRedValues[i], newGamma);
-      newGreenValues[i] = Math.pow(newGreenValues[i], newGamma);
-      newBlueValues[i] = Math.pow(newBlueValues[i], newGamma);
-    }
-
-    // newRedValues = newRedValues.map(x => Math.pow(x, newGamma));
-    // newGreenValues = newGreenValues.map(x => Math.pow(x, newGamma));
-    // newBlueValues = newBlueValues.map(x => Math.pow(x, newGamma));
+    newRedValues = newRedValues.map(x => Math.pow(x, newGamma));
+    newGreenValues = newGreenValues.map(x => Math.pow(x, newGamma));
+    newBlueValues = newBlueValues.map(x => Math.pow(x, newGamma));
   }
 
   // change the interval of the values from [0, 1] back to [0, 255]
