@@ -10,7 +10,7 @@ import { Dataset } from 'src/layer/dataset';
 
 // import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
 import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
-// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
+import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -56,6 +56,9 @@ export class AbstractLayer {
 
         if (gain) {
           blob = manipulateGain(blob, gain);
+        }
+        if (gamma) {
+          blob = manipulateGamma(blob, gamma);
         }
 
         return blob;
