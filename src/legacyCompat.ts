@@ -42,6 +42,8 @@ export async function legacyGetMapFromParams(
   let layer;
   switch (api) {
     case ApiType.WMS:
+      console.log('legacyGetMapFromParams wms', { getMapParams });
+
       layer = new WmsLayer({ baseUrl, layerId: layers });
       return layer.getMap(getMapParams, api);
 
