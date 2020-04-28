@@ -18,11 +18,18 @@ export default {
   title: 'legacyGetMapFromParams [Playground]',
 };
 
-const bboxAsArray = [-234814.5508920615, 4774562.534805251, -156543.03392804097, 4852834.051769271];
+const madridBboxAsArrayEPSG3857 = [
+  -430493.3433021127,
+  4931105.568733289,
+  -410925.4640611076,
+  4950673.447974297,
+];
 const maxCC = 0;
-const gainString = "2";
-const gammaString = "2";
+const gainString = '2';
+const gammaString = '2';
 const timeString = '2019-10-01/2020-04-23';
+// EOBrowser example:
+// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const basicParamsObject = {
   maxcc: maxCC,
@@ -31,7 +38,7 @@ const basicParamsObject = {
   showlogo: false,
   width: 512,
   height: 512,
-  bbox: bboxAsArray,
+  bbox: madridBboxAsArrayEPSG3857,
   format: 'image/jpeg',
   crs: 'EPSG:3857',
   preview: 2,
@@ -46,7 +53,7 @@ const paramsObjectWithGain = {
   showlogo: false,
   width: 512,
   height: 512,
-  bbox: bboxAsArray,
+  bbox: madridBboxAsArrayEPSG3857,
   format: 'image/jpeg',
   crs: 'EPSG:3857',
   preview: 2,
@@ -61,7 +68,7 @@ const paramsObjectWithGamma = {
   showlogo: false,
   width: 512,
   height: 512,
-  bbox: bboxAsArray,
+  bbox: madridBboxAsArrayEPSG3857,
   format: 'image/jpeg',
   crs: 'EPSG:3857',
   preview: 2,
@@ -100,11 +107,10 @@ export const ProcessingLegacyGetMapFromParamsWithGain = () => {
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
-    try{
+    try {
       const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGain, ApiType.PROCESSING);
       img.src = URL.createObjectURL(imageBlob);
-    }
-    catch(err){
+    } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
   };
@@ -123,23 +129,20 @@ export const ProcessingLegacyGetMapFromParamsWithGamma = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    try{
+    try {
       await setAuthTokenWithOAuthCredentials();
       const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma, ApiType.PROCESSING);
       img.src = URL.createObjectURL(imageBlob);
-    }
-      catch (err) {
+    } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
 
-
-
-// OGC API (WMS) 
+// OGC API (WMS)
 
 export const WMSLegacyGetMapFromBasicParams = () => {
   const img = document.createElement('img');
@@ -154,7 +157,7 @@ export const WMSLegacyGetMapFromBasicParams = () => {
     const imageBlob = await legacyGetMapFromParams(baseUrl, basicParamsObject);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
@@ -169,15 +172,14 @@ export const WMSLegacyGetMapFromParamsWithGain = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    try{
+    try {
       const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGain);
       img.src = URL.createObjectURL(imageBlob);
-    }
-    catch (err) {
+    } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
@@ -192,15 +194,14 @@ export const WMSLegacyGetMapFromParamsWithGamma = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    try{
+    try {
       const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma);
       img.src = URL.createObjectURL(imageBlob);
-    }
-    catch (err) {
+    } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };

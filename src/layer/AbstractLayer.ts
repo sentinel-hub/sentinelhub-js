@@ -8,6 +8,10 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 
+// import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
+import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
+// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
+
 interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
@@ -26,6 +30,19 @@ export class AbstractLayer {
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
+        console.log('AbsLayer getMap wms', { params });
+
+        let gain, gamma;
+
+        if (params.gain) {
+          gain = params.gain;
+          params.gain = undefined;
+        }
+        if (params.gamma) {
+          gamma = params.gamma;
+          params.gamma = undefined;
+        }
+
         const url = this.getMapUrl(params, api);
         const requestConfig: AxiosRequestConfig = {
           // 'blob' responseType does not work with Node.js:
@@ -33,7 +50,15 @@ export class AbstractLayer {
           useCache: true,
         };
         const response = await axios.get(url, requestConfig);
-        return response.data;
+        let blob = response.data;
+
+        console.log('getMap response of getMapUrl', { blob });
+
+        if (gain) {
+          blob = manipulateGain(blob, gain);
+        }
+
+        return blob;
       default:
         const className = this.constructor.name;
         throw new Error(`API type "${api}" not supported in ${className}`);
