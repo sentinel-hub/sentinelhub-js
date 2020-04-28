@@ -28,8 +28,6 @@ const maxCC = 0;
 const gainString = '2';
 const gammaString = '2';
 const timeString = '2019-10-01/2020-04-23';
-// EOBrowser example:
-// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const basicParamsObject = {
   maxcc: maxCC,
@@ -44,6 +42,8 @@ const basicParamsObject = {
   preview: 2,
   bgcolor: '000000',
 };
+// EOBrowser example:
+// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGain = {
   maxcc: maxCC,
@@ -59,6 +59,8 @@ const paramsObjectWithGain = {
   preview: 2,
   bgcolor: '000000',
 };
+// EOBrowser example for GAIN:
+// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGamma = {
   maxcc: maxCC,
@@ -74,6 +76,8 @@ const paramsObjectWithGamma = {
   preview: 2,
   bgcolor: '000000',
 };
+// EOBrowser example for GAMMA:
+// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 // PROCESSING API
 
