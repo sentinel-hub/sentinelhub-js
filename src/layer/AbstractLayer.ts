@@ -9,8 +9,9 @@ import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/laye
 import { Dataset } from 'src/layer/dataset';
 
 // import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
-import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
-import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
+// import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
+// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
+import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -54,12 +55,14 @@ export class AbstractLayer {
 
         console.log('getMap response of getMapUrl', { blob });
 
-        if (gain) {
-          blob = manipulateGain(blob, gain);
-        }
-        if (gamma) {
-          blob = manipulateGamma(blob, gamma);
-        }
+        // if (gain) {
+        //   blob = manipulateGain(blob, gain);
+        // }
+        // if (gamma) {
+        //   blob = manipulateGamma(blob, gamma);
+        // }
+
+        blob = manipulateGainGamma(blob, gain, gamma);
 
         return blob;
       default:

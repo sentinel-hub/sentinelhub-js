@@ -46,38 +46,26 @@ const basicParamsObject = {
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGain = {
-  maxcc: maxCC,
+  ...basicParamsObject,
   gain: gainString,
-  layers: s2l2aLayerId,
-  time: timeString,
-  showlogo: false,
-  width: 512,
-  height: 512,
-  bbox: madridBboxAsArrayEPSG3857,
-  format: 'image/jpeg',
-  crs: 'EPSG:3857',
-  preview: 2,
-  bgcolor: '000000',
 };
 // EOBrowser example for GAIN:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGamma = {
-  maxcc: maxCC,
+  ...basicParamsObject,
   gamma: gammaString,
-  layers: s2l2aLayerId,
-  time: timeString,
-  showlogo: false,
-  width: 512,
-  height: 512,
-  bbox: madridBboxAsArrayEPSG3857,
-  format: 'image/jpeg',
-  crs: 'EPSG:3857',
-  preview: 2,
-  bgcolor: '000000',
 };
 // EOBrowser example for GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
+
+const paramsObjectWithGainAndGamma = {
+  ...basicParamsObject,
+  gain: gainString,
+  gamma: gammaString,
+};
+// EOBrowser example for GAIN AND GAMMA:
+// https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 // PROCESSING API
 
@@ -206,6 +194,30 @@ export const WMSLegacyGetMapFromParamsWithGamma = () => {
   const perform = async () => {
     try {
       const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma);
+      img.src = URL.createObjectURL(imageBlob);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const WMSLegacyGetMapFromParamsWithGainAndGamma = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAIN AND GAMMA</h2>';
+  wrapperEl.innerHTML +=
+    '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    try {
+      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGainAndGamma);
       img.src = URL.createObjectURL(imageBlob);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
