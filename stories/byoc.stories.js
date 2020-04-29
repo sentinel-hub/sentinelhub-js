@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LocationIdSHv3 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -170,6 +170,7 @@ export const findTiles = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
   const containerEl = document.createElement('pre');
 
