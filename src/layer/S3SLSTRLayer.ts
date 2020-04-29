@@ -79,6 +79,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       view: this.view,
     };
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,

@@ -192,7 +192,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset);
+    const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+    );
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
@@ -204,6 +211,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected fetchTiles(
+    searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -212,7 +220,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
-    if (!this.dataset.searchIndexUrl) {
+    if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
     const bboxPolygon = bbox.toGeoJSON();
@@ -231,7 +239,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.datasetParameters = datasetParameters;
     }
 
-    return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
+    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 
   protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
