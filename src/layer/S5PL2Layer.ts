@@ -92,6 +92,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       // minQa: this.minQa,
     };
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,
