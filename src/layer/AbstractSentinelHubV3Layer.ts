@@ -250,8 +250,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
+  protected async getFindDatesUTCUrl(): Promise<string> {
+    return this.dataset.findDatesUTCUrl;
+  }
+
   public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    if (!this.dataset.findDatesUTCUrl) {
+    const findDatesUTCUrl = await this.getFindDatesUTCUrl();
+    if (!findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
 
@@ -262,7 +267,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       to: toTime.toISOString(),
       ...(await this.getFindDatesUTCAdditionalParameters()),
     };
-    const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
+    const response = await axios.post(findDatesUTCUrl, payload);
     const found: Moment[] = response.data.map((date: string) => moment.utc(date));
 
     // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).

@@ -175,7 +175,7 @@ export const findTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (with collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -201,7 +201,7 @@ export const findTilesAuth = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (without collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -230,10 +230,11 @@ export const findDatesUTC = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -278,7 +279,7 @@ export const findDatesUTCAuth = () => {
   const layer = new BYOCLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
