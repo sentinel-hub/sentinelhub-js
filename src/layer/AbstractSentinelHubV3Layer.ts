@@ -104,6 +104,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
+  protected getShServiceHostname(): string {
+    return this.dataset.shServiceHostname;
+  }
+
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
@@ -135,8 +139,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
-
-      return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
+      const shServiceHostname = this.getShServiceHostname();
+      return processingGetMap(shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);
@@ -157,7 +161,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not have a dataset specified');
     }
-    const baseUrl = `${this.dataset.shServiceHostname}ogc/wms/${this.instanceId}`;
+    const shServiceHostname = this.getShServiceHostname();
+    const baseUrl = `${shServiceHostname}ogc/wms/${this.instanceId}`;
     const evalsource = this.dataset.shWmsEvalsource;
     return wmsGetMapUrl(
       baseUrl,
@@ -318,7 +323,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
     }
 
-    const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
+    const shServiceHostname = this.getShServiceHostname();
+    const { data } = await axios.post(shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
     // convert date strings to Date objects
     for (let channel in data) {
       data[channel] = data[channel].map((dailyStats: any) => ({

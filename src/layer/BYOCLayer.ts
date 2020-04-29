@@ -4,7 +4,13 @@ import axios from 'axios';
 
 import { getAuthToken } from 'src/auth';
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, LocationIdSHv3, SHV3_LOCATIONS_ROOT_URL } from 'src/layer/const';
+import {
+  PaginatedTiles,
+  LocationIdSHv3,
+  SHV3_LOCATIONS_ROOT_URL,
+  GetMapParams,
+  ApiType,
+} from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -71,6 +77,11 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
   }
 
+  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
+    await this.updateLayerFromServiceIfNeeded();
+    return await super.getMap(params, api);
+  }
+
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded();
     payload.input.data[0].dataFilter.collectionId = this.collectionId;
@@ -115,6 +126,14 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       }),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getShServiceHostname(): string {
+    if (this.locationId === null) {
+      throw new Error('Parameter locationId must be specified');
+    }
+    const shServiceHostname = SHV3_LOCATIONS_ROOT_URL[this.locationId];
+    return shServiceHostname;
   }
 
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {
