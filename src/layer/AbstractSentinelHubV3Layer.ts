@@ -133,7 +133,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       //Convert internal evalscript to V3 if it's not in that version.
-      if (!this.evalscript.startsWith('//VERSION=3')) {
+      if (this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
         let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
         this.evalscript = evalscriptV3;
       }
