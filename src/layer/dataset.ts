@@ -214,7 +214,7 @@ export const DATASET_BYOC: Dataset = {
   shWmsEvalsource: 'CUSTOM',
   shProcessingApiDatasourceAbbreviation: 'CUSTOM',
   datasetParametersType: 'BYOC',
-  shServiceHostname: 'https://services.sentinel-hub.com/',
+  shServiceHostname: null, // depends on location, for example: https://services.sentinel-hub.com/
   searchIndexUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex
   findDatesUTCUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData
   orbitTimeMinutes: null,

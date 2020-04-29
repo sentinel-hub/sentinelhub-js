@@ -34,7 +34,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new BYOCLayer({ instanceId, layerId });
+  const layer = new BYOCLayer({ instanceId, layerId, locationId: LocationIdSHv3.awsEuCentral1 });
 
   const getMapParams = {
     bbox: bbox,
@@ -60,6 +60,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
