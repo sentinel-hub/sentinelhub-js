@@ -10,7 +10,6 @@ import {
   PreviewMode,
   cancelFactory,
   isCancelled,
-  WmsLayer,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
