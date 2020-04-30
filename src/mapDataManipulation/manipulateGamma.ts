@@ -7,7 +7,7 @@ import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation
 // - change the values according to the algorithm
 // - change the interval of the values from [0, 1] back to [0, 255]
 
-export async function manipulateGamma(originalBlob: Blob, newGamma: number) {
+export async function manipulateGamma(originalBlob: Blob, newGamma: number): Promise<Blob> {
   let newRedValues = [...Array(256).keys()];
   let newGreenValues = [...Array(256).keys()];
   let newBlueValues = [...Array(256).keys()];
@@ -29,7 +29,7 @@ export async function manipulateGamma(originalBlob: Blob, newGamma: number) {
   newGreenValues = newGreenValues.map(x => Math.round((255 / 1) * x));
   newBlueValues = newBlueValues.map(x => Math.round((255 / 1) * x));
 
-  const manipulatePixel = function(r: number, g: number, b: number, a: number) {
+  const manipulatePixel = function(r: number, g: number, b: number, a: number): object {
     return { r: newRedValues[r], g: newGreenValues[g], b: newBlueValues[b], a };
   };
   return await mapDataManipulation(originalBlob, manipulatePixel);
