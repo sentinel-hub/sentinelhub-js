@@ -23,7 +23,7 @@ export class AbstractLayer {
     this.description = description;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, config?: AxiosRequestConfig): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: AxiosRequestConfig): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
@@ -31,7 +31,7 @@ export class AbstractLayer {
           // 'blob' responseType does not work with Node.js:
           responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
           useCache: true,
-          ...config,
+          ...reqConfig,
         };
         const response = await axios.get(url, requestConfig);
         return response.data;
@@ -247,7 +247,7 @@ export class AbstractLayer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getStats(payload: any, config?: AxiosRequestConfig): Promise<any> {
+  public async getStats(payload: any, reqConfig?: AxiosRequestConfig): Promise<any> {
     throw new Error('getStats() not implemented for this dataset');
   }
 

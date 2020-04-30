@@ -104,7 +104,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, config?: AxiosRequestConfig): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: AxiosRequestConfig): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
@@ -135,10 +135,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
-      return processingGetMap(this.dataset.shServiceHostname, updatedPayload, config);
+      return processingGetMap(this.dataset.shServiceHostname, updatedPayload, reqConfig);
     }
 
-    return super.getMap(params, api, config);
+    return super.getMap(params, api, reqConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {
