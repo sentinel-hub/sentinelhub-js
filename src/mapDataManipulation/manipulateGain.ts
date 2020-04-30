@@ -13,7 +13,7 @@ export async function manipulateGain(
   newMinValue?: number,
   newMaxValue?: number,
   newOffset?: number,
-) {
+): Promise<Blob> {
   const minValue = newMinValue ? newMinValue : 0.0;
   const maxValue = newMaxValue ? newMaxValue : 1.0;
   const gain = newGain ? newGain : 1.0;
@@ -40,7 +40,7 @@ export async function manipulateGain(
   newGreenValues = newGreenValues.map(x => Math.round((255 / 1) * x));
   newBlueValues = newBlueValues.map(x => Math.round((255 / 1) * x));
 
-  const manipulatePixel = function(r: number, g: number, b: number, a: number) {
+  const manipulatePixel = function(r: number, g: number, b: number, a: number): object {
     return { r: newRedValues[r], g: newGreenValues[g], b: newBlueValues[b], a };
   };
   return await mapDataManipulation(originalBlob, manipulatePixel);
