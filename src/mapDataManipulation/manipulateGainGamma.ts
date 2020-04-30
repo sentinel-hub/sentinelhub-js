@@ -4,7 +4,7 @@ import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation
 // https://git.sinergise.com/sentinel-core/java/blob/master/RendererService/src/main/resources/com/sinergise/sentinel/renderer/javascript/global/js/defaultVisualizer.js
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the interval of the values from [0, 255] to [0, 1]
-// - change the values according to the algorithm
+// - change the values according to the algorithm (first manipulation of gain and then gamma)
 // - change the interval of the values from [0, 1] back to [0, 255]
 
 export async function manipulateGainGamma(
