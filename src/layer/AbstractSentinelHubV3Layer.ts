@@ -104,7 +104,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, config?: AxiosRequestConfig): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
@@ -141,11 +141,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
-
-      return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
+      return processingGetMap(this.dataset.shServiceHostname, updatedPayload, config);
     }
 
-    return super.getMap(params, api);
+    return super.getMap(params, api, config);
   }
 
   public supportsApiType(api: ApiType): boolean {
@@ -269,7 +268,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return found.map(m => m.toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams, reqConfig?: AxiosRequestConfig): Promise<GetStats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -311,7 +310,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
     }
 
-    const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
+    const { data } = await axios.post(
+      this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId,
+      payload,
+      reqConfig,
+    );
     // convert date strings to Date objects
     for (let channel in data) {
       data[channel] = data[channel].map((dailyStats: any) => ({

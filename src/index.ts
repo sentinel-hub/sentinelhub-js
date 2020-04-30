@@ -48,6 +48,7 @@ import {
 } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
+import { cancelFactory, isCancelled } from 'src/utils/cancelRequests';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -110,4 +111,6 @@ export {
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
+  cancelFactory,
+  isCancelled,
 };
