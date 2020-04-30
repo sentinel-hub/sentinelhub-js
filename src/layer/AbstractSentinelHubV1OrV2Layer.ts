@@ -77,6 +77,14 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     );
   }
 
+  public setEvalscript(evalscript: string): void {
+    this.evalscript = evalscript;
+  }
+
+  public setEvalscriptUrl(evalscriptUrl: string): void {
+    this.evalscriptUrl = evalscriptUrl;
+  }
+
   protected getFindTilesAdditionalParameters(): Record<string, any> {
     return {};
   }
