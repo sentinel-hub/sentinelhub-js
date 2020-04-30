@@ -132,12 +132,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         }
       }
 
-      //Convert internal evalscript to V3 if it's not in that version.
-      if (this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
-        let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
-        this.evalscript = evalscriptV3;
-      }
-
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
