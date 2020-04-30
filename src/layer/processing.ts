@@ -157,7 +157,11 @@ export function createProcessingPayload(
   return payload;
 }
 
-export async function processingGetMap(shServiceHostname: string, payload: ProcessingPayload): Promise<Blob> {
+export async function processingGetMap(
+  shServiceHostname: string,
+  payload: ProcessingPayload,
+  config?: AxiosRequestConfig,
+): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
@@ -171,6 +175,7 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
+    ...config,
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;
