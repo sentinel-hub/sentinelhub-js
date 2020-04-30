@@ -1,3 +1,4 @@
+// manipulatePixel is a function that transforms pixel's (R,G,B) values into new (R,G,B) values
 export async function mapDataManipulation(originalBlob: Blob, manipulatePixel: any): Promise<Blob> {
   let imgObjectUrl: any;
   try {
