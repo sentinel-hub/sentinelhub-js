@@ -47,6 +47,7 @@ import {
   parseLegacyWmsGetMapParams,
 } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
+import { LocationIdSHv3 } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { cancelFactory, isCancelled } from 'src/utils/cancelRequests';
 
@@ -105,6 +106,7 @@ export {
   PreviewMode,
   S3SLSTRView,
   BBox,
+  LocationIdSHv3,
   setDebugEnabled,
   // legacy:
   legacyGetMapFromUrl,
