@@ -1,6 +1,6 @@
 import { setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { legacyGetMapFromUrl, ApiType, BBox, CRS_EPSG3857, legacyGetMapFromParams } from '../dist/sentinelHub.esm';
+import { legacyGetMapFromUrl, ApiType, legacyGetMapFromParams } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
