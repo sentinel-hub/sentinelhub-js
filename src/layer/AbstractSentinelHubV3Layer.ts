@@ -103,11 +103,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     //   const layerParams = await this.fetchLayerParamsFromSHServiceV3();
     return payload;
   }
-  
-    protected getShServiceHostname(): string {
+
+  protected getShServiceHostname(): string {
     return this.dataset.shServiceHostname;
   }
-  
+
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: AxiosRequestConfig): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
@@ -141,7 +141,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
       const shServiceHostname = this.getShServiceHostname();
       return processingGetMap(shServiceHostname, updatedPayload, reqConfig);
-
     }
 
     return super.getMap(params, api, reqConfig);
@@ -323,7 +322,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
       }
     }
-
 
     const shServiceHostname = this.getShServiceHostname();
     const { data } = await axios.post(shServiceHostname + 'ogc/fis/' + this.instanceId, payload, reqConfig);
