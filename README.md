@@ -188,6 +188,42 @@ We can always use layer to search for data availability:
   const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
 
+
+## Cancelling requests
+
+You can also cancel requests when searching/fetching data.
+
+To do so a factory of tokens needs to be created and a token passed through a request configuration object. In this object can also be defined the amount of retires desired in the case the petition fails.
+
+In the example below, a cancelFactory is created, passing a token inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
+
+This exception can be caught and identified by isCancelled, function that can be imported from the library.
+
+```typescript
+import { cancelFactory, isCancelled, RequestConfiguration } from '@sentinel-hub/sentinelhub-js';
+
+const source = cancelFactory();
+
+const requestConfig : RequestConfiguration = {
+  cancelToken: source.token,
+  retries: 4
+}
+
+setTimeout(() => {
+  source.cancel();
+}, 500);
+
+try {
+  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
+  const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
+}
+catch(err) {
+  if (isCancelled(err)) {
+    // Exception thrown by the cancelled requests is going to be identified by isCancelled.
+  }
+}
+````
+
 ## Getting basic statistics and histogram
 
 Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).
