@@ -90,7 +90,7 @@ It is also possible to create layers by importing their definitions from the Sen
 
 Depending on `baseUrl`, method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
 
-Alternatively, the list can be filtered to include only some of the layers:
+The list can be filtered to include only some of the layers:
 ```javascript
   import { LayersFactory, DATASET_S2L2A } from '@sentinel-hub/sentinelhub-js';
 
@@ -99,6 +99,13 @@ Alternatively, the list can be filtered to include only some of the layers:
     'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
     (layerId, dataset) => layerId.startsWith("ABC_") && dataset === DATASET_S2L2A,
   );
+```
+
+Alternatively, we can also fetch a single layer by using `makeLayer` method:
+```
+  import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+
+  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>');
 ```
 
 Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
