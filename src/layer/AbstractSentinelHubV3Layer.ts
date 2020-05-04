@@ -35,6 +35,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
+  protected evalscriptWasConvertedToV3: boolean | null;
 
   public constructor({
     instanceId = null,
@@ -61,6 +62,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
+    this.evalscriptWasConvertedToV3 = false;
   }
 
   protected async fetchLayerParamsFromSHServiceV3(): Promise<any> {
@@ -112,14 +114,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
       if (this.evalscriptUrl && !this.evalscript) {
         const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
-        let evalscriptV3;
-        //Check version of fetched evalscript by checking if first line starts with //VERSION=3
-        if (response.data.startsWith('//VERSION=3')) {
-          evalscriptV3 = response.data;
-        } else {
-          evalscriptV3 = await this.convertEvalscriptToV3(response.data);
-        }
-        this.evalscript = evalscriptV3;
+        this.evalscript = response.data;
       }
       if (!this.evalscript && !this.dataProduct) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3();
@@ -133,9 +128,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       //Convert internal evalscript to V3 if it's not in that version.
-      if (this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
+      if (!this.evalscriptWasConvertedToV3 && this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
         let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
         this.evalscript = evalscriptV3;
+        this.evalscriptWasConvertedToV3 = true;
       }
 
       const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
