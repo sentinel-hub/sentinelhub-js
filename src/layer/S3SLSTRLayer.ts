@@ -60,13 +60,6 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
-    return {
-      ...super.getWmsGetMapUrlAdditionalParameters(),
-      maxcc: this.maxCloudCoverPercent,
-    };
-  }
-
   public async findTiles(
     bbox: BBox,
     fromTime: Date,
