@@ -1,5 +1,12 @@
 import { BBox } from 'src/bbox';
-import { GetMapParams, Interpolator, PreviewMode, ApiType, PaginatedTiles, RequestConfiguration } from 'src/layer/const';
+import {
+  GetMapParams,
+  Interpolator,
+  PreviewMode,
+  ApiType,
+  PaginatedTiles,
+  RequestConfiguration,
+} from 'src/layer/const';
 import {
   createProcessingPayload,
   convertPreviewToString,
@@ -39,7 +46,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     this.layers = layers;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, reqConfig? : RequestConfiguration): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     if (api !== ApiType.PROCESSING) {
       throw new Error(`Only API type "PROCESSING" is supported`);
     }
