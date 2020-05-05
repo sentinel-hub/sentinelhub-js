@@ -62,6 +62,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
     return {
+      ...super.getWmsGetMapUrlAdditionalParameters(),
       maxcc: this.maxCloudCoverPercent,
     };
   }

@@ -12,6 +12,7 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
     return {
+      ...super.getWmsGetMapUrlAdditionalParameters(),
       maxcc: this.maxCloudCoverPercent,
     };
   }

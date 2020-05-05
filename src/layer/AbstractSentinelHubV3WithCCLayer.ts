@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 
 interface ConstructorParameters {
@@ -10,6 +10,7 @@ interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
   maxCloudCoverPercent?: number | null;
@@ -19,17 +20,8 @@ interface ConstructorParameters {
 export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer {
   public maxCloudCoverPercent: number;
 
-  public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    dataProduct = null,
-    title = null,
-    description = null,
-    maxCloudCoverPercent = 100,
-  }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+  public constructor({ maxCloudCoverPercent = 100, ...rest }: ConstructorParameters) {
+    super(rest);
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 

@@ -19,7 +19,6 @@ export type GetMapParams = {
   height?: number;
   // optional additional parameters:
   preview?: PreviewMode;
-  mosaickingOrder?: MosaickingOrder;
   geometry?: Polygon | MultiPolygon;
   quality?: number;
   gain?: number;
