@@ -1,4 +1,4 @@
-import axios, { CancelTokenSource } from 'axios';
+import axios, { CancelTokenSource, CancelToken } from 'axios';
 
 export class CancelFactory {
   protected source: CancelTokenSource;
@@ -6,15 +6,15 @@ export class CancelFactory {
     this.source = axios.CancelToken.source();
   }
 
-  public static createSource = () => {
+  public static createSource = (): CancelFactory => {
     return new CancelFactory();
   };
 
-  public getToken() {
+  public getToken(): CancelToken {
     return this.source.token;
   }
 
-  public cancel() {
+  public cancel(): void {
     this.source.cancel();
   }
 }
