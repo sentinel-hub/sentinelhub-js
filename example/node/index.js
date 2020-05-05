@@ -13,7 +13,7 @@ const {
   MimeTypes,
   ApiType,
   setDebugEnabled,
-  cancelFactory,
+  CancelFactory,
   isCancelled,
 } = require('../../dist/sentinelHub.cjs');
 
@@ -190,18 +190,20 @@ async function run() {
 
   // Cancel request example
   // Create source and pass token as config on the request (getMap WMS/Processing and getStats supported for layerV3)
-  const source = cancelFactory();
+  const source = CancelFactory.createSource();
   setTimeout(() => {
     printOut('Cancelling request');
     source.cancel();
   }, 100);
   try {
-    const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: source.token });
+    const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: source.getToken() });
+    // const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
+    // const stats = await layer.getStats(getStatsParams, requestConfig);
     console.log(response);
   } catch (err) {
     //The exception thrown by cancelling requests can be identified by isCancelled
-    if (isCancelled(err)) {
-      printOut('Error catched using isCancelled');
+    if (!isCancelled(err)) {
+      throw err
     }
   }
 }

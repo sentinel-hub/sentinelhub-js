@@ -10,6 +10,7 @@ import {
   SHV3_LOCATIONS_ROOT_URL,
   GetMapParams,
   ApiType,
+  RequestConfiguration,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -53,7 +54,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     this.locationId = locationId;
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig? : RequestConfiguration): Promise<void> {
     if (this.collectionId !== null && this.locationId !== null) {
       return;
     }
@@ -72,18 +73,18 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     if (this.locationId === null) {
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
-      const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: false });
+      const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: false, ...reqConfig });
       this.locationId = res.data.location.id;
     }
   }
 
-  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
-    await this.updateLayerFromServiceIfNeeded();
-    return await super.getMap(params, api);
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig? : RequestConfiguration): Promise<Blob> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    return await super.getMap(params, api, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload, reqConfig? : RequestConfiguration): Promise<ProcessingPayload> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
     payload.input.data[0].dataFilter.collectionId = this.collectionId;
     return payload;
   }

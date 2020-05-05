@@ -5,7 +5,7 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, RequestConfiguration } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 
 interface ConstructorParameters {
@@ -23,7 +23,7 @@ export class AbstractLayer {
     this.description = description;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: AxiosRequestConfig): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
         const url = this.getMapUrl(params, api);
@@ -234,6 +234,7 @@ export class AbstractLayer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig? : RequestConfiguration // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Date[]> {
     throw new Error('findDatesUTC() not implemented yet');
   }
