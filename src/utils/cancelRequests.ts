@@ -6,15 +6,15 @@ export class CancelFactory {
     this.source = axios.CancelToken.source();
   }
 
-  static createSource = () => {
+  public static createSource = () => {
     return new CancelFactory();
   };
 
-  getToken() {
+  public getToken() {
     return this.source.token;
   }
 
-  cancel() {
+  public cancel() {
     this.source.cancel();
   }
 }
