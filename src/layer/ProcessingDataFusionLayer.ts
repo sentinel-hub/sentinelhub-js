@@ -53,13 +53,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
 
     // when constructing the payload, we just take the first layer - we will rewrite its info later:
     const bogusFirstLayer = this.layers[0].layer;
-    let payload = createProcessingPayload(
-      bogusFirstLayer.dataset,
-      params,
-      this.evalscript,
-      null,
-      this.mosaickingOrder,
-    );
+    let payload = createProcessingPayload(bogusFirstLayer.dataset, params, this.evalscript);
 
     // replace payload.input.data with information from this.layers:
     payload.input.data = [];
