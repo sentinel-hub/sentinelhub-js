@@ -25,6 +25,13 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {
+      ...super.getWmsGetMapUrlAdditionalParameters(),
+      maxcc: this.maxCloudCoverPercent,
+    };
+  }
+
   public async findTiles(
     bbox: BBox,
     fromTime: Date,

@@ -9,11 +9,4 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
     payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     return payload;
   }
-
-  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
-    return {
-      ...super.getWmsGetMapUrlAdditionalParameters(),
-      maxcc: this.maxCloudCoverPercent,
-    };
-  }
 }
