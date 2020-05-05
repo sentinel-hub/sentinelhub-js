@@ -2,7 +2,8 @@ import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
-import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from 'src/layer/processing';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -30,6 +31,12 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       ...super.getWmsGetMapUrlAdditionalParameters(),
       maxcc: this.maxCloudCoverPercent,
     };
+  }
+
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    payload = await super.updateProcessingGetMapPayload(payload);
+    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    return payload;
   }
 
   public async findTiles(
