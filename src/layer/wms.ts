@@ -131,9 +131,6 @@ export function wmsGetMapUrl(
   if (params.preview !== undefined) {
     queryParams.preview = params.preview;
   }
-  if (params.mosaickingOrder !== undefined) {
-    queryParams.priority = params.mosaickingOrder;
-  }
   if (params.geometry) {
     queryParams.geometry = WKT.convert(params.geometry);
   }

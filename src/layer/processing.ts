@@ -85,6 +85,7 @@ export function createProcessingPayload(
   params: GetMapParams,
   evalscript: string | null = null,
   dataProduct: string | null = null,
+  mosaickingOrder: MosaickingOrder | null = null,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -103,7 +104,7 @@ export function createProcessingPayload(
               from: params.fromTime.toISOString(),
               to: params.toTime.toISOString(),
             },
-            mosaickingOrder: MosaickingOrder.MOST_RECENT,
+            mosaickingOrder: mosaickingOrder ? mosaickingOrder : MosaickingOrder.MOST_RECENT,
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,
@@ -136,9 +137,6 @@ export function createProcessingPayload(
 
   if (params.preview !== undefined) {
     payload.input.data[0].dataFilter.previewMode = convertPreviewToString(params.preview);
-  }
-  if (params.mosaickingOrder !== undefined) {
-    payload.input.data[0].dataFilter.mosaickingOrder = params.mosaickingOrder;
   }
 
   //dataProduct should not be set if evalscript is passed as parameter

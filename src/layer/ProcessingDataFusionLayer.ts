@@ -53,7 +53,13 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
 
     // when constructing the payload, we just take the first layer - we will rewrite its info later:
     const bogusFirstLayer = this.layers[0].layer;
-    let payload = createProcessingPayload(bogusFirstLayer.dataset, params, this.evalscript);
+    let payload = createProcessingPayload(
+      bogusFirstLayer.dataset,
+      params,
+      this.evalscript,
+      null,
+      this.mosaickingOrder,
+    );
 
     // replace payload.input.data with information from this.layers:
     payload.input.data = [];
@@ -81,10 +87,8 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         datasource.dataFilter.previewMode = convertPreviewToString(params.preview);
       }
 
-      if (layerInfo.mosaickingOrder !== undefined) {
-        datasource.dataFilter.mosaickingOrder = layerInfo.mosaickingOrder;
-      } else if (params.mosaickingOrder !== undefined) {
-        datasource.dataFilter.mosaickingOrder = params.mosaickingOrder;
+      if (layerInfo.layer.mosaickingOrder) {
+        datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
       }
 
       if (layerInfo.upsampling !== undefined) {
