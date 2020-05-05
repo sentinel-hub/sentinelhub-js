@@ -47,7 +47,7 @@ import {
   parseLegacyWmsGetMapParams,
 } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
-import { LocationIdSHv3} from 'src/layer/const';
+import { LocationIdSHv3 } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelFactory, isCancelled } from 'src/utils/cancelRequests';
 

@@ -2,7 +2,7 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
 import { CRS_IDS } from 'src/crs';
-import {CancelToken} from 'axios'
+import { CancelToken } from 'axios';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -167,6 +167,6 @@ export type GetStats = {
 };
 
 export type RequestConfiguration = {
-  cancelToken?: CancelToken,
-  retries?: number
-}
+  cancelToken?: CancelToken;
+  retries?: number;
+};

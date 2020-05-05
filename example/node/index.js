@@ -203,7 +203,7 @@ async function run() {
   } catch (err) {
     //The exception thrown by cancelling requests can be identified by isCancelled
     if (!isCancelled(err)) {
-      throw err
+      throw err;
     }
   }
 }
