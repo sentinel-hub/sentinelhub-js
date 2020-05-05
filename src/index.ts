@@ -47,9 +47,9 @@ import {
   parseLegacyWmsGetMapParams,
 } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
-import { LocationIdSHv3 } from 'src/layer/const';
+import { LocationIdSHv3} from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
-import { cancelFactory, isCancelled } from 'src/utils/cancelRequests';
+import { CancelFactory, isCancelled } from 'src/utils/cancelRequests';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -108,11 +108,11 @@ export {
   BBox,
   LocationIdSHv3,
   setDebugEnabled,
+  CancelFactory,
+  isCancelled,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
-  cancelFactory,
-  isCancelled,
 };

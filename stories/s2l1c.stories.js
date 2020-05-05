@@ -8,7 +8,7 @@ import {
   MimeTypes,
   ApiType,
   PreviewMode,
-  cancelFactory,
+  CancelFactory,
   isCancelled,
 } from '../dist/sentinelHub.esm';
 
@@ -415,11 +415,11 @@ export const cancelRequests = () => {
   let source;
 
   button.addEventListener('click', async () => {
-    source = cancelFactory();
+    source = CancelFactory.createSource();
     img.src = '';
     try {
       const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING, {
-        cancelToken: source.token,
+        cancelToken: source.getToken(),
       });
       img.src = URL.createObjectURL(imageBlob);
     } catch (err) {

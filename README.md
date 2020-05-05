@@ -202,10 +202,10 @@ This exception can be caught and identified by isCancelled, function that can be
 ```typescript
 import { cancelFactory, isCancelled, RequestConfiguration } from '@sentinel-hub/sentinelhub-js';
 
-const source = cancelFactory();
+const source = CancelFactory.createSource();
 
 const requestConfig : RequestConfiguration = {
-  cancelToken: source.token,
+  cancelToken: source.getToken(),
   retries: 4
 }
 
@@ -216,10 +216,11 @@ setTimeout(() => {
 try {
   const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
   const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
+  const stats = await layer.getStats(getStatsParams, requestConfig);
 }
 catch(err) {
-  if (isCancelled(err)) {
-    // Exception thrown by the cancelled requests is going to be identified by isCancelled.
+  if (!isCancelled(err)) {
+    throw err;
   }
 }
 ````

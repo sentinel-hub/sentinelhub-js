@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
-import { MimeType, GetMapParams, Interpolator, PreviewMode } from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator, PreviewMode,RequestConfiguration } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 
 export enum MosaickingOrder {
@@ -160,7 +160,7 @@ export function createProcessingPayload(
 export async function processingGetMap(
   shServiceHostname: string,
   payload: ProcessingPayload,
-  reqConfig?: AxiosRequestConfig,
+  reqConfig?: RequestConfiguration,
 ): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {
