@@ -33,6 +33,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     offset?: number,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,
