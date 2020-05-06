@@ -161,6 +161,6 @@ export type DailyChannelStats = {
   };
 };
 
-export type GetStats = {
+export type Stats = {
   [key: string]: DailyChannelStats[];
 };
