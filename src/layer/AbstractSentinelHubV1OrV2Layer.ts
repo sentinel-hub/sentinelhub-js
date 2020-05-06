@@ -9,7 +9,7 @@ import {
   ApiType,
   PaginatedTiles,
   GetStatsParams,
-  GetStats,
+  Stats,
   HistogramType,
   FisPayload,
   MosaickingOrder,
@@ -173,7 +173,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
