@@ -10,8 +10,9 @@ import {
   PaginatedTiles,
   HistogramType,
   FisPayload,
+  MosaickingOrder,
   GetStatsParams,
-  GetStats,
+  Stats,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -24,6 +25,7 @@ interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
 }
@@ -36,6 +38,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
   protected evalscriptWasConvertedToV3: boolean | null;
+  public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
 
   public constructor({
     instanceId = null,
@@ -43,6 +46,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     evalscript = null,
     evalscriptUrl = null,
     dataProduct = null,
+    mosaickingOrder = null,
     title = null,
     description = null,
   }: ConstructorParameters) {
@@ -63,6 +67,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
     this.evalscriptWasConvertedToV3 = false;
+    this.mosaickingOrder = mosaickingOrder;
   }
 
   protected async fetchLayerParamsFromSHServiceV3(): Promise<any> {
@@ -106,6 +111,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
+  protected getShServiceHostname(): string {
+    return this.dataset.shServiceHostname;
+  }
+
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
@@ -116,8 +125,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
         this.evalscript = response.data;
       }
+      let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
-        const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+        layerParams = await this.fetchLayerParamsFromSHServiceV3();
         if (layerParams.evalscript) {
           this.evalscript = layerParams.evalscript;
         } else if (layerParams.dataProduct) {
@@ -126,19 +136,29 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-
+      if (!this.mosaickingOrder) {
+        if (!layerParams) {
+          layerParams = await this.fetchLayerParamsFromSHServiceV3();
+        }
+        this.mosaickingOrder = layerParams.mosaickingOrder;
+      }
       //Convert internal evalscript to V3 if it's not in that version.
       if (!this.evalscriptWasConvertedToV3 && this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
         let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
         this.evalscript = evalscriptV3;
         this.evalscriptWasConvertedToV3 = true;
       }
-
-      const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
+      const payload = createProcessingPayload(
+        this.dataset,
+        params,
+        this.evalscript,
+        this.dataProduct,
+        this.mosaickingOrder,
+      );
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
-
-      return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
+      const shServiceHostname = this.getShServiceHostname();
+      return processingGetMap(shServiceHostname, updatedPayload);
     }
 
     return super.getMap(params, api);
@@ -149,6 +169,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    if (this.mosaickingOrder) {
+      return {
+        priority: this.mosaickingOrder,
+      };
+    }
     return {};
   }
 
@@ -159,7 +184,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not have a dataset specified');
     }
-    const baseUrl = `${this.dataset.shServiceHostname}ogc/wms/${this.instanceId}`;
+    const shServiceHostname = this.getShServiceHostname();
+    const baseUrl = `${shServiceHostname}ogc/wms/${this.instanceId}`;
     const evalsource = this.dataset.shWmsEvalsource;
     return wmsGetMapUrl(
       baseUrl,
@@ -194,7 +220,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset);
+    const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+    );
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
@@ -206,6 +239,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected fetchTiles(
+    searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -214,7 +248,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
-    if (!this.dataset.searchIndexUrl) {
+    if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
     const bboxPolygon = bbox.toGeoJSON();
@@ -233,7 +267,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.datasetParameters = datasetParameters;
     }
 
-    return axios.post(this.dataset.searchIndexUrl, payload, this.createSearchIndexRequestConfig());
+    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig());
   }
 
   protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
@@ -244,8 +278,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
+  protected async getFindDatesUTCUrl(): Promise<string> {
+    return this.dataset.findDatesUTCUrl;
+  }
+
   public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
-    if (!this.dataset.findDatesUTCUrl) {
+    const findDatesUTCUrl = await this.getFindDatesUTCUrl();
+    if (!findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
 
@@ -256,7 +295,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       to: toTime.toISOString(),
       ...(await this.getFindDatesUTCAdditionalParameters()),
     };
-    const response = await axios.post(this.dataset.findDatesUTCUrl, payload);
+    const response = await axios.post(findDatesUTCUrl, payload);
     const found: Moment[] = response.data.map((date: string) => moment.utc(date));
 
     // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
@@ -265,7 +304,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return found.map(m => m.toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -307,7 +346,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
     }
 
-    const { data } = await axios.post(this.dataset.shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
+    const shServiceHostname = this.getShServiceHostname();
+    const { data } = await axios.post(shServiceHostname + 'ogc/fis/' + this.instanceId, payload);
     // convert date strings to Date objects
     for (let channel in data) {
       data[channel] = data[channel].map((dailyStats: any) => ({

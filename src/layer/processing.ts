@@ -2,14 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
-import { MimeType, GetMapParams, Interpolator, PreviewMode } from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-
-export enum MosaickingOrder {
-  MOST_RECENT = 'mostRecent',
-  LEAST_RECENT = 'leastRecent',
-  LEAST_CC = 'leastCC',
-}
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -91,6 +85,7 @@ export function createProcessingPayload(
   params: GetMapParams,
   evalscript: string | null = null,
   dataProduct: string | null = null,
+  mosaickingOrder: MosaickingOrder | null = null,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -109,7 +104,7 @@ export function createProcessingPayload(
               from: params.fromTime.toISOString(),
               to: params.toTime.toISOString(),
             },
-            mosaickingOrder: MosaickingOrder.MOST_RECENT,
+            mosaickingOrder: mosaickingOrder ? mosaickingOrder : MosaickingOrder.MOST_RECENT,
           },
           processing: {},
           type: dataset.shProcessingApiDatasourceAbbreviation,
