@@ -49,6 +49,16 @@ export class AbstractLayer {
     throw new Error('getMapUrl() not implemented yet');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setEvalscript(evalscript: string): void {
+    throw new Error('Evalscript is only supported on Sentinel Hub layers');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public setEvalscriptUrl(evalscriptUrl: string): void {
+    throw new Error('EvalscriptUrl is only supported on Sentinel Hub layers');
+  }
+
   public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars

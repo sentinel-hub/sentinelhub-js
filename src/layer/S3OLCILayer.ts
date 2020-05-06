@@ -15,7 +15,14 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     maxCount?: number,
     offset?: number,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset);
+    const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+    );
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,

@@ -9,9 +9,10 @@ import {
   ApiType,
   PaginatedTiles,
   GetStatsParams,
-  GetStats,
+  Stats,
   HistogramType,
   FisPayload,
+  MosaickingOrder,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -22,6 +23,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
 }
@@ -32,12 +34,14 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   protected layerId: string;
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
+  protected mosaickingOrder: MosaickingOrder | null;
 
   public constructor({
     instanceId = null,
     layerId = null,
     evalscript = null,
     evalscriptUrl = null,
+    mosaickingOrder = null,
     title = null,
     description = null,
   }: ConstructorParameters) {
@@ -49,6 +53,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     this.layerId = layerId;
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
+    this.mosaickingOrder = mosaickingOrder;
   }
 
   protected getEvalsource(): string {
@@ -58,6 +63,11 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    if (this.mosaickingOrder) {
+      return {
+        priority: this.mosaickingOrder,
+      };
+    }
     return {};
   }
 
@@ -75,6 +85,14 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       this.getEvalsource(),
       this.getWmsGetMapUrlAdditionalParameters(),
     );
+  }
+
+  public setEvalscript(evalscript: string): void {
+    this.evalscript = evalscript;
+  }
+
+  public setEvalscriptUrl(evalscriptUrl: string): void {
+    this.evalscriptUrl = evalscriptUrl;
   }
 
   protected getFindTilesAdditionalParameters(): Record<string, any> {
@@ -155,7 +173,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
