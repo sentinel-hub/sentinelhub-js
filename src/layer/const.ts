@@ -44,6 +44,12 @@ export enum PreviewMode {
   EXTENDED_PREVIEW = 2,
 }
 
+export enum MosaickingOrder {
+  MOST_RECENT = 'mostRecent',
+  LEAST_RECENT = 'leastRecent',
+  LEAST_CC = 'leastCC',
+}
+
 export enum ApiType {
   WMS = 'wms',
   PROCESSING = 'processing',

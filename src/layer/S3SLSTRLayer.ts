@@ -3,7 +3,7 @@ import moment from 'moment';
 import { BBox } from 'src/bbox';
 import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
 
 interface ConstructorParameters {
@@ -29,41 +29,23 @@ type S3SLSTRFindTilesDatasetParameters = {
   view: S3SLSTRView;
 };
 
-export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
+export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_S3SLSTR;
-  public maxCloudCoverPercent: number;
   public orbitDirection: OrbitDirection | null;
   public view: S3SLSTRView;
 
-  public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    dataProduct = null,
-    title = null,
-    description = null,
-    maxCloudCoverPercent = 100,
-    view = S3SLSTRView.NADIR,
-  }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
-    this.maxCloudCoverPercent = maxCloudCoverPercent;
+  public constructor({ view = S3SLSTRView.NADIR, ...rest }: ConstructorParameters) {
+    super(rest);
     // images that are not DESCENDING appear empty:
     this.orbitDirection = OrbitDirection.DESCENDING;
     this.view = view;
   }
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    payload = await super.updateProcessingGetMapPayload(payload);
     payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
     payload.input.data[0].processing.view = this.view;
     return payload;
-  }
-
-  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
-    return {
-      maxcc: this.maxCloudCoverPercent,
-    };
   }
 
   public async findTiles(

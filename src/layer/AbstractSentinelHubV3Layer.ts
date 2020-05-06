@@ -10,6 +10,7 @@ import {
   PaginatedTiles,
   HistogramType,
   FisPayload,
+  MosaickingOrder,
   GetStatsParams,
   GetStats,
 } from 'src/layer/const';
@@ -24,6 +25,7 @@ interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
 }
@@ -35,6 +37,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
+  public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
 
   public constructor({
     instanceId = null,
@@ -42,6 +45,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     evalscript = null,
     evalscriptUrl = null,
     dataProduct = null,
+    mosaickingOrder = null,
     title = null,
     description = null,
   }: ConstructorParameters) {
@@ -61,6 +65,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
+    this.mosaickingOrder = mosaickingOrder;
   }
 
   protected async fetchLayerParamsFromSHServiceV3(): Promise<any> {
@@ -125,8 +130,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         }
         this.evalscript = evalscriptV3;
       }
+      let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
-        const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+        layerParams = await this.fetchLayerParamsFromSHServiceV3();
         if (layerParams.evalscript) {
           this.evalscript = layerParams.evalscript;
         } else if (layerParams.dataProduct) {
@@ -135,8 +141,20 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
+      if (!this.mosaickingOrder) {
+        if (!layerParams) {
+          layerParams = await this.fetchLayerParamsFromSHServiceV3();
+        }
+        this.mosaickingOrder = layerParams.mosaickingOrder;
+      }
 
-      const payload = createProcessingPayload(this.dataset, params, this.evalscript, this.dataProduct);
+      const payload = createProcessingPayload(
+        this.dataset,
+        params,
+        this.evalscript,
+        this.dataProduct,
+        this.mosaickingOrder,
+      );
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
       const shServiceHostname = this.getShServiceHostname();
@@ -151,6 +169,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    if (this.mosaickingOrder) {
+      return {
+        priority: this.mosaickingOrder,
+      };
+    }
     return {};
   }
 
