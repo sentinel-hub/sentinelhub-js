@@ -50,9 +50,7 @@ export async function legacyGetMapFromParams(
     // that doesn't match layer's dataset - but we check it nevertheless:
     const expectedEvalsource = layer.dataset.shWmsEvalsource;
     if (expectedEvalsource !== evalsource) {
-      console.warn(
-        `Evalsource ${evalsource} is not valid on this layer (was expecting ${expectedEvalsource})`,
-      );
+      console.warn(`Evalsource ${evalsource} is not valid on this layer, will use: ${expectedEvalsource}`);
     }
     if (evalscriptUrl) {
       layer.setEvalscriptUrl(evalscriptUrl);
