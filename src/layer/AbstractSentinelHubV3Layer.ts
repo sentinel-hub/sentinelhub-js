@@ -12,7 +12,7 @@ import {
   FisPayload,
   MosaickingOrder,
   GetStatsParams,
-  GetStats,
+  Stats,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -304,7 +304,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return found.map(m => m.toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
