@@ -35,8 +35,6 @@ type OgcGetMapOptions = {
   geometry?: string;
   quality?: number;
   evalsource?: string;
-  gain: number | undefined; // needs to be removed
-  gamma: number | undefined; // needs to be removed
   nicename?: string;
   temporal?: boolean;
 };
@@ -71,8 +69,6 @@ export function wmsGetMapUrl(
     height: undefined,
     showlogo: undefined,
     transparent: undefined,
-    gain: undefined, // needs to be removed
-    gamma: undefined, // needs to be removed
     ...additionalParameters,
   };
 
@@ -135,18 +131,6 @@ export function wmsGetMapUrl(
   }
   if (params.quality) {
     queryParams.quality = params.quality;
-  }
-  // needs to be removed
-  // or error: NOT SUPPORTED
-  if (params.gain) {
-    console.log('wmsGetMapUrl', { gain: params.gain });
-    queryParams.gain = params.gain;
-  }
-  // needs to be removed
-  // or error: NOT SUPPORTED
-  if (params.gamma) {
-    console.log('wmsGetMapUrl', { gamma: params.gamma });
-    queryParams.gamma = params.gamma;
   }
   if (params.nicename) {
     queryParams.nicename = params.nicename;

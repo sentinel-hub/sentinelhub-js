@@ -65,6 +65,12 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (api !== ApiType.WMS) {
       throw new Error('Only WMS is supported on this layer');
     }
+    if (params.gain) {
+      throw new Error('Parameter gain is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.gamma) {
+      throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
+    }
     const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
     return wmsGetMapUrl(
       baseUrl,

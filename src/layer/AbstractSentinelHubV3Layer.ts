@@ -157,6 +157,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not have a dataset specified');
     }
+    if (params.gain) {
+      throw new Error('Parameter gain is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.gamma) {
+      throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
+    }
     const baseUrl = `${this.dataset.shServiceHostname}ogc/wms/${this.instanceId}`;
     const evalsource = this.dataset.shWmsEvalsource;
     return wmsGetMapUrl(
