@@ -39,12 +39,28 @@ export async function legacyGetMapFromParams(
     wmsParams,
   );
 
-  let layer;
+  const layerId = layers.split(',')[0];
+  const layer = await LayersFactory.makeLayer(baseUrl, layerId);
+  if (!layer) {
+    throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
+  }
+
+  if (evalscript || evalscriptUrl) {
+    // we assume that devs don't do things like setting evalsource on a layer to something
+    // that doesn't match layer's dataset - but we check it nevertheless:
+    const expectedEvalsource = layer.dataset.shWmsEvalsource;
+    if (expectedEvalsource !== evalsource) {
+      console.warn(`Evalsource ${evalsource} is not valid on this layer, will use: ${expectedEvalsource}`);
+    }
+    if (evalscriptUrl) {
+      layer.setEvalscriptUrl(evalscriptUrl);
+    } else {
+      layer.setEvalscript(evalscript);
+    }
+  }
+
   switch (api) {
     case ApiType.WMS:
-      console.log('legacyGetMapFromParams wms', { getMapParams });
-
-      layer = new WmsLayer({ baseUrl, layerId: layers });
       return layer.getMap(getMapParams, api);
 
     case ApiType.PROCESSING:
@@ -53,42 +69,8 @@ export async function legacyGetMapFromParams(
         // the parameters. If some of them are incompatible, we _don't_ render the possibly incorrect image,
         // but instead throw an exception. In this case, parameter 'fallbackToWmsApi' allows rendering image
         // using the regular WMS.
-
-        // We use LayerFactory to construct the layer, but then change the evalscript if needed:
-        const layerId = layers.split(',')[0];
-        const layerFactoryResult = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId);
-        if (layerFactoryResult.length < 1) {
-          throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
-        }
-        layer = layerFactoryResult[0];
         if (!(layer instanceof AbstractSentinelHubV3Layer)) {
           throw new Error('Processing API is only possible with SH V3 layers');
-        }
-        if (evalscript) {
-          let decodedEvalscript;
-          if (typeof window !== 'undefined' && window.atob) {
-            decodedEvalscript = atob(evalscript);
-          } else {
-            // node.js doesn't support atob:
-            decodedEvalscript = Buffer.from(evalscript, 'base64').toString('utf8');
-          }
-          if (!decodedEvalscript.startsWith('//VERSION=3')) {
-            throw new Error(
-              "To avoid possible bugs, legacy functions only allow evalscripts explicitly marked with '//VERSION=3' comment with Processing API",
-            );
-          }
-          // we assume that devs don't do things like setting evalsource on a layer to something
-          // that doesn't match layer's dataset - but we check it nevertheless:
-          const expectedEvalsource = layer.dataset.shWmsEvalsource;
-          if (expectedEvalsource !== evalsource) {
-            throw new Error(
-              `Evalsource ${evalsource} is not valid on this layer (was expecting ${expectedEvalsource})`,
-            );
-          }
-          layer.setEvalscript(decodedEvalscript);
-        } else if (evalscriptUrl) {
-          // Processing API doesn't support evalscriptUrl, bail out:
-          throw new Error('Parameter evalscriptUrl is not supported with Processing API');
         }
         if (wmsParams.gamma && Number(wmsParams.gamma).toFixed(1) !== '1.0') {
           throw new Error('Parameter gamma is not supported with Processing API');
@@ -127,7 +109,7 @@ type ParsedLegacyWmsGetMapParams = {
   getMapParams: GetMapParams;
 };
 
-function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegacyWmsGetMapParams {
+export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegacyWmsGetMapParams {
   const params = convertKeysToLowercase(wmsParams);
 
   const layers = params.layers;
@@ -228,9 +210,19 @@ function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegac
     getMapParams.unknown = unknown;
   }
 
+  let decodedEvalscript = null;
+  if (params.evalscript) {
+    if (typeof window !== 'undefined' && window.atob) {
+      decodedEvalscript = atob(params.evalscript);
+    } else {
+      // node.js doesn't support atob:
+      decodedEvalscript = Buffer.from(params.evalscript, 'base64').toString('utf8');
+    }
+  }
+
   return {
     layers: layers,
-    evalscript: params.evalscript,
+    evalscript: decodedEvalscript,
     evalscriptUrl: params.evalscriptUrl,
     evalsource: params.evalsource,
     getMapParams: getMapParams,

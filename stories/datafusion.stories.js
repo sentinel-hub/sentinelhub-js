@@ -8,6 +8,7 @@ import {
   ApiType,
   S2L1CLayer,
   S2L2ALayer,
+  MosaickingOrder,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -53,7 +54,11 @@ export const getMapProcessing = () => {
     await setAuthTokenWithOAuthCredentials();
 
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2l1cLayerId });
-    const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: s2l2aLayerId,
+      mosaickingOrder: MosaickingOrder.LEAST_RECENT,
+    });
     const layers = [
       {
         layer: layerS2L2A,
@@ -75,7 +80,7 @@ export const getMapProcessing = () => {
         var setup = () => ({
           input: [
             {datasource: "l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
-            {datasource: "l1c", bands:["B02", "B03", "B04"], units:"REFLECTANCE"}],
+            {datasource: "l1c", bands:["B02", "B03", "B04"], units: "REFLECTANCE"}],
           output: [
             {id: "default", bands: 3, sampleType: SampleType.AUTO}
           ]

@@ -1,10 +1,16 @@
 import { BBox } from 'src/bbox';
-import { GetMapParams, Interpolator, PreviewMode, ApiType, PaginatedTiles } from 'src/layer/const';
+import {
+  GetMapParams,
+  Interpolator,
+  PreviewMode,
+  ApiType,
+  PaginatedTiles,
+  MosaickingOrder,
+} from 'src/layer/const';
 import {
   createProcessingPayload,
   convertPreviewToString,
   processingGetMap,
-  MosaickingOrder,
   ProcessingPayloadDatasource,
 } from 'src/layer/processing';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -27,6 +33,7 @@ export type DataFusionLayerInfo = {
   fromTime?: Date;
   toTime?: Date;
   preview?: PreviewMode;
+  mosaickingOrder?: MosaickingOrder;
   upsampling?: Interpolator;
   downsampling?: Interpolator;
 };
@@ -72,6 +79,10 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         datasource.dataFilter.previewMode = convertPreviewToString(layerInfo.preview);
       } else if (params.preview !== undefined) {
         datasource.dataFilter.previewMode = convertPreviewToString(params.preview);
+      }
+
+      if (layerInfo.layer.mosaickingOrder) {
+        datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
       }
 
       if (layerInfo.upsampling !== undefined) {

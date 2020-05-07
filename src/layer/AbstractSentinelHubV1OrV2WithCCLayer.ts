@@ -1,3 +1,4 @@
+import { MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 
 interface ConstructorParameters {
@@ -8,27 +9,21 @@ interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
   maxCloudCoverPercent?: number | null;
+  mosaickingOrder?: MosaickingOrder | null;
 }
 
 // same as AbstractSentinelHubV1OrV2Layer, but with maxCloudCoverPercent (useful for Landsat datasets)
 export class AbstractSentinelHubV1OrV2WithCCLayer extends AbstractSentinelHubV1OrV2Layer {
   public maxCloudCoverPercent: number;
 
-  public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    title = null,
-    description = null,
-    maxCloudCoverPercent = 100,
-  }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, title, description });
+  public constructor({ maxCloudCoverPercent = 100, ...rest }: ConstructorParameters) {
+    super(rest);
     this.maxCloudCoverPercent = maxCloudCoverPercent;
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
     return {
+      ...super.getWmsGetMapUrlAdditionalParameters(),
       maxcc: this.maxCloudCoverPercent,
     };
   }

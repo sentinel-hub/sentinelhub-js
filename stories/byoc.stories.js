@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LocationIdSHv3 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -15,10 +15,10 @@ const layerId = process.env.BYOC_LAYER_ID;
 
 const bbox = new BBox(
   CRS_EPSG3857,
-  1252344.271424327,
-  5165920.119625352,
-  1330615.7883883484,
-  5244191.636589374,
+  process.env.BYOC_BBOX_EPSG3857_MINX ? process.env.BYOC_BBOX_EPSG3857_MINX : 1252344.271424327,
+  process.env.BYOC_BBOX_EPSG3857_MINY ? process.env.BYOC_BBOX_EPSG3857_MINY : 5165920.119625352,
+  process.env.BYOC_BBOX_EPSG3857_MAXX ? process.env.BYOC_BBOX_EPSG3857_MAXX : 1330615.7883883484,
+  process.env.BYOC_BBOX_EPSG3857_MAXY ? process.env.BYOC_BBOX_EPSG3857_MAXY : 5244191.636589374,
 );
 
 const gain = 2;
@@ -37,7 +37,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new BYOCLayer({ instanceId, layerId });
+  const layer = new BYOCLayer({ instanceId, layerId, locationId: LocationIdSHv3.awsEuCentral1 });
 
   const getMapParams = {
     bbox: bbox,
@@ -63,6 +63,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
@@ -183,7 +184,7 @@ export const getMapURLGainGamma = () => {
   imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>S2L2A getMapURLGainGamma</h2>';
+  wrapperEl.innerHTML = '<h2>BYOC getMapURLGainGamma</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
@@ -191,7 +192,7 @@ export const getMapURLGainGamma = () => {
   wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
-    const layer = new BYOCLayer({ instanceId, layerId });
+    const layer = new BYOCLayer({ instanceId, layerId, locationId: LocationIdSHv3.awsEuCentral1 });
 
     const getMapParams = {
       bbox: bbox,
@@ -245,7 +246,7 @@ export const getMapWMSGainGamma = () => {
   imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>S2L2A getMapWMSGainGamma</h2>';
+  wrapperEl.innerHTML = '<h2>BYOC getMapWMSGainGamma</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
@@ -253,6 +254,7 @@ export const getMapWMSGainGamma = () => {
   wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
@@ -307,7 +309,7 @@ export const getMapProcessingGainGamma = () => {
   imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingGainGamma</h2>';
+  wrapperEl.innerHTML = '<h2>BYOC getMapProcessingGainGamma</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
@@ -361,11 +363,12 @@ export const findTiles = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (with collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -391,7 +394,7 @@ export const findTilesAuth = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (without collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -420,10 +423,11 @@ export const findDatesUTC = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -468,7 +472,7 @@ export const findDatesUTCAuth = () => {
   const layer = new BYOCLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);

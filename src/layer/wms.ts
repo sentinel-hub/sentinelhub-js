@@ -3,7 +3,7 @@ import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
 import { CRS_EPSG4326, CRS_IDS } from 'src/crs';
-import { GetMapParams, MimeTypes, MimeType } from 'src/layer/const';
+import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from 'src/layer/const';
 
 export enum ServiceType {
   WMS = 'WMS',
@@ -32,6 +32,7 @@ type OgcGetMapOptions = {
   evalscript?: string;
   evalscripturl?: string;
   preview?: number;
+  priority?: MosaickingOrder;
   geometry?: string;
   quality?: number;
   evalsource?: string;

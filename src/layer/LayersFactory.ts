@@ -59,6 +59,7 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
+    [DATASET_BYOC.shJsonGetCapabilitiesDataset]: DATASET_BYOC,
   };
 
   private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
@@ -91,6 +92,14 @@ export class LayersFactory {
     [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
+
+  public static async makeLayer(baseUrl: string, layerId: string): Promise<AbstractLayer> {
+    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId);
+    if (layers.length === 0) {
+      return null;
+    }
+    return layers[0];
+  }
 
   public static async makeLayers(
     baseUrl: string,
