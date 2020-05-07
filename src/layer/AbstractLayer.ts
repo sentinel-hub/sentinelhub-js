@@ -31,10 +31,7 @@ export class AbstractLayer {
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
-        console.log('AbsLayer getMap wms', { params });
-
         let gain, gamma;
-
         if (params.gain) {
           gain = params.gain;
           params.gain = undefined;
