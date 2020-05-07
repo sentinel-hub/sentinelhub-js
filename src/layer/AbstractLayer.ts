@@ -54,8 +54,6 @@ export class AbstractLayer {
         let blob = response.data;
 
         // this code applies only if we use separate functions manipulateGain and manipulateGamma
-        // in visualizers, there's first manipulation of gain and then gamma
-        // https://git.sinergise.com/sentinel-core/java/blob/master/RendererService/src/main/resources/com/sinergise/sentinel/renderer/javascript/global/js/defaultVisualizer.js
         // if (gain) {
         //   blob = manipulateGain(blob, gain);
         // }
