@@ -72,6 +72,88 @@ export const getMapWMS = () => {
   return wrapperEl;
 };
 
+export const getMapURLGain = () => {
+  const imgGainIs1 = document.createElement('img');
+  imgGainIs1.width = '512';
+  imgGainIs1.height = '512';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '512';
+  imgGainIs2.height = '512';
+
+  const gain = 2;
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gain vs gain=${gain}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+
+  const layer = new WmsLayer({ baseUrl, layerId });
+
+  const getMapParams = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+  };
+  const imageUrl1 = layer.getMapUrl(getMapParams, ApiType.WMS);
+  imgGainIs1.src = imageUrl1;
+
+  const getMapParamsWithGainIs2 = {
+    ...getMapParams,
+    gain: gain,
+  };
+
+  const imageUrl2 = layer.getMapUrl(getMapParamsWithGainIs2, ApiType.WMS);
+  imgGainIs2.src = imageUrl2;
+  return wrapperEl;
+};
+
+export const getMapWMSGain = () => {
+  const imgGainIs1 = document.createElement('img');
+  imgGainIs1.width = '512';
+  imgGainIs1.height = '512';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '512';
+  imgGainIs2.height = '512';
+
+  const gain = 2;
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMap with WMS; no gain vs gain=${gain}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+
+  const perform = async () => {
+    const layer = new WmsLayer({ baseUrl, layerId });
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlobGainIs1 = await layer.getMap(getMapParams, ApiType.WMS);
+    imgGainIs1.src = URL.createObjectURL(imageBlobGainIs1);
+
+    const getMapParamsWithGainIs2 = {
+      ...getMapParams,
+      gain: gain,
+    };
+
+    const imageBlobGainIs2 = await layer.getMap(getMapParamsWithGainIs2, ApiType.WMS);
+    imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const getMapWmsLayersFactory = () => {
   const img = document.createElement('img');
   img.width = '512';
