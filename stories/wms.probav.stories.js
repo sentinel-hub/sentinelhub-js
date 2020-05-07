@@ -15,6 +15,9 @@ const layerId = 'PROBAV_S5_TOA_100M';
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
+const gain = 2;
+const gamma = 2;
+
 export default {
   title: 'WMS - ProbaV',
 };
@@ -81,8 +84,6 @@ export const getMapURLGain = () => {
   imgGainIs2.width = '512';
   imgGainIs2.height = '512';
 
-  const gain = 2;
-
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gain vs gain=${gain}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
@@ -119,8 +120,6 @@ export const getMapWMSGain = () => {
   const imgGainIs2 = document.createElement('img');
   imgGainIs2.width = '512';
   imgGainIs2.height = '512';
-
-  const gain = 2;
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>GetMap with WMS; no gain vs gain=${gain}</h2>`;
@@ -163,8 +162,6 @@ export const getMapURLGamma = () => {
   imgGammaIs2.width = '512';
   imgGammaIs2.height = '512';
 
-  const gamma = 2;
-
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gamma vs gamma=${gamma}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
@@ -201,8 +198,6 @@ export const getMapWMSGamma = () => {
   const imgGammaIs2 = document.createElement('img');
   imgGammaIs2.width = '512';
   imgGammaIs2.height = '512';
-
-  const gamma = 2;
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>GetMap with WMS; no gamma vs gamma=${gamma}</h2>`;

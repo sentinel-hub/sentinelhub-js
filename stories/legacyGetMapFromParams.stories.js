@@ -25,8 +25,8 @@ const madridBboxAsArrayEPSG3857 = [
   4950673.447974297,
 ];
 const maxCC = 0;
-const gainString = '2';
-const gammaString = '2';
+const gain = 2;
+const gamma = 2;
 const timeString = '2019-10-01/2020-04-23';
 
 const basicParamsObject = {
@@ -47,22 +47,22 @@ const basicParamsObject = {
 
 const paramsObjectWithGain = {
   ...basicParamsObject,
-  gain: gainString,
+  gain: gain,
 };
 // EOBrowser example for GAIN:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGamma = {
   ...basicParamsObject,
-  gamma: gammaString,
+  gamma: gamma,
 };
 // EOBrowser example for GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
 const paramsObjectWithGainAndGamma = {
   ...basicParamsObject,
-  gain: gainString,
-  gamma: gammaString,
+  gain: gain,
+  gamma: gamma,
 };
 // EOBrowser example for GAIN AND GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
@@ -89,19 +89,31 @@ export const ProcessingLegacyGetMapFromBasicParams = () => {
 };
 
 export const ProcessingLegacyGetMapFromParamsWithGain = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const imgGainIs1 = document.createElement('img');
+  imgGainIs1.width = '512';
+  imgGainIs1.height = '512';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '512';
+  imgGainIs2.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>ProcessingLegacyGetMapFromParams GAIN</h2>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.innerHTML = `<h2>ProcessingLegacyGetMapFromParams; no gain vs gain=${gain}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
     try {
-      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGain, ApiType.PROCESSING);
-      img.src = URL.createObjectURL(imageBlob);
+      const imageBlobGainIs1 = await legacyGetMapFromParams(baseUrl, basicParamsObject, ApiType.PROCESSING);
+      imgGainIs1.src = URL.createObjectURL(imageBlobGainIs1);
+
+      const imageBlobGainIs2 = await legacyGetMapFromParams(
+        baseUrl,
+        paramsObjectWithGain,
+        ApiType.PROCESSING,
+      );
+      imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
@@ -112,19 +124,32 @@ export const ProcessingLegacyGetMapFromParamsWithGain = () => {
 };
 
 export const ProcessingLegacyGetMapFromParamsWithGamma = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const imgGammaIs1 = document.createElement('img');
+  imgGammaIs1.width = '512';
+  imgGammaIs1.height = '512';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '512';
+  imgGammaIs2.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>ProcessingLegacyGetMapFromParams GAMMA</h2>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.innerHTML = `<h2>ProcessingLegacyGetMapFromParams; no gamma vs gamma=${gamma}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
 
   const perform = async () => {
     try {
       await setAuthTokenWithOAuthCredentials();
-      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma, ApiType.PROCESSING);
-      img.src = URL.createObjectURL(imageBlob);
+
+      const imageBlobGammaIs1 = await legacyGetMapFromParams(baseUrl, basicParamsObject, ApiType.PROCESSING);
+      imgGammaIs1.src = URL.createObjectURL(imageBlobGammaIs1);
+
+      const imageBlobGammaIs2 = await legacyGetMapFromParams(
+        baseUrl,
+        paramsObjectWithGamma,
+        ApiType.PROCESSING,
+      );
+      imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
@@ -157,20 +182,28 @@ export const WMSLegacyGetMapFromBasicParams = () => {
 };
 
 export const WMSLegacyGetMapFromParamsWithGain = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const imgGainIs1 = document.createElement('img');
+  imgGainIs1.width = '512';
+  imgGainIs1.height = '512';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '512';
+  imgGainIs2.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAIN</h2>';
+  wrapperEl.innerHTML = `<h2>ProcessingLegacyGetMapFromParams; no gain vs gain=${gain}</h2>`;
   wrapperEl.innerHTML +=
     '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
 
   const perform = async () => {
     try {
-      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGain);
-      img.src = URL.createObjectURL(imageBlob);
+      const imageBlobGainIs1 = await legacyGetMapFromParams(baseUrl, basicParamsObject);
+      imgGainIs1.src = URL.createObjectURL(imageBlobGainIs1);
+
+      const imageBlobGainIs2 = await legacyGetMapFromParams(baseUrl, paramsObjectWithGain);
+      imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
@@ -181,20 +214,28 @@ export const WMSLegacyGetMapFromParamsWithGain = () => {
 };
 
 export const WMSLegacyGetMapFromParamsWithGamma = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const imgGammaIs1 = document.createElement('img');
+  imgGammaIs1.width = '512';
+  imgGammaIs1.height = '512';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '512';
+  imgGammaIs2.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAMMA</h2>';
+  wrapperEl.innerHTML = `<h2>ProcessingLegacyGetMapFromParams; no gamma vs gamma=${gamma}</h2>`;
   wrapperEl.innerHTML +=
     '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
 
   const perform = async () => {
     try {
-      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma);
-      img.src = URL.createObjectURL(imageBlob);
+      const imageBlobGammaIs1 = await legacyGetMapFromParams(baseUrl, basicParamsObject);
+      imgGammaIs1.src = URL.createObjectURL(imageBlobGammaIs1);
+
+      const imageBlobGammaIs2 = await legacyGetMapFromParams(baseUrl, paramsObjectWithGamma);
+      imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
@@ -205,20 +246,28 @@ export const WMSLegacyGetMapFromParamsWithGamma = () => {
 };
 
 export const WMSLegacyGetMapFromParamsWithGainAndGamma = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '512';
+  imgNoGainGamma.height = '512';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '512';
+  imgGainGammaAre2.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>WMSLegacyGetMapFromParams GAIN AND GAMMA</h2>';
+  wrapperEl.innerHTML = `<h2>WMSLegacyGetMapFromParams; no gain/gamma vs gain=${gain} and gamma=${gamma}</h2>`;
   wrapperEl.innerHTML +=
     '<p><a href="https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A" target="_blank">Equivalent in EOBrowser</a></p>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
     try {
-      const imageBlob = await legacyGetMapFromParams(baseUrl, paramsObjectWithGainAndGamma);
-      img.src = URL.createObjectURL(imageBlob);
+      const imageBlobNoGainGamma = await legacyGetMapFromParams(baseUrl, basicParamsObject);
+      imgNoGainGamma.src = URL.createObjectURL(imageBlobNoGainGamma);
+
+      const imageBlobGainGamaAre2 = await legacyGetMapFromParams(baseUrl, paramsObjectWithGainAndGamma);
+      imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
