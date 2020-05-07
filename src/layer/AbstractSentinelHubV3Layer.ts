@@ -18,6 +18,11 @@ import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'sr
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 
+// import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
+// import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
+// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
+import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
+
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -136,7 +141,21 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
 
-      return processingGetMap(this.dataset.shServiceHostname, updatedPayload);
+      let blob = await processingGetMap(this.dataset.shServiceHostname, updatedPayload);
+      // this code applies only if we use separate functions manipulateGain and manipulateGamma
+      // in visualizers, there's first manipulation of gain and then gamma
+      // https://git.sinergise.com/sentinel-core/java/blob/master/RendererService/src/main/resources/com/sinergise/sentinel/renderer/javascript/global/js/defaultVisualizer.js
+      // if (params.gain) {
+      //   blob = manipulateGain(blob, params.gain);
+      // }
+      // if (params.gamma) {
+      //   blob = manipulateGamma(blob, params.gamma);
+      // }
+
+      // combined algorithms for manipulating gain and gamma in one function
+      blob = await manipulateGainGamma(blob, params.gain, params.gamma);
+
+      return blob;
     }
 
     return super.getMap(params, api);

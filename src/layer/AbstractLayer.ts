@@ -53,6 +53,7 @@ export class AbstractLayer {
         const response = await axios.get(url, requestConfig);
         let blob = response.data;
 
+        // this code applies only if we use separate functions manipulateGain and manipulateGamma
         // in visualizers, there's first manipulation of gain and then gamma
         // https://git.sinergise.com/sentinel-core/java/blob/master/RendererService/src/main/resources/com/sinergise/sentinel/renderer/javascript/global/js/defaultVisualizer.js
         // if (gain) {
@@ -62,7 +63,8 @@ export class AbstractLayer {
         //   blob = manipulateGamma(blob, gamma);
         // }
 
-        blob = manipulateGainGamma(blob, gain, gamma);
+        // combined algorithms for manipulating gain and gamma in one function
+        blob = await manipulateGainGamma(blob, gain, gamma);
 
         return blob;
       default:
