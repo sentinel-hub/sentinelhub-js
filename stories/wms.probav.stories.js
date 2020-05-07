@@ -75,56 +75,30 @@ export const getMapWMS = () => {
   return wrapperEl;
 };
 
-export const getMapURLGain = () => {
-  const imgGainIs1 = document.createElement('img');
-  imgGainIs1.width = '512';
-  imgGainIs1.height = '512';
+export const getMapWMSGainGamma = () => {
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '256';
+  imgNoGainGamma.height = '256';
 
   const imgGainIs2 = document.createElement('img');
-  imgGainIs2.width = '512';
-  imgGainIs2.height = '512';
+  imgGainIs2.width = '256';
+  imgGainIs2.height = '256';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '256';
+  imgGammaIs2.height = '256';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '256';
+  imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gain vs gain=${gain}</h2>`;
-  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.innerHTML = '<h2>WMS getMapWMSGainGamma</h2>';
+  wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
-
-  const layer = new WmsLayer({ baseUrl, layerId });
-
-  const getMapParams = {
-    bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-    width: 512,
-    height: 512,
-    format: MimeTypes.JPEG,
-  };
-  const imageUrl1 = layer.getMapUrl(getMapParams, ApiType.WMS);
-  imgGainIs1.src = imageUrl1;
-
-  const getMapParamsWithGainIs2 = {
-    ...getMapParams,
-    gain: gain,
-  };
-
-  const imageUrl2 = layer.getMapUrl(getMapParamsWithGainIs2, ApiType.WMS);
-  imgGainIs2.src = imageUrl2;
-  return wrapperEl;
-};
-
-export const getMapWMSGain = () => {
-  const imgGainIs1 = document.createElement('img');
-  imgGainIs1.width = '512';
-  imgGainIs1.height = '512';
-
-  const imgGainIs2 = document.createElement('img');
-  imgGainIs2.width = '512';
-  imgGainIs2.height = '512';
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>GetMap with WMS; no gain vs gain=${gain}</h2>`;
-  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
-  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
     const layer = new WmsLayer({ baseUrl, layerId });
@@ -137,72 +111,68 @@ export const getMapWMSGain = () => {
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlobGainIs1 = await layer.getMap(getMapParams, ApiType.WMS);
-    imgGainIs1.src = URL.createObjectURL(imageBlobGainIs1);
 
-    const getMapParamsWithGainIs2 = {
+    const getMapParamsGainIs2 = {
       ...getMapParams,
       gain: gain,
     };
 
-    const imageBlobGainIs2 = await layer.getMap(getMapParamsWithGainIs2, ApiType.WMS);
-    imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
+    const getMapParamsGammaIs2 = {
+      ...getMapParams,
+      gamma: gamma,
+    };
+
+    const getMapParamsGainGammaAre2 = {
+      ...getMapParams,
+      gain: gain,
+      gamma: gamma,
+    };
+
+    try {
+      const imageBlobNoGainGamma = await layer.getMap(getMapParams, ApiType.WMS);
+      imgNoGainGamma.src = URL.createObjectURL(imageBlobNoGainGamma);
+
+      const imageBlobGainIs2 = await layer.getMap(getMapParamsGainIs2, ApiType.WMS);
+      imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
+
+      const imageBlobGammaIs2 = await layer.getMap(getMapParamsGammaIs2, ApiType.WMS);
+      imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
+
+      const imageBlobGainGamaAre2 = await layer.getMap(getMapParamsGainGammaAre2, ApiType.WMS);
+      imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
   };
   perform().then(() => {});
 
   return wrapperEl;
 };
 
-export const getMapURLGamma = () => {
-  const imgGammaIs1 = document.createElement('img');
-  imgGammaIs1.width = '512';
-  imgGammaIs1.height = '512';
+export const getMapURLGainGamma = () => {
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '256';
+  imgNoGainGamma.height = '256';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '256';
+  imgGainIs2.height = '256';
 
   const imgGammaIs2 = document.createElement('img');
-  imgGammaIs2.width = '512';
-  imgGammaIs2.height = '512';
+  imgGammaIs2.width = '256';
+  imgGammaIs2.height = '256';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '256';
+  imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gamma vs gamma=${gamma}</h2>`;
-  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
+  wrapperEl.innerHTML = '<h2>WMS getMapURLGainGamma</h2>';
+  wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
   wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
-
-  const layer = new WmsLayer({ baseUrl, layerId });
-
-  const getMapParams = {
-    bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-    width: 512,
-    height: 512,
-    format: MimeTypes.JPEG,
-  };
-  const imageUrl1 = layer.getMapUrl(getMapParams, ApiType.WMS);
-  imgGammaIs1.src = imageUrl1;
-
-  const getMapParamsWithGammaIs2 = {
-    ...getMapParams,
-    gamma: gamma,
-  };
-
-  const imageUrl2 = layer.getMapUrl(getMapParamsWithGammaIs2, ApiType.WMS);
-  imgGammaIs2.src = imageUrl2;
-  return wrapperEl;
-};
-
-export const getMapWMSGamma = () => {
-  const imgGammaIs1 = document.createElement('img');
-  imgGammaIs1.width = '512';
-  imgGammaIs1.height = '512';
-
-  const imgGammaIs2 = document.createElement('img');
-  imgGammaIs2.width = '512';
-  imgGammaIs2.height = '512';
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>GetMap with WMS; no gamma vs gamma=${gamma}</h2>`;
-  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
-  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
     const layer = new WmsLayer({ baseUrl, layerId });
@@ -215,16 +185,38 @@ export const getMapWMSGamma = () => {
       height: 512,
       format: MimeTypes.JPEG,
     };
-    const imageBlobGammaIs1 = await layer.getMap(getMapParams, ApiType.WMS);
-    imgGammaIs1.src = URL.createObjectURL(imageBlobGammaIs1);
 
-    const getMapParamsWithGammaIs2 = {
+    const getMapParamsGainIs2 = {
+      ...getMapParams,
+      gain: gain,
+    };
+
+    const getMapParamsGammaIs2 = {
       ...getMapParams,
       gamma: gamma,
     };
 
-    const imageBlobGammaIs2 = await layer.getMap(getMapParamsWithGammaIs2, ApiType.WMS);
-    imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
+    const getMapParamsGainGammaAre2 = {
+      ...getMapParams,
+      gain: gain,
+      gamma: gamma,
+    };
+
+    try {
+      const imageBlobNoGainGamma = await layer.getMapUrl(getMapParams, ApiType.WMS);
+      imgNoGainGamma.src = imageBlobNoGainGamma;
+
+      const imageBlobGainIs2 = await layer.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
+      imgGainIs2.src = imageBlobGainIs2;
+
+      const imageBlobGammaIs2 = await layer.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
+      imgGammaIs2.src = imageBlobGammaIs2;
+
+      const imageBlobGainGamaAre2 = await layer.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
+      imgGainGammaAre2.src = imageBlobGainGamaAre2;
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
   };
   perform().then(() => {});
 
