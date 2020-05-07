@@ -7,6 +7,7 @@ import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation
 // - change the values according to the algorithm (first manipulation of gain and then gamma)
 // - change the interval of the values from [0, 1] back to [0, 255]
 
+// combined algorithms for manipulating gain and gamma in one function
 export async function manipulateGainGamma(
   originalBlob: Blob,
   newGain?: number,
