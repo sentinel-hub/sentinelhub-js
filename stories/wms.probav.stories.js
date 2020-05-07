@@ -154,6 +154,88 @@ export const getMapWMSGain = () => {
   return wrapperEl;
 };
 
+export const getMapURLGamma = () => {
+  const imgGammaIs1 = document.createElement('img');
+  imgGammaIs1.width = '512';
+  imgGammaIs1.height = '512';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '512';
+  imgGammaIs2.height = '512';
+
+  const gamma = 2;
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMapUrl (WMS); no gamma vs gamma=${gamma}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+
+  const layer = new WmsLayer({ baseUrl, layerId });
+
+  const getMapParams = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+  };
+  const imageUrl1 = layer.getMapUrl(getMapParams, ApiType.WMS);
+  imgGammaIs1.src = imageUrl1;
+
+  const getMapParamsWithGammaIs2 = {
+    ...getMapParams,
+    gamma: gamma,
+  };
+
+  const imageUrl2 = layer.getMapUrl(getMapParamsWithGammaIs2, ApiType.WMS);
+  imgGammaIs2.src = imageUrl2;
+  return wrapperEl;
+};
+
+export const getMapWMSGamma = () => {
+  const imgGammaIs1 = document.createElement('img');
+  imgGammaIs1.width = '512';
+  imgGammaIs1.height = '512';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '512';
+  imgGammaIs2.height = '512';
+
+  const gamma = 2;
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMap with WMS; no gamma vs gamma=${gamma}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+
+  const perform = async () => {
+    const layer = new WmsLayer({ baseUrl, layerId });
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlobGammaIs1 = await layer.getMap(getMapParams, ApiType.WMS);
+    imgGammaIs1.src = URL.createObjectURL(imageBlobGammaIs1);
+
+    const getMapParamsWithGammaIs2 = {
+      ...getMapParams,
+      gamma: gamma,
+    };
+
+    const imageBlobGammaIs2 = await layer.getMap(getMapParamsWithGammaIs2, ApiType.WMS);
+    imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const getMapWmsLayersFactory = () => {
   const img = document.createElement('img');
   img.width = '512';
