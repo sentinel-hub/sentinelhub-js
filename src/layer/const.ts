@@ -44,6 +44,12 @@ export enum PreviewMode {
   EXTENDED_PREVIEW = 2,
 }
 
+export enum MosaickingOrder {
+  MOST_RECENT = 'mostRecent',
+  LEAST_RECENT = 'leastRecent',
+  LEAST_CC = 'leastCC',
+}
+
 export enum ApiType {
   WMS = 'wms',
   PROCESSING = 'processing',
@@ -101,6 +107,21 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://creodias.sentinel-hub.com/',
 ];
 
+// See https://services.sentinel-hub.com/api/v1/metadata/location/ for an up-to-date
+// list of location ids and the corresponding URLs.
+export enum LocationIdSHv3 {
+  awsEuCentral1 = 'aws-eu-central-1',
+  awsUsWest2 = 'aws-us-west-2',
+  creo = 'creo',
+  mundi = 'mundi',
+}
+export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
+  [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
+  [LocationIdSHv3.awsUsWest2]: 'https://services-uswest2.sentinel-hub.com/',
+  [LocationIdSHv3.creo]: 'https://creodias.sentinel-hub.com/',
+  [LocationIdSHv3.mundi]: 'https://shservices.mundiwebservices.com/',
+};
+
 export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
@@ -146,6 +167,6 @@ export type DailyChannelStats = {
   };
 };
 
-export type GetStats = {
+export type Stats = {
   [key: string]: DailyChannelStats[];
 };
