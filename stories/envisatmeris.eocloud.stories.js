@@ -148,6 +148,35 @@ export const getMapWMSEvalscript = () => {
   return wrapperEl;
 };
 
+export const getMapWMSGain = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    const layer = new EnvisatMerisEOCloudLayer({ instanceId, layerId });
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+      gain: '2',
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const findTiles = () => {
   const layer = new EnvisatMerisEOCloudLayer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
