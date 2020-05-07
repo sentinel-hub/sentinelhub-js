@@ -24,6 +24,9 @@ const layerId = process.env.EOC_ENVISATMERIS_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
+const gain = 2;
+const gamma = 2;
+
 export default {
   title: 'Envisat Meris - EOCloud',
 };
@@ -148,14 +151,30 @@ export const getMapWMSEvalscript = () => {
   return wrapperEl;
 };
 
-export const getMapWMSGain = () => {
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+export const getMapURLGainGamma = () => {
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '256';
+  imgNoGainGamma.height = '256';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '256';
+  imgGainIs2.height = '256';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '256';
+  imgGammaIs2.height = '256';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '256';
+  imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with WMS</h2>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.innerHTML = '<h2>Envisat Meris getMapURLGainGamma</h2>';
+  wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
 
   const perform = async () => {
     const layer = new EnvisatMerisEOCloudLayer({ instanceId, layerId });
@@ -167,10 +186,89 @@ export const getMapWMSGain = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      gain: '2',
     };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
+
+    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
+    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+
+    try {
+      const imageBlobNoGainGamma = await layer.getMapUrl(getMapParams, ApiType.WMS);
+      imgNoGainGamma.src = imageBlobNoGainGamma;
+
+      const imageBlobGainIs2 = await layer.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
+      imgGainIs2.src = imageBlobGainIs2;
+
+      const imageBlobGammaIs2 = await layer.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
+      imgGammaIs2.src = imageBlobGammaIs2;
+
+      const imageBlobGainGamaAre2 = await layer.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
+      imgGainGammaAre2.src = imageBlobGainGamaAre2;
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapWMSGainGamma = () => {
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '256';
+  imgNoGainGamma.height = '256';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '256';
+  imgGainIs2.height = '256';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '256';
+  imgGammaIs2.height = '256';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '256';
+  imgGainGammaAre2.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Envisat Meris getMapWMSGainGamma</h2>';
+  wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
+
+  const perform = async () => {
+    const layer = new EnvisatMerisEOCloudLayer({ instanceId, layerId });
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2008, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2008, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
+    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+
+    try {
+      const imageBlobNoGainGamma = await layer.getMap(getMapParams, ApiType.WMS);
+      imgNoGainGamma.src = URL.createObjectURL(imageBlobNoGainGamma);
+
+      const imageBlobGainIs2 = await layer.getMap(getMapParamsGainIs2, ApiType.WMS);
+      imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
+
+      const imageBlobGammaIs2 = await layer.getMap(getMapParamsGammaIs2, ApiType.WMS);
+      imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
+
+      const imageBlobGainGamaAre2 = await layer.getMap(getMapParamsGainGammaAre2, ApiType.WMS);
+      imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
   };
   perform().then(() => {});
 
