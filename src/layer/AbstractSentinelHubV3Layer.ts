@@ -162,7 +162,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       );
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload);
-
       const shServiceHostname = this.getShServiceHostname();
 
       let blob = await processingGetMap(shServiceHostname, updatedPayload);
