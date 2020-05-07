@@ -186,21 +186,9 @@ export const getMapURLGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = {
-      ...getMapParams,
-      gain: gain,
-    };
-
-    const getMapParamsGammaIs2 = {
-      ...getMapParams,
-      gamma: gamma,
-    };
-
-    const getMapParamsGainGammaAre2 = {
-      ...getMapParams,
-      gain: gain,
-      gamma: gamma,
-    };
+    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
+    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
 
     try {
       const imageBlobNoGainGamma = await layer.getMapUrl(getMapParams, ApiType.WMS);

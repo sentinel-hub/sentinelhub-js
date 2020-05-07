@@ -43,25 +43,15 @@ const basicParamsObject = {
 // EOBrowser example:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
-const paramsObjectWithGain = {
-  ...basicParamsObject,
-  gain: gain,
-};
+const paramsObjectWithGain = { ...basicParamsObject, gain: gain };
 // EOBrowser example for GAIN:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
-const paramsObjectWithGamma = {
-  ...basicParamsObject,
-  gamma: gamma,
-};
+const paramsObjectWithGamma = { ...basicParamsObject, gamma: gamma };
 // EOBrowser example for GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 
-const paramsObjectWithGainAndGamma = {
-  ...basicParamsObject,
-  gain: gain,
-  gamma: gamma,
-};
+const paramsObjectWithGainAndGamma = { ...basicParamsObject, gain: gain, gamma: gamma };
 // EOBrowser example for GAIN AND GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
 

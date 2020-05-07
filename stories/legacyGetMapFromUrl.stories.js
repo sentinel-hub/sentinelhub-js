@@ -1,5 +1,4 @@
 import { setAuthTokenWithOAuthCredentials } from './storiesUtils';
-
 import { legacyGetMapFromUrl, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
