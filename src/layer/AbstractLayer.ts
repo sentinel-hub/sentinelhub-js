@@ -53,8 +53,6 @@ export class AbstractLayer {
         const response = await axios.get(url, requestConfig);
         let blob = response.data;
 
-        console.log('getMap response of getMapUrl', { blob });
-
         // in visualizers, there's first manipulation of gain and then gamma
         // https://git.sinergise.com/sentinel-core/java/blob/master/RendererService/src/main/resources/com/sinergise/sentinel/renderer/javascript/global/js/defaultVisualizer.js
         // if (gain) {

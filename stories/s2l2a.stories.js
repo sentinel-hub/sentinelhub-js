@@ -98,6 +98,45 @@ export const GetMapWMS = () => {
   return wrapperEl;
 };
 
+export const GetMapURLGain = () => {
+  const imgGainIs1 = document.createElement('img');
+  imgGainIs1.width = '512';
+  imgGainIs1.height = '512';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '512';
+  imgGainIs2.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS) for Sentinel-2 L2A; gain</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs1);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+
+  const layerS2L2A = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 0 });
+
+  const getMapParams = {
+    bbox: bbox4326,
+    fromTime: new Date(Date.UTC(2018, 9 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+  };
+
+  const imageUrl1 = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
+  imgGainIs1.src = imageUrl1;
+
+  const getMapParamsWithGainIs2 = {
+    ...getMapParams,
+    gain: 2,
+  };
+
+  const imageUrl2 = layerS2L2A.getMapUrl(getMapParamsWithGainIs2, ApiType.WMS);
+  imgGainIs2.src = imageUrl2;
+
+  return wrapperEl;
+};
+
 export const GetMapWMSGain = () => {
   const imgGainIs1 = document.createElement('img');
   imgGainIs1.width = '512';
@@ -128,12 +167,7 @@ export const GetMapWMSGain = () => {
     imgGainIs1.src = URL.createObjectURL(imageBlobGainIs1);
 
     const getMapParamsWithGainIs2 = {
-      bbox: bbox4326,
-      fromTime: new Date(Date.UTC(2018, 9 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
+      ...getMapParams,
       gain: 2,
     };
     const imageBlobGainIs2 = await layerS2L2A.getMap(getMapParamsWithGainIs2, ApiType.WMS);
