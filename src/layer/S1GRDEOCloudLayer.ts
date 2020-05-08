@@ -133,15 +133,19 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
-    return [{
-      href: tile.pathFragment,
-      rel:'self',
-      title: 'EOCloudPath'
-    },
-    {
-      href: `https://finder.creodias.eu/files/${tile.pathFragment.split('eodata')[1]}/preview/quick-look.png`,
-      rel:'self',
-      title: 'Preview'
-    }];
+    return [
+      {
+        href: tile.pathFragment,
+        rel: 'self',
+        title: 'EOCloudPath',
+      },
+      {
+        href: `https://finder.creodias.eu/files/${
+          tile.pathFragment.split('eodata')[1]
+        }/preview/quick-look.png`,
+        rel: 'self',
+        title: 'Preview',
+      },
+    ];
   }
 }

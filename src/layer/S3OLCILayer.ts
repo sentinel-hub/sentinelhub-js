@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
+import { PaginatedTiles, Link } from 'src/layer/const';
 import { DATASET_S3OLCI } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 
@@ -28,8 +28,28 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {},
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    console.log('In get tile links of OLCI');
+    return [
+      {
+        href: tile.originalId.replace('EODATA', '/eodata'),
+        rel: 'self',
+        title: 'creoDIASPath',
+      },
+      {
+        href: `https://finder.creodias.eu/files${tile.originalId.replace(
+          'EODATA',
+          '',
+        )}/${tile.productName.replace('.SEN3', '')}-ql.jpg`,
+        rel: 'self',
+        title: 'Preview',
+      },
+    ];
   }
 }

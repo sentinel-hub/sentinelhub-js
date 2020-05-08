@@ -179,11 +179,12 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
-    return [{
-      href: tile.dataUri,
-      rel:'self',
-      title: 'AWSPath'
-    },
-   ];
+    return [
+      {
+        href: tile.dataUri,
+        rel: 'self',
+        title: 'AWSPath',
+      },
+    ];
   }
 }

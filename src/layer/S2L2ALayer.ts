@@ -12,10 +12,12 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
-    return [{
-      href: tile.dataUri,
-      rel:'self',
-      title: 'AWSPath'
-    }];
+    return [
+      {
+        href: tile.dataUri,
+        rel: 'self',
+        title: 'AWSPath',
+      },
+    ];
   }
 }

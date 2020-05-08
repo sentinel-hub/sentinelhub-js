@@ -68,10 +68,10 @@ export enum BackscatterCoeff {
 
 export type Link = {
   // https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md#link-object
-  href: string,
-  rel: string,
-  title?: string,
-  type?: string 
+  href: string;
+  rel: string;
+  title?: string;
+  type?: string;
 };
 
 export type Tile = {
