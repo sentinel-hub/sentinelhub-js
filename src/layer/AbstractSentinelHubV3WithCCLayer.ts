@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
+import { PaginatedTiles, RequestConfiguration } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 
 interface ConstructorParameters {
@@ -39,6 +39,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     toTime: Date,
     maxCount?: number,
     offset?: number,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
@@ -47,6 +48,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       toTime,
       maxCount,
       offset,
+      reqConfig,
       this.maxCloudCoverPercent,
     );
     return {
@@ -61,7 +63,9 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration,
+  ): Promise<Record<string, any>> {
     return {
       maxCloudCoverage: this.maxCloudCoverPercent / 100,
     };

@@ -12,6 +12,7 @@ import {
   GetStats,
   HistogramType,
   FisPayload,
+  RequestConfiguration,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -92,6 +93,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     toTime: Date,
     maxCount: number = 50,
     offset: number = 0,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
@@ -112,6 +114,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         'Content-Type': 'application/json',
         'Accept-CRS': 'EPSG:4326',
       },
+      ...reqConfig,
     });
 
     const responseTiles: any[] = response.data.tiles;
@@ -125,7 +128,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration,
+  ): Promise<Record<string, any>> {
     return {};
   }
 
@@ -133,7 +138,12 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+  public async findDatesUTC(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    reqConfig?: RequestConfiguration,
+  ): Promise<Date[]> {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
@@ -142,7 +152,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     const params = {
       timefrom: fromTime.toISOString(),
       timeto: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters()),
+      ...(await this.getFindDatesUTCAdditionalParameters(reqConfig)),
     };
 
     const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
@@ -150,12 +160,13 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       headers: {
         'Content-Type': 'application/json',
       },
+      ...reqConfig,
     });
 
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<GetStats> {
+  public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<GetStats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -200,6 +211,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
       params: payload,
+      ...reqConfig,
     });
     // convert date strings to Date objects
     for (let channel in data) {

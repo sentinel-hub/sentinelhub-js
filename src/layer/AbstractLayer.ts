@@ -62,6 +62,7 @@ export class AbstractLayer {
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('findTiles() not implemented yet');
   }
@@ -72,6 +73,7 @@ export class AbstractLayer {
     toTime: Date,
     maxFindTilesRequests: number = 50,
     tilesPerRequest: number = 50,
+    reqConfig?: RequestConfiguration,
   ): Promise<FlyoverInterval[]> {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
@@ -108,6 +110,7 @@ export class AbstractLayer {
         toTime,
         tilesPerRequest,
         i * tilesPerRequest,
+        reqConfig,
       );
 
       // apply each tile to the flyover to calculate coverage:

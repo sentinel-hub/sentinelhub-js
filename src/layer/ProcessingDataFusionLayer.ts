@@ -109,6 +109,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not supported - use individual layers when searching for tiles or flyovers');
   }
