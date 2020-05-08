@@ -36,7 +36,13 @@ export type GetMapParams = {
   };
 };
 
-export type Interpolator = 'BILINEAR' | 'BICUBIC' | 'LANCZOS' | 'BOX' | 'NEAREST';
+export enum Interpolator {
+  BILINEAR = 'BILINEAR',
+  BICUBIC = 'BICUBIC',
+  LANCZOS = 'LANCZOS',
+  BOX = 'BOX',
+  NEAREST = 'NEAREST',
+}
 
 export enum PreviewMode {
   DETAIL = 0,

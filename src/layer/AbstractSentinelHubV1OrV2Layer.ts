@@ -13,6 +13,7 @@ import {
   HistogramType,
   FisPayload,
   MosaickingOrder,
+  Interpolator,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -26,6 +27,8 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  upsampling?: Interpolator | null;
+  downsampling?: Interpolator | null;
 }
 
 // this class provides any SHv1- or SHv2-specific (EO Cloud) functionality to the subclasses:
@@ -35,6 +38,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected mosaickingOrder: MosaickingOrder | null;
+  protected upsampling: Interpolator | null;
+  protected downsampling: Interpolator | null;
 
   public constructor({
     instanceId = null,
@@ -44,6 +49,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     mosaickingOrder = null,
     title = null,
     description = null,
+    upsampling = null,
+    downsampling = null,
   }: ConstructorParameters) {
     super({ title, description });
     if (!layerId || !instanceId) {
@@ -54,6 +61,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.mosaickingOrder = mosaickingOrder;
+    this.upsampling = upsampling;
+    this.downsampling = downsampling;
   }
 
   protected getEvalsource(): string {
@@ -63,12 +72,17 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    let additionalParameters: Record<string, any> = {};
     if (this.mosaickingOrder) {
-      return {
-        priority: this.mosaickingOrder,
-      };
+      additionalParameters.priority = this.mosaickingOrder;
     }
-    return {};
+    if (this.upsampling) {
+      additionalParameters.upsampling = this.upsampling;
+    }
+    if (this.downsampling) {
+      additionalParameters.priority = this.downsampling;
+    }
+    return additionalParameters;
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {

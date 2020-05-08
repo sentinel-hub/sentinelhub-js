@@ -1,7 +1,14 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
-import { ApiType, MimeTypes, OrbitDirection, PreviewMode, MosaickingOrder } from 'src/layer/const';
+import {
+  ApiType,
+  MimeTypes,
+  OrbitDirection,
+  PreviewMode,
+  MosaickingOrder,
+  Interpolator,
+} from 'src/layer/const';
 import { setDebugEnabled } from 'src/utils/debug';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
@@ -104,6 +111,7 @@ export {
   OrbitDirection,
   PreviewMode,
   MosaickingOrder,
+  Interpolator,
   S3SLSTRView,
   BBox,
   LocationIdSHv3,
