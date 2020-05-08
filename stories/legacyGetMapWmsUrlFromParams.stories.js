@@ -94,7 +94,7 @@ export const legacyGetMapWmsUrlFromParamsGainGamma = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>WMS LegacyGetMapFromUrl</h2>';
-  wrapperEl.innerHTML = "<h3>[DOESN'T SUPPORT GAIN/GAMMA so an error should be shown]</h3>";
+  wrapperEl.innerHTML += "<h3>[DOESN'T SUPPORT GAIN/GAMMA so an error should be shown]</h3>";
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
