@@ -129,7 +129,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration,
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     return {};
   }

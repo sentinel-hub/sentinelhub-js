@@ -119,7 +119,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration,
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       productType: 'GRD',

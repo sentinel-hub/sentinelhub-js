@@ -105,7 +105,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig?: RequestConfiguration,
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<ProcessingPayload> {
     // Subclasses should override this method if they wish to supply additional
     // parameters to Processing API.
@@ -273,7 +273,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig?: RequestConfiguration,
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     return {};
   }
@@ -282,7 +282,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(reqConfig?: RequestConfiguration): Promise<string> {
+  protected async getFindDatesUTCUrl(
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<string> {
     return this.dataset.findDatesUTCUrl;
   }
 

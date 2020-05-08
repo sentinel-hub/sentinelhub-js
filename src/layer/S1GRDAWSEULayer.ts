@@ -167,7 +167,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration,
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
