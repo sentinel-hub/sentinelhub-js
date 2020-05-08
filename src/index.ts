@@ -114,3 +114,4 @@ export {
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
 };
+console.log("LOCAL SENTINELHUB-JS")

@@ -66,10 +66,19 @@ export enum BackscatterCoeff {
   SIGMA0_ELLIPSOID = 'SIGMA0_ELLIPSOID',
 }
 
+export type Link = {
+  // https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md#link-object
+  href: string,
+  rel: string,
+  title?: string,
+  type?: string 
+};
+
 export type Tile = {
   geometry: Polygon | MultiPolygon;
   sensingTime: Date;
   meta: Record<string, any>;
+  links?: Link[];
 };
 
 export type PaginatedTiles = {

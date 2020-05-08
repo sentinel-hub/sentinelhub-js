@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder, Link  } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 
@@ -61,7 +61,13 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {
           cloudCoverPercent: tile.cloudCoverPercentage,
+          tileId: tile.id,
+          MGRSLocation: tile.dataUri
+          .split('/')
+          .slice(4, 7)
+          .join('')
         },
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -76,5 +82,8 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return {
       maxcc: this.maxCloudCoverPercent,
     };
+  }
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [];
   }
 }
