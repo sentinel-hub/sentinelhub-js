@@ -11,6 +11,7 @@ import {
   MimeTypes,
   ApiType,
   MosaickingOrder,
+  Interpolator,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -427,6 +428,121 @@ export const MosaickingOrderProcessing = () => {
     layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_RECENT;
     img3.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
     layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_CC;
+    img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const UpsamplingWMS = () => {
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  const img2 = document.createElement('img');
+  img2.width = '256';
+  img2.height = '256';
+  const img3 = document.createElement('img');
+  img3.width = '256';
+  img3.height = '256';
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>WMS upsampling - default from instance, NEAREST, BILINEAR and BICUBIC</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+  wrapperEl.insertAdjacentElement('beforeend', img2);
+  wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
+
+  const bboxUpsampling = new BBox(
+    CRS_EPSG4326,
+    12.534885406494142,
+    42.53034594479704,
+    12.579259872436525,
+    42.56044583171783,
+  );
+
+  const perform = async () => {
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: 'S2L2A_SCL',
+    });
+    const getMapParams = {
+      bbox: bboxUpsampling,
+      fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 4 - 1, 10, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    img1.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.upsampling = Interpolator.NEAREST;
+    img2.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.upsampling = Interpolator.BILINEAR;
+    img3.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.upsampling = Interpolator.BICUBIC;
+    img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const UpsamplingProcessing = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  const img2 = document.createElement('img');
+  img2.width = '256';
+  img2.height = '256';
+  const img3 = document.createElement('img');
+  img3.width = '256';
+  img3.height = '256';
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>WMS upsampling - default from instance, NEAREST, BILINEAR and BICUBIC</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+  wrapperEl.insertAdjacentElement('beforeend', img2);
+  wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
+
+  const bboxUpsampling = new BBox(
+    CRS_EPSG4326,
+    12.534885406494142,
+    42.53034594479704,
+    12.579259872436525,
+    42.56044583171783,
+  );
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: 'S2L2A_SCL',
+    });
+    const getMapParams = {
+      bbox: bboxUpsampling,
+      fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 4 - 1, 10, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    img1.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.upsampling = Interpolator.NEAREST;
+    img2.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.upsampling = Interpolator.BILINEAR;
+    img3.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.upsampling = Interpolator.BICUBIC;
     img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
   };
   perform().then(() => {});
