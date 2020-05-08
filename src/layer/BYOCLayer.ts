@@ -11,6 +11,8 @@ import {
   GetMapParams,
   ApiType,
   RequestConfiguration,
+  GetStatsParams,
+  Stats,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -170,5 +172,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       },
     };
     return result;
+  }
+
+  public async getStats(params: GetStatsParams): Promise<Stats> {
+    await this.updateLayerFromServiceIfNeeded();
+    return super.getStats(params);
   }
 }

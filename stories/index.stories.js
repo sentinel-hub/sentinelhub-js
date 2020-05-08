@@ -10,6 +10,7 @@ import {
   BBox,
   MimeTypes,
   ApiType,
+  MosaickingOrder,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -320,6 +321,113 @@ export const S2FindFlyovers = () => {
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const MosaickingOrderWMS = () => {
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  const img2 = document.createElement('img');
+  img2.width = '256';
+  img2.height = '256';
+  const img3 = document.createElement('img');
+  img3.width = '256';
+  img3.height = '256';
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>WMS mosaicking order - default from instance, mostRecent, leastRecent and leastCC</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+  wrapperEl.insertAdjacentElement('beforeend', img2);
+  wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: s2l2aLayerId,
+      evalscript: 'return [2.5 * B04, 2.5 * B03, 2.5 * B02]',
+    });
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    img1.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.MOST_RECENT;
+    img2.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_RECENT;
+    img3.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_CC;
+    img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.WMS));
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const MosaickingOrderProcessing = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  const img2 = document.createElement('img');
+  img2.width = '256';
+  img2.height = '256';
+  const img3 = document.createElement('img');
+  img3.width = '256';
+  img3.height = '256';
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>Processing mosaicking order - default from instance, mostRecent, leastRecent and leastCC</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+  wrapperEl.insertAdjacentElement('beforeend', img2);
+  wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: s2l2aLayerId,
+      evalscript: 'return [2.5 * B04, 2.5 * B03, 2.5 * B02]',
+    });
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    img1.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.MOST_RECENT;
+    img2.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_RECENT;
+    img3.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
+    layerS2L2A.mosaickingOrder = MosaickingOrder.LEAST_CC;
+    img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
   };
   perform().then(() => {});
 
