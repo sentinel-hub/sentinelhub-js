@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
+import { PaginatedTiles, Link } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -107,6 +107,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
           geometry: tile.tileDrawRegionGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),
           meta: {},
+          links: this.getTileLinks(tile),
         };
       }),
       hasMore: response.data.hasMore,
@@ -134,5 +135,15 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return {
       maxcc: this.maxCloudCoverPercent,
     };
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        href: tile.originalId.replace('EODATA', '/eodata'),
+        rel: 'self',
+        title: 'creoDIASPath',
+      },
+    ];
   }
 }
