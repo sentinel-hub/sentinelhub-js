@@ -62,13 +62,13 @@ export const getMapProcessing = () => {
     const layers = [
       {
         layer: layerS2L2A,
-        id: 'l2a',
+        id: 's2l2a',
         fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 26, 0, 0, 0)),
       },
       {
         layer: layerS2L1C,
-        id: 'l1c',
+        id: 's2l1c',
         fromTime: new Date(Date.UTC(2020, 2 - 1, 10, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 24, 0, 0, 0)),
       },
@@ -79,8 +79,8 @@ export const getMapProcessing = () => {
         //VERSION=3
         var setup = () => ({
           input: [
-            {datasource: "l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
-            {datasource: "l1c", bands:["B02", "B03", "B04"], units: "REFLECTANCE"}],
+            {datasource: "s2l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
+            {datasource: "s2l1c", bands:["B02", "B03", "B04"], units: "REFLECTANCE"}],
           output: [
             {id: "default", bands: 3, sampleType: SampleType.AUTO}
           ]
@@ -88,7 +88,12 @@ export const getMapProcessing = () => {
 
 
         function evaluatePixel(samples, inputData, inputMetadata, customData, outputMetadata) {
-          var sample = samples.l2a[0];
+          var sample = samples.s2l2a[0];
+          if (!sample) {
+            return {
+              default: [0, 0, 0],
+            }
+          }
           let val = [sample.B04, sample.B03, sample.B02];
 
           return {
@@ -139,13 +144,13 @@ export const getMapProcessingEvalscriptUrl = () => {
     const layers = [
       {
         layer: layerS2L2A,
-        id: 'l2a',
+        id: 's2l2a',
         fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 26, 0, 0, 0)),
       },
       {
         layer: layerS2L1C,
-        id: 'l1c',
+        id: 's2l1c',
         fromTime: new Date(Date.UTC(2020, 2 - 1, 10, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 24, 0, 0, 0)),
       },
@@ -153,7 +158,7 @@ export const getMapProcessingEvalscriptUrl = () => {
     const layer = new ProcessingDataFusionLayer({
       layers: layers,
       evalscriptUrl:
-        'https://gist.githubusercontent.com/sinergise-anze/33fe78d9b1fd24d656882d7916a83d4d/raw/7b9c52160d0d1254937955398e6690dc88096742/data-fusion-evalscript.js',
+        'https://gist.githubusercontent.com/sinergise-anze/33fe78d9b1fd24d656882d7916a83d4d/raw/295b9d9f033c7e3f1e533363322d84846808564c/data-fusion-evalscript.js',
     });
 
     const getMapParams = {
