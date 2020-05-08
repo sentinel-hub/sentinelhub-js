@@ -153,7 +153,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-      if (!this.mosaickingOrder) {
+      if (!this.mosaickingOrder && this.instanceId && this.layerId) {
         if (!layerParams) {
           layerParams = await this.fetchLayerParamsFromSHServiceV3();
         }
