@@ -153,13 +153,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
       if (!this.mosaickingOrder) {
         if (!layerParams) {
-          layerParams = await this.fetchLayerParamsFromSHServiceV3();
+          layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
         }
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
       //Convert internal evalscript to V3 if it's not in that version.
       if (!this.evalscriptWasConvertedToV3 && this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
-        let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
+        let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
         this.evalscript = evalscriptV3;
         this.evalscriptWasConvertedToV3 = true;
       }
@@ -341,7 +341,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     found.sort((a, b) => b.unix() - a.unix());
     return found.map(m => m.toDate());
   }
-
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
     if (!params.geometry) {
