@@ -32,13 +32,15 @@ export class AbstractLayer {
     switch (api) {
       case ApiType.WMS:
         // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
-        // getting the url of the image.
+        //   getting the url of the image.
         // getMap() changes the received image according to provided gain and gamma after it is received.
         // An error is thrown in getMapUrl() in case gain and gamma are present, because:
-        // - we don't send gain and gamma to the services as they may not be supported there
-        // - if they are supported on the services, gain and gamma would be applied twice in getMap()
-        // This is a dirty fix, but gain and gamma need to be removed from the parameters in getMap()
-        // so the errors in getMapUrl() are not triggered.
+        // - we don't send gain and gamma to the services as they may not be supported there and we don't want
+        //    to deceive the users with returning the image where gain and gamma were ignored
+        // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
+        //    were sent to the services in getMapUrl()
+        // This is a dirty fix, but gain and gamma need to be removed from the parameters in getMap() so the
+        //   errors in getMapUrl() are not triggered.
         let gain, gamma;
         if (params.gain) {
           gain = params.gain;
