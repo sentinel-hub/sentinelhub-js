@@ -223,7 +223,7 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
   return {
     layers: layers,
     evalscript: decodedEvalscript,
-    evalscriptUrl: params.evalscriptUrl,
+    evalscriptUrl: params.evalscripturl,
     evalsource: params.evalsource,
     getMapParams: getMapParams,
   };
