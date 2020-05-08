@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection, RequestConfiguration } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -72,6 +72,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
@@ -85,6 +86,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
@@ -101,7 +103,9 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration,
+  ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,

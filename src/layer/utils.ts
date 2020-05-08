@@ -1,8 +1,12 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
+import {
+  SH_SERVICE_HOSTNAMES_V1_OR_V2,
+  SH_SERVICE_HOSTNAMES_V3,
+  RequestConfiguration,
+} from 'src/layer/const';
 
 export type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -27,34 +31,58 @@ export type GetCapabilitiesXml = {
   };
 };
 
-export async function fetchGetCapabilitiesXml(baseUrl: string): Promise<GetCapabilitiesXml> {
+export async function fetchGetCapabilitiesXml(
+  baseUrl: string,
+  reqConfig: RequestConfiguration,
+): Promise<GetCapabilitiesXml> {
   const query = {
     service: 'wms',
     request: 'GetCapabilities',
     format: 'text/xml',
   };
+  const axiosReqConfig: AxiosRequestConfig = {
+    responseType: 'text',
+    useCache: true,
+    ...reqConfig,
+  };
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
-  const res = await axios.get(url, { responseType: 'text', useCache: true });
+  const res = await axios.get(url, axiosReqConfig);
   const parsedXml = await parseStringPromise(res.data);
   return parsedXml;
 }
 
-export async function fetchGetCapabilitiesJson(baseUrl: string): Promise<any[]> {
+export async function fetchGetCapabilitiesJson(
+  baseUrl: string,
+  reqConfig: RequestConfiguration,
+): Promise<any[]> {
   const query = {
     request: 'GetCapabilities',
     format: 'application/json',
   };
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
-  const res = await axios.get(url, { responseType: 'json', useCache: true });
+  const axiosReqConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    useCache: true,
+    ...reqConfig,
+  };
+  const res = await axios.get(url, axiosReqConfig);
   return res.data.layers;
 }
 
-export async function fetchGetCapabilitiesJsonV1(baseUrl: string): Promise<any[]> {
+export async function fetchGetCapabilitiesJsonV1(
+  baseUrl: string,
+  reqConfig: RequestConfiguration,
+): Promise<any[]> {
   const instanceId = parseSHInstanceId(baseUrl);
   const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
-  const res = await axios.get(url, { responseType: 'json', useCache: true });
+  const axiosReqConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    useCache: true,
+    ...reqConfig,
+  };
+  const res = await axios.get(url, axiosReqConfig);
   return res.data.layers;
 }
 

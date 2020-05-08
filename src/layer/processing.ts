@@ -160,7 +160,7 @@ export function createProcessingPayload(
 export async function processingGetMap(
   shServiceHostname: string,
   payload: ProcessingPayload,
-  reqConfig?: RequestConfiguration,
+  reqConfig: RequestConfiguration,
 ): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {

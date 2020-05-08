@@ -66,7 +66,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
 
     if (this.collectionId === null) {
-      const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
       this.collectionId = layerParams['collectionId'];
     }
 
@@ -90,7 +90,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig?: RequestConfiguration,
+    reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
     payload.input.data[0].dataFilter.collectionId = this.collectionId;
@@ -103,8 +103,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount?: number,
     offset?: number,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded();
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
       type: 'BYOC',
@@ -120,6 +121,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       null,
       findTilesDatasetParameters,
     );
@@ -149,15 +151,17 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(): Promise<string> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
     const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
     return findDatesUTCUrl;
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration,
+  ): Promise<Record<string, any>> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     const result: Record<string, any> = {
       datasetParameters: {

@@ -1,7 +1,7 @@
 import moment, { Moment } from 'moment';
 
 import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType } from 'src/layer/const';
+import { GetMapParams, ApiType, RequestConfiguration } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { fetchGetCapabilitiesXml } from './utils';
@@ -35,9 +35,10 @@ export class WmsLayer extends AbstractLayer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date,
     toTime: Date,
+    reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
     // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
-    const capabilities = await fetchGetCapabilitiesXml(this.baseUrl);
+    const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, reqConfig);
     const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
       layerInfo => this.layerId === layerInfo.Name[0],
     );
