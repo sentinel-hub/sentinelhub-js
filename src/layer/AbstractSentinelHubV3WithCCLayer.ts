@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, MosaickingOrder, Link  } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder, Link } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 
@@ -63,9 +63,9 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
           cloudCoverPercent: tile.cloudCoverPercentage,
           tileId: tile.id,
           MGRSLocation: tile.dataUri
-          .split('/')
-          .slice(4, 7)
-          .join('')
+            .split('/')
+            .slice(4, 7)
+            .join(''),
         },
         links: this.getTileLinks(tile),
       })),

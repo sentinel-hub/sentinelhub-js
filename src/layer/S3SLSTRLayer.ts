@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection, Link } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -78,6 +78,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
           cloudCoverPercent: tile.cloudCoverPercentage,
           orbitDirection: tile.orbitDirection,
         },
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -99,5 +100,23 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     }
 
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        href: tile.originalId.replace('EODATA', '/eodata'),
+        rel: 'self',
+        title: 'creoDIASPath',
+      },
+      {
+        href: `https://finder.creodias.eu/files${tile.originalId.replace(
+          'EODATA',
+          '',
+        )}/${tile.productName.replace('.SEN3', '')}-ql.jpg`,
+        rel: 'self',
+        title: 'Preview',
+      },
+    ];
   }
 }
