@@ -8,7 +8,7 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig?: RequestConfiguration,
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<ProcessingPayload> {
     payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     return payload;
