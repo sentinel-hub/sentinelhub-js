@@ -229,7 +229,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       maxCount,
       offset,
     );
-    console.log('Find tiles V3 layer');
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,

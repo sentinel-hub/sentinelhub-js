@@ -35,7 +35,6 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
-    console.log('In get tile links of OLCI');
     return [
       {
         href: tile.originalId.replace('EODATA', '/eodata'),
