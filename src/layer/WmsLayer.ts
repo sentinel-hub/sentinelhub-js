@@ -26,10 +26,9 @@ export class WmsLayer extends AbstractLayer {
     description = null,
     legendUrl = null,
   }: ConstructorParameters) {
-    super({ title, description });
+    super({ title, description, legendUrl });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
-    this.legendUrl = legendUrl;
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {

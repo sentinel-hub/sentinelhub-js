@@ -106,6 +106,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.backscatterCoeff = layerParams['backCoeff'];
     this.orthorectify = layerParams['orthorectify'];
     this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
+    this.legend = layerParams['legend'] ? layerParams['legend'] : null;
   }
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
