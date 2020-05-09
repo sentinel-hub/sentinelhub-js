@@ -152,7 +152,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   protected getStatsAdditionalParameters(): Record<string, any> {
     return {};
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
   }
