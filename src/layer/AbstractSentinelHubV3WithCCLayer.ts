@@ -76,9 +76,11 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       maxcc: this.maxCloudCoverPercent,
     };
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {};
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
   }

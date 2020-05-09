@@ -239,7 +239,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       hasMore: response.data.hasMore,
     };
   }
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
   }
