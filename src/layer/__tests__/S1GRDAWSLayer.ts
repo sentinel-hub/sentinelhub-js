@@ -126,6 +126,14 @@ test.each([
           resolution: Resolution.HIGH,
           orbitDirection: OrbitDirection.ASCENDING,
         },
+        links: [
+          {
+            href:
+              's3://sentinel-s1-l1c/GRD/2020/2/2/EW/DH/S1A_EW_GRDM_1SDH_20200202T180532_20200202T180632_031077_03921C_E6C8',
+            rel: 'self',
+            title: 'AWSPath',
+          },
+        ],
       },
     ]);
   },
