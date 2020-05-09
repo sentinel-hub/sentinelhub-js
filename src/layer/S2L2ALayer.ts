@@ -20,4 +20,15 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
       },
     ];
   }
+
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {
+      cloudCoverPercent: tile.cloudCoverPercentage,
+      tileId: tile.id,
+      MGRSLocation: tile.dataUri
+        .split('/')
+        .slice(4, 7)
+        .join(''),
+    };
+  }
 }
