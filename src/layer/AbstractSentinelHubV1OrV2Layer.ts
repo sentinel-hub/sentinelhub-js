@@ -217,8 +217,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   public async updateLayerFromServiceIfNeeded(): Promise<void> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error(
-        "One or more of these parameters (polarization, acquisitionMode, resolution) \
-        are not set and can't be fetched from service because instanceId and layerId are not available",
+        "Additional data can't be fetched from service because instanceId and layerId are not defined",
       );
     }
     const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
