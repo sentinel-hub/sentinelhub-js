@@ -40,6 +40,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
+  protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
   protected upsampling: Interpolator | null;
   protected downsampling: Interpolator | null;
@@ -72,6 +73,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
+    this.evalscriptWasConvertedToV3 = false;
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
@@ -122,23 +124,33 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
+  protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
+    if (this.evalscriptUrl && !this.evalscript) {
+      const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
+      this.evalscript = response.data;
+    }
+  }
+
+  protected async convertEvalscriptToV3IfNeeded(): Promise<void> {
+    // Convert internal evalscript to V3 if it's not in that version.
+    if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
+      return;
+    }
+    if (!this.evalscript.startsWith('//VERSION=3')) {
+      this.evalscript = await this.convertEvalscriptToV3(this.evalscript);
+    }
+    this.evalscriptWasConvertedToV3 = true;
+  }
+
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
         throw new Error('This layer does not support Processing API (unknown dataset)');
       }
-      if (this.evalscriptUrl && !this.evalscript) {
-        const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
-        let evalscriptV3;
-        //Check version of fetched evalscript by checking if first line starts with //VERSION=3
-        if (response.data.startsWith('//VERSION=3')) {
-          evalscriptV3 = response.data;
-        } else {
-          evalscriptV3 = await this.convertEvalscriptToV3(response.data);
-        }
-        this.evalscript = evalscriptV3;
-      }
+
+      await this.fetchEvalscriptUrlIfNeeded();
+
       let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
         layerParams = await this.fetchLayerParamsFromSHServiceV3();
@@ -162,6 +174,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         this.upsampling = layerParams.upsampling;
         this.downsampling = layerParams.downsampling;
       }
+
+      await this.convertEvalscriptToV3IfNeeded();
 
       const payload = createProcessingPayload(
         this.dataset,
