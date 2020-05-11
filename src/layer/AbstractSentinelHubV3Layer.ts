@@ -79,7 +79,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.downsampling = downsampling;
   }
 
-  public async fetchLayerParamsFromSHServiceV3(): Promise<any> {
+  protected async fetchLayerParamsFromSHServiceV3(): Promise<any> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error('Could not fetch layer params - instanceId and layerId must be set on Layer');
     }
