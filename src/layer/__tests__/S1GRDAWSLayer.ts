@@ -11,6 +11,8 @@ import {
   OrbitDirection,
 } from 'src';
 
+import { LinkType } from 'src/layer/const';
+
 test('timezone should NOT be UTC', () => {
   // We are testing correctness in case of local timezones, so it doesn't make sense to
   // run these tests in UTC timezone. Env var in package.json should take care of that, but we
@@ -128,10 +130,9 @@ test.each([
         },
         links: [
           {
-            href:
+            target:
               's3://sentinel-s1-l1c/GRD/2020/2/2/EW/DH/S1A_EW_GRDM_1SDH_20200202T180532_20200202T180632_031077_03921C_E6C8',
-            rel: 'self',
-            title: 'AWSPath',
+            type: LinkType.AWS,
           },
         ],
       },
