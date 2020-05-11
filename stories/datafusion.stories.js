@@ -34,7 +34,7 @@ const bbox = new BBox(
 );
 
 export default {
-  title: 'Data fusion - Sentinel-2 L1C and Landsat 8',
+  title: 'Data fusion',
 };
 
 export const getMapProcessing = () => {
