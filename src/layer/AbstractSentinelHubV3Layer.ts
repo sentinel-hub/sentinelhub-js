@@ -115,16 +115,33 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
+  protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
+    if (this.evalscriptUrl && !this.evalscript) {
+      const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
+      this.evalscript = response.data;
+    }
+  }
+
+  protected async convertEvalscriptToV3IfNeeded(): Promise<void> {
+    // Convert internal evalscript to V3 if it's not in that version.
+    if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
+      return;
+    }
+    if (!this.evalscript.startsWith('//VERSION=3')) {
+      this.evalscript = await this.convertEvalscriptToV3(this.evalscript);
+    }
+    this.evalscriptWasConvertedToV3 = true;
+  }
+
   public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
         throw new Error('This layer does not support Processing API (unknown dataset)');
       }
-      if (this.evalscriptUrl && !this.evalscript) {
-        const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
-        this.evalscript = response.data;
-      }
+
+      await this.fetchEvalscriptUrlIfNeeded();
+
       let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
         layerParams = await this.fetchLayerParamsFromSHServiceV3();
@@ -136,18 +153,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-      if (!this.mosaickingOrder) {
+      if (!this.mosaickingOrder && this.instanceId && this.layerId) {
         if (!layerParams) {
           layerParams = await this.fetchLayerParamsFromSHServiceV3();
         }
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
-      //Convert internal evalscript to V3 if it's not in that version.
-      if (!this.evalscriptWasConvertedToV3 && this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
-        let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript);
-        this.evalscript = evalscriptV3;
-        this.evalscriptWasConvertedToV3 = true;
-      }
+
+      await this.convertEvalscriptToV3IfNeeded();
+
       const payload = createProcessingPayload(
         this.dataset,
         params,
