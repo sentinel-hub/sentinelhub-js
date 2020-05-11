@@ -109,7 +109,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!layerParams) {
       throw new Error('Layer params could not be found');
     }
-    console.log('AbstractSentinelHubV3Layer -> layerParams', layerParams);
     return layerParams;
   }
 
