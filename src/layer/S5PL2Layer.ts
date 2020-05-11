@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, Link } from 'src/layer/const';
+import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -140,9 +140,8 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [
       {
-        href: tile.originalId.replace('EODATA', '/eodata'),
-        rel: 'self',
-        title: 'creoDIASPath',
+        target: tile.originalId.replace('EODATA', '/eodata'),
+        type: LinkType.CREODIAS,
       },
     ];
   }

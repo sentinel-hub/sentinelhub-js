@@ -1,6 +1,6 @@
 import { DATASET_EOCLOUD_LANDSAT5 } from 'src/layer/dataset';
 import { AbstractSentinelHubV1OrV2WithCCLayer } from 'src/layer/AbstractSentinelHubV1OrV2WithCCLayer';
-import { Link } from 'src/layer/const';
+import { Link, LinkType } from 'src/layer/const';
 
 export class Landsat5EOCloudLayer extends AbstractSentinelHubV1OrV2WithCCLayer {
   public readonly dataset = DATASET_EOCLOUD_LANDSAT5;
@@ -29,21 +29,19 @@ export class Landsat5EOCloudLayer extends AbstractSentinelHubV1OrV2WithCCLayer {
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [
       {
-        href: tile.pathFragment,
-        rel: 'self',
-        title: 'EOCloudPath',
+        target: tile.pathFragment,
+        type: LinkType.EOCLOUD,
       },
       {
-        href: `${tile.previewUrl.replace('eocloud', 'creodias')}.JPG`,
-        rel: 'self',
-        title: 'Preview',
+        target: `${tile.previewUrl.replace('eocloud', 'creodias')}.JPG`,
+        type: LinkType.PREVIEW,
       },
     ];
   }
 
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {
-      cloudCoverPercent: tile.cloudCoverPercentage,
+      ...super.extractFindTilesMeta(tile),
       sunElevation: tile.sunElevation,
     };
   }

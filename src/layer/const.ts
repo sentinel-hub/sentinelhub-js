@@ -66,12 +66,16 @@ export enum BackscatterCoeff {
   SIGMA0_ELLIPSOID = 'SIGMA0_ELLIPSOID',
 }
 
+export enum LinkType {
+  EOCLOUD = 'eocloud',
+  AWS = 'aws',
+  PREVIEW = 'preview',
+  CREODIAS = 'creodias',
+}
+
 export type Link = {
-  // https://github.com/radiantearth/stac-spec/blob/master/item-spec/item-spec.md#link-object
-  href: string;
-  rel: string;
-  title?: string;
-  type?: string;
+  target: string;
+  type: LinkType;
 };
 
 export type Tile = {
