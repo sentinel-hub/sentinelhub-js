@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, MosaickingOrder, Link } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 
@@ -78,10 +78,9 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMeta(tile: any): Record<string, any> {
-    return {};
-  }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected getTileLinks(tile: Record<string, any>): Link[] {
-    return [];
+    return {
+      ...super.extractFindTilesMeta(tile),
+      cloudCoverPercent: tile.cloudCoverPercentage,
+    };
   }
 }

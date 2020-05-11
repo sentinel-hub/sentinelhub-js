@@ -1,7 +1,7 @@
 import { DATASET_S2L2A } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
-import { Link } from 'src/layer/const';
+import { Link, LinkType } from 'src/layer/const';
 
 export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_S2L2A;
@@ -14,16 +14,15 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [
       {
-        href: tile.dataUri,
-        rel: 'self',
-        title: 'AWSPath',
+        target: tile.dataUri,
+        type: LinkType.AWS,
       },
     ];
   }
 
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {
-      cloudCoverPercent: tile.cloudCoverPercentage,
+      ...super.extractFindTilesMeta(tile),
       tileId: tile.id,
       MGRSLocation: tile.dataUri
         .split('/')
