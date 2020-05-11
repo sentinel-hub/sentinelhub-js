@@ -42,8 +42,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected dataProduct: string | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
-  protected upsampling: Interpolator | null;
-  protected downsampling: Interpolator | null;
+  public upsampling: Interpolator | null;
+  public downsampling: Interpolator | null;
 
   public constructor({
     instanceId = null,
@@ -79,7 +79,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.downsampling = downsampling;
   }
 
-  protected async fetchLayerParamsFromSHServiceV3(): Promise<any> {
+  public async fetchLayerParamsFromSHServiceV3(): Promise<any> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error('Could not fetch layer params - instanceId and layerId must be set on Layer');
     }
@@ -97,7 +97,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
-    const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: true });
+    const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: false });
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
@@ -109,6 +109,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!layerParams) {
       throw new Error('Layer params could not be found');
     }
+    console.log('AbstractSentinelHubV3Layer -> layerParams', layerParams);
     return layerParams;
   }
 

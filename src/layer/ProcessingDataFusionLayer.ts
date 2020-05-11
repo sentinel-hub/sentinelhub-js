@@ -94,16 +94,12 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
       }
 
-      if (layerInfo.upsampling !== undefined) {
-        payload.input.data[0].processing.upsampling = layerInfo.upsampling;
-      } else if (params.upsampling !== undefined) {
-        payload.input.data[0].processing.upsampling = params.upsampling;
+      if (layerInfo.layer.upsampling) {
+        datasource.processing.upsampling = layerInfo.layer.upsampling;
       }
 
-      if (layerInfo.downsampling !== undefined) {
-        payload.input.data[0].processing.downsampling = layerInfo.downsampling;
-      } else if (params.downsampling !== undefined) {
-        payload.input.data[0].processing.downsampling = params.downsampling;
+      if (layerInfo.layer.downsampling) {
+        datasource.processing.downsampling = layerInfo.layer.downsampling;
       }
 
       payload.input.data.push(datasource);
