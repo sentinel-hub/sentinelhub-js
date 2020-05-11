@@ -193,18 +193,18 @@ We can always use layer to search for data availability:
 
 You can also cancel requests when searching/fetching data.
 
-To do so a factory of tokens needs to be created and a token passed through a request configuration object. In this object can also be defined the amount of retires desired in the case the petition fails.
+To do so a token needs to be created and passed through a requests configuration object. Other config such as retries can also be defined there.
 
 In the example below, a cancelFactory is created, passing a token inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
 
-This exception can be caught and identified by isCancelled, function that can be imported from the library.
+This exception can be caught and identified by `isCancelled`.
 
 ```typescript
-import { cancelFactory, isCancelled, RequestConfiguration } from '@sentinel-hub/sentinelhub-js';
+import { CancelFactory, isCancelled } from '@sentinel-hub/sentinelhub-js';
 
 const source = CancelFactory.createSource();
 
-const requestConfig : RequestConfiguration = {
+const requestConfig = {
   cancelToken: source.getToken(),
   retries: 4
 }

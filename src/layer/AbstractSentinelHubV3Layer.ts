@@ -270,10 +270,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
-    if (!maxCount) {
+    if (maxCount === null) {
       maxCount = 1;
     }
-    if (!offset) {
+    if (offset === null) {
       offset = 0;
     }
     const bboxPolygon = bbox.toGeoJSON();

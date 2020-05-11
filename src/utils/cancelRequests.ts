@@ -1,22 +1,14 @@
 import axios, { CancelTokenSource, CancelToken } from 'axios';
 
 export class CancelFactory {
-  protected source: CancelTokenSource;
-  private constructor() {
-    this.source = axios.CancelToken.source();
-  }
+  protected static source: CancelTokenSource | null = null;
 
-  public static createSource = (): CancelFactory => {
-    return new CancelFactory();
+  public static createSource = (): CancelTokenSource => {
+    if (CancelFactory.source === null) {
+      CancelFactory.source = axios.CancelToken.source();
+    }
+    return CancelFactory.source;
   };
-
-  public getToken(): CancelToken {
-    return this.source.token;
-  }
-
-  public cancel(): void {
-    this.source.cancel();
-  }
 }
 
 export const isCancelled = (err: Error): boolean => {

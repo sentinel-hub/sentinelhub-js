@@ -196,9 +196,7 @@ async function run() {
     source.cancel();
   }, 100);
   try {
-    const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: source.getToken() });
-    // const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
-    // const stats = await layer.getStats(getStatsParams, requestConfig);
+    const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: source.token });
     console.log(response);
   } catch (err) {
     //The exception thrown by cancelling requests can be identified by isCancelled
