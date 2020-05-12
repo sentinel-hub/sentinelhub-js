@@ -1,4 +1,4 @@
-import axios, { CancelTokenSource, CancelToken } from 'axios';
+import axios, { CancelTokenSource } from 'axios';
 
 export class CancelFactory {
   protected static source: CancelTokenSource | null = null;
