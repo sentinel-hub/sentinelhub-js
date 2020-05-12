@@ -22,7 +22,8 @@ import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer
   methods wouldn't make sense and are thus disabled.
 */
 interface ConstructorParameters {
-  evalscript: string;
+  evalscript: string | null;
+  evalscriptUrl: string | null;
   layers: DataFusionLayerInfo[];
   title?: string | null;
   description?: string | null;
@@ -42,8 +43,14 @@ export type DataFusionLayerInfo = {
 export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   protected layers: DataFusionLayerInfo[];
 
-  public constructor({ title = null, description = null, evalscript, layers }: ConstructorParameters) {
-    super({ title, description, evalscript });
+  public constructor({
+    title = null,
+    description = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    layers,
+  }: ConstructorParameters) {
+    super({ title, description, evalscript, evalscriptUrl });
     this.layers = layers;
   }
 
@@ -51,6 +58,8 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     if (api !== ApiType.PROCESSING) {
       throw new Error(`Only API type "PROCESSING" is supported`);
     }
+
+    await this.fetchEvalscriptUrlIfNeeded();
 
     // when constructing the payload, we just take the first layer - we will rewrite its info later:
     const bogusFirstLayer = this.layers[0].layer;

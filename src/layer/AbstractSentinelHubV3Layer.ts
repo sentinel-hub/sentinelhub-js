@@ -14,6 +14,7 @@ import {
   GetStatsParams,
   RequestConfiguration,
   Stats,
+  Link,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -125,21 +126,34 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
+
+  protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
+    if (this.evalscriptUrl && !this.evalscript) {
+      const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
+      this.evalscript = response.data;
+    }
+  }
+
+  protected async convertEvalscriptToV3IfNeeded(): Promise<void> {
+    // Convert internal evalscript to V3 if it's not in that version.
+    if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
+      return;
+    }
+    if (!this.evalscript.startsWith('//VERSION=3')) {
+      this.evalscript = await this.convertEvalscriptToV3(this.evalscript);
+    }
+    this.evalscriptWasConvertedToV3 = true;
+  }
+
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
         throw new Error('This layer does not support Processing API (unknown dataset)');
       }
-      if (this.evalscriptUrl && !this.evalscript) {
-        const requestConfiguration: AxiosRequestConfig = {
-          responseType: 'text',
-          useCache: true,
-          ...reqConfig,
-        };
-        const response = await axios.get(this.evalscriptUrl, requestConfiguration);
-        this.evalscript = response.data;
-      }
+
+      await this.fetchEvalscriptUrlIfNeeded();
+
       let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
         layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
@@ -151,18 +165,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-      if (!this.mosaickingOrder) {
+      if (!this.mosaickingOrder && this.instanceId && this.layerId) {
         if (!layerParams) {
           layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
         }
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
-      //Convert internal evalscript to V3 if it's not in that version.
-      if (!this.evalscriptWasConvertedToV3 && this.evalscript && !this.evalscript.startsWith('//VERSION=3')) {
-        let evalscriptV3 = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
-        this.evalscript = evalscriptV3;
-        this.evalscriptWasConvertedToV3 = true;
-      }
+
+      await this.convertEvalscriptToV3IfNeeded();
+      
       const payload = createProcessingPayload(
         this.dataset,
         params,
@@ -250,10 +261,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {},
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {};
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [];
   }
 
   protected fetchTiles(
