@@ -13,6 +13,7 @@ import {
   MosaickingOrder,
   GetStatsParams,
   Stats,
+  Link,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -246,10 +247,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {},
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {};
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [];
   }
 
   protected fetchTiles(
