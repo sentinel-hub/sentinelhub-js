@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -74,10 +74,8 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          cloudCoverPercent: tile.cloudCoverPercentage,
-          orbitDirection: tile.orbitDirection,
-        },
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -99,5 +97,28 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     }
 
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.originalId.replace('EODATA', '/eodata'),
+        type: LinkType.CREODIAS,
+      },
+      {
+        target: `https://finder.creodias.eu/files${tile.originalId.replace(
+          'EODATA',
+          '',
+        )}/${tile.productName.replace('.SEN3', '')}-ql.jpg`,
+        type: LinkType.PREVIEW,
+      },
+    ];
+  }
+
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {
+      ...super.extractFindTilesMeta(tile),
+      orbitDirection: tile.orbitDirection,
+    };
   }
 }

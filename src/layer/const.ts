@@ -72,10 +72,23 @@ export enum BackscatterCoeff {
   SIGMA0_ELLIPSOID = 'SIGMA0_ELLIPSOID',
 }
 
+export enum LinkType {
+  EOCLOUD = 'eocloud',
+  AWS = 'aws',
+  PREVIEW = 'preview',
+  CREODIAS = 'creodias',
+}
+
+export type Link = {
+  target: string;
+  type: LinkType;
+};
+
 export type Tile = {
   geometry: Polygon | MultiPolygon;
   sensingTime: Date;
   meta: Record<string, any>;
+  links?: Link[];
 };
 
 export type PaginatedTiles = {
