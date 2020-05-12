@@ -2,7 +2,7 @@ import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 import { AcquisitionMode, Polarization } from 'src/layer/S1GRDAWSEULayer';
-import { OrbitDirection, MosaickingOrder } from 'src/layer/const';
+import { OrbitDirection, MosaickingOrder, Link, LinkType } from 'src/layer/const';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -130,5 +130,20 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       result.orbitDirection = this.orbitDirection;
     }
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.pathFragment,
+        type: LinkType.EOCLOUD,
+      },
+      {
+        target: `https://finder.creodias.eu/files/${
+          tile.pathFragment.split('eodata')[1]
+        }/preview/quick-look.png`,
+        type: LinkType.PREVIEW,
+      },
+    ];
   }
 }
