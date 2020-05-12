@@ -62,9 +62,8 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          cloudCoverPercent: tile.cloudCoverPercentage,
-        },
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -80,6 +79,13 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   protected getStatsAdditionalParameters(): Record<string, any> {
     return {
       maxcc: this.maxCloudCoverPercent,
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {
+      ...super.extractFindTilesMeta(tile),
+      cloudCoverPercent: tile.cloudCoverPercentage,
     };
   }
 }
