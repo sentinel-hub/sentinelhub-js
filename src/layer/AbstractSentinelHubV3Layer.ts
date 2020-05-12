@@ -133,13 +133,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
   }
 
-  protected async convertEvalscriptToV3IfNeeded(): Promise<void> {
+  protected async convertEvalscriptToV3IfNeeded(reqConfig: RequestConfiguration): Promise<void> {
     // Convert internal evalscript to V3 if it's not in that version.
     if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
       return;
     }
     if (!this.evalscript.startsWith('//VERSION=3')) {
-      this.evalscript = await this.convertEvalscriptToV3(this.evalscript);
+      this.evalscript = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
     }
     this.evalscriptWasConvertedToV3 = true;
   }
@@ -171,7 +171,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
 
-      await this.convertEvalscriptToV3IfNeeded();
+      await this.convertEvalscriptToV3IfNeeded(reqConfig);
 
       const payload = createProcessingPayload(
         this.dataset,
