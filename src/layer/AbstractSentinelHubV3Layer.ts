@@ -126,7 +126,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
-
   protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
       const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
@@ -173,7 +172,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       await this.convertEvalscriptToV3IfNeeded();
-      
+
       const payload = createProcessingPayload(
         this.dataset,
         params,
