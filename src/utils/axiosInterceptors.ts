@@ -15,6 +15,7 @@ declare module 'axios' {
   export interface AxiosRequestConfig {
     useCache?: boolean;
     retries?: number;
+    cacheKey?: string;
   }
 }
 
@@ -111,6 +112,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 
   const cachedResponse = await cache.match(cacheKey);
   if (!cachedResponse || !cacheStillValid(cachedResponse)) {
+    request.cacheKey = cacheKey;
     return request;
   }
 
@@ -158,9 +160,8 @@ const saveCacheResponse = async (response: any): Promise<any> => {
   if (typeof window === 'undefined' || !window.caches) {
     return response;
   }
-  const cacheKey = await generateCacheKey(response.config);
   // resource not cacheable?
-  if (cacheKey === null) {
+  if (!response.config.cacheKey) {
     return response;
   }
   let cache;
@@ -196,7 +197,7 @@ const saveCacheResponse = async (response: any): Promise<any> => {
     default:
       throw new Error('Unsupported response type: ' + request.responseType);
   }
-  cache.put(cacheKey, new Response(responseData, response));
+  cache.put(response.config.cacheKey, new Response(responseData, response));
   return response;
 };
 
