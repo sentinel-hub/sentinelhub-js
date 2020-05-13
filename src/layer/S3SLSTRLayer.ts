@@ -1,12 +1,11 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-
-import { PaginatedTiles, OrbitDirection, Link, LinkType, RequestConfiguration } from 'src/layer/const';
-
+import { PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -54,8 +53,8 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {

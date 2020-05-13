@@ -199,7 +199,7 @@ async function run() {
 
   try {
     const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: token });
-    console.log(response);
+    console.log('Image was recieved before 100 miliseconds');
   } catch (err) {
     //The exception thrown by cancelling requests can be identified by isCancelled
     if (!isCancelled(err)) {

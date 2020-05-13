@@ -12,14 +12,15 @@ import {
   Stats,
   HistogramType,
   FisPayload,
-  RequestConfiguration,
   MosaickingOrder,
   Link,
+  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  DEFAULT_FIND_TILES_OFFSET_PARAMETER,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
-import { getAxiosReqParams } from 'src/utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -111,12 +112,18 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount: number = 50,
-    offset: number = 0,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
+    }
+    if (maxCount === null) {
+      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
+    }
+    if (offset === null) {
+      offset = DEFAULT_FIND_TILES_OFFSET_PARAMETER;
     }
     const payload = bbox.toGeoJSON();
     const params = {

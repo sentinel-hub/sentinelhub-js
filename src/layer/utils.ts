@@ -2,12 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import {
-  SH_SERVICE_HOSTNAMES_V1_OR_V2,
-  SH_SERVICE_HOSTNAMES_V3,
-  RequestConfiguration,
-} from 'src/layer/const';
-import { getAxiosReqParams } from 'src/utils/cancelRequests';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 export type GetCapabilitiesXml = {
   WMS_Capabilities: {

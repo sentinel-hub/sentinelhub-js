@@ -2,9 +2,10 @@ import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 
-import { PaginatedTiles, MosaickingOrder, RequestConfiguration } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -44,8 +45,8 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(

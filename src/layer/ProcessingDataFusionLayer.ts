@@ -5,7 +5,6 @@ import {
   PreviewMode,
   ApiType,
   PaginatedTiles,
-  RequestConfiguration,
   MosaickingOrder,
 } from 'src/layer/const';
 import {
@@ -15,7 +14,7 @@ import {
   ProcessingPayloadDatasource,
 } from 'src/layer/processing';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 /*
   This layer allows using Processing API "data fusion". It takes a list of layers and
   their accompanying parameters and allows us to call `getMap`. Note that `find*()`
@@ -121,8 +120,8 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not supported - use individual layers when searching for tiles or flyovers');

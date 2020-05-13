@@ -1,5 +1,9 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
-import { RequestConfiguration } from '../layer/const';
+
+export type RequestConfiguration = {
+  cancelToken?: CancelToken;
+  retries?: number;
+};
 
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;

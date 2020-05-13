@@ -10,14 +10,13 @@ import {
   SHV3_LOCATIONS_ROOT_URL,
   GetMapParams,
   ApiType,
-  RequestConfiguration,
   GetStatsParams,
   Stats,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
-import { getAxiosReqParams } from 'src/utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -104,8 +103,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);

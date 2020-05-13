@@ -3,16 +3,9 @@ import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
 
-import {
-  MimeType,
-  GetMapParams,
-  Interpolator,
-  PreviewMode,
-  MosaickingOrder,
-  RequestConfiguration,
-} from 'src/layer/const';
+import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams } from 'src/utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',

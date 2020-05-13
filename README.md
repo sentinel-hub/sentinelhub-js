@@ -217,7 +217,7 @@ try {
   const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
   const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
   const stats = await layer.getStats(getStatsParams, requestConfig);
-  const tiles = await layer.findTiles(bbox, fromTime, toTime, undefined, undefined, requestConfig);
+  const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
 }
 catch(err) {
   if (!isCancelled(err)) {
