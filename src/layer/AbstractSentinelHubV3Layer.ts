@@ -12,16 +12,16 @@ import {
   FisPayload,
   MosaickingOrder,
   GetStatsParams,
-  RequestConfiguration,
   Stats,
   Link,
+  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  DEFAULT_FIND_TILES_OFFSET_PARAMETER,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
-
-import { getAxiosReqParams } from '../utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -245,8 +245,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
@@ -282,20 +282,20 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount: number = 1,
-    offset: number = 0,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig: RequestConfiguration,
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
-    if (!searchIndexUrl) {
-      throw new Error('This dataset does not support searching for tiles');
-    }
     if (maxCount === null) {
-      maxCount = 1;
+      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
     }
     if (offset === null) {
-      offset = 0;
+      offset = DEFAULT_FIND_TILES_OFFSET_PARAMETER;
+    }
+    if (!searchIndexUrl) {
+      throw new Error('This dataset does not support searching for tiles');
     }
     const bboxPolygon = bbox.toGeoJSON();
     // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in

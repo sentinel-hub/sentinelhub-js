@@ -4,11 +4,7 @@ import {
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
 } from 'src/layer/utils';
-import {
-  SH_SERVICE_HOSTNAMES_V1_OR_V2,
-  SH_SERVICE_HOSTNAMES_V3,
-  RequestConfiguration,
-} from 'src/layer/const';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -44,6 +40,7 @@ import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 export class LayersFactory {
   /*

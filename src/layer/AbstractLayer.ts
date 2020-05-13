@@ -5,15 +5,9 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
-import {
-  GetMapParams,
-  ApiType,
-  PaginatedTiles,
-  FlyoverInterval,
-  RequestConfiguration,
-} from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams } from 'src/utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -71,8 +65,8 @@ export class AbstractLayer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('findTiles() not implemented yet');

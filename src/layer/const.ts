@@ -2,7 +2,6 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
 import { CRS_IDS } from 'src/crs';
-import { CancelToken } from 'src/utils/cancelRequests';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -185,7 +184,5 @@ export type Stats = {
   [key: string]: DailyChannelStats[];
 };
 
-export type RequestConfiguration = {
-  cancelToken?: CancelToken;
-  retries?: number;
-};
+export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
+export const DEFAULT_FIND_TILES_OFFSET_PARAMETER = 0;

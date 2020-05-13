@@ -2,18 +2,11 @@ import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 
-import {
-  BackscatterCoeff,
-  PaginatedTiles,
-  OrbitDirection,
-  Link,
-  LinkType,
-  RequestConfiguration,
-} from 'src/layer/const';
+import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
-
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -135,8 +128,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);

@@ -1,12 +1,11 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-
-import { PaginatedTiles, Link, LinkType, RequestConfiguration } from 'src/layer/const';
-
+import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching
@@ -82,8 +81,8 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (this.productType === null) {
