@@ -13,6 +13,7 @@ import {
   RequestConfiguration,
 } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { getAxiosReqParams } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -37,7 +38,7 @@ export class AbstractLayer {
           // 'blob' responseType does not work with Node.js:
           responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
           useCache: true,
-          ...reqConfig,
+          ...getAxiosReqParams(reqConfig),
         };
         const response = await axios.get(url, requestConfig);
         return response.data;
@@ -267,7 +268,7 @@ export class AbstractLayer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getStats(payload: any, reqConfig?: AxiosRequestConfig): Promise<any> {
+  public async getStats(payload: any, reqConfig?: RequestConfiguration): Promise<any> {
     throw new Error('getStats() not implemented for this dataset');
   }
 

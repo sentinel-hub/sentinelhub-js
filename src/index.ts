@@ -56,7 +56,7 @@ import {
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { LocationIdSHv3 } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
-import { CancelFactory, isCancelled } from 'src/utils/cancelRequests';
+import { CancelToken, isCancelled } from 'src/utils/cancelRequests';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -116,7 +116,7 @@ export {
   BBox,
   LocationIdSHv3,
   setDebugEnabled,
-  CancelFactory,
+  CancelToken,
   isCancelled,
   RequestConfiguration,
   // legacy:

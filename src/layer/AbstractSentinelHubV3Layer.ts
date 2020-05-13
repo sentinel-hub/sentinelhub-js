@@ -21,6 +21,8 @@ import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'sr
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 
+import { getAxiosReqParams } from '../utils/cancelRequests';
+
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -94,7 +96,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       responseType: 'json',
       headers: headers,
       useCache: true,
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     };
     const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
@@ -234,7 +236,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected createSearchIndexRequestConfig(reqConfig: RequestConfiguration): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     };
     return requestConfig;
   }
@@ -350,7 +352,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
 
     const axiosReqConfig: AxiosRequestConfig = {
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     };
     const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
     const found: Moment[] = response.data.map((date: string) => moment.utc(date));
@@ -404,7 +406,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
 
     const axiosReqConfig: AxiosRequestConfig = {
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     };
 
     const shServiceHostname = this.getShServiceHostname();
@@ -436,7 +438,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       },
       useCache: true,
       responseType: 'text',
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     };
     const res = await axios.post(url, evalscript, requestConfig);
     return res.data;

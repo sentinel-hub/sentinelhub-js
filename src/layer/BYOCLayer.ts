@@ -17,6 +17,7 @@ import {
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { getAxiosReqParams } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -79,7 +80,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         responseType: 'json',
         headers: headers,
         useCache: false,
-        ...reqConfig,
+        ...getAxiosReqParams(reqConfig),
       });
       this.locationId = res.data.location.id;
     }
