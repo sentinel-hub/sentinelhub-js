@@ -138,25 +138,34 @@ export class LayersFactory {
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description }) => {
-      if (!dataset) {
-        return new WmsLayer({ baseUrl, layerId, title, description });
-      }
+    return Promise.all(
+      filteredLayersInfos.map(async ({ layerId, dataset, title, description }) => {
+        if (!dataset) {
+          return new WmsLayer({ baseUrl, layerId, title, description });
+        }
 
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
-      if (!SHLayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-      }
-      return new SHLayerClass({
-        instanceId: parseSHInstanceId(baseUrl),
-        layerId,
-        evalscript: null,
-        evalscriptUrl: null,
-        dataProduct: null,
-        title,
-        description,
-      });
-    });
+        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
+        if (!SHLayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+        }
+
+        const layer = new SHLayerClass({
+          instanceId: parseSHInstanceId(baseUrl),
+          layerId,
+          evalscript: null,
+          evalscriptUrl: null,
+          dataProduct: null,
+          title,
+          description,
+        });
+
+        if (layer instanceof BYOCLayer) {
+          await layer.updateLayerFromServiceIfNeeded();
+        }
+
+        return layer;
+      }),
+    );
   }
 
   private static async makeLayersSHv12(
