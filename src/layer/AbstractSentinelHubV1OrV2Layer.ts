@@ -19,6 +19,7 @@ import {
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
+import { getAxiosReqParams } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -133,7 +134,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         'Content-Type': 'application/json',
         'Accept-CRS': 'EPSG:4326',
       },
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     });
 
     const responseTiles: any[] = response.data.tiles;
@@ -184,7 +185,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       headers: {
         'Content-Type': 'application/json',
       },
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     });
 
     return response.data.map((date: string) => moment.utc(date).toDate());
@@ -235,7 +236,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
       params: payload,
-      ...reqConfig,
+      ...getAxiosReqParams(reqConfig),
     });
     // convert date strings to Date objects
     for (let channel in data) {

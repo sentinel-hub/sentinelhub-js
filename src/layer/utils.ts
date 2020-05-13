@@ -7,6 +7,7 @@ import {
   SH_SERVICE_HOSTNAMES_V3,
   RequestConfiguration,
 } from 'src/layer/const';
+import { getAxiosReqParams } from 'src/utils/cancelRequests';
 
 export type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -43,7 +44,7 @@ export async function fetchGetCapabilitiesXml(
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'text',
     useCache: true,
-    ...reqConfig,
+    ...getAxiosReqParams(reqConfig),
   };
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
@@ -65,7 +66,7 @@ export async function fetchGetCapabilitiesJson(
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
     useCache: true,
-    ...reqConfig,
+    ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);
   return res.data.layers;
@@ -80,7 +81,7 @@ export async function fetchGetCapabilitiesJsonV1(
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
     useCache: true,
-    ...reqConfig,
+    ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);
   return res.data.layers;

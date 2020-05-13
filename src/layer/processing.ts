@@ -12,6 +12,7 @@ import {
   RequestConfiguration,
 } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { getAxiosReqParams } from 'src/utils/cancelRequests';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -178,7 +179,7 @@ export async function processingGetMap(
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
-    ...reqConfig,
+    ...getAxiosReqParams(reqConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;

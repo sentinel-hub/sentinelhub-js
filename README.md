@@ -195,22 +195,22 @@ You can also cancel requests when searching/fetching data.
 
 To do so a token needs to be created and passed through a requests configuration object. Other config such as retries can also be defined there.
 
-In the example below, a cancelFactory is created, passing a token inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
+In the example below, a cancel token is passed inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
 
 This exception can be caught and identified by `isCancelled`.
 
 ```typescript
-import { CancelFactory, isCancelled } from '@sentinel-hub/sentinelhub-js';
+import { CancelToken, isCancelled } from '@sentinel-hub/sentinelhub-js';
 
-const source = CancelFactory.createSource();
+const token = new CancelToken();
 
 const requestConfig = {
-  cancelToken: source.getToken(),
+  cancelToken: token,
   retries: 4
 }
 
 setTimeout(() => {
-  source.cancel();
+  token.cancel();
 }, 500);
 
 try {
