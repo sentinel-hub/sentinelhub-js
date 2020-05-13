@@ -41,7 +41,7 @@ export async function legacyGetMapFromParams(
 
   let layer;
   // Layers parameter may contain list of layers which is at the moment supported only by WmsLayer.
-  // In case there is more then one layer specified in layers parameter, WmsLayer will be used.
+  // In case there is more than one layer specified in layers parameter, WmsLayer will be used.
 
   if (layers && layers.split(',').length > 1) {
     layer = new WmsLayer({ baseUrl, layerId: layers });
