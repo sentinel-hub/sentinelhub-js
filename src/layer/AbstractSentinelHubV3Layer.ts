@@ -384,8 +384,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected async convertEvalscriptToV3(evalscript: string): Promise<string> {
     const authToken = getAuthToken();
-    const shServiceHostname = this.getShServiceHostname();
-    const url = `${shServiceHostname}/api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+    const url = this.getConvertScriptBaseUrl();
     const requestConfig: AxiosRequestConfig = {
       headers: {
         Authorization: `Bearer ${authToken}`,
@@ -396,5 +395,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
     const res = await axios.post(url, evalscript, requestConfig);
     return res.data;
+  }
+
+  protected getConvertScriptBaseUrl() {
+    const shServiceHostname = this.getShServiceHostname();
+    return `${shServiceHostname}/api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
   }
 }
