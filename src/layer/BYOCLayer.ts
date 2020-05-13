@@ -74,7 +74,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     if (this.locationId === null) {
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
-      const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: false });
+      const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: true });
       this.locationId = res.data.location.id;
     }
   }
