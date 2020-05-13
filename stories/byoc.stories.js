@@ -1,6 +1,15 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LocationIdSHv3 } from '../dist/sentinelHub.esm';
+import {
+  BYOCLayer,
+  CRS_EPSG3857,
+  BBox,
+  MimeTypes,
+  ApiType,
+  LocationIdSHv3,
+  DATASET_BYOC,
+  LayersFactory,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -160,6 +169,24 @@ export const getMapProcessingFromLayer = () => {
   };
   perform().then(() => {});
 
+  return wrapperEl;
+};
+
+export const createLayerUsingLayersFactory = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Create BYOC layer with layersFactory.makeLayer</h2>';
+  const label = document.createElement('div');
+  label.innerHTML = 'collectionId:';
+  wrapperEl.insertAdjacentElement('beforeend', label);
+  const collectionId = document.createElement('CollectionId:');
+  wrapperEl.insertAdjacentElement('beforeend', collectionId);
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
+    const layer = await LayersFactory.makeLayer(baseUrl, layerId);
+    collectionId.innerHTML = layer.collectionId;
+  };
+  perform().then(() => {});
   return wrapperEl;
 };
 
