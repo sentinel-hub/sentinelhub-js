@@ -17,6 +17,12 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
         target: tile.dataUri,
         type: LinkType.AWS,
       },
+      {
+        target: `https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles${
+          tile.dataUri.split('tiles')[1]
+        }/preview.jpg`,
+        type: LinkType.PREVIEW,
+      },
     ];
   }
 
