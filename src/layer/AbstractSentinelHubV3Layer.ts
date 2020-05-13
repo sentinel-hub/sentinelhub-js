@@ -399,6 +399,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected getConvertScriptBaseUrl() {
     const shServiceHostname = this.getShServiceHostname();
-    return `${shServiceHostname}/api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+    return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
   }
 }
