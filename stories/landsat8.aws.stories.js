@@ -19,8 +19,13 @@ if (!process.env.LANDSAT8_LAYER_ID) {
   throw new Error('LANDSAT8_LAYER_ID environment variable is not defined!');
 }
 
+if (!process.env.LANDSAT8_NDVI_LAYER_ID) {
+  throw new Error('LANDSAT8_NDVI_LAYER_ID environment variable is not defined!');
+}
+
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.LANDSAT8_LAYER_ID;
+const layerIdNdvi = process.env.LANDSAT8_NDVI_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
@@ -257,7 +262,7 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId: 'L8-NDVI', maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLayer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -278,10 +283,10 @@ export const stats = () => {
 export const statsBBOX3857 = () => {
   const wrapperEl = document.createElement('div');
   const containerEl = document.createElement('pre');
-  wrapperEl.innerHTML = '<h2>getStats</h2>';
+  wrapperEl.innerHTML = '<h2>getStats for EPSG:3857</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId: 'L8-NDVI', maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLayer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),

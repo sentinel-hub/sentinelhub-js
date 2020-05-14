@@ -1,8 +1,9 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles } from 'src/layer/const';
-import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
+import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from 'src/layer/processing';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -10,6 +11,7 @@ interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
@@ -20,19 +22,22 @@ interface ConstructorParameters {
 export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer {
   public maxCloudCoverPercent: number;
 
-  public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    dataProduct = null,
-    title = null,
-    description = null,
-    legendUrl = null,
-    maxCloudCoverPercent = 100,
-  }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
+  public constructor({ maxCloudCoverPercent = 100, ...rest }: ConstructorParameters) {
+    super(rest);
     this.maxCloudCoverPercent = maxCloudCoverPercent;
+  }
+
+  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    return {
+      ...super.getWmsGetMapUrlAdditionalParameters(),
+      maxcc: this.maxCloudCoverPercent,
+    };
+  }
+
+  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+    payload = await super.updateProcessingGetMapPayload(payload);
+    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    return payload;
   }
 
   public async findTiles(
@@ -43,6 +48,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     offset?: number,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,
@@ -54,9 +60,8 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          cloudCoverPercent: tile.cloudCoverPercentage,
-        },
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -70,6 +75,13 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   protected getStatsAdditionalParameters(): Record<string, any> {
     return {
       maxcc: this.maxCloudCoverPercent,
+    };
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {
+      ...super.extractFindTilesMeta(tile),
+      cloudCoverPercent: tile.cloudCoverPercentage,
     };
   }
 }

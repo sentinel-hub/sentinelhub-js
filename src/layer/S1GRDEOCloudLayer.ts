@@ -2,7 +2,7 @@ import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 import { AcquisitionMode, Polarization } from 'src/layer/S1GRDAWSEULayer';
-import { OrbitDirection } from 'src/layer/const';
+import { OrbitDirection, MosaickingOrder, Link, LinkType } from 'src/layer/const';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -13,6 +13,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
   acquisitionMode?: AcquisitionMode | null;
@@ -32,13 +33,14 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     layerId = null,
     evalscript = null,
     evalscriptUrl = null,
+    mosaickingOrder = null,
     title = null,
     description = null,
     acquisitionMode = null,
     polarization = null,
     orbitDirection = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, title, description });
+    super({ instanceId, layerId, evalscript, evalscriptUrl, mosaickingOrder, title, description });
     // it is not possible to determine these parameters by querying the service, because there
     // is no endpoint which would return them:
     if ((evalscript || evalscriptUrl) && (!acquisitionMode || !polarization)) {
@@ -128,5 +130,20 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       result.orbitDirection = this.orbitDirection;
     }
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.pathFragment,
+        type: LinkType.EOCLOUD,
+      },
+      {
+        target: `https://finder.creodias.eu/files/${
+          tile.pathFragment.split('eodata')[1]
+        }/preview/quick-look.png`,
+        type: LinkType.PREVIEW,
+      },
+    ];
   }
 }

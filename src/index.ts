@@ -105,3 +105,5 @@ export {
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
 };
+
+console.log("LOCAL SENTINELHUB-JS")

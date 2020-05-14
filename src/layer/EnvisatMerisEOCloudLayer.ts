@@ -1,5 +1,5 @@
 import { DATASET_EOCLOUD_ENVISAT_MERIS } from 'src/layer/dataset';
-
+import { Link, LinkType } from 'src/layer/const';
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 
 export class EnvisatMerisEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
@@ -22,5 +22,14 @@ export class EnvisatMerisEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
       title,
       description,
     });
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.pathFragment,
+        type: LinkType.EOCLOUD,
+      },
+    ];
   }
 }

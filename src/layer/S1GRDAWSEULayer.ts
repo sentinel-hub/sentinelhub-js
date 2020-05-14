@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { BackscatterCoeff, PaginatedTiles, OrbitDirection } from 'src/layer/const';
+import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
 
@@ -141,6 +141,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
 
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,
@@ -159,6 +160,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
           acquisitionMode: tile.acquisitionMode,
           resolution: tile.resolution,
         },
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -177,5 +179,14 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       result.datasetParameters.orbitDirection = this.orbitDirection;
     }
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.dataUri,
+        type: LinkType.AWS,
+      },
+    ];
   }
 }

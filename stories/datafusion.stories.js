@@ -8,6 +8,7 @@ import {
   ApiType,
   S2L1CLayer,
   S2L2ALayer,
+  MosaickingOrder,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -33,7 +34,7 @@ const bbox = new BBox(
 );
 
 export default {
-  title: 'Data fusion - Sentinel-2 L1C and Landsat 8',
+  title: 'Data fusion',
 };
 
 export const getMapProcessing = () => {
@@ -53,17 +54,21 @@ export const getMapProcessing = () => {
     await setAuthTokenWithOAuthCredentials();
 
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2l1cLayerId });
-    const layerS2L2A = new S2L2ALayer({ instanceId, layerId: s2l2aLayerId });
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: s2l2aLayerId,
+      mosaickingOrder: MosaickingOrder.LEAST_RECENT,
+    });
     const layers = [
       {
         layer: layerS2L2A,
-        id: 'l2a',
+        id: 's2l2a',
         fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 26, 0, 0, 0)),
       },
       {
         layer: layerS2L1C,
-        id: 'l1c',
+        id: 's2l1c',
         fromTime: new Date(Date.UTC(2020, 2 - 1, 10, 0, 0, 0)),
         toTime: new Date(Date.UTC(2020, 2 - 1, 24, 0, 0, 0)),
       },
@@ -74,8 +79,8 @@ export const getMapProcessing = () => {
         //VERSION=3
         var setup = () => ({
           input: [
-            {datasource: "l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
-            {datasource: "l1c", bands:["B02", "B03", "B04"], units:"REFLECTANCE"}],
+            {datasource: "s2l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
+            {datasource: "s2l1c", bands:["B02", "B03", "B04"], units: "REFLECTANCE"}],
           output: [
             {id: "default", bands: 3, sampleType: SampleType.AUTO}
           ]
@@ -83,7 +88,12 @@ export const getMapProcessing = () => {
 
 
         function evaluatePixel(samples, inputData, inputMetadata, customData, outputMetadata) {
-          var sample = samples.l2a[0];
+          var sample = samples.s2l2a[0];
+          if (!sample) {
+            return {
+              default: [0, 0, 0],
+            }
+          }
           let val = [sample.B04, sample.B03, sample.B02];
 
           return {
@@ -91,6 +101,64 @@ export const getMapProcessing = () => {
           }
         }
       `,
+    });
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2019, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 2 - 1, 22, 23, 59, 59)),
+      width: 300,
+      height: 300,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingEvalscriptUrl = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '300';
+  img.height = '300';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing - evalscriptUrl</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2l1cLayerId });
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId: s2l2aLayerId,
+      mosaickingOrder: MosaickingOrder.LEAST_RECENT,
+    });
+    const layers = [
+      {
+        layer: layerS2L2A,
+        id: 's2l2a',
+        fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2020, 2 - 1, 26, 0, 0, 0)),
+      },
+      {
+        layer: layerS2L1C,
+        id: 's2l1c',
+        fromTime: new Date(Date.UTC(2020, 2 - 1, 10, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2020, 2 - 1, 24, 0, 0, 0)),
+      },
+    ];
+    const layer = new ProcessingDataFusionLayer({
+      layers: layers,
+      evalscriptUrl:
+        'https://gist.githubusercontent.com/sinergise-anze/33fe78d9b1fd24d656882d7916a83d4d/raw/295b9d9f033c7e3f1e533363322d84846808564c/data-fusion-evalscript.js',
     });
 
     const getMapParams = {
