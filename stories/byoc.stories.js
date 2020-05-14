@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LocationIdSHv3 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -34,7 +34,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new BYOCLayer({ instanceId, layerId });
+  const layer = new BYOCLayer({ instanceId, layerId, locationId: LocationIdSHv3.awsEuCentral1 });
 
   const getMapParams = {
     bbox: bbox,
@@ -60,6 +60,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const layer = new BYOCLayer({ instanceId, layerId });
 
     const getMapParams = {
@@ -170,11 +171,12 @@ export const findTiles = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (with collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -200,7 +202,7 @@ export const findTilesAuth = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findTiles (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findTiles (without collectionId and locationId)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
@@ -229,10 +231,11 @@ export const findDatesUTC = () => {
     instanceId,
     layerId,
     collectionId: process.env.BYOC_COLLECTION_ID,
+    locationId: LocationIdSHv3.awsEuCentral1,
   });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (with collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
@@ -277,7 +280,7 @@ export const findDatesUTCAuth = () => {
   const layer = new BYOCLayer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId)</h2>';
+  wrapperEl.innerHTML = '<h2>findDatesUTC (without collectionId and locationId)</h2>';
 
   const containerEl = document.createElement('pre');
   wrapperEl.insertAdjacentElement('beforeend', containerEl);

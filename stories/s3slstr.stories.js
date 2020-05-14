@@ -227,8 +227,8 @@ export const findDatesUTC = () => {
   const layer = new S3SLSTRLayer({ instanceId, layerId });
   const specialBBox4326 = new BBox(CRS_EPSG4326, 10, 40, 14, 44);
 
-  const fromTime = new Date(Date.UTC(2018, 1 - 1, 1, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2018, 2 - 1, 1, 23, 59, 59));
+  const fromTime = new Date(Date.UTC(2018, 11 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2018, 12 - 1, 1, 23, 59, 59));
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =

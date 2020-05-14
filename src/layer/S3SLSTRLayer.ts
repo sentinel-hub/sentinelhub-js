@@ -1,9 +1,9 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
 
 interface ConstructorParameters {
@@ -30,42 +30,23 @@ type S3SLSTRFindTilesDatasetParameters = {
   view: S3SLSTRView;
 };
 
-export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
+export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_S3SLSTR;
-  public maxCloudCoverPercent: number;
   public orbitDirection: OrbitDirection | null;
   public view: S3SLSTRView;
 
-  public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    dataProduct = null,
-    title = null,
-    description = null,
-    legendUrl = null,
-    maxCloudCoverPercent = 100,
-    view = S3SLSTRView.NADIR,
-  }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
-    this.maxCloudCoverPercent = maxCloudCoverPercent;
+  public constructor({ view = S3SLSTRView.NADIR, ...rest }: ConstructorParameters) {
+    super(rest);
     // images that are not DESCENDING appear empty:
     this.orbitDirection = OrbitDirection.DESCENDING;
     this.view = view;
   }
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+    payload = await super.updateProcessingGetMapPayload(payload);
     payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
     payload.input.data[0].processing.view = this.view;
     return payload;
-  }
-
-  protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
-    return {
-      maxcc: this.maxCloudCoverPercent,
-    };
   }
 
   public async findTiles(
@@ -81,6 +62,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       view: this.view,
     };
     const response = await this.fetchTiles(
+      this.dataset.searchIndexUrl,
       bbox,
       fromTime,
       toTime,
@@ -93,10 +75,8 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          cloudCoverPercent: tile.cloudCoverPercentage,
-          orbitDirection: tile.orbitDirection,
-        },
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
       })),
       hasMore: response.data.hasMore,
     };
@@ -118,5 +98,28 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3Layer {
     }
 
     return result;
+  }
+
+  protected getTileLinks(tile: Record<string, any>): Link[] {
+    return [
+      {
+        target: tile.originalId.replace('EODATA', '/eodata'),
+        type: LinkType.CREODIAS,
+      },
+      {
+        target: `https://finder.creodias.eu/files${tile.originalId.replace(
+          'EODATA',
+          '',
+        )}/${tile.productName.replace('.SEN3', '')}-ql.jpg`,
+        type: LinkType.PREVIEW,
+      },
+    ];
+  }
+
+  protected extractFindTilesMeta(tile: any): Record<string, any> {
+    return {
+      ...super.extractFindTilesMeta(tile),
+      orbitDirection: tile.orbitDirection,
+    };
   }
 }
