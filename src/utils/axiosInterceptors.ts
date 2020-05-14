@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, CancelToken } from 'axios';
 import { stringify } from 'query-string';
 
 import { isDebugEnabled } from 'src/utils/debug';
@@ -15,6 +15,7 @@ declare module 'axios' {
   export interface AxiosRequestConfig {
     useCache?: boolean;
     retries?: number;
+    cancelToken?: CancelToken;
     cacheKey?: string;
   }
 }

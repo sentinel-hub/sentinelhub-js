@@ -13,6 +13,8 @@ const {
   MimeTypes,
   ApiType,
   setDebugEnabled,
+  CancelToken,
+  isCancelled,
 } = require('../../dist/sentinelHub.cjs');
 
 function printOut(title, value) {
@@ -185,6 +187,25 @@ async function run() {
   const fs = require('fs');
   const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
   fs.writeFileSync('./image.jpeg', imageBlob, { encoding: null });
+
+  // Cancel request example
+  // Create source and pass token as config on the request (getMap WMS/Processing and getStats supported for layerV3)
+  const token = new CancelToken();
+
+  setTimeout(() => {
+    printOut('Cancelling request');
+    token.cancel();
+  }, 100);
+
+  try {
+    const response = await layerS2L2A.getMap(getMapParams, ApiType.WMS, { cancelToken: token });
+    console.log('Image was recieved before 100 miliseconds');
+  } catch (err) {
+    //The exception thrown by cancelling requests can be identified by isCancelled
+    if (!isCancelled(err)) {
+      throw err;
+    }
+  }
 }
 
 run()

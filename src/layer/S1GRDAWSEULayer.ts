@@ -1,11 +1,12 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
+
 import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
-
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -86,7 +87,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orbitDirection = orbitDirection;
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
       return;
     }
@@ -96,7 +97,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         are not set and can't be fetched from service because instanceId and layerId are not available",
       );
     }
-    const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
 
     this.acquisitionMode = layerParams['acquisitionMode'];
     this.polarization = layerParams['polarization'];
@@ -106,8 +107,11 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    reqConfig: RequestConfiguration,
+  ): Promise<ProcessingPayload> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
     payload.input.data[0].dataFilter.polarization = this.polarization;
@@ -124,10 +128,11 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded();
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
@@ -136,7 +141,6 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       orbitDirection: this.orbitDirection,
       resolution: this.resolution,
     };
-
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
       bbox,
@@ -144,6 +148,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       null,
       findTilesDatasetParameters,
     );
@@ -163,7 +168,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,

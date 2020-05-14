@@ -40,6 +40,7 @@ import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
 import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 export class LayersFactory {
   /*
@@ -93,8 +94,12 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
-  public static async makeLayer(baseUrl: string, layerId: string): Promise<AbstractLayer> {
-    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId);
+  public static async makeLayer(
+    baseUrl: string,
+    layerId: string,
+    reqConfig?: RequestConfiguration,
+  ): Promise<AbstractLayer> {
+    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId, reqConfig);
     if (layers.length === 0) {
       return null;
     }
@@ -104,27 +109,29 @@ export class LayersFactory {
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv3(baseUrl, filterLayers);
+        return await this.makeLayersSHv3(baseUrl, filterLayers, reqConfig);
       }
     }
 
     for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv12(baseUrl, filterLayers);
+        return await this.makeLayersSHv12(baseUrl, filterLayers, reqConfig);
       }
     }
 
-    return await this.makeLayersWms(baseUrl, filterLayers);
+    return await this.makeLayersWms(baseUrl, filterLayers, reqConfig);
   }
 
   private static async makeLayersSHv3(
     baseUrl: string,
     filterLayers: Function | null,
+    reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl);
+    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
     const layersInfos = getCapabilitiesJson.map(layerInfo => ({
       layerId: layerInfo.id,
       title: layerInfo.name,
@@ -162,8 +169,9 @@ export class LayersFactory {
   private static async makeLayersSHv12(
     baseUrl: string,
     filterLayers: Function | null,
+    reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl);
+    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
 
     const result: AbstractLayer[] = [];
     for (let layerInfo of getCapabilitiesJsonV1) {
@@ -201,8 +209,9 @@ export class LayersFactory {
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
+    reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await fetchGetCapabilitiesXml(baseUrl);
+    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
     const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
