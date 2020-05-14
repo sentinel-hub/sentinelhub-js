@@ -185,4 +185,3 @@ export type Stats = {
 };
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
-export const DEFAULT_FIND_TILES_OFFSET_PARAMETER = 0;
