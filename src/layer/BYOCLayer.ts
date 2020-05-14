@@ -165,4 +165,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     await this.updateLayerFromServiceIfNeeded();
     return super.getStats(params);
   }
+
+  protected getConvertEvalscriptBaseUrl(): string {
+    return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
+  }
 }
