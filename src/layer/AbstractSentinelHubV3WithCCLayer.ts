@@ -1,9 +1,11 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
+
 import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -43,8 +45,9 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
@@ -53,6 +56,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       toTime,
       maxCount,
       offset,
+      reqConfig,
       this.maxCloudCoverPercent,
     );
     return {
@@ -66,7 +70,9 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     return {
       maxCloudCoverage: this.maxCloudCoverPercent / 100,
     };
