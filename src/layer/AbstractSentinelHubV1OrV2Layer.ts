@@ -81,7 +81,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       additionalParameters.upsampling = this.upsampling;
     }
     if (this.downsampling) {
-      additionalParameters.priority = this.downsampling;
+      additionalParameters.downsampling = this.downsampling;
     }
     return additionalParameters;
   }
