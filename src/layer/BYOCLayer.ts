@@ -78,9 +78,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       const res = await axios.get(url, {
         responseType: 'json',
         headers: headers,
-        useCache: false,
+        useCache: true,
         ...getAxiosReqParams(reqConfig),
       });
+
       this.locationId = res.data.location.id;
     }
   }
@@ -177,5 +178,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public async getStats(params: GetStatsParams): Promise<Stats> {
     await this.updateLayerFromServiceIfNeeded();
     return super.getStats(params);
+  }
+
+  protected getConvertEvalscriptBaseUrl(): string {
+    return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
   }
 }
