@@ -15,7 +15,6 @@ import {
   Stats,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-  DEFAULT_FIND_TILES_OFFSET_PARAMETER,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -292,7 +291,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
     }
     if (offset === null) {
-      offset = DEFAULT_FIND_TILES_OFFSET_PARAMETER;
+      offset = 0;
     }
     if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');

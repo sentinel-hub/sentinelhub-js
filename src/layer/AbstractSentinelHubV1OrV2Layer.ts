@@ -15,7 +15,6 @@ import {
   MosaickingOrder,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-  DEFAULT_FIND_TILES_OFFSET_PARAMETER,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
@@ -123,7 +122,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
     }
     if (offset === null) {
-      offset = DEFAULT_FIND_TILES_OFFSET_PARAMETER;
+      offset = 0;
     }
     const payload = bbox.toGeoJSON();
     const params = {
