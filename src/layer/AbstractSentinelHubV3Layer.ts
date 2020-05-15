@@ -13,6 +13,7 @@ import {
   MosaickingOrder,
   GetStatsParams,
   Stats,
+  Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
 } from 'src/layer/const';
@@ -31,6 +32,8 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  upsampling?: Interpolator | null;
+  downsampling?: Interpolator | null;
   legendUrl?: string | null;
 }
 
@@ -44,6 +47,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public legend?: any[] | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
+  public upsampling: Interpolator | null;
+  public downsampling: Interpolator | null;
 
   public constructor({
     instanceId = null,
@@ -54,6 +59,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     mosaickingOrder = null,
     title = null,
     description = null,
+    upsampling = null,
+    downsampling = null,
     legendUrl = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
@@ -74,6 +81,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.dataProduct = dataProduct;
     this.evalscriptWasConvertedToV3 = false;
     this.mosaickingOrder = mosaickingOrder;
+    this.upsampling = upsampling;
+    this.downsampling = downsampling;
   }
 
   protected async fetchLayerParamsFromSHServiceV3(reqConfig: RequestConfiguration): Promise<any> {
@@ -171,11 +180,17 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
         }
       }
-      if (!this.mosaickingOrder && this.instanceId && this.layerId) {
+      if (
+        this.instanceId &&
+        this.layerId &&
+        (!this.mosaickingOrder || !this.upsampling || !this.downsampling)
+      ) {
         if (!layerParams) {
           layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
         }
         this.mosaickingOrder = layerParams.mosaickingOrder;
+        this.upsampling = layerParams.upsampling;
+        this.downsampling = layerParams.downsampling;
       }
 
       await this.convertEvalscriptToV3IfNeeded(reqConfig);
@@ -186,6 +201,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         this.evalscript,
         this.dataProduct,
         this.mosaickingOrder,
+        this.upsampling,
+        this.downsampling,
       );
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload, reqConfig);
@@ -201,12 +218,18 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
+    let additionalParameters: Record<string, any> = {};
+
     if (this.mosaickingOrder) {
-      return {
-        priority: this.mosaickingOrder,
-      };
+      additionalParameters.priority = this.mosaickingOrder;
     }
-    return {};
+    if (this.upsampling) {
+      additionalParameters.upsampling = this.upsampling;
+    }
+    if (this.downsampling) {
+      additionalParameters.downsampling = this.downsampling;
+    }
+    return additionalParameters;
   }
 
   public getMapUrl(params: GetMapParams, api: ApiType): string {

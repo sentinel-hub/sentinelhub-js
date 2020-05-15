@@ -88,6 +88,8 @@ export function createProcessingPayload(
   evalscript: string | null = null,
   dataProduct: string | null = null,
   mosaickingOrder: MosaickingOrder | null = null,
+  upsampling: Interpolator | null = null,
+  downsampling: Interpolator | null = null,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -127,11 +129,11 @@ export function createProcessingPayload(
     },
   };
 
-  if (params.upsampling !== undefined) {
-    payload.input.data[0].processing.upsampling = params.upsampling;
+  if (params.upsampling || upsampling) {
+    payload.input.data[0].processing.upsampling = params.upsampling ? params.upsampling : upsampling;
   }
-  if (params.downsampling !== undefined) {
-    payload.input.data[0].processing.downsampling = params.downsampling;
+  if (params.downsampling || downsampling) {
+    payload.input.data[0].processing.downsampling = params.downsampling ? params.downsampling : downsampling;
   }
   if (params.geometry !== undefined) {
     payload.input.bounds.geometry = params.geometry;
