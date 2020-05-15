@@ -202,3 +202,37 @@ export const WMSLegacyGetMapFromParamsWrongEvalsource = () => {
 
   return wrapperEl;
 };
+
+export const WMSLegacyGetMapFromParamsWithDates = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>WMS LegacyGetMapFromParams with aquisition dates</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const params = {
+    bbox: [1110477.1469270408, 7078680.315433605, 1115369.1167372921, 7083572.285243855],
+    crs: 'EPSG:3857',
+    evalscriptoverrides: '',
+    format: 'image/png',
+    layers: `${s2l2aLayerId},DATE`,
+    maxcc: 100,
+    pane: 'activeLayer',
+    preview: 2,
+    showlogo: false,
+    time: '2019-07-01/2020-01-15',
+    transparent: true,
+    width: 512,
+    height: 512,
+  };
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const imageBlob = await legacyGetMapFromParams(baseUrl, params);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

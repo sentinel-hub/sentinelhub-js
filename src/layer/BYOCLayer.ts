@@ -16,6 +16,7 @@ import {
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -55,7 +56,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     this.locationId = locationId;
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     if (this.collectionId !== null && this.locationId !== null) {
       return;
     }
@@ -67,25 +68,34 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
 
     if (this.collectionId === null) {
-      const layerParams = await this.fetchLayerParamsFromSHServiceV3();
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
       this.collectionId = layerParams['collectionId'];
     }
 
     if (this.locationId === null) {
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
-      const res = await axios.get(url, { responseType: 'json', headers: headers, useCache: false });
+      const res = await axios.get(url, {
+        responseType: 'json',
+        headers: headers,
+        useCache: true,
+        ...getAxiosReqParams(reqConfig),
+      });
+
       this.locationId = res.data.location.id;
     }
   }
 
-  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
-    await this.updateLayerFromServiceIfNeeded();
-    return await super.getMap(params, api);
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    return await super.getMap(params, api, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    reqConfig: RequestConfiguration,
+  ): Promise<ProcessingPayload> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
     payload.input.data[0].dataFilter.collectionId = this.collectionId;
     return payload;
   }
@@ -94,10 +104,11 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded();
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
       type: 'BYOC',
@@ -113,6 +124,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       null,
       findTilesDatasetParameters,
     );
@@ -142,15 +154,17 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(): Promise<string> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
     const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
     return findDatesUTCUrl;
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
-    await this.updateLayerFromServiceIfNeeded();
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration,
+  ): Promise<Record<string, any>> {
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     const result: Record<string, any> = {
       datasetParameters: {
@@ -164,5 +178,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public async getStats(params: GetStatsParams): Promise<Stats> {
     await this.updateLayerFromServiceIfNeeded();
     return super.getStats(params);
+  }
+
+  protected getConvertEvalscriptBaseUrl(): string {
+    return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
   }
 }

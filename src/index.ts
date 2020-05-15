@@ -43,6 +43,7 @@ import { ProcessingDataFusionLayer } from 'src/layer/ProcessingDataFusionLayer';
 import { legacyGetMapFromUrl, legacyGetMapWmsUrlFromParams, legacyGetMapFromParams } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
+import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -100,6 +101,9 @@ export {
   S3SLSTRView,
   BBox,
   setDebugEnabled,
+  CancelToken,
+  isCancelled,
+  RequestConfiguration,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,

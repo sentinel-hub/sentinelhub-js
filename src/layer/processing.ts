@@ -2,8 +2,10 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
+
 import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -152,7 +154,11 @@ export function createProcessingPayload(
   return payload;
 }
 
-export async function processingGetMap(shServiceHostname: string, payload: ProcessingPayload): Promise<Blob> {
+export async function processingGetMap(
+  shServiceHostname: string,
+  payload: ProcessingPayload,
+  reqConfig: RequestConfiguration,
+): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
@@ -166,6 +172,7 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
+    ...getAxiosReqParams(reqConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;

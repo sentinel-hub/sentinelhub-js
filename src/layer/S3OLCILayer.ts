@@ -4,6 +4,7 @@ import { BBox } from 'src/bbox';
 import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
 import { DATASET_S3OLCI } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3OLCI;
@@ -12,8 +13,9 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
@@ -22,6 +24,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
     );
     return {
       tiles: response.data.tiles.map(tile => ({
