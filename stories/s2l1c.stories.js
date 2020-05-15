@@ -8,6 +8,8 @@ import {
   MimeTypes,
   ApiType,
   PreviewMode,
+  CancelToken,
+  isCancelled,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -375,5 +377,64 @@ export const statsBBOX3857 = () => {
   };
   perform().then(() => {});
 
+  return wrapperEl;
+};
+
+export const cancelRequests = () => {
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent: 20,
+  });
+
+  const getMapParams = {
+    bbox: bbox4326,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+  };
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>Cancel Requests example</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const button = document.createElement('button');
+  button.innerHTML = 'Start Request';
+  const button2 = document.createElement('button');
+  button2.innerHTML = 'Cancel Request';
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement('beforeend', button);
+  wrapperEl.insertAdjacentElement('beforeend', button2);
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  let token;
+
+  button.addEventListener('click', async () => {
+    token = new CancelToken();
+    img.src = '';
+    try {
+      const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING, {
+        cancelToken: token,
+      });
+      img.src = URL.createObjectURL(imageBlob);
+    } catch (err) {
+      if (!isCancelled(err)) {
+        throw err;
+      }
+    }
+  });
+
+  button2.addEventListener('click', () => {
+    token.cancel();
+  });
+  const setToken = async () => {
+    await setAuthTokenWithOAuthCredentials();
+  };
+  setToken();
   return wrapperEl;
 };
