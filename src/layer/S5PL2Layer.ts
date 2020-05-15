@@ -5,6 +5,7 @@ import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching
@@ -31,6 +32,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   productType?: ProductType | null;
   maxCloudCoverPercent?: number | null;
   minQa?: number | null;
@@ -56,11 +58,12 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     dataProduct = null,
     title = null,
     description = null,
+    legendUrl = null,
     productType = null,
     maxCloudCoverPercent = 100,
     minQa = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
     this.productType = productType;
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     this.minQa = minQa;
@@ -80,8 +83,9 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (this.productType === null) {
       throw new Error('Parameter productType must be specified!');
@@ -98,6 +102,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
@@ -114,7 +119,9 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,

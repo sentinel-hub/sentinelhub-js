@@ -5,6 +5,7 @@ import { PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const'
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -14,6 +15,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
   view?: S3SLSTRView | null;
 }
@@ -52,8 +54,9 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount?: number,
-    offset?: number,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
@@ -67,6 +70,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       toTime,
       maxCount,
       offset,
+      reqConfig,
       this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
@@ -81,7 +85,9 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {
         type: this.dataset.datasetParametersType,
