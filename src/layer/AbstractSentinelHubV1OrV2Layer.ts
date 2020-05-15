@@ -14,11 +14,13 @@ import {
   FisPayload,
   MosaickingOrder,
   Link,
+  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { fetchGetCapabilitiesXml } from 'src/layer/utils';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -112,11 +114,18 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxCount: number = 50,
-    offset: number = 0,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (!this.dataset.searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
+    }
+    if (maxCount === null) {
+      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
+    }
+    if (offset === null) {
+      offset = 0;
     }
     const payload = bbox.toGeoJSON();
     const params = {
@@ -134,6 +143,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         'Content-Type': 'application/json',
         'Accept-CRS': 'EPSG:4326',
       },
+      ...getAxiosReqParams(reqConfig),
     });
 
     const responseTiles: any[] = response.data.tiles;
@@ -148,7 +158,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     };
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     return {};
   }
 
@@ -160,7 +172,12 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return [];
   }
 
-  public async findDatesUTC(bbox: BBox, fromTime: Date, toTime: Date): Promise<Date[]> {
+  public async findDatesUTC(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    reqConfig?: RequestConfiguration,
+  ): Promise<Date[]> {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
@@ -169,7 +186,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     const params = {
       timefrom: fromTime.toISOString(),
       timeto: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters()),
+      ...(await this.getFindDatesUTCAdditionalParameters(reqConfig)),
     };
 
     const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
@@ -177,12 +194,13 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       headers: {
         'Content-Type': 'application/json',
       },
+      ...getAxiosReqParams(reqConfig),
     });
 
     return response.data.map((date: string) => moment.utc(date).toDate());
   }
 
-  public async getStats(params: GetStatsParams): Promise<Stats> {
+  public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -227,6 +245,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
       params: payload,
+      ...getAxiosReqParams(reqConfig),
     });
     // convert date strings to Date objects
     for (let channel in data) {
@@ -238,14 +257,14 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return data;
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error(
         "Additional data can't be fetched from service because instanceId and layerId are not defined",
       );
     }
     const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-    const capabilities = await fetchGetCapabilitiesXml(baseUrl);
+    const capabilities = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
     const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
       layerInfo => this.layerId === layerInfo.Name[0],
     );

@@ -183,3 +183,5 @@ export type DailyChannelStats = {
 export type Stats = {
   [key: string]: DailyChannelStats[];
 };
+
+export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;

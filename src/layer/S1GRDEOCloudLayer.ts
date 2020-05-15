@@ -3,6 +3,7 @@ import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
 import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
 import { AcquisitionMode, Polarization } from 'src/layer/S1GRDAWSEULayer';
 import { OrbitDirection, MosaickingOrder, Link, LinkType } from 'src/layer/const';
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
@@ -120,7 +121,9 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     return result;
   }
 
-  protected async getFindDatesUTCAdditionalParameters(): Promise<Record<string, any>> {
+  protected async getFindDatesUTCAdditionalParameters(
+    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       productType: 'GRD',
       acquisitionMode: this.acquisitionMode,
