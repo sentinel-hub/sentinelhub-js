@@ -19,6 +19,7 @@ import {
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
+import { fetchGetCapabilitiesXml } from 'src/layer/utils';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 interface ConstructorParameters {
@@ -29,6 +30,7 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 // this class provides any SHv1- or SHv2-specific (EO Cloud) functionality to the subclasses:
@@ -47,8 +49,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     mosaickingOrder = null,
     title = null,
     description = null,
+    legendUrl = null,
   }: ConstructorParameters) {
-    super({ title, description });
+    super({ title, description, legendUrl });
     if (!layerId || !instanceId) {
       throw new Error('Parameters instanceId and layerId must be specified!');
     }
@@ -252,5 +255,26 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       }));
     }
     return data;
+  }
+
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
+    if (this.instanceId === null || this.layerId === null) {
+      throw new Error(
+        "Additional data can't be fetched from service because instanceId and layerId are not defined",
+      );
+    }
+    const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
+    const capabilities = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
+    const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
+      layerInfo => this.layerId === layerInfo.Name[0],
+    );
+    if (!layer) {
+      throw new Error('Layer not found');
+    }
+    const legendUrl =
+      layer.Style && layer.Style[0].LegendURL
+        ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+        : null;
+    this.legendUrl = legendUrl;
   }
 }

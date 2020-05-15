@@ -12,6 +12,7 @@ interface ConstructorParameters {
   layerId?: string;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 export class WmsLayer extends AbstractLayer {
@@ -19,8 +20,14 @@ export class WmsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
 
-  public constructor({ baseUrl, layerId, title = null, description = null }: ConstructorParameters) {
-    super({ title, description });
+  public constructor({
+    baseUrl,
+    layerId,
+    title = null,
+    description = null,
+    legendUrl = null,
+  }: ConstructorParameters) {
+    super({ title, description, legendUrl });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
   }
@@ -89,5 +96,30 @@ export class WmsLayer extends AbstractLayer {
     );
     found.sort((a, b) => b.unix() - a.unix());
     return found.map(m => m.toDate());
+  }
+
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
+    if (this.legendUrl) {
+      return;
+    }
+    if (this.baseUrl === null || this.layerId === null) {
+      throw new Error(
+        "Additional data can't be fetched from service because baseUrl and layerId are not defined",
+      );
+    }
+    const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, reqConfig);
+    const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
+      layer => this.layerId === layer.Name[0],
+    );
+    if (!layer) {
+      throw new Error('Layer not found');
+    }
+    const legendUrl =
+      layer.Style && layer.Style[0].LegendURL
+        ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+        : layer.Layer && layer.Layer[0].Style && layer.Layer[0].Style[0].LegendURL
+        ? layer.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+        : null;
+    this.legendUrl = legendUrl;
   }
 }

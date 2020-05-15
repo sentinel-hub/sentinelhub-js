@@ -12,16 +12,19 @@ import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequest
 interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 export class AbstractLayer {
   public title: string | null = null;
   public description: string | null = null;
   public readonly dataset: Dataset | null = null;
+  public legendUrl: string | null = null;
 
-  public constructor({ title = null, description = null }: ConstructorParameters) {
+  public constructor({ title = null, description = null, legendUrl = null }: ConstructorParameters) {
     this.title = title;
     this.description = description;
+    this.legendUrl = legendUrl;
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
@@ -266,5 +269,6 @@ export class AbstractLayer {
     throw new Error('getStats() not implemented for this dataset');
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {}
 }
