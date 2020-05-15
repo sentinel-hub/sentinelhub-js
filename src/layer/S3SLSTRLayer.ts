@@ -15,6 +15,7 @@ interface ConstructorParameters {
   dataProduct?: string | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
   view?: S3SLSTRView | null;
 }

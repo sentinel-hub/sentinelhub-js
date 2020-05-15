@@ -31,6 +31,7 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 // this class provides any SHv3-specific functionality to the subclasses:
@@ -40,6 +41,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
   protected dataProduct: string | null;
+  public legend?: any[] | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
 
@@ -52,8 +54,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     mosaickingOrder = null,
     title = null,
     description = null,
+    legendUrl = null,
   }: ConstructorParameters) {
-    super({ title, description });
+    super({ title, description, legendUrl });
     if (
       (layerId === null || instanceId === null) &&
       evalscript === null &&
@@ -103,6 +106,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       ...l.datasourceDefaults,
       evalscript: l.styles[0].evalScript,
       dataProduct: l.styles[0].dataProduct,
+      legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
+        ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
+        : null,
     }));
 
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
@@ -443,6 +449,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return res.data;
   }
 
+  public async updateLayerFromServiceIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+    this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+  }
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
     return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;

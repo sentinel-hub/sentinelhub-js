@@ -16,6 +16,7 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
 }
 
