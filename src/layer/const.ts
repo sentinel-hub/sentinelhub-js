@@ -36,7 +36,13 @@ export type GetMapParams = {
   };
 };
 
-export type Interpolator = 'BILINEAR' | 'BICUBIC' | 'LANCZOS' | 'BOX' | 'NEAREST';
+export enum Interpolator {
+  BILINEAR = 'BILINEAR',
+  BICUBIC = 'BICUBIC',
+  LANCZOS = 'LANCZOS',
+  BOX = 'BOX',
+  NEAREST = 'NEAREST',
+}
 
 export enum PreviewMode {
   DETAIL = 0,
@@ -66,10 +72,23 @@ export enum BackscatterCoeff {
   SIGMA0_ELLIPSOID = 'SIGMA0_ELLIPSOID',
 }
 
+export enum LinkType {
+  EOCLOUD = 'eocloud',
+  AWS = 'aws',
+  PREVIEW = 'preview',
+  CREODIAS = 'creodias',
+}
+
+export type Link = {
+  target: string;
+  type: LinkType;
+};
+
 export type Tile = {
   geometry: Polygon | MultiPolygon;
   sensingTime: Date;
   meta: Record<string, any>;
+  links?: Link[];
 };
 
 export type PaginatedTiles = {
@@ -170,3 +189,5 @@ export type DailyChannelStats = {
 export type Stats = {
   [key: string]: DailyChannelStats[];
 };
+
+export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;

@@ -39,23 +39,31 @@ export async function legacyGetMapFromParams(
     wmsParams,
   );
 
-  const layerId = layers.split(',')[0];
-  const layer = await LayersFactory.makeLayer(baseUrl, layerId);
-  if (!layer) {
-    throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
-  }
+  let layer;
+  // Layers parameter may contain list of layers which is at the moment supported only by WmsLayer.
+  // In case there is more than one layer specified in layers parameter, WmsLayer will be used.
 
-  if (evalscript || evalscriptUrl) {
-    // we assume that devs don't do things like setting evalsource on a layer to something
-    // that doesn't match layer's dataset - but we check it nevertheless:
-    const expectedEvalsource = layer.dataset.shWmsEvalsource;
-    if (expectedEvalsource !== evalsource) {
-      console.warn(`Evalsource ${evalsource} is not valid on this layer, will use: ${expectedEvalsource}`);
+  if (layers && layers.split(',').length > 1) {
+    layer = new WmsLayer({ baseUrl, layerId: layers });
+  } else {
+    const layerId = layers;
+    layer = await LayersFactory.makeLayer(baseUrl, layerId);
+    if (!layer) {
+      throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
     }
-    if (evalscriptUrl) {
-      layer.setEvalscriptUrl(evalscriptUrl);
-    } else {
-      layer.setEvalscript(evalscript);
+
+    if (evalscript || evalscriptUrl) {
+      // we assume that devs don't do things like setting evalsource on a layer to something
+      // that doesn't match layer's dataset - but we check it nevertheless:
+      const expectedEvalsource = layer.dataset.shWmsEvalsource;
+      if (expectedEvalsource !== evalsource) {
+        console.warn(`Evalsource ${evalsource} is not valid on this layer, will use: ${expectedEvalsource}`);
+      }
+      if (evalscriptUrl) {
+        layer.setEvalscriptUrl(evalscriptUrl);
+      } else {
+        layer.setEvalscript(evalscript);
+      }
     }
   }
 
@@ -217,7 +225,7 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
   return {
     layers: layers,
     evalscript: decodedEvalscript,
-    evalscriptUrl: params.evalscriptUrl,
+    evalscriptUrl: params.evalscripturl,
     evalsource: params.evalsource,
     getMapParams: getMapParams,
   };
