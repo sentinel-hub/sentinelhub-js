@@ -22,11 +22,6 @@ import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'sr
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-
-// import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
-// import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
-// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
-import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
 
 interface ConstructorParameters {
@@ -215,17 +210,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const shServiceHostname = this.getShServiceHostname();
 
       let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
-      // this code applies only if we use separate functions manipulateGain and manipulateGamma
-      // if (params.gain) {
-      //   blob = manipulateGain(blob, params.gain);
-      // }
-      // if (params.gamma) {
-      //   blob = manipulateGamma(blob, params.gamma);
-      // }
-
-      // combined algorithms for manipulating gain and gamma in one function
-      // blob = await manipulateGainGamma(blob, params.gain, params.gamma);
-
       blob = await runPredefinedEffectFunctions(blob, { gain: params.gain, gamma: params.gamma });
 
       return blob;

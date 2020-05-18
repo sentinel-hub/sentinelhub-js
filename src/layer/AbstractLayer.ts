@@ -8,11 +8,6 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-
-// import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
-// import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
-// import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
-import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
 
 interface ConstructorParameters {
@@ -65,18 +60,6 @@ export class AbstractLayer {
         };
         const response = await axios.get(url, requestConfig);
         let blob = response.data;
-
-        // this code applies only if we use separate functions manipulateGain and manipulateGamma
-        // if (gain) {
-        //   blob = manipulateGain(blob, gain);
-        // }
-        // if (gamma) {
-        //   blob = manipulateGamma(blob, gamma);
-        // }
-
-        // combined algorithms for manipulating gain and gamma in one function
-        // blob = await manipulateGainGamma(blob, gain, gamma);
-
         blob = await runPredefinedEffectFunctions(blob, { gain: gain, gamma: gamma });
 
         return blob;
