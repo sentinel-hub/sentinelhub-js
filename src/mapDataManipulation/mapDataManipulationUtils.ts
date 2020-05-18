@@ -11,7 +11,7 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
 export function changeRgbMappingArraysWithFunction(
   rgbMappingArrays: RgbMappingArrays,
   transfrormationFunction: Function,
-) {
+): RgbMappingArrays {
   rgbMappingArrays.red = rgbMappingArrays.red.map(x => transfrormationFunction(x));
   rgbMappingArrays.green = rgbMappingArrays.green.map(x => transfrormationFunction(x));
   rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transfrormationFunction(x));
