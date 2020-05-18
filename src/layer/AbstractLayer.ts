@@ -8,6 +8,8 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+
+import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
@@ -41,13 +43,15 @@ export class AbstractLayer {
         //    were sent to the services in getMapUrl()
         // This is a dirty fix, but gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
-        let gain, gamma;
+
+        let predefinedEffects: PredefinedEffects = {};
+
         if (params.gain) {
-          gain = params.gain;
+          predefinedEffects.gain = params.gain;
           params.gain = undefined;
         }
         if (params.gamma) {
-          gamma = params.gamma;
+          predefinedEffects.gamma = params.gamma;
           params.gamma = undefined;
         }
 
@@ -60,7 +64,7 @@ export class AbstractLayer {
         };
         const response = await axios.get(url, requestConfig);
         let blob = response.data;
-        blob = await runPredefinedEffectFunctions(blob, { gain: gain, gamma: gamma });
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
 
         return blob;
       default:
