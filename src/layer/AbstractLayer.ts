@@ -8,7 +8,7 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
   title?: string | null;
