@@ -27,8 +27,9 @@ export async function runPredefinedEffectFunctions(
   // change the values according to the algorithm (gamma)
   rgbMappingArrays = gammaEffectFunction(rgbMappingArrays, predefinedEffectFunctions);
 
-  // change the interval of the values from [0, 1] back to [0, 255]
-  rgbMappingArrays = changeRgbMappingArraysInterval(rgbMappingArrays, 0, 1, 0, 255);
+  // change the interval of the values from [0, 1] back to [0, 255], strictly limit values to the interval
+  const limitValuesToInterval = true;
+  rgbMappingArrays = changeRgbMappingArraysInterval(rgbMappingArrays, 0, 1, 0, 255, limitValuesToInterval);
 
   // prepare manipulatePixel function for mapDataManipulation
   const manipulatePixel = prepareManipulatePixel(rgbMappingArrays);
