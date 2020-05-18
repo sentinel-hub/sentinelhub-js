@@ -8,6 +8,16 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
   };
 }
 
+export function changeRgbMappingArraysWithFunction(
+  rgbMappingArrays: RgbMappingArrays,
+  transfrormationFunction: Function,
+) {
+  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transfrormationFunction(x));
+  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transfrormationFunction(x));
+  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transfrormationFunction(x));
+  return rgbMappingArrays;
+}
+
 // from one interval to another
 // f(x) = c + ((d - c) / (b - a)) * (x - a)
 // a = oldMin, b = oldMax; c = newMin, d = newMax
@@ -31,13 +41,11 @@ export function changeRgbMappingArraysInterval(
     return newX;
   };
 
-  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformValueToInterval(x));
-  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformValueToInterval(x));
-  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformValueToInterval(x));
+  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueToInterval);
   return rgbMappingArrays;
 }
 
-export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): any {
+export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Function {
   return function(r: number, g: number, b: number, a: number): object {
     return { r: rgbMappingArrays.red[r], g: rgbMappingArrays.green[g], b: rgbMappingArrays.blue[b], a };
   };
