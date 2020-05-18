@@ -1,13 +1,4 @@
-export type PredefinedEffectFunctions = {
-  gain?: number;
-  gamma?: number;
-};
-
-export type RgbMappingArrays = {
-  red: number[];
-  green: number[];
-  blue: number[];
-};
+import { RgbMappingArrays } from 'src/mapDataManipulation/const';
 
 export function prepareRgbMappingArrays(): RgbMappingArrays {
   return {

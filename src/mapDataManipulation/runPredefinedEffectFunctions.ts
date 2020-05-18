@@ -1,6 +1,6 @@
 import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
+import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import {
-  PredefinedEffectFunctions,
   prepareRgbMappingArrays,
   changeRgbMappingArraysInterval,
   prepareManipulatePixel,
@@ -14,7 +14,7 @@ import { gainEffectFunction, gammaEffectFunction } from 'src/mapDataManipulation
 
 export async function runPredefinedEffectFunctions(
   originalBlob: Blob,
-  predefinedEffectFunctions: PredefinedEffectFunctions,
+  predefinedEffects: PredefinedEffects,
 ): Promise<Blob> {
   let rgbMappingArrays = prepareRgbMappingArrays();
 
@@ -22,10 +22,10 @@ export async function runPredefinedEffectFunctions(
   rgbMappingArrays = changeRgbMappingArraysInterval(rgbMappingArrays, 0, 255, 0, 1);
 
   // change the values according to the algorithm (gain)
-  rgbMappingArrays = gainEffectFunction(rgbMappingArrays, predefinedEffectFunctions);
+  rgbMappingArrays = gainEffectFunction(rgbMappingArrays, predefinedEffects);
 
   // change the values according to the algorithm (gamma)
-  rgbMappingArrays = gammaEffectFunction(rgbMappingArrays, predefinedEffectFunctions);
+  rgbMappingArrays = gammaEffectFunction(rgbMappingArrays, predefinedEffects);
 
   // change the interval of the values from [0, 1] back to [0, 255], strictly limit values to the interval
   const limitValuesToInterval = true;

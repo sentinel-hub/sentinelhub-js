@@ -1,16 +1,13 @@
-import {
-  PredefinedEffectFunctions,
-  RgbMappingArrays,
-} from 'src/mapDataManipulation/mapDataManipulationUtils';
+import { PredefinedEffects, RgbMappingArrays } from 'src/mapDataManipulation/const';
 
 export function gainEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
-  predefinedEffectFunctions: PredefinedEffectFunctions,
+  predefinedEffects: PredefinedEffects,
 ): RgbMappingArrays {
   // change the values according to the algorithm (gain)
   const minValue = 0.0;
   const maxValue = 1.0;
-  const gain = predefinedEffectFunctions.gain ? predefinedEffectFunctions.gain : 1.0;
+  const gain = predefinedEffects.gain ? predefinedEffects.gain : 1.0;
   const factor = gain / (maxValue - minValue);
   let offset = 0.0;
   offset = offset - factor * minValue;
@@ -23,10 +20,10 @@ export function gainEffectFunction(
 
 export function gammaEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
-  predefinedEffectFunctions: PredefinedEffectFunctions,
+  predefinedEffects: PredefinedEffects,
 ): RgbMappingArrays {
   // change the values according to the algorithm (gamma)
-  const gamma = predefinedEffectFunctions.gamma ? predefinedEffectFunctions.gamma : 1.0;
+  const gamma = predefinedEffects.gamma ? predefinedEffects.gamma : 1.0;
   if (gamma != 1.0) {
     rgbMappingArrays.red = rgbMappingArrays.red.map(x => Math.pow(x, gamma));
     rgbMappingArrays.green = rgbMappingArrays.green.map(x => Math.pow(x, gamma));
