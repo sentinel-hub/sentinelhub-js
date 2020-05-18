@@ -17,7 +17,7 @@ export async function manipulateGamma(originalBlob: Blob, newGamma: number): Pro
   newBlueValues = newBlueValues.map(x => (1 / 255) * x);
 
   // change the values according to the algorithm
-  if (newGamma != 1.0) {
+  if (newGamma && newGamma != 1.0) {
     newRedValues = newRedValues.map(x => Math.pow(x, newGamma));
     newGreenValues = newGreenValues.map(x => Math.pow(x, newGamma));
     newBlueValues = newBlueValues.map(x => Math.pow(x, newGamma));

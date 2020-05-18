@@ -38,9 +38,9 @@ export async function manipulateGainGamma(
 
   // change the values according to the algorithm (gamma)
   if (gamma != 1.0) {
-    newRedValues = newRedValues.map(x => Math.pow(x, newGamma));
-    newGreenValues = newGreenValues.map(x => Math.pow(x, newGamma));
-    newBlueValues = newBlueValues.map(x => Math.pow(x, newGamma));
+    newRedValues = newRedValues.map(x => Math.pow(x, gamma));
+    newGreenValues = newGreenValues.map(x => Math.pow(x, gamma));
+    newBlueValues = newBlueValues.map(x => Math.pow(x, gamma));
   }
 
   // change the interval of the values from [0, 1] back to [0, 255]

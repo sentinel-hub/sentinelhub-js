@@ -27,6 +27,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 // import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
 // import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
 import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -223,7 +224,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       // }
 
       // combined algorithms for manipulating gain and gamma in one function
-      blob = await manipulateGainGamma(blob, params.gain, params.gamma);
+      // blob = await manipulateGainGamma(blob, params.gain, params.gamma);
+
+      blob = await runPredefinedEffectFunctions(blob, { gain: params.gain, gamma: params.gamma });
 
       return blob;
     }
