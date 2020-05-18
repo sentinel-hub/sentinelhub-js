@@ -22,7 +22,7 @@ import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'sr
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
   instanceId?: string | null;
