@@ -11,9 +11,11 @@ export function gainEffectFunction(
   const factor = gain / (maxValue - minValue);
   let offset = 0.0;
   offset = offset - factor * minValue;
-  rgbMappingArrays.red = rgbMappingArrays.red.map(x => Math.max(0.0, x * factor + offset));
-  rgbMappingArrays.green = rgbMappingArrays.green.map(x => Math.max(0.0, x * factor + offset));
-  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => Math.max(0.0, x * factor + offset));
+
+  const transformValueWithGain = (x: number): number => Math.max(0.0, x * factor + offset);
+  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformValueWithGain(x));
+  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformValueWithGain(x));
+  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformValueWithGain(x));
 
   return rgbMappingArrays;
 }
@@ -24,10 +26,12 @@ export function gammaEffectFunction(
 ): RgbMappingArrays {
   // change the values according to the algorithm (gamma)
   const gamma = predefinedEffects.gamma ? predefinedEffects.gamma : 1.0;
+
   if (gamma != 1.0) {
-    rgbMappingArrays.red = rgbMappingArrays.red.map(x => Math.pow(x, gamma));
-    rgbMappingArrays.green = rgbMappingArrays.green.map(x => Math.pow(x, gamma));
-    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => Math.pow(x, gamma));
+    const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
+    rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformValueWithGamma(x));
+    rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformValueWithGamma(x));
+    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformValueWithGamma(x));
   }
 
   return rgbMappingArrays;
