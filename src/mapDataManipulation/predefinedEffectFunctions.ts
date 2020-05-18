@@ -1,6 +1,7 @@
 import { PredefinedEffects, RgbMappingArrays } from 'src/mapDataManipulation/const';
+import { changeRgbMappingArraysWithFunction } from 'src/mapDataManipulation/mapDataManipulationUtils';
 
-export function gainEffectFunction(
+export function runGainEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
   predefinedEffects: PredefinedEffects,
 ): RgbMappingArrays {
@@ -13,14 +14,11 @@ export function gainEffectFunction(
   offset = offset - factor * minValue;
 
   const transformValueWithGain = (x: number): number => Math.max(0.0, x * factor + offset);
-  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformValueWithGain(x));
-  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformValueWithGain(x));
-  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformValueWithGain(x));
-
+  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGain);
   return rgbMappingArrays;
 }
 
-export function gammaEffectFunction(
+export function runGammaEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
   predefinedEffects: PredefinedEffects,
 ): RgbMappingArrays {
@@ -29,10 +27,7 @@ export function gammaEffectFunction(
 
   if (gamma != 1.0) {
     const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
-    rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformValueWithGamma(x));
-    rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformValueWithGamma(x));
-    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformValueWithGamma(x));
+    rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGamma);
   }
-
   return rgbMappingArrays;
 }

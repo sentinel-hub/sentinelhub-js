@@ -5,7 +5,10 @@ import {
   changeRgbMappingArraysInterval,
   prepareManipulatePixel,
 } from 'src/mapDataManipulation/mapDataManipulationUtils';
-import { gainEffectFunction, gammaEffectFunction } from 'src/mapDataManipulation/predefinedEffectFunctions';
+import {
+  runGainEffectFunction,
+  runGammaEffectFunction,
+} from 'src/mapDataManipulation/predefinedEffectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the interval of the values from [0, 255] to [0, 1]
@@ -22,10 +25,10 @@ export async function runPredefinedEffectFunctions(
   rgbMappingArrays = changeRgbMappingArraysInterval(rgbMappingArrays, 0, 255, 0, 1);
 
   // change the values according to the algorithm (gain)
-  rgbMappingArrays = gainEffectFunction(rgbMappingArrays, predefinedEffects);
+  rgbMappingArrays = runGainEffectFunction(rgbMappingArrays, predefinedEffects);
 
   // change the values according to the algorithm (gamma)
-  rgbMappingArrays = gammaEffectFunction(rgbMappingArrays, predefinedEffects);
+  rgbMappingArrays = runGammaEffectFunction(rgbMappingArrays, predefinedEffects);
 
   // change the interval of the values from [0, 1] back to [0, 255], strictly limit values to the interval
   const limitValuesToInterval = true;
