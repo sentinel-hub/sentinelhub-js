@@ -2,8 +2,10 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
+
 import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -86,6 +88,8 @@ export function createProcessingPayload(
   evalscript: string | null = null,
   dataProduct: string | null = null,
   mosaickingOrder: MosaickingOrder | null = null,
+  upsampling: Interpolator | null = null,
+  downsampling: Interpolator | null = null,
 ): ProcessingPayload {
   const { bbox } = params;
 
@@ -125,11 +129,11 @@ export function createProcessingPayload(
     },
   };
 
-  if (params.upsampling !== undefined) {
-    payload.input.data[0].processing.upsampling = params.upsampling;
+  if (params.upsampling || upsampling) {
+    payload.input.data[0].processing.upsampling = params.upsampling ? params.upsampling : upsampling;
   }
-  if (params.downsampling !== undefined) {
-    payload.input.data[0].processing.downsampling = params.downsampling;
+  if (params.downsampling || downsampling) {
+    payload.input.data[0].processing.downsampling = params.downsampling ? params.downsampling : downsampling;
   }
   if (params.geometry !== undefined) {
     payload.input.bounds.geometry = params.geometry;
@@ -152,7 +156,11 @@ export function createProcessingPayload(
   return payload;
 }
 
-export async function processingGetMap(shServiceHostname: string, payload: ProcessingPayload): Promise<Blob> {
+export async function processingGetMap(
+  shServiceHostname: string,
+  payload: ProcessingPayload,
+  reqConfig: RequestConfiguration,
+): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
@@ -166,6 +174,7 @@ export async function processingGetMap(shServiceHostname: string, payload: Proce
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
+    ...getAxiosReqParams(reqConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;

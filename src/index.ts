@@ -1,7 +1,14 @@
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
-import { ApiType, MimeTypes, OrbitDirection, PreviewMode, MosaickingOrder } from 'src/layer/const';
+import {
+  ApiType,
+  MimeTypes,
+  OrbitDirection,
+  PreviewMode,
+  MosaickingOrder,
+  Interpolator,
+} from 'src/layer/const';
 import { setDebugEnabled } from 'src/utils/debug';
 
 import { LayersFactory } from 'src/layer/LayersFactory';
@@ -49,6 +56,7 @@ import {
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
 import { LocationIdSHv3 } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
+import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -104,10 +112,14 @@ export {
   OrbitDirection,
   PreviewMode,
   MosaickingOrder,
+  Interpolator,
   S3SLSTRView,
   BBox,
   LocationIdSHv3,
   setDebugEnabled,
+  CancelToken,
+  isCancelled,
+  RequestConfiguration,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,

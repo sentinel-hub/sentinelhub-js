@@ -7,6 +7,7 @@ import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
+import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 // import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
 // import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
@@ -16,19 +17,22 @@ import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma
 interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
+  legendUrl?: string | null;
 }
 
 export class AbstractLayer {
   public title: string | null = null;
   public description: string | null = null;
   public readonly dataset: Dataset | null = null;
+  public legendUrl: string | null = null;
 
-  public constructor({ title = null, description = null }: ConstructorParameters) {
+  public constructor({ title = null, description = null, legendUrl = null }: ConstructorParameters) {
     this.title = title;
     this.description = description;
+    this.legendUrl = legendUrl;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
         // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
@@ -56,6 +60,7 @@ export class AbstractLayer {
           // 'blob' responseType does not work with Node.js:
           responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
           useCache: true,
+          ...getAxiosReqParams(reqConfig),
         };
         const response = await axios.get(url, requestConfig);
         let blob = response.data;
@@ -101,8 +106,9 @@ export class AbstractLayer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount: number = 50, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('findTiles() not implemented yet');
   }
@@ -113,6 +119,7 @@ export class AbstractLayer {
     toTime: Date,
     maxFindTilesRequests: number = 50,
     tilesPerRequest: number = 50,
+    reqConfig?: RequestConfiguration,
   ): Promise<FlyoverInterval[]> {
     if (!this.dataset || !this.dataset.orbitTimeMinutes) {
       throw new Error('Orbit time is needed for grouping tiles into flyovers.');
@@ -149,6 +156,7 @@ export class AbstractLayer {
         toTime,
         tilesPerRequest,
         i * tilesPerRequest,
+        reqConfig,
       );
 
       // apply each tile to the flyover to calculate coverage:
@@ -281,6 +289,7 @@ export class AbstractLayer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Date[]> {
     throw new Error('findDatesUTC() not implemented yet');
   }
@@ -294,9 +303,10 @@ export class AbstractLayer {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async getStats(payload: any): Promise<any> {
+  public async getStats(payload: any, reqConfig?: RequestConfiguration): Promise<any> {
     throw new Error('getStats() not implemented for this dataset');
   }
 
-  public async updateLayerFromServiceIfNeeded(): Promise<void> {}
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {}
 }

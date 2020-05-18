@@ -14,14 +14,15 @@ import {
   ProcessingPayloadDatasource,
 } from 'src/layer/processing';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-
+import { RequestConfiguration } from 'src/utils/cancelRequests';
 /*
   This layer allows using Processing API "data fusion". It takes a list of layers and
   their accompanying parameters and allows us to call `getMap`. Note that `find*()`
   methods wouldn't make sense and are thus disabled.
 */
 interface ConstructorParameters {
-  evalscript: string;
+  evalscript: string | null;
+  evalscriptUrl: string | null;
   layers: DataFusionLayerInfo[];
   title?: string | null;
   description?: string | null;
@@ -41,15 +42,23 @@ export type DataFusionLayerInfo = {
 export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   protected layers: DataFusionLayerInfo[];
 
-  public constructor({ title = null, description = null, evalscript, layers }: ConstructorParameters) {
-    super({ title, description, evalscript });
+  public constructor({
+    title = null,
+    description = null,
+    evalscript = null,
+    evalscriptUrl = null,
+    layers,
+  }: ConstructorParameters) {
+    super({ title, description, evalscript, evalscriptUrl });
     this.layers = layers;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType): Promise<Blob> {
+  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     if (api !== ApiType.PROCESSING) {
       throw new Error(`Only API type "PROCESSING" is supported`);
     }
+
+    await this.fetchEvalscriptUrlIfNeeded();
 
     // when constructing the payload, we just take the first layer - we will rewrite its info later:
     const bogusFirstLayer = this.layers[0].layer;
@@ -85,22 +94,18 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
       }
 
-      if (layerInfo.upsampling !== undefined) {
-        payload.input.data[0].processing.upsampling = layerInfo.upsampling;
-      } else if (params.upsampling !== undefined) {
-        payload.input.data[0].processing.upsampling = params.upsampling;
+      if (layerInfo.layer.upsampling) {
+        datasource.processing.upsampling = layerInfo.layer.upsampling;
       }
 
-      if (layerInfo.downsampling !== undefined) {
-        payload.input.data[0].processing.downsampling = layerInfo.downsampling;
-      } else if (params.downsampling !== undefined) {
-        payload.input.data[0].processing.downsampling = params.downsampling;
+      if (layerInfo.layer.downsampling) {
+        datasource.processing.downsampling = layerInfo.layer.downsampling;
       }
 
       payload.input.data.push(datasource);
     }
 
-    return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload);
+    return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {
@@ -111,8 +116,9 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
-    maxCount?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
-    offset?: number, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not supported - use individual layers when searching for tiles or flyovers');
   }
