@@ -13,6 +13,7 @@ import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequest
 // import { manipulateGain } from 'src/mapDataManipulation/manipulateGain';
 // import { manipulateGamma } from 'src/mapDataManipulation/manipulateGamma';
 import { manipulateGainGamma } from 'src/mapDataManipulation/manipulateGainGamma';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPreparedEffects';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -74,7 +75,9 @@ export class AbstractLayer {
         // }
 
         // combined algorithms for manipulating gain and gamma in one function
-        blob = await manipulateGainGamma(blob, gain, gamma);
+        // blob = await manipulateGainGamma(blob, gain, gamma);
+
+        blob = await runPredefinedEffectFunctions(blob, { gain: gain, gamma: gamma });
 
         return blob;
       default:
