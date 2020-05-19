@@ -159,6 +159,28 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
+Gain and gamma effects are supported only when the blob is retrieved, because the effects are applied in the library. 
+
+```javascript
+  const getMapParamsWithGainAndGamma = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    gain: 1.2,
+    gamma: 0.9
+  };
+  const imageBlob = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
+```
+
+As mentioned above, both of the images above should be _exactly_ the same, no matter which API type is used. 
+This is also true when using gain and gamma effects.
+
+When retrieving an image URL with gain and gamma applied, an error is thrown.
+
 ## Searching for data
 
 Searching for the data is a domain either of a _layer_ or its _dataset_ (if available). This library supports different services, some of which (ProbaV and GIBS for example) specify availability dates _per layer_ and not dataset.
@@ -257,6 +279,8 @@ If we already have a WMS GetMap URL, we can use it directly:
   const imageBlob3 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString);
   const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
+
+Gain and gamma effects are also supported in these two functions as a part of `wmsParams` or `fullUrlWithWmsQueryString`.
 
 ## Authentication for Processing API
 
