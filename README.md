@@ -177,9 +177,9 @@ Gain and gamma effects are supported only when the blob is retrieved, because th
 ```
 
 As mentioned above, both of the images above should be _exactly_ the same, no matter which API type is used. 
-This is also true when using gain and gamma effects.
+This is still true when applying gain and gamma effects.
 
-When retrieving an image URL with gain and gamma applied, an error is thrown.
+When retrieving an image URL with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ## Searching for data
 
