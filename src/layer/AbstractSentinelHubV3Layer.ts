@@ -23,6 +23,9 @@ import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 
+import { PredefinedEffects } from 'src/mapDataManipulation/const';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
+
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -207,7 +210,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       // allow subclasses to update payload with their own parameters:
       const updatedPayload = await this.updateProcessingGetMapPayload(payload, reqConfig);
       const shServiceHostname = this.getShServiceHostname();
-      return processingGetMap(shServiceHostname, updatedPayload, reqConfig);
+
+      let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
+
+      let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+
+      return blob;
     }
 
     return super.getMap(params, api, reqConfig);
@@ -238,6 +247,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     if (!this.dataset) {
       throw new Error('This layer does not have a dataset specified');
+    }
+    if (params.gain) {
+      throw new Error('Parameter gain is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.gamma) {
+      throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
     }
     const shServiceHostname = this.getShServiceHostname();
     const baseUrl = `${shServiceHostname}ogc/wms/${this.instanceId}`;

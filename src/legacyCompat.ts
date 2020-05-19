@@ -80,12 +80,6 @@ export async function legacyGetMapFromParams(
         if (!(layer instanceof AbstractSentinelHubV3Layer)) {
           throw new Error('Processing API is only possible with SH V3 layers');
         }
-        if (wmsParams.gamma && Number(wmsParams.gamma).toFixed(1) !== '1.0') {
-          throw new Error('Parameter gamma is not supported with Processing API');
-        }
-        if (wmsParams.gain && Number(wmsParams.gain).toFixed(1) !== '1.0') {
-          throw new Error('Parameter gain is not supported with Processing API');
-        }
         return layer.getMap(getMapParams, api);
       } catch (ex) {
         if (fallbackToWmsApi) {

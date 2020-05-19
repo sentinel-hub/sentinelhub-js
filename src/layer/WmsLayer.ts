@@ -36,6 +36,12 @@ export class WmsLayer extends AbstractLayer {
     if (api !== ApiType.WMS) {
       throw new Error('Only WMS is supported on this layer');
     }
+    if (params.gain) {
+      throw new Error('Parameter gain is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.gamma) {
+      throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
+    }
     return wmsGetMapUrl(this.baseUrl, this.layerId, params);
   }
 

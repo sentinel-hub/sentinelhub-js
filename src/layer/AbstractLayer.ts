@@ -9,6 +9,9 @@ import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/laye
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
+import { PredefinedEffects } from 'src/mapDataManipulation/const';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
+
 interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
@@ -30,6 +33,28 @@ export class AbstractLayer {
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
+        // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
+        //   getting the url of the image.
+        // getMap() changes the received image according to provided gain and gamma after it is received.
+        // An error is thrown in getMapUrl() in case gain and gamma are present, because:
+        // - we don't send gain and gamma to the services as they may not be supported there and we don't want
+        //    to deceive the users with returning the image where gain and gamma were ignored
+        // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
+        //    were sent to the services in getMapUrl()
+        // This is a dirty fix, but gain and gamma need to be removed from the parameters in getMap() so the
+        //   errors in getMapUrl() are not triggered.
+
+        let predefinedEffects: PredefinedEffects = {};
+
+        if (params.gain) {
+          predefinedEffects.gain = params.gain;
+          params.gain = undefined;
+        }
+        if (params.gamma) {
+          predefinedEffects.gamma = params.gamma;
+          params.gamma = undefined;
+        }
+
         const url = this.getMapUrl(params, api);
         const requestConfig: AxiosRequestConfig = {
           // 'blob' responseType does not work with Node.js:
@@ -38,7 +63,10 @@ export class AbstractLayer {
           ...getAxiosReqParams(reqConfig),
         };
         const response = await axios.get(url, requestConfig);
-        return response.data;
+        let blob = response.data;
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+
+        return blob;
       default:
         const className = this.constructor.name;
         throw new Error(`API type "${api}" not supported in ${className}`);
