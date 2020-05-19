@@ -36,8 +36,6 @@ type OgcGetMapOptions = {
   geometry?: string;
   quality?: number;
   evalsource?: string;
-  gain: number | undefined;
-  gamma: number | undefined;
   nicename?: string;
   temporal?: boolean;
 };
@@ -72,8 +70,6 @@ export function wmsGetMapUrl(
     height: undefined,
     showlogo: undefined,
     transparent: undefined,
-    gain: undefined,
-    gamma: undefined,
     ...additionalParameters,
   };
 
@@ -136,12 +132,6 @@ export function wmsGetMapUrl(
   }
   if (params.quality) {
     queryParams.quality = params.quality;
-  }
-  if (params.gain) {
-    queryParams.gain = params.gain;
-  }
-  if (params.gamma) {
-    queryParams.gamma = params.gamma;
   }
   if (params.nicename) {
     queryParams.nicename = params.nicename;
