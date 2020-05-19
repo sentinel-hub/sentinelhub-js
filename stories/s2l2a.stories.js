@@ -328,11 +328,7 @@ export const GetMapWMSMaxCC20vs60 = () => {
   const layerS2L2A60 = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `
-  <h2>GetMap: maxCC=20 vs maxCC=60</h2>
-  <p>top left part of left image should be white (cc of the tile is above 20)</p>
-  <p>TODO: this story doesn't work because there is no data for S-2 in 2014 available; should be fixed.</p>
-  `;
+  wrapperEl.innerHTML = `<h2>GetMap: maxCC=20 vs maxCC=60</h2>`;
 
   const img20 = document.createElement('img');
   img20.width = '512';
@@ -351,8 +347,8 @@ export const GetMapWMSMaxCC20vs60 = () => {
   const perform = async () => {
     const getMapParams = {
       bbox: bbox4326,
-      fromTime: new Date(Date.UTC(2014, 1 - 1, 14, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2014, 1 - 1, 14, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
@@ -362,6 +358,50 @@ export const GetMapWMSMaxCC20vs60 = () => {
     img20.src = URL.createObjectURL(imageBlob20);
 
     const imageBlob60 = await layerS2L2A60.getMap(getMapParams, ApiType.WMS);
+    img60.src = URL.createObjectURL(imageBlob60);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapProcessingMaxCC20vs60 = () => {
+  const layerS2L2A20 = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 20 });
+  const layerS2L2A60 = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMap: maxCC=20 vs maxCC=60</h2>`;
+
+  const img20 = document.createElement('img');
+  img20.width = '512';
+  img20.height = '512';
+  img20.style.border = '2px solid green';
+  img20.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img20);
+
+  const img60 = document.createElement('img');
+  img60.width = '512';
+  img60.height = '512';
+  img60.style.border = '2px solid blue';
+  img60.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img60);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 1 - 1, 15, 6, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const imageBlob20 = await layerS2L2A20.getMap(getMapParams, ApiType.PROCESSING);
+    img20.src = URL.createObjectURL(imageBlob20);
+
+    const imageBlob60 = await layerS2L2A60.getMap(getMapParams, ApiType.PROCESSING);
     img60.src = URL.createObjectURL(imageBlob60);
   };
   perform().then(() => {});
