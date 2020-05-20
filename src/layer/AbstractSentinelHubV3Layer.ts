@@ -491,9 +491,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return res.data;
   }
 
-  public async updateLayerFromServiceIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
