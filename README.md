@@ -88,7 +88,7 @@ It is also possible to create layers by importing their definitions from the Sen
     // [ '<layer-id-1>', '<layer-id-2>',... ]
 ```
 
-Depending on `baseUrl`, method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
+Depending on the first parameter (`baseUrl`), method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
 
 The list can be filtered to include only some of the layers:
 ```javascript
@@ -102,11 +102,19 @@ The list can be filtered to include only some of the layers:
 ```
 
 Alternatively, we can also fetch a single layer by using `makeLayer` method:
-```
+```javascript
   import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
   const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>');
 ```
+
+Some additional layer information can be passed to `makeLayer` and `makeLayers` as an object in order to create layers with the provided information instead of the information from the services.
+
+```javascript
+  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', { maxCloudCoverPercent: 30 });
+
+  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', null, { maxCloudCoverPercent: 30 });
+  ```
 
 Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
 
@@ -214,6 +222,8 @@ setTimeout(() => {
 }, 500);
 
 try {
+  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', null, requestConfig);
+  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', null, null, requestConfig);
   const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
   const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
   const stats = await layer.getStats(getStatsParams, requestConfig);
