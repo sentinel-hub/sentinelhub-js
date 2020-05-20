@@ -223,7 +223,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
-    return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
+    if (this.dataProduct) {
+      return api === ApiType.WMS;
+    } else {
+      return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
+    }
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
