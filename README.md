@@ -188,12 +188,12 @@ We can always use layer to search for data availability:
   const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
 
-## Request timeout
+## Requests configuration
 
-You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. When not specified the method will not time out.
+You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. Default value for `timeout` is `null` (disabled).
 
 ```typescript
-const requestConfig = {
+const requestsConfig = {
   timeout: 5000,
 };
 
@@ -207,23 +207,24 @@ try {
 }
 ```
 
+You can specify that network requests should be retried by passing the number of retries for network requests used by the method. The default of `retries` is `null` (disabled).
 
-## Cancelling requests
+```typescript
+const requestsConfig = {
+  retries: 4
+}
+```
 
-You can also cancel requests when searching/fetching data.
-
-To do so a token needs to be created and passed through a requests configuration object. Other config such as retries can also be defined there.
+You can also cancel requests when searching/fetching data. To do so a token needs to be created and passed through the requests configuration object. 
 
 In the example below, a cancel token is passed inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
-
-This exception can be caught and identified by `isCancelled`.
 
 ```typescript
 import { CancelToken, isCancelled } from '@sentinel-hub/sentinelhub-js';
 
 const token = new CancelToken();
 
-const requestConfig = {
+const requestsConfig = {
   cancelToken: token,
   retries: 4
 }
@@ -239,11 +240,12 @@ try {
   const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
 }
 catch(err) {
+  // The exception thrown by canceling network requests can be caught and identified by `isCancelled`.
   if (!isCancelled(err)) {
     throw err;
   }
 }
-````
+```
 
 ## Getting basic statistics and histogram
 
