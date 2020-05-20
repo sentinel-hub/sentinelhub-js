@@ -190,7 +190,17 @@ We can always use layer to search for data availability:
 
 ## Requests configuration
 
+You can specify that network requests should be retried by passing the number of retries for network requests used by the method. The default of `retries` is `null` (disabled).
+
+```typescript
+const requestsConfig = {
+  retries: 4
+}
+```
+
 You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. Default value for `timeout` is `null` (disabled).
+
+Specifying a timeout will cancel retries of network requests (all retries share the same timeout).
 
 ```typescript
 const requestsConfig = {
@@ -204,14 +214,6 @@ try {
   const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
 } catch (err) {
   throw err;
-}
-```
-
-You can specify that network requests should be retried by passing the number of retries for network requests used by the method. The default of `retries` is `null` (disabled).
-
-```typescript
-const requestsConfig = {
-  retries: 4
 }
 ```
 
@@ -229,7 +231,7 @@ const requestsConfig = {
   retries: 4
 }
 
-setTimeout(() => {
+const requestTimeout = setTimeout(() => {
   token.cancel();
 }, 500);
 
@@ -238,6 +240,7 @@ try {
   const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
   const stats = await layer.getStats(getStatsParams, requestConfig);
   const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
+  clearTimeout(requestTimeout)
 }
 catch(err) {
   // The exception thrown by canceling network requests can be caught and identified by `isCancelled`.
