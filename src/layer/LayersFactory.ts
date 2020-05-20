@@ -97,9 +97,15 @@ export class LayersFactory {
   public static async makeLayer(
     baseUrl: string,
     layerId: string,
+    overrideSHLayerParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer> {
-    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId, reqConfig);
+    const layers = await LayersFactory.makeLayers(
+      baseUrl,
+      (lId: string) => lId === layerId,
+      overrideSHLayerParams,
+      reqConfig,
+    );
     if (layers.length === 0) {
       return null;
     }
@@ -109,17 +115,18 @@ export class LayersFactory {
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
+    overrideSHLayerParams?: Record<string, any>,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv3(baseUrl, filterLayers, reqConfig);
+        return await this.makeLayersSHv3(baseUrl, filterLayers, overrideSHLayerParams, reqConfig);
       }
     }
 
     for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv12(baseUrl, filterLayers, reqConfig);
+        return await this.makeLayersSHv12(baseUrl, filterLayers, overrideSHLayerParams, reqConfig);
       }
     }
 
@@ -129,6 +136,7 @@ export class LayersFactory {
   private static async makeLayersSHv3(
     baseUrl: string,
     filterLayers: Function | null,
+    overrideSHLayerParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
@@ -164,6 +172,9 @@ export class LayersFactory {
         title,
         description,
         legendUrl,
+        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+        // otherwise the default values from layer definition on the service will be used.
+        ...overrideSHLayerParams,
       });
     });
   }
@@ -171,6 +182,7 @@ export class LayersFactory {
   private static async makeLayersSHv12(
     baseUrl: string,
     filterLayers: Function | null,
+    overrideSHLayerParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
@@ -194,6 +206,13 @@ export class LayersFactory {
       if (!SH12LayerClass) {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
       }
+
+      // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+      // otherwise the default values from layer definition on the service will be used.
+      if (overrideSHLayerParams.maxCloudCoverPercent) {
+        layerInfo.settings.maxCC = overrideSHLayerParams.maxCloudCoverPercent;
+      }
+
       const layer = SH12LayerClass.makeLayer(
         layerInfo,
         parseSHInstanceId(baseUrl),
