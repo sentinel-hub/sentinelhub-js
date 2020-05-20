@@ -188,6 +188,25 @@ We can always use layer to search for data availability:
   const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
 
+## Request timeout
+
+You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. When not specified the method will not time out.
+
+```typescript
+const requestConfig = {
+  timeout: 5000,
+};
+
+try {
+  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
+  const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
+  const stats = await layer.getStats(getStatsParams, requestConfig);
+  const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
+} catch (err) {
+  throw err;
+}
+```
+
 
 ## Cancelling requests
 
