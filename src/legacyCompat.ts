@@ -44,8 +44,6 @@ export async function legacyGetMapFromParams(
     otherLayerParams,
   } = parseLegacyWmsGetMapParams(wmsParams);
 
-  console.log('lgmfromparams', { getMapParams, otherLayerParams });
-
   let layer;
   // Layers parameter may contain list of layers which is at the moment supported only by WmsLayer.
   // In case there is more than one layer specified in layers parameter, WmsLayer will be used.
