@@ -97,9 +97,15 @@ export class LayersFactory {
   public static async makeLayer(
     baseUrl: string,
     layerId: string,
+    overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer> {
-    const layers = await LayersFactory.makeLayers(baseUrl, (lId: string) => lId === layerId, reqConfig);
+    const layers = await LayersFactory.makeLayers(
+      baseUrl,
+      (lId: string) => lId === layerId,
+      overrideConstructorParams,
+      reqConfig,
+    );
     if (layers.length === 0) {
       return null;
     }
@@ -109,26 +115,28 @@ export class LayersFactory {
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
+    overrideConstructorParams?: Record<string, any>,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv3(baseUrl, filterLayers, reqConfig);
+        return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
       }
     }
 
     for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
       if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv12(baseUrl, filterLayers, reqConfig);
+        return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
       }
     }
 
-    return await this.makeLayersWms(baseUrl, filterLayers, reqConfig);
+    return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
   }
 
   private static async makeLayersSHv3(
     baseUrl: string,
     filterLayers: Function | null,
+    overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
@@ -164,6 +172,9 @@ export class LayersFactory {
         title,
         description,
         legendUrl,
+        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+        // otherwise the default values from layer definition on the service will be used.
+        ...overrideConstructorParams,
       });
     });
   }
@@ -171,6 +182,7 @@ export class LayersFactory {
   private static async makeLayersSHv12(
     baseUrl: string,
     filterLayers: Function | null,
+    overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
@@ -194,6 +206,13 @@ export class LayersFactory {
       if (!SH12LayerClass) {
         throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
       }
+
+      // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+      // otherwise the default values from layer definition on the service will be used.
+      if (overrideConstructorParams.maxCloudCoverPercent) {
+        layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
+      }
+
       const layer = SH12LayerClass.makeLayer(
         layerInfo,
         parseSHInstanceId(baseUrl),
@@ -211,6 +230,7 @@ export class LayersFactory {
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
+    overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
