@@ -128,7 +128,7 @@ export const getMapWMSLayersFactoryOverrideConstructorParamsNull = () => {
       await LayersFactory.makeLayers(
         `${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`,
         (lId, datasetId) => layerId === lId,
-        null
+        null,
       )
     )[0];
     const getMapParams = {
@@ -142,7 +142,7 @@ export const getMapWMSLayersFactoryOverrideConstructorParamsNull = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };

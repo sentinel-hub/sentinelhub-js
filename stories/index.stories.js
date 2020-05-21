@@ -211,7 +211,8 @@ export const S2GetMapMakeLayerOverrideConstructorParamsNull = () => {
   img.height = '512';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with WMS for Sentinel-2 L2A - makeLayer, overrideConstructorParams = null</h2>';
+  wrapperEl.innerHTML =
+    '<h2>GetMap with WMS for Sentinel-2 L2A - makeLayer, overrideConstructorParams = null</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   // getMap is async:
@@ -232,7 +233,7 @@ export const S2GetMapMakeLayerOverrideConstructorParamsNull = () => {
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
 
   return wrapperEl;
 };
