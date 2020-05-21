@@ -167,7 +167,7 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
-Gain and gamma effects are supported only when the blob is retrieved, because the effects are applied in the library. 
+Gain and gamma effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
 
 ```javascript
   const getMapParamsWithGainAndGamma = {
@@ -184,10 +184,7 @@ Gain and gamma effects are supported only when the blob is retrieved, because th
   const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
 ```
 
-As mentioned above, both of the images above should be _exactly_ the same, no matter which API type is used. 
-This is still true when applying gain and gamma effects.
-
-When retrieving an image URL with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
+When retrieving an image URL (via `getMapUrl()`) with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ## Searching for data
 
