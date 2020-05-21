@@ -209,7 +209,7 @@ export class LayersFactory {
 
       // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
       // otherwise the default values from layer definition on the service will be used.
-      if (overrideConstructorParams.maxCloudCoverPercent) {
+      if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
         layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
       }
 

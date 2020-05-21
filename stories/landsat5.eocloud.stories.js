@@ -114,6 +114,39 @@ export const getMapWMSLayersFactory = () => {
   return wrapperEl;
 };
 
+export const getMapWMSLayersFactoryOverrideConstructorParamsNull = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>makeLayers with overrideConstructorParams = null</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+        null
+      )
+    )[0];
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2010, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => { });
+
+  return wrapperEl;
+};
+
 export const getMapWMSEvalscript = () => {
   const img = document.createElement('img');
   img.width = '512';
