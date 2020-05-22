@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L2ALayer, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { S2L2ALayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, CRS_EPSG3857 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -13,6 +13,13 @@ if (!process.env.S2L2A_LAYER_ID) {
 const instanceId = process.env.INSTANCE_ID;
 const layerId = process.env.S2L2A_LAYER_ID;
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+const bbox3857 = new BBox(
+  CRS_EPSG3857,
+  1174072.7544603075,
+  5009377.085697314,
+  1252344.2714243277,
+  5087648.602661333,
+);
 const geometryPolygon = {
   type: 'Polygon',
   coordinates: [
@@ -587,6 +594,94 @@ export const getMapProcessingGainGamma = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
+    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+
+    try {
+      const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+      imgNoGainGamma.src = URL.createObjectURL(imageBlobNoGainGamma);
+
+      const imageBlobGainIs2 = await layerS2L2A.getMap(getMapParamsGainIs2, ApiType.PROCESSING);
+      imgGainIs2.src = URL.createObjectURL(imageBlobGainIs2);
+
+      const imageBlobGammaIs2 = await layerS2L2A.getMap(getMapParamsGammaIs2, ApiType.PROCESSING);
+      imgGammaIs2.src = URL.createObjectURL(imageBlobGammaIs2);
+
+      const imageBlobGainGamaAre2 = await layerS2L2A.getMap(getMapParamsGainGammaAre2, ApiType.PROCESSING);
+      imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingGainGammaCheckTransparency = () => {
+  const imgNoGainGamma = document.createElement('img');
+  imgNoGainGamma.width = '256';
+  imgNoGainGamma.height = '256';
+
+  const imgGainIs2 = document.createElement('img');
+  imgGainIs2.width = '256';
+  imgGainIs2.height = '256';
+
+  const imgGammaIs2 = document.createElement('img');
+  imgGammaIs2.width = '256';
+  imgGammaIs2.height = '256';
+
+  const imgGainGammaAre2 = document.createElement('img');
+  imgGainGammaAre2.width = '256';
+  imgGainGammaAre2.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingGainGamma; Check transparency</h2>';
+  wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.innerHTML += '<p>Note: Whole images can be transparent if there is no data to show</p>';
+  wrapperEl.style.backgroundColor = 'lightgreen';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGammaIs2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainGammaAre2);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      maxCloudCoverPercent: 0,
+      evalscript: `
+        //VERSION=3
+        let minVal = 0.0;
+        let maxVal = 0.4;
+        
+        let viz = new HighlightCompressVisualizer(minVal, maxVal);
+        
+        function setup() {
+          return {
+            input: ["B04", "B03", "B02","dataMask"],
+            output: { bands: 4 }
+          };
+        }
+        
+        function evaluatePixel(samples) {
+          let val = [samples.B04, samples.B03, samples.B02,samples.dataMask];
+          return viz.processList(val);
+        }`,
+    });
+
+    const getMapParams = {
+      bbox: bbox3857,
+      fromTime: new Date(Date.UTC(2020, 4 - 1, 15, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 4 - 1, 15, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.PNG,
     };
 
     const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
