@@ -641,6 +641,7 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingGainGamma; Check transparency</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
+  wrapperEl.innerHTML += '<p>Note: Whole images can be transparent if there is no data to show</p>';
   wrapperEl.style.backgroundColor = 'lightgreen';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
@@ -676,8 +677,8 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
 
     const getMapParams = {
       bbox: bbox3857,
-      fromTime: new Date(Date.UTC(2020, 5 - 1, 20, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2020, 5 - 1, 20, 23, 59, 59)),
+      fromTime: new Date(Date.UTC(2020, 4 - 1, 15, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 4 - 1, 15, 23, 59, 59)),
       width: 512,
       height: 512,
       format: MimeTypes.PNG,
