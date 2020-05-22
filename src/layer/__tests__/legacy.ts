@@ -57,13 +57,8 @@ test('parseLegacyWmsGetMapParams with evalscripturl', () => {
     showlogo: false,
     bgcolor: '00000000',
     transparent: true,
-    // this might not be correct - it is just how it is at the moment. Fix as needed:
-    unknown: {
-      evalscripturl:
-        'https://gist.githubusercontent.com/sinergise-anze/33fe78d9b1fd24d656882d7916a83d4d/raw/295b9d9f033c7e3f1e533363322d84846808564c/data-fusion-evalscript.js',
-      evalsource: 'S2',
-      maxcc: '70',
-    },
+    // we are not testing unknown params field:
+    unknown: getMapParams.unknown,
   };
   expect(getMapParams).toStrictEqual(expectedGetMapParams);
   expect(otherLayerParams).toStrictEqual({
