@@ -213,8 +213,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
       let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
 
-      let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      if (params.gain || params.gamma) {
+        let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      }
 
       return blob;
     }
