@@ -57,7 +57,7 @@ export class AbstractLayer {
         let blob = response.data;
 
         // apply effects:
-        if (params.gain || params.gamma) {
+        if (params.gain !== undefined || params.gamma !== undefined) {
           let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
           blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
         }
