@@ -225,9 +225,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public supportsApiType(api: ApiType): boolean {
     if (this.dataProduct) {
       return api === ApiType.WMS;
-    } else {
-      return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
     }
+    return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
@@ -494,6 +493,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
     this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
   protected getConvertEvalscriptBaseUrl(): string {
