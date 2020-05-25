@@ -56,13 +56,13 @@ export class AbstractLayer {
         }
 
         const url = this.getMapUrl(params, api);
-        const requestConfig: AxiosRequestConfig = {
+        const requestsConfig: AxiosRequestConfig = {
           // 'blob' responseType does not work with Node.js:
           responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
           useCache: true,
           ...getAxiosReqParams(reqConfig),
         };
-        const response = await axios.get(url, requestConfig);
+        const response = await axios.get(url, requestsConfig);
         let blob = response.data;
         blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
 
