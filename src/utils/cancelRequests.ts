@@ -65,6 +65,7 @@ export function setMethodTimeout(
 
     if (timeout) {
       const timer = setTimeout(() => {
+        axios.CancelToken.source().cancel();
         throw new Error('The method did not finish before the specified timeout.');
       }, timeout);
       originalMethod
