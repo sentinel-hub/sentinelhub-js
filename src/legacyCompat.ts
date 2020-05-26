@@ -401,7 +401,7 @@ function previewFromParams(params: any): number {
     // (this parameter was set directly on layers for the old instances)
     return 2;
   }
-  return Math.min(Math.max(Number.parseInt(params.preview), 0), 3);
+  return Math.min(Math.max(Number.parseInt(params.preview), 0), 2);
 }
 
 function bgcolorFromParams(params: any): string {
