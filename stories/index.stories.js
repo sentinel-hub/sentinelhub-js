@@ -7,6 +7,7 @@ import {
   DATASET_S2L2A,
   LayersFactory,
   CRS_EPSG4326,
+  CRS_EPSG3857,
   BBox,
   MimeTypes,
   ApiType,
@@ -27,10 +28,23 @@ if (!process.env.S1GRDIW_LAYER_ID) {
   throw new Error('S1GRDIW_LAYER_ID environment variable is not defined!');
 }
 
+if (!process.env.EOC_INSTANCE_ID) {
+  throw new Error('EOC_INSTANCE_ID environment variable is not defined!');
+}
+
+if (!process.env.EOC_LANDSAT5_LAYER_ID) {
+  throw new Error('EOC_LANDSAT5_LAYER_ID environment variable is not defined!');
+}
+
 const instanceId = process.env.INSTANCE_ID;
 const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 const s1grdLayerId = process.env.S1GRDIW_LAYER_ID;
+
+const eocInstanceId = process.env.EOC_INSTANCE_ID;
+const l5LayerId = process.env.EOC_LANDSAT5_LAYER_ID;
+
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
+const bbox3857 = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 
 export default {
   title: 'Demo',
@@ -584,7 +598,7 @@ export const UpsamplingProcessing = () => {
   return wrapperEl;
 };
 
-export const wmsGetMapUrl = () => {
+export const wmsGetMapUrlshServices = () => {
   const getMapParams = {
     bbox: bbox4326,
     fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
@@ -605,7 +619,68 @@ export const wmsGetMapUrl = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
-    '<h2>_wmsGetMapUrl() - do not use, could be changed or removed at any time without notice</h2>';
+    '<h2>_wmsGetMapUrl() - Sentinel hub services - do not use, could be changed or removed at any time without notice</h2>';
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  img1.src = url;
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+
+  return wrapperEl;
+};
+
+export const wmsGetMapUrlEoCloud = () => {
+  const getMapParams = {
+    bbox: bbox3857,
+    fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2010, 12 - 1, 22, 23, 59, 59)),
+    width: 256,
+    height: 256,
+    format: MimeTypes.JPEG,
+  };
+
+  const url = _wmsGetMapUrl(
+    `https://eocloud.sentinel-hub.com/v1/wms/${eocInstanceId}`,
+    l5LayerId,
+    getMapParams,
+    'return [B04 * 2.5, B03 * 2.5, B02 * 2.5];',
+    null,
+    'L5',
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>_wmsGetMapUrl() - EOCloud - do not use, could be changed or removed at any time without notice</h2>';
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  img1.src = url;
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+
+  return wrapperEl;
+};
+
+export const wmsGetMapUrlExternal = () => {
+  const getMapParams = {
+    bbox: bbox3857,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 256,
+    height: 256,
+    format: MimeTypes.JPEG,
+  };
+
+  const url = _wmsGetMapUrl(
+    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+    'PROBAV_S1_TOA_333M',
+    getMapParams,
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>_wmsGetMapUrl() - external sources - do not use, could be changed or removed at any time without notice</h2>';
 
   const img1 = document.createElement('img');
   img1.width = '256';
