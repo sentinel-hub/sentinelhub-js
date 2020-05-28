@@ -107,7 +107,8 @@ export function wmsGetMapUrl(
   }
 
   if (evalscript || evalscriptUrl) {
-    if (!evalsource) {
+    // on eo-cloud, datasource must be defined if we are using evalscript:
+    if (!evalsource && baseUrl.startsWith('https://eocloud.sentinel-hub.com/')) {
       throw new Error('Dataset is not defined on this layer - are you using a correct subclass?');
     }
     queryParams.evalsource = evalsource;
