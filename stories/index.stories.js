@@ -604,7 +604,8 @@ export const wmsGetMapUrl = () => {
   );
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>_wmsGetMapUrl() - do not use, could be changed or removed at any time without notice</h2>';
+  wrapperEl.innerHTML =
+    '<h2>_wmsGetMapUrl() - do not use, could be changed or removed at any time without notice</h2>';
 
   const img1 = document.createElement('img');
   img1.width = '256';
