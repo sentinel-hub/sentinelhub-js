@@ -598,7 +598,7 @@ export const UpsamplingProcessing = () => {
   return wrapperEl;
 };
 
-export const wmsGetMapUrlshServices = () => {
+export const wmsGetMapUrlShServices = () => {
   const getMapParams = {
     bbox: bbox4326,
     fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
@@ -620,6 +620,37 @@ export const wmsGetMapUrlshServices = () => {
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML =
     '<h2>_wmsGetMapUrl() - Sentinel hub services - do not use, could be changed or removed at any time without notice</h2>';
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  img1.src = url;
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+
+  return wrapperEl;
+};
+
+export const wmsGetMapUrlShServicesNoEvalsource = () => {
+  const getMapParams = {
+    bbox: bbox4326,
+    fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 4 - 1, 10, 23, 59, 59)),
+    width: 256,
+    height: 256,
+    format: MimeTypes.JPEG,
+  };
+
+  const url = _wmsGetMapUrl(
+    `https://services.sentinel-hub.com/ogc/wms/${instanceId}`,
+    s2l2aLayerId,
+    getMapParams,
+    'return [B04 * 2.5, B03 * 2.5, B02 * 2.5];',
+    null,
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>_wmsGetMapUrl() - Sentinel hub services (no evalsource) - do not use, could be changed or removed at any time without notice</h2>';
 
   const img1 = document.createElement('img');
   img1.width = '256';
