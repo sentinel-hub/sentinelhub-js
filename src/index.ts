@@ -57,6 +57,7 @@ import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEUL
 import { LocationIdSHv3, GetMapParams } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
+import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -126,4 +127,6 @@ export {
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
+  // discouraged - temporary solution which will likely break in the future:
+  _wmsGetMapUrl,
 };
