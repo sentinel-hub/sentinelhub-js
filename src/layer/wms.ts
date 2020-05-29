@@ -88,7 +88,7 @@ export function wmsGetMapUrl(
     queryParams.format = params.format;
   }
 
-  if (params.fromTime === null) {
+  if (!params.fromTime) {
     queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
   } else {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
