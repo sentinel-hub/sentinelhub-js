@@ -10,6 +10,7 @@ import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
+import { isAnyPredefinedEffectSet } from 'src/mapDataManipulation/mapDataManipulationUtils';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
@@ -57,8 +58,8 @@ export class AbstractLayer {
         let blob = response.data;
 
         // apply effects:
-        if (params.gain !== undefined || params.gamma !== undefined) {
-          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+        const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+        if (isAnyPredefinedEffectSet(predefinedEffects)) {
           blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
         }
 
