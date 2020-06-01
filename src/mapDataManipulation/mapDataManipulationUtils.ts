@@ -57,8 +57,8 @@ export function isPredefinedEffectSet(effect: number): boolean {
 
 export function isAnyPredefinedEffectSet(effects: PredefinedEffects): boolean {
   let isAnyEffectSet = false;
-  for (let [key, value] of Object.entries(effects)) {
-    isAnyEffectSet = isAnyEffectSet || isPredefinedEffectSet(value);
+  for (let [, val] of Object.entries(effects)) {
+    isAnyEffectSet = isAnyEffectSet || isPredefinedEffectSet(val);
   }
   return isAnyEffectSet;
 }
