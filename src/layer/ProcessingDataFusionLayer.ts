@@ -15,6 +15,11 @@ import {
 } from 'src/layer/processing';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
+
+import { PredefinedEffects } from 'src/mapDataManipulation/const';
+import { isAnyPredefinedEffectSet } from 'src/mapDataManipulation/mapDataManipulationUtils';
+import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
+
 /*
   This layer allows using Processing API "data fusion". It takes a list of layers and
   their accompanying parameters and allows us to call `getMap`. Note that `find*()`
@@ -105,7 +110,15 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       payload.input.data.push(datasource);
     }
 
-    return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
+    let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
+
+    // apply effects:
+    const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+    if (isAnyPredefinedEffectSet(predefinedEffects)) {
+      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+    }
+
+    return blob;
   }
 
   public supportsApiType(api: ApiType): boolean {
