@@ -1,6 +1,7 @@
 import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import {
+  isAnyPredefinedEffectSet,
   prepareRgbMappingArrays,
   changeRgbMappingArraysInterval,
   prepareManipulatePixel,
@@ -19,6 +20,10 @@ export async function runPredefinedEffectFunctions(
   originalBlob: Blob,
   predefinedEffects: PredefinedEffects,
 ): Promise<Blob> {
+  if (!isAnyPredefinedEffectSet(predefinedEffects)) {
+    return originalBlob;
+  }
+
   let rgbMappingArrays = prepareRgbMappingArrays();
 
   // change the interval of the values from [0, 255] to [0, 1]

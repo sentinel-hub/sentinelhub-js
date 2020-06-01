@@ -24,6 +24,7 @@ import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
+import { isAnyPredefinedEffectSet } from 'src/mapDataManipulation/mapDataManipulationUtils';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
@@ -213,8 +214,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
       let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
 
-      if (params.gain !== undefined || params.gamma !== undefined) {
-        let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+      // apply effects:
+      const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+      if (isAnyPredefinedEffectSet(predefinedEffects)) {
         blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
       }
 
