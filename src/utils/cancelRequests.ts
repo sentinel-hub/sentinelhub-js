@@ -79,17 +79,17 @@ export function timeoutWrapper(requestsConfigIndex: number): Function {
             clearTimeout(timer);
             throw e;
           });
+      } else {
+        originalMethod
+          .apply(context, args)
+          .then((result: any) => {
+            return result;
+          })
+          .catch((e: Error) => {
+            throw e;
+          });
       }
-     else {
-      originalMethod
-        .apply(context, args)
-        .then((result: any) => {
-          return result;
-        })
-        .catch((e: Error) => {
-          throw e;
-        });
-    }
+    };
     return descriptor;
   };
 }
