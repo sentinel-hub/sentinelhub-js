@@ -165,7 +165,7 @@ export async function processingGetMap(
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
-  const requestsConfig: AxiosRequestConfig = {
+  const axiosRequestsConfig: AxiosRequestConfig = {
     headers: {
       Authorization: 'Bearer ' + authToken,
       'Content-Type': 'application/json',
@@ -176,6 +176,6 @@ export async function processingGetMap(
     useCache: true,
     ...getAxiosReqParams(requestsConfig),
   };
-  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestsConfig);
+  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, axiosRequestsConfig);
   return response.data;
 }
