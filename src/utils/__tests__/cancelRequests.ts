@@ -1,8 +1,8 @@
-import { timeoutWrapper } from '../cancelRequests';
+import { timeoutWrapper, RequestConfiguration } from '../cancelRequests';
 
 class TestClass {
   @timeoutWrapper(1)
-  public async resolvedPromise(timeout: number): Promise<boolean> {
+  public async resolvedPromise(timeout: number, reqConfig?: RequestConfiguration): Promise<boolean> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(true);
@@ -10,9 +10,12 @@ class TestClass {
     });
   }
 
-  public async errorPromise(): Promise<void> {
+  @timeoutWrapper(1)
+  public async rejectedPromise(timeout: number, reqConfig?: RequestConfiguration): Promise<void> {
     return new Promise((resolve, reject) => {
-      reject('Test error');
+      setTimeout(() => {
+        reject('Test error');
+      }, timeout);
     });
   }
 }
@@ -20,8 +23,42 @@ class TestClass {
 describe('timeoutWrapper', () => {
   const testClass = new TestClass();
 
-  it('should resolve the promise when no timeout is specified', async () => {
+  it('should correctly resolve the promise when timeout is undefined', async () => {
     const result = await testClass.resolvedPromise(1);
     expect(result).toBe(true);
+  });
+
+  it('should resolve the promise when timeout is null', async () => {
+    const result = await testClass.resolvedPromise(1, { timeout: null });
+    expect(result).toBe(true);
+  });
+
+  it('should resolve the promise when the method finished before the timeout', async () => {
+    const result = await testClass.resolvedPromise(1, { timeout: 2 });
+    expect(result).toBe(true);
+  });
+
+  it('should return an error when the method times out', () => {
+    testClass.resolvedPromise(2, { timeout: 1 }).catch(e => {
+      expect(e).toEqual({
+        error: 'The method did not finish before the specified timeout.',
+      });
+    });
+  });
+
+  it('should correctly reject the promise when timeout is undefined', () => {
+    testClass.resolvedPromise(1).catch(e => {
+      expect(e).toEqual({
+        error: 'Test error',
+      });
+    });
+  });
+
+  it('should correctly reject the promise when timeout is null', () => {
+    testClass.resolvedPromise(1, { timeout: null }).catch(e => {
+      expect(e).toEqual({
+        error: 'Test error',
+      });
+    });
   });
 });
