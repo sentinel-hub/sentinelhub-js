@@ -2,7 +2,9 @@ import { timeoutWrapper, RequestConfiguration } from '../cancelRequests';
 
 class TestClass {
   @timeoutWrapper(1)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async resolvedPromise(timeout: number, reqConfig?: RequestConfiguration): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(true);
@@ -11,7 +13,9 @@ class TestClass {
   }
 
   @timeoutWrapper(1)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async rejectedPromise(timeout: number, reqConfig?: RequestConfiguration): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         reject('Test error');
