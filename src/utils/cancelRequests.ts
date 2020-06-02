@@ -42,19 +42,20 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
 };
 
 export function timeoutWrapper(requestsConfigIndex: number): Function {
-  return function setMethodTimeout(
+  return function(
     target: any,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
   ): PropertyDescriptor {
+    const originalMethod = descriptor.value;
+
     descriptor.value = function() {
       const context = this;
       const args = arguments;
-      const originalMethod = descriptor.value;
 
       // retrieve requestsConfig from arguments...
       const getTimeout = (args: IArguments): number | undefined => {
-        const requestConfig = args[requestsConfigIndex];
+        const requestConfig = args && args[requestsConfigIndex];
         if (requestConfig) {
           return requestConfig.timeout;
         }
@@ -66,9 +67,10 @@ export function timeoutWrapper(requestsConfigIndex: number): Function {
       if (timeout) {
         const timer = setTimeout(() => {
           axios.CancelToken.source().cancel();
+          clearTimeout(timer);
           throw new Error('The method did not finish before the specified timeout.');
         }, timeout);
-        originalMethod
+        return originalMethod
           .apply(context, args)
           .then((result: any) => {
             clearTimeout(timer);
@@ -79,7 +81,7 @@ export function timeoutWrapper(requestsConfigIndex: number): Function {
             throw e;
           });
       } else {
-        originalMethod
+        return originalMethod
           .apply(context, args)
           .then((result: any) => {
             return result;
