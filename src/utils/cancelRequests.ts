@@ -3,12 +3,13 @@ import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelToke
 export type RequestConfiguration = {
   cancelToken?: CancelToken;
   retries?: number;
+  timeout?: number | null;
 };
 
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;
   protected source: CancelTokenSource | null = null;
-  private constructor() {
+  public constructor() {
     this.source = axios.CancelToken.source();
     this.token = this.source.token;
   }
@@ -36,4 +37,26 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
   }
   axiosReqConfig.retries = reqConfig.retries;
   return axiosReqConfig;
+};
+
+export const ensureTimeout = async (reqConfig: RequestConfiguration, promise: Promise<any>): Promise<any> => {
+  const { cancelToken, timeout } = reqConfig;
+
+  if (!timeout) {
+    return promise;
+  }
+
+  if (!cancelToken) {
+    const token = new CancelToken();
+    reqConfig.cancelToken = token;
+  }
+
+  const timer = setTimeout(() => {
+    reqConfig.cancelToken.cancel();
+    clearTimeout(timer);
+  }, timeout);
+
+  const resolvedValue = await promise;
+  clearTimeout(timer);
+  return resolvedValue;
 };
