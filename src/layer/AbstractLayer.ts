@@ -58,7 +58,7 @@ export class AbstractLayer {
           useCache: true,
           ...getAxiosReqParams(requestsConfig),
         };
-        const response = await axios.get(url, requestsConfig);
+        const response = await axios.get(url, requestConfig);
         let blob = response.data;
 
         // apply effects:
