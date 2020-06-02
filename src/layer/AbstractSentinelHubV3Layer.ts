@@ -213,8 +213,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
       let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
 
-      let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      if (params.gain !== undefined || params.gamma !== undefined) {
+        let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      }
 
       return blob;
     }
@@ -223,6 +225,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
+    if (this.dataProduct) {
+      return api === ApiType.WMS;
+    }
     return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
   }
 
@@ -487,9 +492,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return res.data;
   }
 
-  public async updateLayerFromServiceIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
