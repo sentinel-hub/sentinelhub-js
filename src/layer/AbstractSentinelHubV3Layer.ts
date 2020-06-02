@@ -286,11 +286,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected createSearchIndexRequestConfig(requestsConfig: RequestConfiguration): AxiosRequestConfig {
-    const requestsConfig: AxiosRequestConfig = {
+    const axiosRequestsConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
       ...getAxiosReqParams(requestsConfig),
     };
-    return requestsConfig;
+    return axiosRequestsConfig;
   }
 
   public async findTiles(
@@ -483,7 +483,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   ): Promise<string> {
     const authToken = getAuthToken();
     const url = this.getConvertEvalscriptBaseUrl();
-    const requestsConfig: AxiosRequestConfig = {
+    const axiosRequestsConfig: AxiosRequestConfig = {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/ecmascript',
@@ -492,7 +492,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       responseType: 'text',
       ...getAxiosReqParams(requestsConfig),
     };
-    const res = await axios.post(url, evalscript, requestsConfig);
+    const res = await axios.post(url, evalscript, axiosRequestsConfig);
     return res.data;
   }
 
