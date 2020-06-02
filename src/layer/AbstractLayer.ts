@@ -30,7 +30,7 @@ export class AbstractLayer {
     this.legendUrl = legendUrl;
   }
 
-  @setMethodTimeout
+  @setMethodTimeout(2)
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
