@@ -41,6 +41,9 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
   return axiosReqConfig;
 };
 
+// this is a class method wrapper that times out all open axios requests after the timeout specified in the method requestsConfig object
+// the wrapper function takes a single argument - the index of the requestsConfig object inside method params
+// if a timeout is not specified when calling the original method, the decorator returns the original invokation (does nothing)
 export function timeoutWrapper(requestsConfigIndex: number): Function {
   return function(
     target: any,
