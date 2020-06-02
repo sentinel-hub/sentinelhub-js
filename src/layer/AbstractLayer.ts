@@ -7,7 +7,7 @@ import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams, RequestConfiguration, setMethodTimeout } from 'src/utils/cancelRequests';
+import { getAxiosReqParams, RequestConfiguration, timeoutWrapper } from 'src/utils/cancelRequests';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
@@ -30,7 +30,7 @@ export class AbstractLayer {
     this.legendUrl = legendUrl;
   }
 
-  @setMethodTimeout(2)
+  @timeoutWrapper(2)
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:

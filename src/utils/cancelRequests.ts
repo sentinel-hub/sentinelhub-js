@@ -54,8 +54,7 @@ export function timeoutWrapper(requestsConfigIndex: number): Function {
 
       // retrieve requestsConfig from arguments...
       const getTimeout = (args: IArguments): number | undefined => {
-        const argumentArray = [...args];
-        const requestConfig = argumentArray[requestsConfigIndex];
+        const requestConfig = args[requestsConfigIndex];
         if (requestConfig) {
           return requestConfig.timeout;
         }
