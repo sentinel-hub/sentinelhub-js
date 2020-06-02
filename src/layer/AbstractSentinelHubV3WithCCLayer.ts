@@ -48,7 +48,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
@@ -57,7 +57,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
       this.maxCloudCoverPercent,
     );
     return {
@@ -72,7 +72,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     return {
       maxCloudCoverage: this.maxCloudCoverPercent / 100,

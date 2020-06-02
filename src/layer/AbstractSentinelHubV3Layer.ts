@@ -88,7 +88,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.downsampling = downsampling;
   }
 
-  protected async fetchLayerParamsFromSHServiceV3(reqConfig: RequestConfiguration): Promise<any> {
+  protected async fetchLayerParamsFromSHServiceV3(requestsConfig: RequestConfiguration): Promise<any> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error('Could not fetch layer params - instanceId and layerId must be set on Layer');
     }
@@ -110,7 +110,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       responseType: 'json',
       headers: headers,
       useCache: true,
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(requestsConfig),
     };
     const res = await axios.get(url, requestsConfig);
     const layersParams = res.data.map((l: any) => ({
@@ -132,7 +132,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<ProcessingPayload> {
     // Subclasses should override this method if they wish to supply additional
     // parameters to Processing API.
@@ -152,18 +152,22 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
   }
 
-  protected async convertEvalscriptToV3IfNeeded(reqConfig: RequestConfiguration): Promise<void> {
+  protected async convertEvalscriptToV3IfNeeded(requestsConfig: RequestConfiguration): Promise<void> {
     // Convert internal evalscript to V3 if it's not in that version.
     if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
       return;
     }
     if (!this.evalscript.startsWith('//VERSION=3')) {
-      this.evalscript = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
+      this.evalscript = await this.convertEvalscriptToV3(this.evalscript, requestsConfig);
     }
     this.evalscriptWasConvertedToV3 = true;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
+  public async getMap(
+    params: GetMapParams,
+    api: ApiType,
+    requestsConfig?: RequestConfiguration,
+  ): Promise<Blob> {
     // SHv3 services support Processing API:
     if (api === ApiType.PROCESSING) {
       if (!this.dataset) {
@@ -174,7 +178,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
       let layerParams = null;
       if (!this.evalscript && !this.dataProduct) {
-        layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+        layerParams = await this.fetchLayerParamsFromSHServiceV3(requestsConfig);
         if (layerParams.evalscript) {
           this.evalscript = layerParams.evalscript;
         } else if (layerParams.dataProduct) {
@@ -189,14 +193,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         (!this.mosaickingOrder || !this.upsampling || !this.downsampling)
       ) {
         if (!layerParams) {
-          layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+          layerParams = await this.fetchLayerParamsFromSHServiceV3(requestsConfig);
         }
         this.mosaickingOrder = layerParams.mosaickingOrder;
         this.upsampling = layerParams.upsampling;
         this.downsampling = layerParams.downsampling;
       }
 
-      await this.convertEvalscriptToV3IfNeeded(reqConfig);
+      await this.convertEvalscriptToV3IfNeeded(requestsConfig);
 
       const payload = createProcessingPayload(
         this.dataset,
@@ -208,21 +212,26 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         this.downsampling,
       );
       // allow subclasses to update payload with their own parameters:
-      const updatedPayload = await this.updateProcessingGetMapPayload(payload, reqConfig);
+      const updatedPayload = await this.updateProcessingGetMapPayload(payload, requestsConfig);
       const shServiceHostname = this.getShServiceHostname();
 
-      let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
+      let blob = await processingGetMap(shServiceHostname, updatedPayload, requestsConfig);
 
-      let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      if (params.gain !== undefined || params.gamma !== undefined) {
+        let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+      }
 
       return blob;
     }
 
-    return super.getMap(params, api, reqConfig);
+    return super.getMap(params, api, requestsConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {
+    if (this.dataProduct) {
+      return api === ApiType.WMS;
+    }
     return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
   }
 
@@ -276,10 +285,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscriptUrl = evalscriptUrl;
   }
 
-  protected createSearchIndexRequestConfig(reqConfig: RequestConfiguration): AxiosRequestConfig {
+  protected createSearchIndexRequestConfig(requestsConfig: RequestConfiguration): AxiosRequestConfig {
     const requestsConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(requestsConfig),
     };
     return requestsConfig;
   }
@@ -290,7 +299,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const response = await this.fetchTiles(
       this.dataset.searchIndexUrl,
@@ -299,7 +308,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
     );
     return {
       tiles: response.data.tiles.map(tile => ({
@@ -327,7 +336,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig: RequestConfiguration,
+    requestsConfig: RequestConfiguration,
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
@@ -356,11 +365,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.datasetParameters = datasetParameters;
     }
 
-    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig(reqConfig));
+    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig(requestsConfig));
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     return {};
   }
@@ -370,7 +379,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected async getFindDatesUTCUrl(
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<string> {
     return this.dataset.findDatesUTCUrl;
   }
@@ -379,9 +388,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const findDatesUTCUrl = await this.getFindDatesUTCUrl(reqConfig);
+    const findDatesUTCUrl = await this.getFindDatesUTCUrl(requestsConfig);
     if (!findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
@@ -391,13 +400,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       queryArea: bboxPolygon,
       from: fromTime.toISOString(),
       to: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters(reqConfig)),
+      ...(await this.getFindDatesUTCAdditionalParameters(requestsConfig)),
     };
 
-    const axiosReqConfig: AxiosRequestConfig = {
-      ...getAxiosReqParams(reqConfig),
+    const axiosrequestsConfig: AxiosRequestConfig = {
+      ...getAxiosReqParams(requestsConfig),
     };
-    const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
+    const response = await axios.post(findDatesUTCUrl, payload, axiosrequestsConfig);
     const found: Moment[] = response.data.map((date: string) => moment.utc(date));
 
     // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
@@ -406,7 +415,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return found.map(m => m.toDate());
   }
 
-  public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
+  public async getStats(params: GetStatsParams, requestsConfig?: RequestConfiguration): Promise<Stats> {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -448,15 +457,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
     }
 
-    const axiosReqConfig: AxiosRequestConfig = {
-      ...getAxiosReqParams(reqConfig),
+    const axiosrequestsConfig: AxiosRequestConfig = {
+      ...getAxiosReqParams(requestsConfig),
     };
 
     const shServiceHostname = this.getShServiceHostname();
     const { data } = await axios.post(
       shServiceHostname + 'ogc/fis/' + this.instanceId,
       payload,
-      axiosReqConfig,
+      axiosrequestsConfig,
     );
     // convert date strings to Date objects
     for (let channel in data) {
@@ -470,7 +479,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected async convertEvalscriptToV3(
     evalscript: string,
-    reqConfig: RequestConfiguration,
+    requestsConfig: RequestConfiguration,
   ): Promise<string> {
     const authToken = getAuthToken();
     const url = this.getConvertEvalscriptBaseUrl();
@@ -481,15 +490,17 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       },
       useCache: true,
       responseType: 'text',
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(requestsConfig),
     };
     const res = await axios.post(url, evalscript, requestsConfig);
     return res.data;
   }
 
-  public async updateLayerFromServiceIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
-    const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+  public async updateLayerFromServiceIfNeeded(requestsConfig?: RequestConfiguration): Promise<void> {
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3(requestsConfig);
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();

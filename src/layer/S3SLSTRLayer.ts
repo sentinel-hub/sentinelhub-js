@@ -56,7 +56,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
@@ -70,7 +70,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
       this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
@@ -86,7 +86,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {

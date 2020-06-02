@@ -85,7 +85,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     if (this.productType === null) {
       throw new Error('Parameter productType must be specified!');
@@ -102,7 +102,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
       this.maxCloudCoverPercent,
       findTilesDatasetParameters,
     );
@@ -120,7 +120,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {

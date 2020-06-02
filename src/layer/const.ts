@@ -26,7 +26,7 @@ export type GetMapParams = {
   nicename?: string;
   showlogo?: boolean;
   bgcolor?: string;
-  transparent?: boolean | number;
+  transparent?: boolean;
   temporal?: boolean;
   upsampling?: Interpolator;
   downsampling?: Interpolator;

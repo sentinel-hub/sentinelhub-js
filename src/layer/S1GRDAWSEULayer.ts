@@ -89,7 +89,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orbitDirection = orbitDirection;
   }
 
-  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(requestsConfig?: RequestConfiguration): Promise<void> {
     if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
       return;
     }
@@ -99,7 +99,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         are not set and can't be fetched from service because instanceId and layerId are not available",
       );
     }
-    const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+    const layerParams = await this.fetchLayerParamsFromSHServiceV3(requestsConfig);
 
     this.acquisitionMode = layerParams['acquisitionMode'];
     this.polarization = layerParams['polarization'];
@@ -108,13 +108,15 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.orthorectify = layerParams['orthorectify'];
     this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig: RequestConfiguration,
+    requestsConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
 
     payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
     payload.input.data[0].dataFilter.polarization = this.polarization;
@@ -133,9 +135,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
 
     const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
       type: this.dataset.datasetParametersType,
@@ -151,7 +153,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
       null,
       findTilesDatasetParameters,
     );
@@ -172,7 +174,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
     const result: Record<string, any> = {
       datasetParameters: {

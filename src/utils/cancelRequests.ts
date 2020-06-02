@@ -29,16 +29,16 @@ export const isCancelled = (err: Error): boolean => {
   return axios.isCancel(err);
 };
 
-export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequestConfig => {
-  let axiosReqConfig: AxiosRequestConfig = {};
-  if (!reqConfig) {
-    return axiosReqConfig;
+export const getAxiosReqParams = (requestsConfig: RequestConfiguration): AxiosRequestConfig => {
+  let axiosrequestsConfig: AxiosRequestConfig = {};
+  if (!requestsConfig) {
+    return axiosrequestsConfig;
   }
-  if (reqConfig.cancelToken) {
-    axiosReqConfig.cancelToken = reqConfig.cancelToken.getToken();
+  if (requestsConfig.cancelToken) {
+    axiosrequestsConfig.cancelToken = requestsConfig.cancelToken.getToken();
   }
-  axiosReqConfig.retries = reqConfig.retries;
-  return axiosReqConfig;
+  axiosrequestsConfig.retries = requestsConfig.retries;
+  return axiosrequestsConfig;
 };
 
 // this is a class method wrapper that times out all open axios requests after the timeout specified in the method requestsConfig object

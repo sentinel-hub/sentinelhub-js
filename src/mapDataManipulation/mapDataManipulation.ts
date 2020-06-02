@@ -23,7 +23,7 @@ export async function mapDataManipulation(originalBlob: Blob, manipulatePixel: a
     const blob: Blob = await new Promise(resolve => {
       imgCanvas.toBlob(blob => {
         resolve(blob);
-      }, 'image/jpeg');
+      }, originalBlob.type);
     });
     return blob;
   } catch (e) {

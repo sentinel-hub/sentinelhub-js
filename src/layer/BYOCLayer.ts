@@ -56,7 +56,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     this.locationId = locationId;
   }
 
-  public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
+  public async updateLayerFromServiceIfNeeded(requestsConfig?: RequestConfiguration): Promise<void> {
     if (this.collectionId !== null && this.locationId !== null) {
       return;
     }
@@ -68,7 +68,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
 
     if (this.collectionId === null) {
-      const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3(requestsConfig);
       this.collectionId = layerParams['collectionId'];
     }
 
@@ -79,23 +79,27 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         responseType: 'json',
         headers: headers,
         useCache: true,
-        ...getAxiosReqParams(reqConfig),
+        ...getAxiosReqParams(requestsConfig),
       });
 
       this.locationId = res.data.location.id;
     }
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
-    return await super.getMap(params, api, reqConfig);
+  public async getMap(
+    params: GetMapParams,
+    api: ApiType,
+    requestsConfig?: RequestConfiguration,
+  ): Promise<Blob> {
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
+    return await super.getMap(params, api, requestsConfig);
   }
 
   protected async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig: RequestConfiguration,
+    requestsConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
     payload.input.data[0].dataFilter.collectionId = this.collectionId;
     return payload;
   }
@@ -106,9 +110,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     toTime: Date,
     maxCount: number | null = null,
     offset: number | null = null,
-    reqConfig?: RequestConfiguration,
+    requestsConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
 
     const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
       type: 'BYOC',
@@ -124,7 +128,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       toTime,
       maxCount,
       offset,
-      reqConfig,
+      requestsConfig,
       null,
       findTilesDatasetParameters,
     );
@@ -154,17 +158,17 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+  protected async getFindDatesUTCUrl(requestsConfig: RequestConfiguration): Promise<string> {
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
     const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
     return findDatesUTCUrl;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
-    reqConfig: RequestConfiguration,
+    requestsConfig: RequestConfiguration,
   ): Promise<Record<string, any>> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    await this.updateLayerFromServiceIfNeeded(requestsConfig);
 
     const result: Record<string, any> = {
       datasetParameters: {
@@ -182,5 +186,20 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   protected getConvertEvalscriptBaseUrl(): string {
     return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
+  }
+
+  public async getAvailableBands(requestsConfig?: RequestConfiguration): Promise<void> {
+    if (this.collectionId === null) {
+      throw new Error('Parameter collectionId is not set');
+    }
+    const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
+    const headers = { Authorization: `Bearer ${getAuthToken()}` };
+    const res = await axios.get(url, {
+      responseType: 'json',
+      headers: headers,
+      useCache: true,
+      ...getAxiosReqParams(requestsConfig),
+    });
+    return res.data.bands;
   }
 }

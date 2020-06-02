@@ -35,9 +35,14 @@ export async function legacyGetMapFromParams(
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
 ): Promise<Blob> {
-  const { layers, evalscript, evalscriptUrl, evalsource, getMapParams } = parseLegacyWmsGetMapParams(
-    wmsParams,
-  );
+  const {
+    layers,
+    evalscript,
+    evalscriptUrl,
+    evalsource,
+    getMapParams,
+    otherLayerParams,
+  } = parseLegacyWmsGetMapParams(wmsParams);
 
   let layer;
   // Layers parameter may contain list of layers which is at the moment supported only by WmsLayer.
@@ -47,7 +52,9 @@ export async function legacyGetMapFromParams(
     layer = new WmsLayer({ baseUrl, layerId: layers });
   } else {
     const layerId = layers;
-    layer = await LayersFactory.makeLayer(baseUrl, layerId);
+
+    // Warning: otherLayerParams override layer's params that are retrieved from service.
+    layer = await LayersFactory.makeLayer(baseUrl, layerId, otherLayerParams);
     if (!layer) {
       throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
     }
@@ -109,6 +116,7 @@ type ParsedLegacyWmsGetMapParams = {
   evalscriptUrl: string | null;
   evalsource: string | null;
   getMapParams: GetMapParams;
+  otherLayerParams: Record<string, any>;
 };
 
 export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): ParsedLegacyWmsGetMapParams {
@@ -140,11 +148,12 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
     getMapParams.height = height;
   }
 
-  // Instead of dealing with maxCC at this point, we pass it through as an unknown parameter. In the
-  // future, it should be used to instantiate the layers instead.
-  // if (params.maxcc) {
-  //   getMapParams.maxCloudCoverPercent = parseInt(params.maxcc);
-  // }
+  // Use otherLayerParams when instantiating the layer(s).
+  // Warning: otherLayerParams will override layer's params that are retrieved from service.
+  const otherLayerParams: Record<string, any> = {};
+  if (params.maxcc) {
+    otherLayerParams.maxCloudCoverPercent = parseInt(params.maxcc);
+  }
 
   if (params.preview) {
     getMapParams.preview = previewFromParams(params);
@@ -228,6 +237,7 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
     evalscriptUrl: params.evalscripturl,
     evalsource: params.evalsource,
     getMapParams: getMapParams,
+    otherLayerParams: otherLayerParams,
   };
 }
 
@@ -261,7 +271,10 @@ function crsFromParams(ogcService: ServiceType, params: any): CRS_IDS {
   let crs;
   switch (ogcService) {
     case ServiceType.WMS:
-      crs = params.crs;
+      // The standard: 'srs' if using WMS <= 1.1.1, 'crs' if using WMS >= 1.3.0
+      // EOB is inconsistent and sometimes sets 'srs' and sometimes 'crs' when using WMS <= 1.1.1
+      // so we check for crs instead of checking WMS version
+      crs = params.crs ? params.crs : params.srs;
       break;
     case ServiceType.WCS:
       crs = params.srs;
@@ -388,7 +401,7 @@ function previewFromParams(params: any): number {
     // (this parameter was set directly on layers for the old instances)
     return 2;
   }
-  return Math.min(Math.max(Number.parseInt(params.preview), 0), 3);
+  return Math.min(Math.max(Number.parseInt(params.preview), 0), 2);
 }
 
 function bgcolorFromParams(params: any): string {

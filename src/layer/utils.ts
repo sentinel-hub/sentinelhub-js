@@ -31,28 +31,28 @@ export type GetCapabilitiesXml = {
 
 export async function fetchGetCapabilitiesXml(
   baseUrl: string,
-  reqConfig: RequestConfiguration,
+  requestsConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXml> {
   const query = {
     service: 'wms',
     request: 'GetCapabilities',
     format: 'text/xml',
   };
-  const axiosReqConfig: AxiosRequestConfig = {
+  const axiosrequestsConfig: AxiosRequestConfig = {
     responseType: 'text',
     useCache: true,
-    ...getAxiosReqParams(reqConfig),
+    ...getAxiosReqParams(requestsConfig),
   };
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
-  const res = await axios.get(url, axiosReqConfig);
+  const res = await axios.get(url, axiosrequestsConfig);
   const parsedXml = await parseStringPromise(res.data);
   return parsedXml;
 }
 
 export async function fetchGetCapabilitiesJson(
   baseUrl: string,
-  reqConfig: RequestConfiguration,
+  requestsConfig: RequestConfiguration,
 ): Promise<any[]> {
   const query = {
     request: 'GetCapabilities',
@@ -60,27 +60,27 @@ export async function fetchGetCapabilitiesJson(
   };
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
-  const axiosReqConfig: AxiosRequestConfig = {
+  const axiosrequestsConfig: AxiosRequestConfig = {
     responseType: 'json',
     useCache: true,
-    ...getAxiosReqParams(reqConfig),
+    ...getAxiosReqParams(requestsConfig),
   };
-  const res = await axios.get(url, axiosReqConfig);
+  const res = await axios.get(url, axiosrequestsConfig);
   return res.data.layers;
 }
 
 export async function fetchGetCapabilitiesJsonV1(
   baseUrl: string,
-  reqConfig: RequestConfiguration,
+  requestsConfig: RequestConfiguration,
 ): Promise<any[]> {
   const instanceId = parseSHInstanceId(baseUrl);
   const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
-  const axiosReqConfig: AxiosRequestConfig = {
+  const axiosrequestsConfig: AxiosRequestConfig = {
     responseType: 'json',
     useCache: true,
-    ...getAxiosReqParams(reqConfig),
+    ...getAxiosReqParams(requestsConfig),
   };
-  const res = await axios.get(url, axiosReqConfig);
+  const res = await axios.get(url, axiosrequestsConfig);
   return res.data.layers;
 }
 

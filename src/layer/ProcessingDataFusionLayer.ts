@@ -53,7 +53,11 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     this.layers = layers;
   }
 
-  public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
+  public async getMap(
+    params: GetMapParams,
+    api: ApiType,
+    requestsConfig?: RequestConfiguration,
+  ): Promise<Blob> {
     if (api !== ApiType.PROCESSING) {
       throw new Error(`Only API type "PROCESSING" is supported`);
     }
@@ -105,7 +109,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       payload.input.data.push(datasource);
     }
 
-    return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
+    return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, requestsConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {
@@ -118,7 +122,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    requestsConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('Not supported - use individual layers when searching for tiles or flyovers');
   }

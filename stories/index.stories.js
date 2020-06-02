@@ -12,6 +12,7 @@ import {
   ApiType,
   MosaickingOrder,
   Interpolator,
+  _wmsGetMapUrl,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -198,6 +199,39 @@ export const S2GetMapMakeLayer = () => {
       format: MimeTypes.JPEG,
     };
     const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const S2GetMapMakeLayerOverrideConstructorParamsNull = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>GetMap with WMS for Sentinel-2 L2A - makeLayer, overrideConstructorParams = null</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const baseUrl = `${DATASET_S2L2A.shServiceHostname}ogc/wms/${instanceId}`;
+    const layerS2L2A = await LayersFactory.makeLayer(baseUrl, s2l2aLayerId, null);
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -546,6 +580,38 @@ export const UpsamplingProcessing = () => {
     img4.src = URL.createObjectURL(await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING));
   };
   perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const wmsGetMapUrl = () => {
+  const getMapParams = {
+    bbox: bbox4326,
+    fromTime: new Date(Date.UTC(2020, 4 - 1, 10, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 4 - 1, 10, 23, 59, 59)),
+    width: 256,
+    height: 256,
+    format: MimeTypes.JPEG,
+  };
+
+  const url = _wmsGetMapUrl(
+    `https://services.sentinel-hub.com/ogc/wms/${instanceId}`,
+    s2l2aLayerId,
+    getMapParams,
+    'return [B04 * 2.5, B03 * 2.5, B02 * 2.5];',
+    null,
+    'S2',
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    '<h2>_wmsGetMapUrl() - do not use, could be changed or removed at any time without notice</h2>';
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+  img1.src = url;
+  wrapperEl.insertAdjacentElement('beforeend', img1);
 
   return wrapperEl;
 };

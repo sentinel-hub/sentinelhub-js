@@ -159,7 +159,7 @@ export function createProcessingPayload(
 export async function processingGetMap(
   shServiceHostname: string,
   payload: ProcessingPayload,
-  reqConfig: RequestConfiguration,
+  requestsConfig: RequestConfiguration,
 ): Promise<Blob> {
   const authToken = getAuthToken();
   if (!authToken) {
@@ -174,7 +174,7 @@ export async function processingGetMap(
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     useCache: true,
-    ...getAxiosReqParams(reqConfig),
+    ...getAxiosReqParams(requestsConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestsConfig);
   return response.data;
