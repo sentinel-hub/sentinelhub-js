@@ -69,7 +69,7 @@ export function timeoutWrapper(requestsConfigIndex: number): Function {
 
       if (timeout) {
         const timer = setTimeout(() => {
-          axios.CancelToken.source().cancel();
+          axios.CancelToken && axios.CancelToken.source().cancel();
           clearTimeout(timer);
           throw new Error('The method did not finish before the specified timeout.');
         }, timeout);
