@@ -106,13 +106,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
-    const requestsConfig: AxiosRequestConfig = {
+    const axiosRequestsConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
       useCache: true,
       ...getAxiosReqParams(requestsConfig),
     };
-    const res = await axios.get(url, requestsConfig);
+    const res = await axios.get(url, axiosRequestsConfig);
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
