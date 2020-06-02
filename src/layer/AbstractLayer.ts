@@ -31,7 +31,11 @@ export class AbstractLayer {
   }
 
   @timeoutWrapper(2)
-  public async getMap(params: GetMapParams, api: ApiType, requestsConfig?: RequestConfiguration): Promise<Blob> {
+  public async getMap(
+    params: GetMapParams,
+    api: ApiType,
+    requestsConfig?: RequestConfiguration,
+  ): Promise<Blob> {
     switch (api) {
       case ApiType.WMS:
         // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
