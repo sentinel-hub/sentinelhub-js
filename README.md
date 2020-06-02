@@ -87,7 +87,7 @@ const layersIds = layers.map(l => l.layerId);
 // [ '<layer-id-1>', '<layer-id-2>',... ]
 ```
 
-Depending on `baseUrl`, method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
+Depending on the first parameter (`baseUrl`), method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
 
 The list can be filtered to include only some of the layers:
 
@@ -103,10 +103,29 @@ const layers = await LayersFactory.makeLayers(
 
 Alternatively, we can also fetch a single layer by using `makeLayer` method:
 
-```
-  import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+```javascript
+import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
-  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>');
+const layer = await LayersFactory.makeLayer(
+  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+  '<layer-id>',
+);
+```
+
+Some additional layer information can be passed to `makeLayer` and `makeLayers` as an object in order to create layers with the provided information instead of the information from the services.
+
+```javascript
+const layer = await LayersFactory.makeLayer(
+  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+  '<layer-id>',
+  { maxCloudCoverPercent: 30 },
+);
+
+const layers = await LayersFactory.makeLayers(
+  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+  null,
+  { maxCloudCoverPercent: 30 },
+);
 ```
 
 Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
@@ -160,6 +179,25 @@ if (layer.supportsApiType(ApiType.PROCESSING)) {
   imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
 }
 ```
+
+Gain and gamma effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
+
+```javascript
+const getMapParamsWithGainAndGamma = {
+  bbox: bbox,
+  fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+  toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+  width: 512,
+  height: 512,
+  format: MimeTypes.JPEG,
+  gain: 1.2,
+  gamma: 0.9,
+};
+const imageBlob = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.WMS);
+const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
+```
+
+When retrieving an image URL (via `getMapUrl()`) with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ## Searching for data
 
@@ -282,6 +320,8 @@ If we already have a WMS GetMap URL, we can use it directly:
 const imageBlob3 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString);
 const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
+
+Gain and gamma effects are also supported in these two functions as a part of `wmsParams` or `fullUrlWithWmsQueryString`.
 
 ## Authentication for Processing API
 

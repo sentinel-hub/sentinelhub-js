@@ -114,6 +114,39 @@ export const getMapWMSLayersFactory = () => {
   return wrapperEl;
 };
 
+export const getMapWMSLayersFactoryOverrideConstructorParamsNull = () => {
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>makeLayers with overrideConstructorParams = null</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    const layer = (
+      await LayersFactory.makeLayers(
+        `${DATASET_EOCLOUD_LANDSAT5.shServiceHostname}v1/wms/${instanceId}`,
+        (lId, datasetId) => layerId === lId,
+        null,
+      )
+    )[0];
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2010, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const getMapWMSEvalscript = () => {
   const img = document.createElement('img');
   img.width = '512';
@@ -142,6 +175,48 @@ export const getMapWMSEvalscript = () => {
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapWMSMaxCC20vs60 = () => {
+  const layerL520 = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent: 20 });
+  const layerL560 = new Landsat5EOCloudLayer({ instanceId, layerId, maxCloudCoverPercent: 60 });
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>GetMap: maxCC=20 vs maxCC=60</h2>`;
+
+  const img20 = document.createElement('img');
+  img20.width = '512';
+  img20.height = '512';
+  img20.style.border = '2px solid green';
+  img20.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img20);
+
+  const img60 = document.createElement('img');
+  img60.width = '512';
+  img60.height = '512';
+  img60.style.border = '2px solid blue';
+  img60.style.margin = '10px';
+  wrapperEl.insertAdjacentElement('beforeend', img60);
+
+  const perform = async () => {
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2010, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2010, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const imageBlob20 = await layerL520.getMap(getMapParams, ApiType.WMS);
+    img20.src = URL.createObjectURL(imageBlob20);
+
+    const imageBlob60 = await layerL560.getMap(getMapParams, ApiType.WMS);
+    img60.src = URL.createObjectURL(imageBlob60);
   };
   perform().then(() => {});
 

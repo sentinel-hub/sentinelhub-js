@@ -41,30 +41,26 @@ export class AbstractLayer {
         //    to deceive the users with returning the image where gain and gamma were ignored
         // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
         //    were sent to the services in getMapUrl()
-        // This is a dirty fix, but gain and gamma need to be removed from the parameters in getMap() so the
+        // In other words, gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
-
-        let predefinedEffects: PredefinedEffects = {};
-
-        if (params.gain) {
-          predefinedEffects.gain = params.gain;
-          params.gain = undefined;
-        }
-        if (params.gamma) {
-          predefinedEffects.gamma = params.gamma;
-          params.gamma = undefined;
-        }
-
-        const url = this.getMapUrl(params, api);
-        const requestsConfig: AxiosRequestConfig = {
+        const paramsWithoutEffects = { ...params };
+        delete paramsWithoutEffects.gain;
+        delete paramsWithoutEffects.gamma;
+        const url = this.getMapUrl(paramsWithoutEffects, api);
+        const requestConfig: AxiosRequestConfig = {
           // 'blob' responseType does not work with Node.js:
           responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
           useCache: true,
           ...getAxiosReqParams(reqConfig),
         };
-        const response = await axios.get(url, requestsConfig);
+        const response = await axios.get(url, requestConfig);
         let blob = response.data;
-        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+
+        // apply effects:
+        if (params.gain !== undefined || params.gamma !== undefined) {
+          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+        }
 
         return blob;
       default:

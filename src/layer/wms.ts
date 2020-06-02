@@ -88,7 +88,7 @@ export function wmsGetMapUrl(
     queryParams.format = params.format;
   }
 
-  if (params.fromTime === null) {
+  if (!params.fromTime) {
     queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
   } else {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
@@ -107,7 +107,8 @@ export function wmsGetMapUrl(
   }
 
   if (evalscript || evalscriptUrl) {
-    if (!evalsource) {
+    // on eo-cloud, datasource must be defined if we are using evalscript:
+    if (!evalsource && baseUrl.startsWith('https://eocloud.sentinel-hub.com/')) {
       throw new Error('Dataset is not defined on this layer - are you using a correct subclass?');
     }
     queryParams.evalsource = evalsource;
