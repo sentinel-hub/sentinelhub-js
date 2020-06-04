@@ -45,12 +45,12 @@ export class AbstractLayer {
         // In other words, gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
 
-        const paramsWithoutEffects = { ...params };
-        delete paramsWithoutEffects.gain;
-        delete paramsWithoutEffects.gamma;
-        const url = this.getMapUrl(paramsWithoutEffects, api);
+        let blob = await ensureTimeout(async innerConfig => {
+          const paramsWithoutEffects = { ...params };
+          delete paramsWithoutEffects.gain;
+          delete paramsWithoutEffects.gamma;
+          const url = this.getMapUrl(paramsWithoutEffects, api);
 
-        let blob = await ensureTimeout(reqConfig, async innerConfig => {
           const requestConfig: AxiosRequestConfig = {
             // 'blob' responseType does not work with Node.js:
             responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
@@ -59,7 +59,7 @@ export class AbstractLayer {
           };
           const response = await axios.get(url, requestConfig);
           return response.data;
-        });
+        }, reqConfig);
 
         // apply effects:
         if (params.gain !== undefined || params.gamma !== undefined) {
