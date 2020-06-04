@@ -44,11 +44,13 @@ export class AbstractLayer {
         //    were sent to the services in getMapUrl()
         // In other words, gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
-        const blob = ensureTimeout(reqConfig, async innerConfig => {
-          const paramsWithoutEffects = { ...params };
-          delete paramsWithoutEffects.gain;
-          delete paramsWithoutEffects.gamma;
-          const url = this.getMapUrl(paramsWithoutEffects, api);
+
+        const paramsWithoutEffects = { ...params };
+        delete paramsWithoutEffects.gain;
+        delete paramsWithoutEffects.gamma;
+        const url = this.getMapUrl(paramsWithoutEffects, api);
+
+        let blob = await ensureTimeout(reqConfig, async innerConfig => {
           const requestConfig: AxiosRequestConfig = {
             // 'blob' responseType does not work with Node.js:
             responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
@@ -56,16 +58,15 @@ export class AbstractLayer {
             ...getAxiosReqParams(innerConfig),
           };
           const response = await axios.get(url, requestConfig);
-          let blob = response.data;
-
-          // apply effects:
-          if (params.gain !== undefined || params.gamma !== undefined) {
-            let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-            blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-          }
-
-          return blob;
+          return response.data;
         });
+
+        // apply effects:
+        if (params.gain !== undefined || params.gamma !== undefined) {
+          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+        }
+
         return blob;
 
       default:
