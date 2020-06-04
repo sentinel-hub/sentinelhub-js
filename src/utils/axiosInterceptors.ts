@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, CancelToken } from 'axios';
 import { stringify } from 'query-string';
+import { TextEncoder } from 'text-encoding';
 
 import { isDebugEnabled } from 'src/utils/debug';
 
