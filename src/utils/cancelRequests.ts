@@ -38,25 +38,3 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
   axiosReqConfig.retries = reqConfig.retries;
   return axiosReqConfig;
 };
-
-export const ensureTimeout = async (reqConfig: RequestConfiguration, promise: Promise<any>): Promise<any> => {
-  const { cancelToken, timeout } = reqConfig;
-
-  if (!timeout) {
-    return promise;
-  }
-
-  if (!cancelToken) {
-    const token = new CancelToken();
-    reqConfig.cancelToken = token;
-  }
-
-  const timer = setTimeout(() => {
-    reqConfig.cancelToken.cancel();
-    clearTimeout(timer);
-  }, timeout);
-
-  const resolvedValue = await promise;
-  clearTimeout(timer);
-  return resolvedValue;
-};
