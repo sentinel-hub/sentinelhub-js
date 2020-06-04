@@ -1,9 +1,14 @@
 import { CancelToken, isCancelled, RequestConfiguration } from './cancelRequests';
 
 export const ensureTimeout = async (
-  reqConfig: RequestConfiguration,
   innerFunction: (requestConfig: RequestConfiguration) => Promise<any>,
+  reqConfig?: RequestConfiguration,
 ): Promise<any> => {
+  if (!reqConfig) {
+    const innerResult = await innerFunction(reqConfig);
+    return innerResult;
+  }
+
   const { cancelToken, timeout } = reqConfig;
 
   if (!timeout) {
