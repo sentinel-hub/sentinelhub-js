@@ -8,6 +8,7 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
@@ -43,26 +44,30 @@ export class AbstractLayer {
         //    were sent to the services in getMapUrl()
         // In other words, gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
-        const paramsWithoutEffects = { ...params };
-        delete paramsWithoutEffects.gain;
-        delete paramsWithoutEffects.gamma;
-        const url = this.getMapUrl(paramsWithoutEffects, api);
-        const requestConfig: AxiosRequestConfig = {
-          // 'blob' responseType does not work with Node.js:
-          responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-          useCache: true,
-          ...getAxiosReqParams(reqConfig),
-        };
-        const response = await axios.get(url, requestConfig);
-        let blob = response.data;
+        const blob = ensureTimeout(reqConfig, async innerConfig => {
+          const paramsWithoutEffects = { ...params };
+          delete paramsWithoutEffects.gain;
+          delete paramsWithoutEffects.gamma;
+          const url = this.getMapUrl(paramsWithoutEffects, api);
+          const requestConfig: AxiosRequestConfig = {
+            // 'blob' responseType does not work with Node.js:
+            responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
+            useCache: true,
+            ...getAxiosReqParams(innerConfig),
+          };
+          const response = await axios.get(url, requestConfig);
+          let blob = response.data;
 
-        // apply effects:
-        if (params.gain !== undefined || params.gamma !== undefined) {
-          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-        }
+          // apply effects:
+          if (params.gain !== undefined || params.gamma !== undefined) {
+            let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+            blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+          }
 
+          return blob;
+        });
         return blob;
+
       default:
         const className = this.constructor.name;
         throw new Error(`API type "${api}" not supported in ${className}`);
