@@ -1,22 +1,19 @@
-import { CancelToken, RequestConfiguration } from './cancelRequests';
+import { CancelToken, isCancelled, RequestConfiguration } from './cancelRequests';
 
 export const ensureTimeout = async (
   reqConfig: RequestConfiguration,
-  promise: () => Promise<any>,
+  innerFunction: (requestConfig: RequestConfiguration) => Promise<any>,
 ): Promise<any> => {
   const { cancelToken, timeout } = reqConfig;
 
   if (!timeout) {
-    return promise;
+    const innerResult = await innerFunction(reqConfig);
+    return innerResult;
   }
 
   if (!cancelToken) {
-    try {
-      const token = new CancelToken();
-      reqConfig.cancelToken = token;
-    } catch (e) {
-      throw e;
-    }
+    const token = new CancelToken();
+    reqConfig.cancelToken = token;
   }
 
   const timer = setTimeout(() => {
@@ -24,7 +21,17 @@ export const ensureTimeout = async (
     clearTimeout(timer);
   }, timeout);
 
-  const resolvedValue = await promise;
-  clearTimeout(timer);
-  return resolvedValue;
+  try {
+    const resolvedValue = await innerFunction(reqConfig);
+    clearTimeout(timer);
+    return resolvedValue;
+  } catch (e) {
+    if (isCancelled(e)) {
+      clearTimeout(timer);
+      return null;
+    } else {
+      clearTimeout(timer);
+      throw e;
+    }
+  }
 };
