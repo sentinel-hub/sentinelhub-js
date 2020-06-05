@@ -1,3 +1,4 @@
+
 - [Installation](#installation)
 - [Usage](#usage)
   - [Layers](#layers)
@@ -13,7 +14,7 @@
     - [Storybook](#storybook)
 - [Copyright and license](#copyright-and-license)
 
----
+-----
 
 # Installation
 
@@ -28,12 +29,12 @@ $ npm install @sentinel-hub/sentinelhub-js
 The core data structure is `Layer`, which corresponds to a _layer_ as returned by OGC WMS GetCapabilities request. Basic (WMS-capable) `Layer` can be initialized like this:
 
 ```javascript
-import { WmsLayer } from '@sentinel-hub/sentinelhub-js';
+  import { WmsLayer } from '@sentinel-hub/sentinelhub-js';
 
-const layer = new WmsLayer({
-  baseUrl: 'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
-  layerId: '<layer-id>',
-});
+  const layer = new WmsLayer({
+    baseUrl: 'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+    layerId: '<layer-id>',
+  });
 ```
 
 Such layer would only allow WMS requests. However, `Layer` is also a superclass for multiple dataset-specific subclasses (like `S1GRDAWSEULayer` - Sentinel-1 GRD data on AWS eu-central-1 Sentinel Hub endpoint) which can be instantiated with their own specific parameters and thus have additional capabilities.
@@ -78,64 +79,51 @@ When it comes to Sentinel Hub layers, there are four ways to determine their con
 It is also possible to create layers by importing their definitions from the Sentinel Hub configuration instance:
 
 ```javascript
-import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+  import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
-const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>');
-// [ layer1, layer2, ... ] - a list of Layer objects
+  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>');
+    // [ layer1, layer2, ... ] - a list of Layer objects
 
-const layersIds = layers.map(l => l.layerId);
-// [ '<layer-id-1>', '<layer-id-2>',... ]
+  const layersIds = layers.map(l => l.layerId);
+    // [ '<layer-id-1>', '<layer-id-2>',... ]
 ```
 
 Depending on the first parameter (`baseUrl`), method `makeLayers()` tries to determine if a specific `Layer` subclass would be better suited and instantiates it with all applicable parameters.
 
 The list can be filtered to include only some of the layers:
-
 ```javascript
-import { LayersFactory, DATASET_S2L2A } from '@sentinel-hub/sentinelhub-js';
+  import { LayersFactory, DATASET_S2L2A } from '@sentinel-hub/sentinelhub-js';
 
-// this will return only a list of those S2L2A layers whose IDs start with "ABC_":
-const layers = await LayersFactory.makeLayers(
-  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
-  (layerId, dataset) => layerId.startsWith('ABC_') && dataset === DATASET_S2L2A,
-);
+  // this will return only a list of those S2L2A layers whose IDs start with "ABC_":
+  const layers = await LayersFactory.makeLayers(
+    'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
+    (layerId, dataset) => layerId.startsWith("ABC_") && dataset === DATASET_S2L2A,
+  );
 ```
 
 Alternatively, we can also fetch a single layer by using `makeLayer` method:
-
 ```javascript
-import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
+  import { LayersFactory } from '@sentinel-hub/sentinelhub-js';
 
-const layer = await LayersFactory.makeLayer(
-  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
-  '<layer-id>',
-);
+  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>');
 ```
 
 Some additional layer information can be passed to `makeLayer` and `makeLayers` as an object in order to create layers with the provided information instead of the information from the services.
 
 ```javascript
-const layer = await LayersFactory.makeLayer(
-  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
-  '<layer-id>',
-  { maxCloudCoverPercent: 30 },
-);
+  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', { maxCloudCoverPercent: 30 });
 
-const layers = await LayersFactory.makeLayers(
-  'https://services.sentinel-hub.com/ogc/wms/<your-instance-id>',
-  null,
-  { maxCloudCoverPercent: 30 },
-);
-```
+  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', null, { maxCloudCoverPercent: 30 });
+  ```
 
 Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
 
 ```javascript
-import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
+  import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
 
-const before = isAuthTokenSet(); // false
-setAuthToken(newAuthToken);
-const after = isAuthTokenSet(); // true
+  const before = isAuthTokenSet(); // false
+  setAuthToken(newAuthToken);
+  const after = isAuthTokenSet(); // true
 ```
 
 The process of getting the authentication token is described in [Authentication for Processing API](#authentication-for-processing-api).
@@ -145,20 +133,20 @@ The process of getting the authentication token is described in [Authentication 
 Maps which correspond to these layers can be fetched via different protocols like WMS and Processing. Not all of the protocols can be used in all cases; for example, Processing can only render layers for which it has `evalscript` available and for which evalscript version 3 is used.
 
 ```javascript
-import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from '@sentinel-hub/sentinelhub-js';
+  import { BBox, CRS_EPSG4326, MimeTypes, ApiType } from '@sentinel-hub/sentinelhub-js';
 
-const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
-const getMapParams = {
-  bbox: bbox,
-  fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-  toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-  width: 512,
-  height: 512,
-  format: MimeTypes.JPEG,
-};
+  const bbox = new BBox(CRS_EPSG4326, 18, 20, 20, 22);
+  const getMapParams = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+  };
 
-const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
+  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
 ```
 
 Note that both of the images above should be _exactly_ the same.
@@ -166,35 +154,34 @@ Note that both of the images above should be _exactly_ the same.
 In some cases we can retrieve just the image URL instead of a blob:
 
 ```javascript
-const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
-const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
+  const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
+  const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
 ```
 
 It is also possible to determine whether a layer supports a specific ApiType:
-
 ```javascript
-if (layer.supportsApiType(ApiType.PROCESSING)) {
-  imageUrl = await layer.getMapUrl(getMapParams, ApiType.PROCESSING);
-} else {
-  imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
-}
+  if (layer.supportsApiType(ApiType.PROCESSING)) {
+    imageUrl = await layer.getMapUrl(getMapParams, ApiType.PROCESSING);
+  } else {
+    imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
+  };
 ```
 
 Gain and gamma effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
 
 ```javascript
-const getMapParamsWithGainAndGamma = {
-  bbox: bbox,
-  fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-  toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-  width: 512,
-  height: 512,
-  format: MimeTypes.JPEG,
-  gain: 1.2,
-  gamma: 0.9,
-};
-const imageBlob = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.WMS);
-const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
+  const getMapParamsWithGainAndGamma = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    gain: 1.2,
+    gamma: 0.9
+  };
+  const imageBlob = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
 ```
 
 When retrieving an image URL (via `getMapUrl()`) with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
@@ -204,30 +191,30 @@ When retrieving an image URL (via `getMapUrl()`) with gain and gamma applied, an
 Searching for the data is a domain either of a _layer_ or its _dataset_ (if available). This library supports different services, some of which (ProbaV and GIBS for example) specify availability dates _per layer_ and not dataset.
 
 We can always use layer to search for data availability:
-
 ```typescript
-import { OrbitDirection } from '@sentinel-hub/sentinelhub-js';
+  import { OrbitDirection } from '@sentinel-hub/sentinelhub-js';
 
-const layerS2L2A = new S2L2ALayer({
-  instanceId: '<my-instance-id>',
-  layerId: '<layer-id-S2L2A>',
-  maxCloudCoverPercent: 50,
-});
-const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
-const flyoversS2L2A = await layerS2L2A.findFlyovers(bbox, fromTime, toTime);
-const datesS2L2A = await layerS2L2A.findDatesUTC(bbox, fromTime, toTime);
+  const layerS2L2A = new S2L2ALayer({
+    instanceId: '<my-instance-id>',
+    layerId: '<layer-id-S2L2A>',
+    maxCloudCoverPercent: 50,
+  });
+  const { tiles, hasMore } = await layerS2L2A.findTiles(bbox, fromTime, toTime, maxCount, offset);
+  const flyoversS2L2A = await layerS2L2A.findFlyovers(bbox, fromTime, toTime);
+  const datesS2L2A = await layerS2L2A.findDatesUTC(bbox, fromTime, toTime);
 
-const layerS1 = new S1GRDAWSEULayer({
-  instanceId: '<my-instance-id>',
-  layerId: '<layer-id-S1GRD>',
-  orthorectify: true,
-  backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
-  orbitDirection: OrbitDirection.ASCENDING,
-});
-const { tiles: tilesS1 } = await layerS1.findTiles(bbox, fromTime, toTime, maxCount, offset);
-const flyoversS1 = await layerS1.findFlyovers(bbox, fromTime, toTime);
-const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
+  const layerS1 = new S1GRDAWSEULayer({
+    instanceId: '<my-instance-id>',
+    layerId: '<layer-id-S1GRD>',
+    orthorectify: true,
+    backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
+    orbitDirection: OrbitDirection.ASCENDING,
+  });
+  const { tiles: tilesS1 } = await layerS1.findTiles(bbox, fromTime, toTime, maxCount, offset);
+  const flyoversS1 = await layerS1.findFlyovers(bbox, fromTime, toTime);
+  const datesS1 = await layerS1.findDatesUTC(bbox, fromTime, toTime);
 ```
+
 
 ## Requests configuration
 
@@ -296,29 +283,30 @@ Getting basic statistics (mean, min, max, standard deviation) and a histogram fo
 The histogram uses the `equalfrequency` binning method and defaults to 5 bins.
 
 ```javascript
-const stats = await layer.getStats({
-  geometry: bbox.toGeoJSON(),
-  fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-  toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-  resolution: resolution,
-  bins: 10,
-});
+  const stats = await layer.getStats({
+    geometry: bbox.toGeoJSON(),
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    resolution: resolution,
+    bins: 10,
+  });
 ```
+
 
 ## Backwards compatibility
 
 To make it easier to use this library with legacy code, there are two functions that are implemented on top of the library, which do not require instantiating a `Layer` subclass.
 
 ```javascript
-const imageBlob1 = await legacyGetMapFromParams(rootUrl, wmsParams);
-const imageBlob2 = await legacyGetMapFromParams(rootUrl, wmsParams, ApiType.PROCESSING); // ApiType.WMS is default
+  const imageBlob1 = await legacyGetMapFromParams(rootUrl, wmsParams);
+  const imageBlob2 = await legacyGetMapFromParams(rootUrl, wmsParams, ApiType.PROCESSING); // ApiType.WMS is default
 ```
 
 If we already have a WMS GetMap URL, we can use it directly:
 
 ```javascript
-const imageBlob3 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString);
-const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
+  const imageBlob3 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString);
+  const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
 
 Gain and gamma effects are also supported in these two functions as a part of `wmsParams` or `fullUrlWithWmsQueryString`.
@@ -349,22 +337,20 @@ Getting the authentication token by calling `requestAuthToken()` with the OAuth 
 This library is an abstraction layer that provides nice interface for accessing the underlying services, which simplifies development - but when requests fail, it is sometimes difficult to understand why. To enable easier debugging, `setDebugEnabled` can be used:
 
 ```javascript
-import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
+  import { setDebugEnabled } from '@sentinel-hub/sentinelhub-js';
 
-setDebugEnabled(true);
-// ... failing operation
-setDebugEnabled(false);
+  setDebugEnabled(true);
+  // ... failing operation
+  setDebugEnabled(false);
 ```
 
 While debug mode is enabled, library will output any request it makes (even if the response comes from cache) to console in the form of a `curl` command.
 
 # Examples
-
 This project contains some examples to demonstrate how the library is used.
 Some preparation is needed before running the examples.
 
 ## Preparation before running examples
-
 To run the examples, the environment variables must be set.
 These variables should be put in the `.env` file in the root folder of this project.
 
