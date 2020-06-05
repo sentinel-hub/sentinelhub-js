@@ -106,13 +106,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
-    const requestsConfig: AxiosRequestConfig = {
+    const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
       useCache: true,
       ...getAxiosReqParams(reqConfig),
     };
-    const res = await axios.get(url, requestsConfig);
+    const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
@@ -282,11 +282,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected createSearchIndexRequestConfig(reqConfig: RequestConfiguration): AxiosRequestConfig {
-    const requestsConfig: AxiosRequestConfig = {
+    const requestConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
       ...getAxiosReqParams(reqConfig),
     };
-    return requestsConfig;
+    return requestConfig;
   }
 
   public async findTiles(
@@ -479,7 +479,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   ): Promise<string> {
     const authToken = getAuthToken();
     const url = this.getConvertEvalscriptBaseUrl();
-    const requestsConfig: AxiosRequestConfig = {
+    const requestConfig: AxiosRequestConfig = {
       headers: {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/ecmascript',
@@ -488,7 +488,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       responseType: 'text',
       ...getAxiosReqParams(reqConfig),
     };
-    const res = await axios.post(url, evalscript, requestsConfig);
+    const res = await axios.post(url, evalscript, requestConfig);
     return res.data;
   }
 
