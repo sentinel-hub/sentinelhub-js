@@ -6,6 +6,7 @@ import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -165,17 +166,20 @@ export async function processingGetMap(
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
-  const requestConfig: AxiosRequestConfig = {
-    headers: {
-      Authorization: 'Bearer ' + authToken,
-      'Content-Type': 'application/json',
-      Accept: '*/*',
-    },
-    // 'blob' responseType does not work with Node.js:
-    responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-    useCache: true,
-    ...getAxiosReqParams(reqConfig),
-  };
-  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
-  return response.data;
+  const responseData = await ensureTimeout(async innerConfig => {
+    const requestConfig: AxiosRequestConfig = {
+      headers: {
+        Authorization: 'Bearer ' + authToken,
+        'Content-Type': 'application/json',
+        Accept: '*/*',
+      },
+      // 'blob' responseType does not work with Node.js:
+      responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
+      useCache: true,
+      ...getAxiosReqParams(innerConfig),
+    };
+    const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
+    return response.data;
+  }, reqConfig);
+  return responseData;
 }
