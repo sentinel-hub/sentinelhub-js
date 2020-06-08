@@ -22,6 +22,7 @@ import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'sr
 import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
@@ -100,33 +101,36 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const authToken = getAuthToken();
 
-    // Note that for SH v3 service, the endpoint for fetching the list of layers is always
-    // https://services.sentinel-hub.com/, even for creodias datasets:
-    const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-    };
-    const requestConfig: AxiosRequestConfig = {
-      responseType: 'json',
-      headers: headers,
-      useCache: true,
-      ...getAxiosReqParams(reqConfig),
-    };
-    const res = await axios.get(url, requestConfig);
-    const layersParams = res.data.map((l: any) => ({
-      layerId: l.id,
-      ...l.datasourceDefaults,
-      evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct,
-      legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
-        ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
-        : null,
-    }));
+    const layerParams = await ensureTimeout(async innerConfig => {
+      // Note that for SH v3 service, the endpoint for fetching the list of layers is always
+      // https://services.sentinel-hub.com/, even for creodias datasets:
+      const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
+      const headers = {
+        Authorization: `Bearer ${authToken}`,
+      };
+      const requestConfig: AxiosRequestConfig = {
+        responseType: 'json',
+        headers: headers,
+        useCache: true,
+        ...getAxiosReqParams(innerConfig),
+      };
+      const res = await axios.get(url, requestConfig);
+      const layersParams = res.data.map((l: any) => ({
+        layerId: l.id,
+        ...l.datasourceDefaults,
+        evalscript: l.styles[0].evalScript,
+        dataProduct: l.styles[0].dataProduct,
+        legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
+          ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
+          : null,
+      }));
 
-    const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
-    if (!layerParams) {
-      throw new Error('Layer params could not be found');
-    }
+      const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
+      if (!layerParams) {
+        throw new Error('Layer params could not be found');
+      }
+      return layerParams;
+    }, reqConfig);
     return layerParams;
   }
 
