@@ -91,6 +91,7 @@ function curlify(
 }
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
+  return request;
   if (!(request && request.useCache)) {
     return request;
   }
@@ -154,6 +155,8 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 };
 
 const saveCacheResponse = async (response: any): Promise<any> => {
+  return response;
+
   // not using cache?
   if (!response.config.useCache) {
     return response;
