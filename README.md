@@ -228,9 +228,11 @@ const requestsConfig = {
 
 You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. Default value for `timeout` is `null` (disabled).
 
-Specifying a timeout will cancel retries of network requests (all retries share the same timeout).
+Specifying the timeout will limit the time spent in the method, by cancelling the network requests (including retries) that take too long.
 
 ```typescript
+import { isCancelled } from '@sentinel-hub/sentinelhub-js';
+
 const requestsConfig = {
   timeout: 5000,
 };
@@ -241,11 +243,14 @@ try {
   const stats = await layer.getStats(getStatsParams, requestsConfig);
   const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
 } catch (err) {
-  throw err;
+  // The exception thrown by canceling network requests can be caught and identified by `isCancelled`.
+  if (!isCancelled(err)) {
+    throw err;
+  }
 }
 ```
 
-You can also cancel requests when searching/fetching data. To do so a token needs to be created and passed through the requests configuration object.
+You can also cancel requests explicitly when searching/fetching data. To do so a token needs to be created and passed through the requests configuration object.
 
 In the example below, a cancel token is passed inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
 
