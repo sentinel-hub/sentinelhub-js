@@ -237,50 +237,53 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       throw new Error('Parameters "fromTime" and "toTime" need to be provided');
     }
 
-    const payload: FisPayload = {
-      layer: this.layerId,
-      crs: CRS_EPSG4326.authId,
-      geometry: WKT.convert(params.geometry),
-      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-        .utc(params.toTime)
-        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
-      resolution: undefined,
-      bins: params.bins || 5,
-      type: HistogramType.EQUALFREQUENCY,
-      ...this.getStatsAdditionalParameters(),
-    };
+    const stats = await ensureTimeout(async innerParams => {
+      const payload: FisPayload = {
+        layer: this.layerId,
+        crs: CRS_EPSG4326.authId,
+        geometry: WKT.convert(params.geometry),
+        time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+          .utc(params.toTime)
+          .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+        resolution: undefined,
+        bins: params.bins || 5,
+        type: HistogramType.EQUALFREQUENCY,
+        ...this.getStatsAdditionalParameters(),
+      };
 
-    if (params.geometry.crs) {
-      const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
-      payload.crs = selectedCrs.authId;
-    }
-    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
-    if (payload.crs === CRS_EPSG4326.authId) {
-      payload.resolution = params.resolution + 'm';
-    } else {
-      payload.resolution = params.resolution;
-    }
-    if (this.evalscript) {
-      if (typeof window !== 'undefined' && window.btoa) {
-        payload.evalscript = btoa(this.evalscript);
-      } else {
-        payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+      if (params.geometry.crs) {
+        const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
+        payload.crs = selectedCrs.authId;
       }
-      payload.evalsource = this.getEvalsource();
-    }
+      // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
+      if (payload.crs === CRS_EPSG4326.authId) {
+        payload.resolution = params.resolution + 'm';
+      } else {
+        payload.resolution = params.resolution;
+      }
+      if (this.evalscript) {
+        if (typeof window !== 'undefined' && window.btoa) {
+          payload.evalscript = btoa(this.evalscript);
+        } else {
+          payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+        }
+        payload.evalsource = this.getEvalsource();
+      }
 
-    const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
-      params: payload,
-      ...getAxiosReqParams(reqConfig),
-    });
-    // convert date strings to Date objects
-    for (let channel in data) {
-      data[channel] = data[channel].map((dailyStats: any) => ({
-        ...dailyStats,
-        date: new Date(dailyStats.date),
-      }));
-    }
-    return data;
+      const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
+        params: payload,
+        ...getAxiosReqParams(innerParams),
+      });
+      // convert date strings to Date objects
+      for (let channel in data) {
+        data[channel] = data[channel].map((dailyStats: any) => ({
+          ...dailyStats,
+          date: new Date(dailyStats.date),
+        }));
+      }
+      return data;
+    }, reqConfig);
+    return stats;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
