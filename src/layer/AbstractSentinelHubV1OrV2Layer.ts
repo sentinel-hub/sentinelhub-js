@@ -22,6 +22,7 @@ import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { fetchGetCapabilitiesXml } from 'src/layer/utils';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -147,35 +148,38 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (offset === null) {
       offset = 0;
     }
-    const payload = bbox.toGeoJSON();
-    const params = {
-      expand: 'true',
-      timefrom: fromTime.toISOString(),
-      timeto: toTime.toISOString(),
-      maxcount: maxCount,
-      offset: Number(offset),
-      ...this.getFindTilesAdditionalParameters(),
-    };
+    const tiles = await ensureTimeout(async innerConfig => {
+      const payload = bbox.toGeoJSON();
+      const params = {
+        expand: 'true',
+        timefrom: fromTime.toISOString(),
+        timeto: toTime.toISOString(),
+        maxcount: maxCount,
+        offset: Number(offset),
+        ...this.getFindTilesAdditionalParameters(),
+      };
 
-    const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-CRS': 'EPSG:4326',
-      },
-      ...getAxiosReqParams(reqConfig),
-    });
+      const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-CRS': 'EPSG:4326',
+        },
+        ...getAxiosReqParams(innerConfig),
+      });
 
-    const responseTiles: any[] = response.data.tiles;
-    return {
-      tiles: responseTiles.map(tile => ({
-        geometry: tile.tileDrawRegionGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+      const responseTiles: any[] = response.data.tiles;
+      return {
+        tiles: responseTiles.map(tile => ({
+          geometry: tile.tileDrawRegionGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: this.extractFindTilesMeta(tile),
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tiles;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
