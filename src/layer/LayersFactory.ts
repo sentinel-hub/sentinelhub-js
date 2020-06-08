@@ -4,6 +4,7 @@ import {
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
 } from 'src/layer/utils';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
 import {
   DATASET_S2L2A,
@@ -100,16 +101,19 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer> {
-    const layers = await LayersFactory.makeLayers(
-      baseUrl,
-      (lId: string) => lId === layerId,
-      overrideConstructorParams,
-      reqConfig,
-    );
-    if (layers.length === 0) {
-      return null;
-    }
-    return layers[0];
+    const layer = await ensureTimeout(async innerConfig => {
+      const layers = await LayersFactory.makeLayers(
+        baseUrl,
+        (lId: string) => lId === layerId,
+        overrideConstructorParams,
+        innerConfig,
+      );
+      if (layers.length === 0) {
+        return null;
+      }
+      return layers[0];
+    }, reqConfig);
+    return layer;
   }
 
   public static async makeLayers(
@@ -118,19 +122,22 @@ export class LayersFactory {
     overrideConstructorParams?: Record<string, any>,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
-      if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+    const returnValue = await ensureTimeout(async innerConfig => {
+      for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
+        if (baseUrl.startsWith(hostname)) {
+          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+        }
       }
-    }
 
-    for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-      if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+      for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
+        if (baseUrl.startsWith(hostname)) {
+          return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+        }
       }
-    }
 
-    return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+    }, reqConfig);
+    return returnValue;
   }
 
   private static async makeLayersSHv3(
@@ -139,44 +146,47 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
-    const layersInfos = getCapabilitiesJson.map(layerInfo => ({
-      layerId: layerInfo.id,
-      title: layerInfo.name,
-      description: layerInfo.description,
-      dataset:
-        layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          : null,
-      legendUrl: layerInfo.legendUrl,
-    }));
+    const layers = await ensureTimeout(async innerConfig => {
+      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, innerConfig);
+      const layersInfos = getCapabilitiesJson.map(layerInfo => ({
+        layerId: layerInfo.id,
+        title: layerInfo.name,
+        description: layerInfo.description,
+        dataset:
+          layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            : null,
+        legendUrl: layerInfo.legendUrl,
+      }));
 
-    const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+      const filteredLayersInfos =
+        filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
-      if (!dataset) {
-        return new WmsLayer({ baseUrl, layerId, title, description });
-      }
+      return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
+        if (!dataset) {
+          return new WmsLayer({ baseUrl, layerId, title, description });
+        }
 
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
-      if (!SHLayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-      }
-      return new SHLayerClass({
-        instanceId: parseSHInstanceId(baseUrl),
-        layerId,
-        evalscript: null,
-        evalscriptUrl: null,
-        dataProduct: null,
-        title,
-        description,
-        legendUrl,
-        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-        // otherwise the default values from layer definition on the service will be used.
-        ...overrideConstructorParams,
+        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
+        if (!SHLayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+        }
+        return new SHLayerClass({
+          instanceId: parseSHInstanceId(baseUrl),
+          layerId,
+          evalscript: null,
+          evalscriptUrl: null,
+          dataProduct: null,
+          title,
+          description,
+          legendUrl,
+          // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+          // otherwise the default values from layer definition on the service will be used.
+          ...overrideConstructorParams,
+        });
       });
-    });
+    }, reqConfig);
+    return layers;
   }
 
   private static async makeLayersSHv12(
@@ -185,46 +195,49 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
+    const resultValue = await ensureTimeout(async innerConfig => {
+      const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, innerConfig);
 
-    const result: AbstractLayer[] = [];
-    for (let layerInfo of getCapabilitiesJsonV1) {
-      const layerId = layerInfo.name;
-      const dataset = LayersFactory.DATASET_FROM_JSON_GETCAPABILITIES_V1[layerInfo.settings.datasourceName];
-      if (!dataset) {
-        throw new Error(`Unknown dataset for layer ${layerId} (${layerInfo.settings.datasourceName})`);
-      }
-
-      if (filterLayers) {
-        const keepLayer = Boolean(filterLayers(layerId, dataset));
-        if (!keepLayer) {
-          continue;
+      const result: AbstractLayer[] = [];
+      for (let layerInfo of getCapabilitiesJsonV1) {
+        const layerId = layerInfo.name;
+        const dataset = LayersFactory.DATASET_FROM_JSON_GETCAPABILITIES_V1[layerInfo.settings.datasourceName];
+        if (!dataset) {
+          throw new Error(`Unknown dataset for layer ${layerId} (${layerInfo.settings.datasourceName})`);
         }
-      }
 
-      const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
-      if (!SH12LayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
-      }
+        if (filterLayers) {
+          const keepLayer = Boolean(filterLayers(layerId, dataset));
+          if (!keepLayer) {
+            continue;
+          }
+        }
 
-      // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-      // otherwise the default values from layer definition on the service will be used.
-      if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
-        layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
-      }
+        const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
+        if (!SH12LayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
+        }
 
-      const layer = SH12LayerClass.makeLayer(
-        layerInfo,
-        parseSHInstanceId(baseUrl),
-        layerId,
-        layerInfo.settings.evalJSScript || null,
-        null,
-        layerInfo.settings.title,
-        layerInfo.settings.description,
-      );
-      result.push(layer);
-    }
-    return result;
+        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+        // otherwise the default values from layer definition on the service will be used.
+        if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
+          layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
+        }
+
+        const layer = SH12LayerClass.makeLayer(
+          layerInfo,
+          parseSHInstanceId(baseUrl),
+          layerId,
+          layerInfo.settings.evalJSScript || null,
+          null,
+          layerInfo.settings.title,
+          layerInfo.settings.description,
+        );
+        result.push(layer);
+      }
+      return result;
+    }, reqConfig);
+    return resultValue;
   }
 
   private static async makeLayersWms(
@@ -233,26 +246,29 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
-      layerId: layerInfo.Name[0],
-      title: layerInfo.Title[0],
-      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
-      dataset: null,
-      legendUrl:
-        layerInfo.Style && layerInfo.Style[0].LegendURL
-          ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
-          ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : null,
-    }));
+    const layers = await ensureTimeout(async innerConfig => {
+      const parsedXml = await fetchGetCapabilitiesXml(baseUrl, innerConfig);
+      const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
+        layerId: layerInfo.Name[0],
+        title: layerInfo.Title[0],
+        description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+        dataset: null,
+        legendUrl:
+          layerInfo.Style && layerInfo.Style[0].LegendURL
+            ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
+            ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : null,
+      }));
 
-    const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+      const filteredLayersInfos =
+        filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(
-      ({ layerId, title, description, legendUrl }) =>
-        new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
-    );
+      return filteredLayersInfos.map(
+        ({ layerId, title, description, legendUrl }) =>
+          new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
+      );
+    }, reqConfig);
+    return layers;
   }
 }
