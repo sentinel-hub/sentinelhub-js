@@ -120,128 +120,131 @@ export class AbstractLayer {
       throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
-    const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
-    const bboxGeometry: Geom = this.roundCoordinates([
-      [
-        [bbox.minX, bbox.minY],
-        [bbox.maxX, bbox.minY],
-        [bbox.maxX, bbox.maxY],
-        [bbox.minX, bbox.maxY],
-        [bbox.minX, bbox.minY],
-      ],
-    ]);
-    const bboxArea = area({
-      type: 'Polygon',
-      coordinates: bboxGeometry,
-    });
+    const flyOvers = ensureTimeout(async () => {
+      const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
+      const bboxGeometry: Geom = this.roundCoordinates([
+        [
+          [bbox.minX, bbox.minY],
+          [bbox.maxX, bbox.minY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.minX, bbox.maxY],
+          [bbox.minX, bbox.minY],
+        ],
+      ]);
+      const bboxArea = area({
+        type: 'Polygon',
+        coordinates: bboxGeometry,
+      });
 
-    let flyovers: FlyoverInterval[] = [];
-    let flyoverIndex = 0;
-    let currentFlyoverGeometry: Geom = null;
-    let nTilesInFlyover;
-    let sumCloudCoverPercent;
-    for (let i = 0; i < maxFindTilesRequests; i++) {
-      // grab new batch of tiles:
-      const { tiles, hasMore } = await this.findTiles(
-        bbox,
-        fromTime,
-        toTime,
-        tilesPerRequest,
-        i * tilesPerRequest,
-        reqConfig,
-      );
+      let flyovers: FlyoverInterval[] = [];
+      let flyoverIndex = 0;
+      let currentFlyoverGeometry: Geom = null;
+      let nTilesInFlyover;
+      let sumCloudCoverPercent;
+      for (let i = 0; i < maxFindTilesRequests; i++) {
+        // grab new batch of tiles:
+        const { tiles, hasMore } = await this.findTiles(
+          bbox,
+          fromTime,
+          toTime,
+          tilesPerRequest,
+          i * tilesPerRequest,
+          reqConfig,
+        );
 
-      // apply each tile to the flyover to calculate coverage:
-      for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
-        // first tile ever? just add its info and continue:
-        if (flyovers.length === 0) {
-          flyovers[flyoverIndex] = {
-            fromTime: tiles[tileIndex].sensingTime,
-            toTime: tiles[tileIndex].sensingTime,
-            coveragePercent: 0,
-            meta: {},
-          };
-          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
-          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-          nTilesInFlyover = 1;
-          continue;
-        }
+        // apply each tile to the flyover to calculate coverage:
+        for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
+          // first tile ever? just add its info and continue:
+          if (flyovers.length === 0) {
+            flyovers[flyoverIndex] = {
+              fromTime: tiles[tileIndex].sensingTime,
+              toTime: tiles[tileIndex].sensingTime,
+              coveragePercent: 0,
+              meta: {},
+            };
+            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            nTilesInFlyover = 1;
+            continue;
+          }
 
-        // append the tile to flyovers:
-        const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
-        const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
-        const diffS = Math.abs(prevDateS - currDateS);
-        if (diffS > orbitTimeS) {
-          // finish the old flyover:
-          try {
-            flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-              bboxGeometry,
-              bboxArea,
-              currentFlyoverGeometry,
+          // append the tile to flyovers:
+          const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
+          const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
+          const diffS = Math.abs(prevDateS - currDateS);
+          if (diffS > orbitTimeS) {
+            // finish the old flyover:
+            try {
+              flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+                bboxGeometry,
+                bboxArea,
+                currentFlyoverGeometry,
+              );
+            } catch (err) {
+              // if anything goes wrong, play it safe and set coveragePercent to null:
+              flyovers[flyoverIndex].coveragePercent = null;
+            }
+            if (sumCloudCoverPercent !== undefined) {
+              flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+            }
+
+            // and start a new one:
+            flyoverIndex++;
+            flyovers[flyoverIndex] = {
+              fromTime: tiles[tileIndex].sensingTime,
+              toTime: tiles[tileIndex].sensingTime,
+              coveragePercent: 0,
+              meta: {},
+            };
+            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            nTilesInFlyover = 1;
+          } else {
+            // the same flyover:
+            flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
+            currentFlyoverGeometry = union(
+              this.roundCoordinates(currentFlyoverGeometry),
+              this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
             );
-          } catch (err) {
-            // if anything goes wrong, play it safe and set coveragePercent to null:
-            flyovers[flyoverIndex].coveragePercent = null;
+            sumCloudCoverPercent =
+              sumCloudCoverPercent !== undefined
+                ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
+                : undefined;
+            nTilesInFlyover++;
           }
-          if (sumCloudCoverPercent !== undefined) {
-            flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
-          }
+        }
 
-          // and start a new one:
-          flyoverIndex++;
-          flyovers[flyoverIndex] = {
-            fromTime: tiles[tileIndex].sensingTime,
-            toTime: tiles[tileIndex].sensingTime,
-            coveragePercent: 0,
-            meta: {},
-          };
-          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
-          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-          nTilesInFlyover = 1;
-        } else {
-          // the same flyover:
-          flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
-          currentFlyoverGeometry = union(
-            this.roundCoordinates(currentFlyoverGeometry),
-            this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
+        // make sure we exit when there are no more tiles:
+        if (!hasMore) {
+          break;
+        }
+        if (i + 1 === maxFindTilesRequests) {
+          throw new Error(
+            `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
           );
-          sumCloudCoverPercent =
-            sumCloudCoverPercent !== undefined
-              ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
-              : undefined;
-          nTilesInFlyover++;
         }
       }
 
-      // make sure we exit when there are no more tiles:
-      if (!hasMore) {
-        break;
+      // if needed, finish the last flyover:
+      if (flyovers.length > 0) {
+        try {
+          flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+            bboxGeometry,
+            bboxArea,
+            currentFlyoverGeometry,
+          );
+        } catch (err) {
+          // if anything goes wrong, play it safe and set coveragePercent to null:
+          flyovers[flyoverIndex].coveragePercent = null;
+        }
+        if (sumCloudCoverPercent !== undefined) {
+          flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+        }
       }
-      if (i + 1 === maxFindTilesRequests) {
-        throw new Error(
-          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
-        );
-      }
-    }
 
-    // if needed, finish the last flyover:
-    if (flyovers.length > 0) {
-      try {
-        flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-          bboxGeometry,
-          bboxArea,
-          currentFlyoverGeometry,
-        );
-      } catch (err) {
-        // if anything goes wrong, play it safe and set coveragePercent to null:
-        flyovers[flyoverIndex].coveragePercent = null;
-      }
-      if (sumCloudCoverPercent !== undefined) {
-        flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
-      }
-    }
-
-    return flyovers;
+      return flyovers;
+    }, reqConfig);
+    return flyOvers;
   }
 
   private calculateCoveragePercent(bboxGeometry: Geom, bboxArea: number, flyoverGeometry: Geom): number {
