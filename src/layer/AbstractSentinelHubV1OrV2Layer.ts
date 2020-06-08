@@ -205,23 +205,25 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
+    const datesUTC = await ensureTimeout(async innerConfig => {
+      const payload = bbox.toGeoJSON();
+      const params = {
+        timefrom: fromTime.toISOString(),
+        timeto: toTime.toISOString(),
+        ...(await this.getFindDatesUTCAdditionalParameters(innerConfig)),
+      };
 
-    const payload = bbox.toGeoJSON();
-    const params = {
-      timefrom: fromTime.toISOString(),
-      timeto: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters(reqConfig)),
-    };
+      const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        ...getAxiosReqParams(innerConfig),
+      });
 
-    const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...getAxiosReqParams(reqConfig),
-    });
-
-    return response.data.map((date: string) => moment.utc(date).toDate());
+      return response.data.map((date: string) => moment.utc(date).toDate());
+    }, reqConfig);
+    return datesUTC;
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
