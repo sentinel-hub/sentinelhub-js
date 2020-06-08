@@ -88,10 +88,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    return await super.getMap(params, api, reqConfig);
+    return await AbstractSentinelHubV3Layer.prototype.getMap(params, api, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {

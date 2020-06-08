@@ -130,7 +130,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return layerParams;
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<ProcessingPayload> {
@@ -221,7 +221,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       return blob;
     }
 
-    return super.getMap(params, api, reqConfig);
+    return AbstractLayer.prototype.getMap(params, api, reqConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {

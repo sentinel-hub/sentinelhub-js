@@ -112,7 +112,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
