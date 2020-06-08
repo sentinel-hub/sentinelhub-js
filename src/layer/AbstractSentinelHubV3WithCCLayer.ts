@@ -6,6 +6,7 @@ import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -50,25 +51,28 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(
-      this.dataset.searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-    );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    const tilesResponse = await ensureTimeout(async innerConfig => {
+      const response = await this.fetchTiles(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        innerConfig,
+        this.maxCloudCoverPercent,
+      );
+      return {
+        tiles: response.data.tiles.map(tile => ({
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: this.extractFindTilesMeta(tile),
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tilesResponse;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
