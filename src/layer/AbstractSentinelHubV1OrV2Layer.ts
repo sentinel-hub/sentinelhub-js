@@ -292,18 +292,22 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         "Additional data can't be fetched from service because instanceId and layerId are not defined",
       );
     }
-    const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-    const capabilities = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
-      layerInfo => this.layerId === layerInfo.Name[0],
-    );
-    if (!layer) {
-      throw new Error('Layer not found');
-    }
-    const legendUrl =
-      layer.Style && layer.Style[0].LegendURL
-        ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-        : null;
+
+    const legendUrl = await ensureTimeout(async innerConfig => {
+      const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
+      const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerConfig);
+      const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
+        layerInfo => this.layerId === layerInfo.Name[0],
+      );
+      if (!layer) {
+        throw new Error('Layer not found');
+      }
+      const legendUrl =
+        layer.Style && layer.Style[0].LegendURL
+          ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : null;
+      return legendUrl;
+    }, reqConfig);
     this.legendUrl = legendUrl;
   }
 }
