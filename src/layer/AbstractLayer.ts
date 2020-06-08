@@ -120,7 +120,7 @@ export class AbstractLayer {
       throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
-    const flyOvers = ensureTimeout(async innerConfig => {
+    const flyOvers = await ensureTimeout(async innerConfig => {
       const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
       const bboxGeometry: Geom = this.roundCoordinates([
         [
