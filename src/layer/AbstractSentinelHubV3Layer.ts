@@ -162,70 +162,78 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       return;
     }
     if (!this.evalscript.startsWith('//VERSION=3')) {
-      this.evalscript = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
+      const evalscript = await ensureTimeout(async innerConfig => {
+        return await this.convertEvalscriptToV3(this.evalscript, innerConfig);
+      }, reqConfig);
+      this.evalscript = evalscript;
     }
     this.evalscriptWasConvertedToV3 = true;
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    // SHv3 services support Processing API:
-    if (api === ApiType.PROCESSING) {
-      if (!this.dataset) {
-        throw new Error('This layer does not support Processing API (unknown dataset)');
-      }
-
-      await this.fetchEvalscriptUrlIfNeeded();
-
-      let layerParams = null;
-      if (!this.evalscript && !this.dataProduct) {
-        layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
-        if (layerParams.evalscript) {
-          this.evalscript = layerParams.evalscript;
-        } else if (layerParams.dataProduct) {
-          this.dataProduct = layerParams.dataProduct;
-        } else {
-          throw new Error(`Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`);
+    const getMapValue = await ensureTimeout(async innerConfig => {
+      // SHv3 services support Processing API:
+      if (api === ApiType.PROCESSING) {
+        if (!this.dataset) {
+          throw new Error('This layer does not support Processing API (unknown dataset)');
         }
-      }
-      if (
-        this.instanceId &&
-        this.layerId &&
-        (!this.mosaickingOrder || !this.upsampling || !this.downsampling)
-      ) {
-        if (!layerParams) {
-          layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+
+        await this.fetchEvalscriptUrlIfNeeded();
+
+        let layerParams = null;
+        if (!this.evalscript && !this.dataProduct) {
+          layerParams = await this.fetchLayerParamsFromSHServiceV3(innerConfig);
+          if (layerParams.evalscript) {
+            this.evalscript = layerParams.evalscript;
+          } else if (layerParams.dataProduct) {
+            this.dataProduct = layerParams.dataProduct;
+          } else {
+            throw new Error(
+              `Could not fetch evalscript / dataProduct from service for layer ${this.layerId}`,
+            );
+          }
         }
-        this.mosaickingOrder = layerParams.mosaickingOrder;
-        this.upsampling = layerParams.upsampling;
-        this.downsampling = layerParams.downsampling;
+        if (
+          this.instanceId &&
+          this.layerId &&
+          (!this.mosaickingOrder || !this.upsampling || !this.downsampling)
+        ) {
+          if (!layerParams) {
+            layerParams = await this.fetchLayerParamsFromSHServiceV3(innerConfig);
+          }
+          this.mosaickingOrder = layerParams.mosaickingOrder;
+          this.upsampling = layerParams.upsampling;
+          this.downsampling = layerParams.downsampling;
+        }
+
+        await this.convertEvalscriptToV3IfNeeded(innerConfig);
+
+        const payload = createProcessingPayload(
+          this.dataset,
+          params,
+          this.evalscript,
+          this.dataProduct,
+          this.mosaickingOrder,
+          this.upsampling,
+          this.downsampling,
+        );
+        // allow subclasses to update payload with their own parameters:
+        const updatedPayload = await this.updateProcessingGetMapPayload(payload, innerConfig);
+        const shServiceHostname = this.getShServiceHostname();
+
+        let blob = await processingGetMap(shServiceHostname, updatedPayload, innerConfig);
+
+        if (params.gain !== undefined || params.gamma !== undefined) {
+          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+        }
+
+        return blob;
       }
 
-      await this.convertEvalscriptToV3IfNeeded(reqConfig);
-
-      const payload = createProcessingPayload(
-        this.dataset,
-        params,
-        this.evalscript,
-        this.dataProduct,
-        this.mosaickingOrder,
-        this.upsampling,
-        this.downsampling,
-      );
-      // allow subclasses to update payload with their own parameters:
-      const updatedPayload = await this.updateProcessingGetMapPayload(payload, reqConfig);
-      const shServiceHostname = this.getShServiceHostname();
-
-      let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
-
-      if (params.gain !== undefined || params.gamma !== undefined) {
-        let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-      }
-
-      return blob;
-    }
-
-    return super.getMap(params, api, reqConfig);
+      return super.getMap(params, api, innerConfig);
+    }, reqConfig);
+    return getMapValue;
   }
 
   public supportsApiType(api: ApiType): boolean {
