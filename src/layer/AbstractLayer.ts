@@ -10,7 +10,6 @@ import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
-import { isAnyPredefinedEffectSet } from 'src/mapDataManipulation/mapDataManipulationUtils';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
