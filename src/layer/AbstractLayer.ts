@@ -9,8 +9,8 @@ import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/laye
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
-import { PredefinedEffects } from 'src/mapDataManipulation/const';
-import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
+import { Effects } from 'src/mapDataManipulation/const';
+import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -57,8 +57,8 @@ export class AbstractLayer {
         let blob = response.data;
 
         // apply effects:
-        const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+        const effects: Effects = { gain: params.gain, gamma: params.gamma };
+        blob = await runEffectFunctions(blob, effects);
 
         return blob;
       default:
