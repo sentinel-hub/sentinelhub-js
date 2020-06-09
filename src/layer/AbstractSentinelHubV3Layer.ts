@@ -24,7 +24,6 @@ import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
-import { isAnyPredefinedEffectSet } from 'src/mapDataManipulation/mapDataManipulationUtils';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
 
 interface ConstructorParameters {
