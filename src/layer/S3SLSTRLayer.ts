@@ -59,7 +59,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerConfig => {
+    const tiles = await ensureTimeout(async innerReqConfig => {
       const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
         type: this.dataset.shProcessingApiDatasourceAbbreviation,
         orbitDirection: this.orbitDirection,
@@ -72,7 +72,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
         this.maxCloudCoverPercent,
         findTilesDatasetParameters,
       );
