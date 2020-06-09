@@ -114,9 +114,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
 
     // apply effects:
     const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-    if (isAnyPredefinedEffectSet(predefinedEffects)) {
-      blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-    }
+    blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
 
     return blob;
   }

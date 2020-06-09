@@ -59,9 +59,7 @@ export class AbstractLayer {
 
         // apply effects:
         const predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-        if (isAnyPredefinedEffectSet(predefinedEffects)) {
-          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-        }
+        blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
 
         return blob;
       default:
