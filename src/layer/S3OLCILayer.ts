@@ -5,6 +5,7 @@ import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
 import { DATASET_S3OLCI } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3OLCI;
@@ -17,24 +18,27 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTiles(
-      this.dataset.searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-    );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {},
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    const tiles = await ensureTimeout(async innerConfig => {
+      const response = await this.fetchTiles(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        innerConfig,
+      );
+      return {
+        tiles: response.data.tiles.map(tile => ({
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {},
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tiles;
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
