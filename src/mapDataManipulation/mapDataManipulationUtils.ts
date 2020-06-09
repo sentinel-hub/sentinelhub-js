@@ -1,4 +1,4 @@
-import { RgbMappingArrays, PredefinedEffects } from 'src/mapDataManipulation/const';
+import { RgbMappingArrays, Effects } from 'src/mapDataManipulation/const';
 
 export function prepareRgbMappingArrays(): RgbMappingArrays {
   return {
@@ -51,14 +51,14 @@ export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Func
   };
 }
 
-export function isPredefinedEffectSet(effect: number): boolean {
+export function isEffectSet(effect: number): boolean {
   return effect !== undefined && effect !== null;
 }
 
-export function isAnyPredefinedEffectSet(effects: PredefinedEffects): boolean {
+export function isAnyEffectSet(effects: Effects): boolean {
   let isAnyEffectSet = false;
   for (let [, val] of Object.entries(effects)) {
-    isAnyEffectSet = isAnyEffectSet || isPredefinedEffectSet(val);
+    isAnyEffectSet = isAnyEffectSet || isEffectSet(val);
   }
   return isAnyEffectSet;
 }
