@@ -59,7 +59,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       throw new Error(`Only API type "PROCESSING" is supported`);
     }
 
-    const getMapValue = await ensureTimeout(async innerConfig => {
+    const getMapValue = await ensureTimeout(async innerReqConfig => {
       await this.fetchEvalscriptUrlIfNeeded();
 
       // when constructing the payload, we just take the first layer - we will rewrite its info later:
@@ -107,7 +107,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         payload.input.data.push(datasource);
       }
 
-      return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, innerConfig);
+      return processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, innerReqConfig);
     }, reqConfig);
     return getMapValue;
   }

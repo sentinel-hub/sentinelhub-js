@@ -52,9 +52,9 @@ export class WmsLayer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const dates = await ensureTimeout(async innerConfig => {
+    const dates = await ensureTimeout(async innerReqConfig => {
       // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
-      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerConfig);
+      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerReqConfig);
       const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
         layerInfo => this.layerId === layerInfo.Name[0],
       );
@@ -109,7 +109,7 @@ export class WmsLayer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerConfig => {
+    await ensureTimeout(async innerReqConfig => {
       if (this.legendUrl) {
         return;
       }
@@ -118,7 +118,7 @@ export class WmsLayer extends AbstractLayer {
           "Additional data can't be fetched from service because baseUrl and layerId are not defined",
         );
       }
-      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerConfig);
+      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerReqConfig);
       const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
         layer => this.layerId === layer.Name[0],
       );

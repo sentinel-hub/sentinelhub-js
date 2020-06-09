@@ -166,7 +166,7 @@ export async function processingGetMap(
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
-  const responseData = await ensureTimeout(async innerConfig => {
+  const responseData = await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = {
       headers: {
         Authorization: 'Bearer ' + authToken,
@@ -176,7 +176,7 @@ export async function processingGetMap(
       // 'blob' responseType does not work with Node.js:
       responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
       useCache: true,
-      ...getAxiosReqParams(innerConfig),
+      ...getAxiosReqParams(innerReqConfig),
     };
     const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
     return response.data;

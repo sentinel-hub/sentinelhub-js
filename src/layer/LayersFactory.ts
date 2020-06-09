@@ -101,12 +101,12 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer> {
-    const layer = await ensureTimeout(async innerConfig => {
+    const layer = await ensureTimeout(async innerReqConfig => {
       const layers = await LayersFactory.makeLayers(
         baseUrl,
         (lId: string) => lId === layerId,
         overrideConstructorParams,
-        innerConfig,
+        innerReqConfig,
       );
       if (layers.length === 0) {
         return null;
@@ -122,20 +122,20 @@ export class LayersFactory {
     overrideConstructorParams?: Record<string, any>,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const returnValue = await ensureTimeout(async innerConfig => {
+    const returnValue = await ensureTimeout(async innerReqConfig => {
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
         }
       }
 
       for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
         if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+          return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
         }
       }
 
-      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerConfig);
+      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
     }, reqConfig);
     return returnValue;
   }
@@ -146,8 +146,8 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const layers = await ensureTimeout(async innerConfig => {
-      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, innerConfig);
+    const layers = await ensureTimeout(async innerReqConfig => {
+      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, innerReqConfig);
       const layersInfos = getCapabilitiesJson.map(layerInfo => ({
         layerId: layerInfo.id,
         title: layerInfo.name,
@@ -195,8 +195,8 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const resultValue = await ensureTimeout(async innerConfig => {
-      const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, innerConfig);
+    const resultValue = await ensureTimeout(async innerReqConfig => {
+      const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, innerReqConfig);
 
       const result: AbstractLayer[] = [];
       for (let layerInfo of getCapabilitiesJsonV1) {
@@ -246,8 +246,8 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const layers = await ensureTimeout(async innerConfig => {
-      const parsedXml = await fetchGetCapabilitiesXml(baseUrl, innerConfig);
+    const layers = await ensureTimeout(async innerReqConfig => {
+      const parsedXml = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
       const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
         layerId: layerInfo.Name[0],
         title: layerInfo.Title[0],

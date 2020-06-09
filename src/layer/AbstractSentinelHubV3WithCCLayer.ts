@@ -51,7 +51,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tilesResponse = await ensureTimeout(async innerConfig => {
+    const tilesResponse = await ensureTimeout(async innerReqConfig => {
       const response = await this.fetchTiles(
         this.dataset.searchIndexUrl,
         bbox,
@@ -59,7 +59,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
         this.maxCloudCoverPercent,
       );
       return {

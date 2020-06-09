@@ -18,7 +18,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerConfig => {
+    const tiles = await ensureTimeout(async innerReqConfig => {
       const response = await this.fetchTiles(
         this.dataset.searchIndexUrl,
         bbox,
@@ -26,7 +26,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
       );
       return {
         tiles: response.data.tiles.map(tile => ({

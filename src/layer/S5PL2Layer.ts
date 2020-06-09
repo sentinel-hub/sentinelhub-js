@@ -91,7 +91,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     if (this.productType === null) {
       throw new Error('Parameter productType must be specified!');
     }
-    const tiles = await ensureTimeout(async innerConfig => {
+    const tiles = await ensureTimeout(async innerReqConfig => {
       const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
         type: this.dataset.datasetParametersType,
         productType: this.productType,
@@ -104,7 +104,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
         this.maxCloudCoverPercent,
         findTilesDatasetParameters,
       );

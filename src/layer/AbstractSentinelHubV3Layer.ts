@@ -101,7 +101,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const authToken = getAuthToken();
 
-    const layerParams = await ensureTimeout(async innerConfig => {
+    const layerParams = await ensureTimeout(async innerReqConfig => {
       // Note that for SH v3 service, the endpoint for fetching the list of layers is always
       // https://services.sentinel-hub.com/, even for creodias datasets:
       const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
@@ -112,7 +112,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         responseType: 'json',
         headers: headers,
         useCache: true,
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       };
       const res = await axios.get(url, requestConfig);
       const layersParams = res.data.map((l: any) => ({
@@ -162,8 +162,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       return;
     }
     if (!this.evalscript.startsWith('//VERSION=3')) {
-      const evalscript = await ensureTimeout(async innerConfig => {
-        return await this.convertEvalscriptToV3(this.evalscript, innerConfig);
+      const evalscript = await ensureTimeout(async innerReqConfig => {
+        return await this.convertEvalscriptToV3(this.evalscript, innerReqConfig);
       }, reqConfig);
       this.evalscript = evalscript;
     }
@@ -171,7 +171,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    const getMapValue = await ensureTimeout(async innerConfig => {
+    const getMapValue = await ensureTimeout(async innerReqConfig => {
       // SHv3 services support Processing API:
       if (api === ApiType.PROCESSING) {
         if (!this.dataset) {
@@ -182,7 +182,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
         let layerParams = null;
         if (!this.evalscript && !this.dataProduct) {
-          layerParams = await this.fetchLayerParamsFromSHServiceV3(innerConfig);
+          layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
           if (layerParams.evalscript) {
             this.evalscript = layerParams.evalscript;
           } else if (layerParams.dataProduct) {
@@ -199,14 +199,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           (!this.mosaickingOrder || !this.upsampling || !this.downsampling)
         ) {
           if (!layerParams) {
-            layerParams = await this.fetchLayerParamsFromSHServiceV3(innerConfig);
+            layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
           }
           this.mosaickingOrder = layerParams.mosaickingOrder;
           this.upsampling = layerParams.upsampling;
           this.downsampling = layerParams.downsampling;
         }
 
-        await this.convertEvalscriptToV3IfNeeded(innerConfig);
+        await this.convertEvalscriptToV3IfNeeded(innerReqConfig);
 
         const payload = createProcessingPayload(
           this.dataset,
@@ -218,10 +218,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           this.downsampling,
         );
         // allow subclasses to update payload with their own parameters:
-        const updatedPayload = await this.updateProcessingGetMapPayload(payload, innerConfig);
+        const updatedPayload = await this.updateProcessingGetMapPayload(payload, innerReqConfig);
         const shServiceHostname = this.getShServiceHostname();
 
-        let blob = await processingGetMap(shServiceHostname, updatedPayload, innerConfig);
+        let blob = await processingGetMap(shServiceHostname, updatedPayload, innerReqConfig);
 
         if (params.gain !== undefined || params.gamma !== undefined) {
           let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
@@ -231,7 +231,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         return blob;
       }
 
-      return super.getMap(params, api, innerConfig);
+      return super.getMap(params, api, innerReqConfig);
     }, reqConfig);
     return getMapValue;
   }
@@ -309,7 +309,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(async innerConfig => {
+    const fetchTilesResponse = await ensureTimeout(async innerReqConfig => {
       const response = await this.fetchTiles(
         this.dataset.searchIndexUrl,
         bbox,
@@ -317,7 +317,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
       );
       return {
         tiles: response.data.tiles.map(tile => ({
@@ -401,8 +401,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const findDatesUTCValue = await ensureTimeout(async innerConfig => {
-      const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerConfig);
+    const findDatesUTCValue = await ensureTimeout(async innerReqConfig => {
+      const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerReqConfig);
       if (!findDatesUTCUrl) {
         throw new Error('This dataset does not support searching for dates');
       }
@@ -412,11 +412,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         queryArea: bboxPolygon,
         from: fromTime.toISOString(),
         to: toTime.toISOString(),
-        ...(await this.getFindDatesUTCAdditionalParameters(innerConfig)),
+        ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
       };
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       };
       const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
       const found: Moment[] = response.data.map((date: string) => moment.utc(date));
@@ -439,7 +439,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!params.fromTime || !params.toTime) {
       throw new Error('Parameters "fromTime" and "toTime" need to be provided');
     }
-    const stats = await ensureTimeout(async innerConfig => {
+    const stats = await ensureTimeout(async innerReqConfig => {
       const payload: FisPayload = {
         layer: this.layerId,
         crs: CRS_EPSG4326.authId,
@@ -472,7 +472,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       };
 
       const shServiceHostname = this.getShServiceHostname();
@@ -497,7 +497,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     evalscript: string,
     reqConfig: RequestConfiguration,
   ): Promise<string> {
-    const response = await ensureTimeout(async innerConfig => {
+    const response = await ensureTimeout(async innerReqConfig => {
       const authToken = getAuthToken();
       const url = this.getConvertEvalscriptBaseUrl();
       const requestConfig: AxiosRequestConfig = {
@@ -507,7 +507,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         },
         useCache: true,
         responseType: 'text',
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       };
       const res = await axios.post(url, evalscript, requestConfig);
       return res.data;
@@ -516,8 +516,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    const layerParams = await ensureTimeout(async innerConfig => {
-      return this.fetchLayerParamsFromSHServiceV3(innerConfig);
+    const layerParams = await ensureTimeout(async innerReqConfig => {
+      return this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
     }, reqConfig);
 
     this.legend = layerParams['legend'] ? layerParams['legend'] : null;

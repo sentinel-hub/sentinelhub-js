@@ -148,7 +148,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (offset === null) {
       offset = 0;
     }
-    const tiles = await ensureTimeout(async innerConfig => {
+    const tiles = await ensureTimeout(async innerReqConfig => {
       const payload = bbox.toGeoJSON();
       const params = {
         expand: 'true',
@@ -165,7 +165,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
           'Content-Type': 'application/json',
           'Accept-CRS': 'EPSG:4326',
         },
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       });
 
       const responseTiles: any[] = response.data.tiles;
@@ -205,12 +205,12 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (!this.dataset.findDatesUTCUrl) {
       throw new Error('This dataset does not support searching for dates');
     }
-    const datesUTC = await ensureTimeout(async innerConfig => {
+    const datesUTC = await ensureTimeout(async innerReqConfig => {
       const payload = bbox.toGeoJSON();
       const params = {
         timefrom: fromTime.toISOString(),
         timeto: toTime.toISOString(),
-        ...(await this.getFindDatesUTCAdditionalParameters(innerConfig)),
+        ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
       };
 
       const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
@@ -218,7 +218,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         headers: {
           'Content-Type': 'application/json',
         },
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       });
 
       return response.data.map((date: string) => moment.utc(date).toDate());
@@ -293,9 +293,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       );
     }
 
-    const legendUrl = await ensureTimeout(async innerConfig => {
+    const legendUrl = await ensureTimeout(async innerReqConfig => {
       const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-      const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerConfig);
+      const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
       const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
         layerInfo => this.layerId === layerInfo.Name[0],
       );

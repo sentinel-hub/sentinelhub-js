@@ -58,7 +58,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerConfig => {
+    await ensureTimeout(async innerReqConfig => {
       if (this.collectionId !== null && this.locationId !== null) {
         return;
       }
@@ -70,7 +70,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       }
 
       if (this.collectionId === null) {
-        const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerConfig);
+        const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
         this.collectionId = layerParams['collectionId'];
       }
 
@@ -81,7 +81,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
           responseType: 'json',
           headers: headers,
           useCache: true,
-          ...getAxiosReqParams(innerConfig),
+          ...getAxiosReqParams(innerReqConfig),
         });
 
         this.locationId = res.data.location.id;
@@ -90,9 +90,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    const getMapValue = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
-      return await super.getMap(params, api, innerConfig);
+    const getMapValue = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+      return await super.getMap(params, api, innerReqConfig);
     }, reqConfig);
     return getMapValue;
   }
@@ -101,8 +101,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
-    const payloadValue = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
+    const payloadValue = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
       payload.input.data[0].dataFilter.collectionId = this.collectionId;
       return payload;
     }, reqConfig);
@@ -117,8 +117,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
+    const tiles = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
 
       const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
         type: 'BYOC',
@@ -134,7 +134,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
         null,
         findTilesDatasetParameters,
       );
@@ -167,8 +167,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
-    const datesUTCUrl = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
+    const datesUTCUrl = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
       const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
       const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
       return findDatesUTCUrl;
@@ -179,8 +179,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration,
   ): Promise<Record<string, any>> {
-    const parameters = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
+    const parameters = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
 
       const result: Record<string, any> = {
         datasetParameters: {
@@ -206,14 +206,14 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     if (this.collectionId === null) {
       throw new Error('Parameter collectionId is not set');
     }
-    const bandsResponseData = await ensureTimeout(async innerConfig => {
+    const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
       const res = await axios.get(url, {
         responseType: 'json',
         headers: headers,
         useCache: true,
-        ...getAxiosReqParams(innerConfig),
+        ...getAxiosReqParams(innerReqConfig),
       });
       return res.data.bands;
     }, reqConfig);

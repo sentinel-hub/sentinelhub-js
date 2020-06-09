@@ -99,8 +99,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         are not set and can't be fetched from service because instanceId and layerId are not available",
       );
     }
-    const layerParams = await ensureTimeout(async innerConfig => {
-      this.fetchLayerParamsFromSHServiceV3(innerConfig);
+    const layerParams = await ensureTimeout(async innerReqConfig => {
+      this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
     }, reqConfig);
 
     this.acquisitionMode = layerParams['acquisitionMode'];
@@ -139,8 +139,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerConfig);
+    const tiles = await ensureTimeout(async innerReqConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
 
       const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
         type: this.dataset.datasetParametersType,
@@ -156,7 +156,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         toTime,
         maxCount,
         offset,
-        innerConfig,
+        innerReqConfig,
         null,
         findTilesDatasetParameters,
       );

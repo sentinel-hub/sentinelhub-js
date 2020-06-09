@@ -34,7 +34,7 @@ export async function fetchGetCapabilitiesXml(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXml> {
-  const parsedXml = await ensureTimeout(async innerConfig => {
+  const parsedXml = await ensureTimeout(async innerReqConfig => {
     const query = {
       service: 'wms',
       request: 'GetCapabilities',
@@ -43,7 +43,7 @@ export async function fetchGetCapabilitiesXml(
     const axiosReqConfig: AxiosRequestConfig = {
       responseType: 'text',
       useCache: true,
-      ...getAxiosReqParams(innerConfig),
+      ...getAxiosReqParams(innerReqConfig),
     };
     const queryString = stringify(query, { sort: false });
     const url = `${baseUrl}?${queryString}`;
@@ -58,7 +58,7 @@ export async function fetchGetCapabilitiesJson(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<any[]> {
-  const layers = await ensureTimeout(async innerConfig => {
+  const layers = await ensureTimeout(async innerReqConfig => {
     const query = {
       request: 'GetCapabilities',
       format: 'application/json',
@@ -68,7 +68,7 @@ export async function fetchGetCapabilitiesJson(
     const axiosReqConfig: AxiosRequestConfig = {
       responseType: 'json',
       useCache: true,
-      ...getAxiosReqParams(innerConfig),
+      ...getAxiosReqParams(innerReqConfig),
     };
     const res = await axios.get(url, axiosReqConfig);
     return res.data.layers;
@@ -80,13 +80,13 @@ export async function fetchGetCapabilitiesJsonV1(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<any[]> {
-  const layers = await ensureTimeout(async innerConfig => {
+  const layers = await ensureTimeout(async innerReqConfig => {
     const instanceId = parseSHInstanceId(baseUrl);
     const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
     const axiosReqConfig: AxiosRequestConfig = {
       responseType: 'json',
       useCache: true,
-      ...getAxiosReqParams(innerConfig),
+      ...getAxiosReqParams(innerReqConfig),
     };
     const res = await axios.get(url, axiosReqConfig);
     return res.data.layers;

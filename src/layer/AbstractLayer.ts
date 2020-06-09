@@ -45,7 +45,7 @@ export class AbstractLayer {
         // In other words, gain and gamma need to be removed from the parameters in getMap() so the
         //   errors in getMapUrl() are not triggered.
 
-        let blob = await ensureTimeout(async innerConfig => {
+        let blob = await ensureTimeout(async innerReqConfig => {
           const paramsWithoutEffects = { ...params };
           delete paramsWithoutEffects.gain;
           delete paramsWithoutEffects.gamma;
@@ -55,7 +55,7 @@ export class AbstractLayer {
             // 'blob' responseType does not work with Node.js:
             responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
             useCache: true,
-            ...getAxiosReqParams(innerConfig),
+            ...getAxiosReqParams(innerReqConfig),
           };
           const response = await axios.get(url, requestConfig);
           return response.data;
@@ -120,7 +120,7 @@ export class AbstractLayer {
       throw new Error('Currently, only EPSG:4326 in findFlyovers');
     }
 
-    const flyOvers = await ensureTimeout(async innerConfig => {
+    const flyOvers = await ensureTimeout(async innerReqConfig => {
       const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
       const bboxGeometry: Geom = this.roundCoordinates([
         [
@@ -149,7 +149,7 @@ export class AbstractLayer {
           toTime,
           tilesPerRequest,
           i * tilesPerRequest,
-          innerConfig,
+          innerReqConfig,
         );
 
         // apply each tile to the flyover to calculate coverage:
