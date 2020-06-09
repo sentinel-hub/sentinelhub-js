@@ -7,7 +7,7 @@ import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
-
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
 */
@@ -99,7 +99,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         are not set and can't be fetched from service because instanceId and layerId are not available",
       );
     }
-    const layerParams = await this.fetchLayerParamsFromSHServiceV3(reqConfig);
+    const layerParams = await ensureTimeout(async innerConfig => {
+      this.fetchLayerParamsFromSHServiceV3(innerConfig);
+    }, reqConfig);
 
     this.acquisitionMode = layerParams['acquisitionMode'];
     this.polarization = layerParams['polarization'];
@@ -137,40 +139,43 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    const tiles = await ensureTimeout(async innerConfig => {
+      await this.updateLayerFromServiceIfNeeded(innerConfig);
 
-    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      acquisitionMode: this.acquisitionMode,
-      polarization: this.polarization,
-      orbitDirection: this.orbitDirection,
-      resolution: this.resolution,
-    };
-    const response = await this.fetchTiles(
-      this.dataset.searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      null,
-      findTilesDatasetParameters,
-    );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          orbitDirection: tile.orbitDirection,
-          polarization: tile.polarization,
-          acquisitionMode: tile.acquisitionMode,
-          resolution: tile.resolution,
-        },
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+      const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+        type: this.dataset.datasetParametersType,
+        acquisitionMode: this.acquisitionMode,
+        polarization: this.polarization,
+        orbitDirection: this.orbitDirection,
+        resolution: this.resolution,
+      };
+      const response = await this.fetchTiles(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        innerConfig,
+        null,
+        findTilesDatasetParameters,
+      );
+      return {
+        tiles: response.data.tiles.map(tile => ({
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {
+            orbitDirection: tile.orbitDirection,
+            polarization: tile.polarization,
+            acquisitionMode: tile.acquisitionMode,
+            resolution: tile.resolution,
+          },
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tiles;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
