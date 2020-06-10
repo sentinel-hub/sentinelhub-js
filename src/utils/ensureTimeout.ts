@@ -19,7 +19,6 @@ export const ensureTimeout = async (
 
   const timer = setTimeout(() => {
     newConfig.cancelToken.cancel();
-    clearTimeout(timer);
   }, timeout);
 
   try {
