@@ -194,10 +194,11 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<void> {
-    if (this.collectionId === null) {
-      throw new Error('Parameter collectionId is not set');
-    }
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
+      if (this.collectionId === null) {
+        throw new Error('Parameter collectionId is not set');
+      }
+
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/CUSTOM/${this.collectionId}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
       const res = await axios.get(url, {
