@@ -32,20 +32,19 @@ export class AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    switch (api) {
-      case ApiType.WMS:
-        // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
-        //   getting the url of the image.
-        // getMap() changes the received image according to provided gain and gamma after it is received.
-        // An error is thrown in getMapUrl() in case gain and gamma are present, because:
-        // - we don't send gain and gamma to the services as they may not be supported there and we don't want
-        //    to deceive the users with returning the image where gain and gamma were ignored
-        // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
-        //    were sent to the services in getMapUrl()
-        // In other words, gain and gamma need to be removed from the parameters in getMap() so the
-        //   errors in getMapUrl() are not triggered.
-
-        let blob = await ensureTimeout(async innerReqConfig => {
+    const getMapValue = await ensureTimeout(async innerReqConfig => {
+      switch (api) {
+        case ApiType.WMS:
+          // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
+          //   getting the url of the image.
+          // getMap() changes the received image according to provided gain and gamma after it is received.
+          // An error is thrown in getMapUrl() in case gain and gamma are present, because:
+          // - we don't send gain and gamma to the services as they may not be supported there and we don't want
+          //    to deceive the users with returning the image where gain and gamma were ignored
+          // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
+          //    were sent to the services in getMapUrl()
+          // In other words, gain and gamma need to be removed from the parameters in getMap() so the
+          //   errors in getMapUrl() are not triggered.
           const paramsWithoutEffects = { ...params };
           delete paramsWithoutEffects.gain;
           delete paramsWithoutEffects.gamma;
@@ -58,21 +57,22 @@ export class AbstractLayer {
             ...getAxiosReqParams(innerReqConfig),
           };
           const response = await axios.get(url, requestConfig);
-          return response.data;
-        }, reqConfig);
+          let blob = response.data;
 
-        // apply effects:
-        if (params.gain !== undefined || params.gamma !== undefined) {
-          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-        }
+          // apply effects:
+          if (params.gain !== undefined || params.gamma !== undefined) {
+            let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+            blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+          }
 
-        return blob;
+          return blob;
 
-      default:
-        const className = this.constructor.name;
-        throw new Error(`API type "${api}" not supported in ${className}`);
-    }
+        default:
+          const className = this.constructor.name;
+          throw new Error(`API type "${api}" not supported in ${className}`);
+      }
+    }, reqConfig);
+    return getMapValue;
   }
 
   public supportsApiType(api: ApiType): boolean {
@@ -113,14 +113,14 @@ export class AbstractLayer {
     tilesPerRequest: number = 50,
     reqConfig?: RequestConfiguration,
   ): Promise<FlyoverInterval[]> {
-    if (!this.dataset || !this.dataset.orbitTimeMinutes) {
-      throw new Error('Orbit time is needed for grouping tiles into flyovers.');
-    }
-    if (bbox.crs !== CRS_EPSG4326) {
-      throw new Error('Currently, only EPSG:4326 in findFlyovers');
-    }
-
     const flyOvers = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset || !this.dataset.orbitTimeMinutes) {
+        throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+      }
+      if (bbox.crs !== CRS_EPSG4326) {
+        throw new Error('Currently, only EPSG:4326 in findFlyovers');
+      }
+
       const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
       const bboxGeometry: Geom = this.roundCoordinates([
         [
