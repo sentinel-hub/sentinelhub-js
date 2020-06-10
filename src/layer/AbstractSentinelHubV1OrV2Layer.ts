@@ -139,16 +139,17 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    if (!this.dataset.searchIndexUrl) {
-      throw new Error('This dataset does not support searching for tiles');
-    }
-    if (maxCount === null) {
-      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
-    }
-    if (offset === null) {
-      offset = 0;
-    }
     const tiles = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset.searchIndexUrl) {
+        throw new Error('This dataset does not support searching for tiles');
+      }
+      if (maxCount === null) {
+        maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
+      }
+      if (offset === null) {
+        offset = 0;
+      }
+
       const payload = bbox.toGeoJSON();
       const params = {
         expand: 'true',
@@ -202,10 +203,10 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    if (!this.dataset.findDatesUTCUrl) {
-      throw new Error('This dataset does not support searching for dates');
-    }
     const datesUTC = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset.findDatesUTCUrl) {
+        throw new Error('This dataset does not support searching for dates');
+      }
       const payload = bbox.toGeoJSON();
       const params = {
         timefrom: fromTime.toISOString(),
@@ -227,17 +228,17 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
-    if (!params.geometry) {
-      throw new Error('Parameter "geometry" needs to be provided');
-    }
-    if (!params.resolution) {
-      throw new Error('Parameter "resolution" needs to be provided');
-    }
-    if (!params.fromTime || !params.toTime) {
-      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
-    }
-
     const stats = await ensureTimeout(async innerParams => {
+      if (!params.geometry) {
+        throw new Error('Parameter "geometry" needs to be provided');
+      }
+      if (!params.resolution) {
+        throw new Error('Parameter "resolution" needs to be provided');
+      }
+      if (!params.fromTime || !params.toTime) {
+        throw new Error('Parameters "fromTime" and "toTime" need to be provided');
+      }
+
       const payload: FisPayload = {
         layer: this.layerId,
         crs: CRS_EPSG4326.authId,
@@ -287,13 +288,13 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    if (this.instanceId === null || this.layerId === null) {
-      throw new Error(
-        "Additional data can't be fetched from service because instanceId and layerId are not defined",
-      );
-    }
-
     const legendUrl = await ensureTimeout(async innerReqConfig => {
+      if (this.instanceId === null || this.layerId === null) {
+        throw new Error(
+          "Additional data can't be fetched from service because instanceId and layerId are not defined",
+        );
+      }
+
       const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
       const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
       const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
