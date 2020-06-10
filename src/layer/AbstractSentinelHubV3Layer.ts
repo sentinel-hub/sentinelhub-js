@@ -424,16 +424,17 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
-    if (!params.geometry) {
-      throw new Error('Parameter "geometry" needs to be provided');
-    }
-    if (!params.resolution) {
-      throw new Error('Parameter "resolution" needs to be provided');
-    }
-    if (!params.fromTime || !params.toTime) {
-      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
-    }
     const stats = await ensureTimeout(async innerReqConfig => {
+      if (!params.geometry) {
+        throw new Error('Parameter "geometry" needs to be provided');
+      }
+      if (!params.resolution) {
+        throw new Error('Parameter "resolution" needs to be provided');
+      }
+      if (!params.fromTime || !params.toTime) {
+        throw new Error('Parameters "fromTime" and "toTime" need to be provided');
+      }
+
       const payload: FisPayload = {
         layer: this.layerId,
         crs: CRS_EPSG4326.authId,
@@ -507,14 +508,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    const layerParams = await ensureTimeout(async innerReqConfig => {
-      return this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
+    await ensureTimeout(async innerReqConfig => {
+      const layerParams = this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
+      this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+      // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+      this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
-
-    this.legend = layerParams['legend'] ? layerParams['legend'] : null;
-    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
-    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
   }
+
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
     return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
