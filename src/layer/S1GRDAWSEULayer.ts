@@ -100,7 +100,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
           are not set and can't be fetched from service because instanceId and layerId are not available",
         );
       }
-      const layerParams = await fetchLayerParamsFromSHServiceV3(innerReqConfig);
+      const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
 
       this.acquisitionMode = layerParams['acquisitionMode'];
       this.polarization = layerParams['polarization'];
