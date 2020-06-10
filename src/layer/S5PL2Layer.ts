@@ -88,10 +88,11 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    if (this.productType === null) {
-      throw new Error('Parameter productType must be specified!');
-    }
     const tiles = await ensureTimeout(async innerReqConfig => {
+      if (this.productType === null) {
+        throw new Error('Parameter productType must be specified!');
+      }
+
       const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
         type: this.dataset.datasetParametersType,
         productType: this.productType,
