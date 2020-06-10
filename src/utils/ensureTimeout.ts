@@ -22,6 +22,8 @@ export const ensureTimeout = async (
   }, timeout);
 
   try {
+    // delete the timeout in case innerFunction has a nested ensureTimeout in order to prevent unnecessary setTimeout calls
+    delete newConfig.timeout;
     const resolvedValue = await innerFunction(newConfig);
     clearTimeout(timer);
     return resolvedValue;
