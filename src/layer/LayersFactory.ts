@@ -237,6 +237,7 @@ export class LayersFactory {
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
