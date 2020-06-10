@@ -90,28 +90,28 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
-      return;
-    }
-    if (this.instanceId === null || this.layerId === null) {
-      throw new Error(
-        "One or more of these parameters (polarization, acquisitionMode, resolution) \
-        are not set and can't be fetched from service because instanceId and layerId are not available",
-      );
-    }
-    const layerParams = await ensureTimeout(async innerReqConfig => {
-      this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
-    }, reqConfig);
+    await ensureTimeout(async innerReqConfig => {
+      if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
+        return;
+      }
+      if (this.instanceId === null || this.layerId === null) {
+        throw new Error(
+          "One or more of these parameters (polarization, acquisitionMode, resolution) \
+          are not set and can't be fetched from service because instanceId and layerId are not available",
+        );
+      }
+      const layerParams = await fetchLayerParamsFromSHServiceV3(innerReqConfig);
 
-    this.acquisitionMode = layerParams['acquisitionMode'];
-    this.polarization = layerParams['polarization'];
-    this.resolution = layerParams['resolution'];
-    this.backscatterCoeff = layerParams['backCoeff'];
-    this.orthorectify = layerParams['orthorectify'];
-    this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
-    this.legend = layerParams['legend'] ? layerParams['legend'] : null;
-    // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
-    this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
+      this.acquisitionMode = layerParams['acquisitionMode'];
+      this.polarization = layerParams['polarization'];
+      this.resolution = layerParams['resolution'];
+      this.backscatterCoeff = layerParams['backCoeff'];
+      this.orthorectify = layerParams['orthorectify'];
+      this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
+      this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+      // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+      this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
+    }, reqConfig);
   }
 
   protected async updateProcessingGetMapPayload(
