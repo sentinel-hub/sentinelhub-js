@@ -16,6 +16,10 @@ export function runGainEffectFunction(
   let offset = 0.0;
   offset = offset - factor * minValue;
 
+  if (gain === 1.0) {
+    return rgbMappingArrays;
+  }
+
   const transformValueWithGain = (x: number): number => Math.max(0.0, x * factor + offset);
   rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGain);
   return rgbMappingArrays;
@@ -28,9 +32,11 @@ export function runGammaEffectFunction(
   // change the values according to the algorithm (gamma)
   const gamma = isEffectSet(effects.gamma) ? effects.gamma : 1.0;
 
-  if (gamma != 1.0) {
-    const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
-    rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGamma);
+  if (gamma === 1.0) {
+    return rgbMappingArrays;
   }
+
+  const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
+  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGamma);
   return rgbMappingArrays;
 }
