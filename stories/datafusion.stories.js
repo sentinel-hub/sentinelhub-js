@@ -231,32 +231,8 @@ export const getMapProcessingGainGamma = () => {
     ];
     const layer = new ProcessingDataFusionLayer({
       layers: layers,
-      evalscript: `
-        //VERSION=3
-        var setup = () => ({
-          input: [
-            {datasource: "s2l2a", bands:["B02", "B03", "B04"], units: "REFLECTANCE", mosaicking: "ORBIT"},
-            {datasource: "s2l1c", bands:["B02", "B03", "B04"], units: "REFLECTANCE"}],
-          output: [
-            {id: "default", bands: 3, sampleType: SampleType.AUTO}
-          ]
-        });
-
-
-        function evaluatePixel(samples, inputData, inputMetadata, customData, outputMetadata) {
-          var sample = samples.s2l2a[0];
-          if (!sample) {
-            return {
-              default: [0, 0, 0],
-            }
-          }
-          let val = [sample.B04, sample.B03, sample.B02];
-
-          return {
-            default: val
-          }
-        }
-      `,
+      evalscriptUrl:
+        'https://gist.githubusercontent.com/sinergise-anze/33fe78d9b1fd24d656882d7916a83d4d/raw/295b9d9f033c7e3f1e533363322d84846808564c/data-fusion-evalscript.js',
     });
 
     const getMapParams = {
