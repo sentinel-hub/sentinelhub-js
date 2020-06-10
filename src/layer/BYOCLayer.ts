@@ -101,12 +101,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {
-    const payloadValue = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
-      payload.input.data[0].dataFilter.collectionId = this.collectionId;
-      return payload;
-    }, reqConfig);
-    return payloadValue;
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    payload.input.data[0].dataFilter.collectionId = this.collectionId;
+    return payload;
   }
 
   public async findTiles(
@@ -167,30 +164,24 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
-    const datesUTCUrl = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
-      const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-      const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
-      return findDatesUTCUrl;
-    }, reqConfig);
-    return datesUTCUrl;
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
+    const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
+    return findDatesUTCUrl;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration,
   ): Promise<Record<string, any>> {
-    const parameters = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-      const result: Record<string, any> = {
-        datasetParameters: {
-          type: this.dataset.datasetParametersType,
-          collectionId: this.collectionId,
-        },
-      };
-      return result;
-    }, reqConfig);
-    return parameters;
+    const result: Record<string, any> = {
+      datasetParameters: {
+        type: this.dataset.datasetParametersType,
+        collectionId: this.collectionId,
+      },
+    };
+    return result;
   }
 
   public async getStats(params: GetStatsParams): Promise<Stats> {
