@@ -162,11 +162,12 @@ export async function processingGetMap(
   payload: ProcessingPayload,
   reqConfig: RequestConfiguration,
 ): Promise<Blob> {
-  const authToken = getAuthToken();
-  if (!authToken) {
-    throw new Error('Must be authenticated to use Processing API');
-  }
   const responseData = await ensureTimeout(async innerReqConfig => {
+    const authToken = getAuthToken();
+    if (!authToken) {
+      throw new Error('Must be authenticated to use Processing API');
+    }
+
     const requestConfig: AxiosRequestConfig = {
       headers: {
         Authorization: 'Bearer ' + authToken,
