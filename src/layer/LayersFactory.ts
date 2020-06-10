@@ -192,7 +192,7 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, innerReqConfig);
+    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
 
     const result: AbstractLayer[] = [];
     for (let layerInfo of getCapabilitiesJsonV1) {
@@ -240,7 +240,7 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
+    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
     const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
