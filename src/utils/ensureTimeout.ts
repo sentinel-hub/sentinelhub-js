@@ -9,20 +9,21 @@ export const ensureTimeout = async (
     return innerResult;
   }
 
-  const { cancelToken, timeout } = reqConfig;
+  const newConfig = { ...reqConfig };
+  const { cancelToken, timeout } = newConfig;
 
   if (!cancelToken) {
     const token = new CancelToken();
-    reqConfig.cancelToken = token;
+    newConfig.cancelToken = token;
   }
 
   const timer = setTimeout(() => {
-    reqConfig.cancelToken.cancel();
+    newConfig.cancelToken.cancel();
     clearTimeout(timer);
   }, timeout);
 
   try {
-    const resolvedValue = await innerFunction(reqConfig);
+    const resolvedValue = await innerFunction(newConfig);
     clearTimeout(timer);
     return resolvedValue;
   } catch (e) {
