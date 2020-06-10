@@ -1,4 +1,4 @@
-import { CancelToken, isCancelled, RequestConfiguration } from './cancelRequests';
+import { CancelToken, RequestConfiguration } from './cancelRequests';
 
 export const ensureTimeout = async (
   innerFunction: (requestConfig: RequestConfiguration) => Promise<any>,
@@ -26,12 +26,7 @@ export const ensureTimeout = async (
     clearTimeout(timer);
     return resolvedValue;
   } catch (e) {
-    if (isCancelled(e)) {
-      clearTimeout(timer);
-      return null;
-    } else {
-      clearTimeout(timer);
-      throw e;
-    }
+    clearTimeout(timer);
+    throw e;
   }
 };
