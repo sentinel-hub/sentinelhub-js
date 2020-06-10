@@ -55,11 +55,11 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    if (api !== ApiType.PROCESSING) {
-      throw new Error(`Only API type "PROCESSING" is supported`);
-    }
-
     const getMapValue = await ensureTimeout(async innerReqConfig => {
+      if (api !== ApiType.PROCESSING) {
+        throw new Error(`Only API type "PROCESSING" is supported`);
+      }
+
       await this.fetchEvalscriptUrlIfNeeded();
 
       // when constructing the payload, we just take the first layer - we will rewrite its info later:
