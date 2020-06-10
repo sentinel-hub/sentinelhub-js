@@ -4,17 +4,12 @@ export const ensureTimeout = async (
   innerFunction: (requestConfig: RequestConfiguration) => Promise<any>,
   reqConfig?: RequestConfiguration,
 ): Promise<any> => {
-  if (!reqConfig) {
+  if (!reqConfig || !reqConfig.timeout) {
     const innerResult = await innerFunction(reqConfig);
     return innerResult;
   }
 
   const { cancelToken, timeout } = reqConfig;
-
-  if (!timeout) {
-    const innerResult = await innerFunction(reqConfig);
-    return innerResult;
-  }
 
   if (!cancelToken) {
     const token = new CancelToken();
