@@ -56,9 +56,5 @@ export function isEffectSet(effect: number): boolean {
 }
 
 export function isAnyEffectSet(effects: Effects): boolean {
-  let isAnyEffectSet = false;
-  for (let [, val] of Object.entries(effects)) {
-    isAnyEffectSet = isAnyEffectSet || isEffectSet(val);
-  }
-  return isAnyEffectSet;
+  return Object.values(effects).some(e => isEffectSet(e));
 }
