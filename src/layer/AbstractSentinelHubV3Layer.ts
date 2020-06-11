@@ -24,8 +24,8 @@ import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from 'src/utils/ensureTimeout';
 
-import { PredefinedEffects } from 'src/mapDataManipulation/const';
-import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
+import { Effects } from 'src/mapDataManipulation/const';
+import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -217,10 +217,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
         let blob = await processingGetMap(shServiceHostname, updatedPayload, innerReqConfig);
 
-        if (params.gain !== undefined || params.gamma !== undefined) {
-          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-        }
+        // apply effects:
+        // support deprecated GetMapParams.gain and .gamma parameters
+        // but override them if they are also present in .effects
+        const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
+        blob = await runEffectFunctions(blob, effects);
 
         return blob;
       }
@@ -264,6 +265,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     if (params.gamma) {
       throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.effects) {
+      throw new Error('Parameter effects is not supported in getMapUrl. Use getMap method instead.');
     }
     const shServiceHostname = this.getShServiceHostname();
     const baseUrl = `${shServiceHostname}ogc/wms/${this.instanceId}`;

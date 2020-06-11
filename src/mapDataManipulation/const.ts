@@ -1,4 +1,4 @@
-export type PredefinedEffects = {
+export type Effects = {
   gain?: number;
   gamma?: number;
 };

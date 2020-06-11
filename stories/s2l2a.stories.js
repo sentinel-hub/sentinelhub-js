@@ -453,9 +453,9 @@ export const getMapURLGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
@@ -515,9 +515,9 @@ export const getMapWMSGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
@@ -531,6 +531,68 @@ export const getMapWMSGainGamma = () => {
 
       const imageBlobGainGamaAre2 = await layerS2L2A.getMap(getMapParamsGainGammaAre2, ApiType.WMS);
       imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapWMSGainNotSetOptions = () => {
+  const imgNoGain = document.createElement('img');
+  imgNoGain.width = '256';
+  imgNoGain.height = '256';
+
+  const imgGainIsUndefined = document.createElement('img');
+  imgGainIsUndefined.width = '256';
+  imgGainIsUndefined.height = '256';
+
+  const imgGainIsNull = document.createElement('img');
+  imgGainIsNull.width = '256';
+  imgGainIsNull.height = '256';
+
+  const imgGainHasValue = document.createElement('img');
+  imgGainHasValue.width = '256';
+  imgGainHasValue.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapWMSGainNotSetOptions</h2>';
+  wrapperEl.innerHTML += '<h4>no gain param | gain = undefined | gain = null | gain param has value </h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGain);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIsUndefined);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainIsNull);
+  wrapperEl.insertAdjacentElement('beforeend', imgGainHasValue);
+
+  const perform = async () => {
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 0 });
+
+    const getMapParamsNoGain = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 9 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsGainIsUndefined = { ...getMapParamsNoGain, effects: { gain: undefined } };
+    const getMapParamsGainIsNull = { ...getMapParamsNoGain, effects: { gain: null } };
+    const getMapParamsGainHasValue = { ...getMapParamsNoGain, effects: { gain: gain } };
+
+    try {
+      const imageBlobNoGain = await layerS2L2A.getMap(getMapParamsNoGain, ApiType.WMS);
+      imgNoGain.src = URL.createObjectURL(imageBlobNoGain);
+
+      const imageBlobGainIsUndefined = await layerS2L2A.getMap(getMapParamsGainIsUndefined, ApiType.WMS);
+      imgGainIsUndefined.src = URL.createObjectURL(imageBlobGainIsUndefined);
+
+      const imageBlobGainIsNull = await layerS2L2A.getMap(getMapParamsGainIsNull, ApiType.WMS);
+      imgGainIsNull.src = URL.createObjectURL(imageBlobGainIsNull);
+
+      const imageBlobGainHasValue = await layerS2L2A.getMap(getMapParamsGainHasValue, ApiType.WMS);
+      imgGainHasValue.src = URL.createObjectURL(imageBlobGainHasValue);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
@@ -596,9 +658,9 @@ export const getMapProcessingGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
@@ -684,9 +746,9 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
       format: MimeTypes.PNG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
