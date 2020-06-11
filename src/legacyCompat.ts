@@ -396,7 +396,7 @@ function previewFromParams(params: any): number {
   //   - 1 -> PREVIEW
   //   - 2 -> EXTENDED_PREVIEW
   //   - 3 -> EXTENDED_PREVIEW (used, but not officially supported)
-  if (!params.preview) {
+  if (params.preview === undefined || params.preview === null) {
     // this setting allows zoomed-out previews on Processing API, otherwise we get bounds-too-big errors
     // (this parameter was set directly on layers for the old instances)
     return 2;
