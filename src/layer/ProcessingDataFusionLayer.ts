@@ -118,6 +118,8 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       // but override them if they are also present in .effects
       const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
       blob = await runEffectFunctions(blob, effects);
+
+      return blob;
     }, reqConfig);
     return getMapValue;
   }
