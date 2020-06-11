@@ -2,6 +2,7 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
 import { CRS_IDS } from 'src/crs';
+import { Effects } from 'src/mapDataManipulation/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -23,6 +24,7 @@ export type GetMapParams = {
   quality?: number;
   gain?: number;
   gamma?: number;
+  effects?: Effects;
   nicename?: string;
   showlogo?: boolean;
   bgcolor?: string;

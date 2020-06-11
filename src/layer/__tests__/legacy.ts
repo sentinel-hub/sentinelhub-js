@@ -59,8 +59,10 @@ test('parseLegacyWmsGetMapParams with evalscripturl', () => {
     showlogo: false,
     bgcolor: '00000000',
     transparent: true,
-    gain: 0.7,
-    gamma: 0.9,
+    effects: {
+      gain: 0.7,
+      gamma: 0.9,
+    },
     // we are not testing unknown params field:
     unknown: getMapParams.unknown,
   };
