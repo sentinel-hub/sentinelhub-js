@@ -32,7 +32,7 @@ export class AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    const getMapValue = await ensureTimeout(async innerReqConfig => {
+    const blob = await ensureTimeout(async innerReqConfig => {
       switch (api) {
         case ApiType.WMS:
           // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
@@ -72,7 +72,7 @@ export class AbstractLayer {
           throw new Error(`API type "${api}" not supported in ${className}`);
       }
     }, reqConfig);
-    return getMapValue;
+    return blob;
   }
 
   public supportsApiType(api: ApiType): boolean {
