@@ -453,9 +453,9 @@ export const getMapURLGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
@@ -515,9 +515,9 @@ export const getMapWMSGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
@@ -577,9 +577,9 @@ export const getMapWMSGainNotSetOptions = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIsUndefined = { ...getMapParamsNoGain, gain: undefined };
-    const getMapParamsGainIsNull = { ...getMapParamsNoGain, gain: null };
-    const getMapParamsGainHasValue = { ...getMapParamsNoGain, gain: gain };
+    const getMapParamsGainIsUndefined = { ...getMapParamsNoGain, effects: { gain: undefined } };
+    const getMapParamsGainIsNull = { ...getMapParamsNoGain, effects: { gain: null } };
+    const getMapParamsGainHasValue = { ...getMapParamsNoGain, effects: { gain: gain } };
 
     try {
       const imageBlobNoGain = await layerS2L2A.getMap(getMapParamsNoGain, ApiType.WMS);
@@ -658,9 +658,9 @@ export const getMapProcessingGainGamma = () => {
       format: MimeTypes.JPEG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
@@ -746,9 +746,9 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
       format: MimeTypes.PNG,
     };
 
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
