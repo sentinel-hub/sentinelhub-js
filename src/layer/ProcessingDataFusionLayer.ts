@@ -112,7 +112,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
 
     // apply effects:
-    const effects: Effects = { gain: params.gain, gamma: params.gamma };
+    const effects: Effects = params.effects || { gain: params.gain, gamma: params.gamma };
     blob = await runEffectFunctions(blob, effects);
 
     return blob;

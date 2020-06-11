@@ -42,6 +42,9 @@ export class WmsLayer extends AbstractLayer {
     if (params.gamma) {
       throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
     }
+    if (params.effects) {
+      throw new Error('Parameter effects is not supported in getMapUrl. Use getMap method instead.');
+    }
     return wmsGetMapUrl(this.baseUrl, this.layerId, params);
   }
 
