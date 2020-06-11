@@ -22,6 +22,7 @@ import { AbstractLayer } from 'src/layer/AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { fetchGetCapabilitiesXml } from 'src/layer/utils';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -138,44 +139,48 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    if (!this.dataset.searchIndexUrl) {
-      throw new Error('This dataset does not support searching for tiles');
-    }
-    if (maxCount === null) {
-      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
-    }
-    if (offset === null) {
-      offset = 0;
-    }
-    const payload = bbox.toGeoJSON();
-    const params = {
-      expand: 'true',
-      timefrom: fromTime.toISOString(),
-      timeto: toTime.toISOString(),
-      maxcount: maxCount,
-      offset: Number(offset),
-      ...this.getFindTilesAdditionalParameters(),
-    };
+    const tiles = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset.searchIndexUrl) {
+        throw new Error('This dataset does not support searching for tiles');
+      }
+      if (maxCount === null) {
+        maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
+      }
+      if (offset === null) {
+        offset = 0;
+      }
 
-    const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-CRS': 'EPSG:4326',
-      },
-      ...getAxiosReqParams(reqConfig),
-    });
+      const payload = bbox.toGeoJSON();
+      const params = {
+        expand: 'true',
+        timefrom: fromTime.toISOString(),
+        timeto: toTime.toISOString(),
+        maxcount: maxCount,
+        offset: Number(offset),
+        ...this.getFindTilesAdditionalParameters(),
+      };
 
-    const responseTiles: any[] = response.data.tiles;
-    return {
-      tiles: responseTiles.map(tile => ({
-        geometry: tile.tileDrawRegionGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+      const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept-CRS': 'EPSG:4326',
+        },
+        ...getAxiosReqParams(innerReqConfig),
+      });
+
+      const responseTiles: any[] = response.data.tiles;
+      return {
+        tiles: responseTiles.map(tile => ({
+          geometry: tile.tileDrawRegionGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: this.extractFindTilesMeta(tile),
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tiles;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -198,103 +203,112 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    if (!this.dataset.findDatesUTCUrl) {
-      throw new Error('This dataset does not support searching for dates');
-    }
+    const datesUTC = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset.findDatesUTCUrl) {
+        throw new Error('This dataset does not support searching for dates');
+      }
+      const payload = bbox.toGeoJSON();
+      const params = {
+        timefrom: fromTime.toISOString(),
+        timeto: toTime.toISOString(),
+        ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
+      };
 
-    const payload = bbox.toGeoJSON();
-    const params = {
-      timefrom: fromTime.toISOString(),
-      timeto: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters(reqConfig)),
-    };
+      const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
+      const response = await axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        ...getAxiosReqParams(innerReqConfig),
+      });
 
-    const url = `${this.dataset.findDatesUTCUrl}?${stringify(params, { sort: false })}`;
-    const response = await axios.post(url, payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      ...getAxiosReqParams(reqConfig),
-    });
-
-    return response.data.map((date: string) => moment.utc(date).toDate());
+      return response.data.map((date: string) => moment.utc(date).toDate());
+    }, reqConfig);
+    return datesUTC;
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
-    if (!params.geometry) {
-      throw new Error('Parameter "geometry" needs to be provided');
-    }
-    if (!params.resolution) {
-      throw new Error('Parameter "resolution" needs to be provided');
-    }
-    if (!params.fromTime || !params.toTime) {
-      throw new Error('Parameters "fromTime" and "toTime" need to be provided');
-    }
-
-    const payload: FisPayload = {
-      layer: this.layerId,
-      crs: CRS_EPSG4326.authId,
-      geometry: WKT.convert(params.geometry),
-      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-        .utc(params.toTime)
-        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
-      resolution: undefined,
-      bins: params.bins || 5,
-      type: HistogramType.EQUALFREQUENCY,
-      ...this.getStatsAdditionalParameters(),
-    };
-
-    if (params.geometry.crs) {
-      const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
-      payload.crs = selectedCrs.authId;
-    }
-    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
-    if (payload.crs === CRS_EPSG4326.authId) {
-      payload.resolution = params.resolution + 'm';
-    } else {
-      payload.resolution = params.resolution;
-    }
-    if (this.evalscript) {
-      if (typeof window !== 'undefined' && window.btoa) {
-        payload.evalscript = btoa(this.evalscript);
-      } else {
-        payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+    const stats = await ensureTimeout(async innerParams => {
+      if (!params.geometry) {
+        throw new Error('Parameter "geometry" needs to be provided');
       }
-      payload.evalsource = this.getEvalsource();
-    }
+      if (!params.resolution) {
+        throw new Error('Parameter "resolution" needs to be provided');
+      }
+      if (!params.fromTime || !params.toTime) {
+        throw new Error('Parameters "fromTime" and "toTime" need to be provided');
+      }
 
-    const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
-      params: payload,
-      ...getAxiosReqParams(reqConfig),
-    });
-    // convert date strings to Date objects
-    for (let channel in data) {
-      data[channel] = data[channel].map((dailyStats: any) => ({
-        ...dailyStats,
-        date: new Date(dailyStats.date),
-      }));
-    }
-    return data;
+      const payload: FisPayload = {
+        layer: this.layerId,
+        crs: CRS_EPSG4326.authId,
+        geometry: WKT.convert(params.geometry),
+        time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+          .utc(params.toTime)
+          .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+        resolution: undefined,
+        bins: params.bins || 5,
+        type: HistogramType.EQUALFREQUENCY,
+        ...this.getStatsAdditionalParameters(),
+      };
+
+      if (params.geometry.crs) {
+        const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
+        payload.crs = selectedCrs.authId;
+      }
+      // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
+      if (payload.crs === CRS_EPSG4326.authId) {
+        payload.resolution = params.resolution + 'm';
+      } else {
+        payload.resolution = params.resolution;
+      }
+      if (this.evalscript) {
+        if (typeof window !== 'undefined' && window.btoa) {
+          payload.evalscript = btoa(this.evalscript);
+        } else {
+          payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
+        }
+        payload.evalsource = this.getEvalsource();
+      }
+
+      const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
+        params: payload,
+        ...getAxiosReqParams(innerParams),
+      });
+      // convert date strings to Date objects
+      for (let channel in data) {
+        data[channel] = data[channel].map((dailyStats: any) => ({
+          ...dailyStats,
+          date: new Date(dailyStats.date),
+        }));
+      }
+      return data;
+    }, reqConfig);
+    return stats;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    if (this.instanceId === null || this.layerId === null) {
-      throw new Error(
-        "Additional data can't be fetched from service because instanceId and layerId are not defined",
+    const legendUrl = await ensureTimeout(async innerReqConfig => {
+      if (this.instanceId === null || this.layerId === null) {
+        throw new Error(
+          "Additional data can't be fetched from service because instanceId and layerId are not defined",
+        );
+      }
+
+      const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
+      const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
+      const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
+        layerInfo => this.layerId === layerInfo.Name[0],
       );
-    }
-    const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-    const capabilities = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
-      layerInfo => this.layerId === layerInfo.Name[0],
-    );
-    if (!layer) {
-      throw new Error('Layer not found');
-    }
-    const legendUrl =
-      layer.Style && layer.Style[0].LegendURL
-        ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-        : null;
+      if (!layer) {
+        throw new Error('Layer not found');
+      }
+      const legendUrl =
+        layer.Style && layer.Style[0].LegendURL
+          ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : null;
+      return legendUrl;
+    }, reqConfig);
     this.legendUrl = legendUrl;
   }
 }

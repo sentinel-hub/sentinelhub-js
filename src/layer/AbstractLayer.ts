@@ -8,6 +8,7 @@ import { CRS_EPSG4326 } from 'src/crs';
 import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { PredefinedEffects } from 'src/mapDataManipulation/const';
 import { runPredefinedEffectFunctions } from 'src/mapDataManipulation/runPredefinedEffectFunctions';
@@ -31,42 +32,47 @@ export class AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    switch (api) {
-      case ApiType.WMS:
-        // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
-        //   getting the url of the image.
-        // getMap() changes the received image according to provided gain and gamma after it is received.
-        // An error is thrown in getMapUrl() in case gain and gamma are present, because:
-        // - we don't send gain and gamma to the services as they may not be supported there and we don't want
-        //    to deceive the users with returning the image where gain and gamma were ignored
-        // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
-        //    were sent to the services in getMapUrl()
-        // In other words, gain and gamma need to be removed from the parameters in getMap() so the
-        //   errors in getMapUrl() are not triggered.
-        const paramsWithoutEffects = { ...params };
-        delete paramsWithoutEffects.gain;
-        delete paramsWithoutEffects.gamma;
-        const url = this.getMapUrl(paramsWithoutEffects, api);
-        const requestConfig: AxiosRequestConfig = {
-          // 'blob' responseType does not work with Node.js:
-          responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-          useCache: true,
-          ...getAxiosReqParams(reqConfig),
-        };
-        const response = await axios.get(url, requestConfig);
-        let blob = response.data;
+    const blob = await ensureTimeout(async innerReqConfig => {
+      switch (api) {
+        case ApiType.WMS:
+          // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
+          //   getting the url of the image.
+          // getMap() changes the received image according to provided gain and gamma after it is received.
+          // An error is thrown in getMapUrl() in case gain and gamma are present, because:
+          // - we don't send gain and gamma to the services as they may not be supported there and we don't want
+          //    to deceive the users with returning the image where gain and gamma were ignored
+          // - if they are supported on the services, gain and gamma would be applied twice in getMap() if they
+          //    were sent to the services in getMapUrl()
+          // In other words, gain and gamma need to be removed from the parameters in getMap() so the
+          //   errors in getMapUrl() are not triggered.
+          const paramsWithoutEffects = { ...params };
+          delete paramsWithoutEffects.gain;
+          delete paramsWithoutEffects.gamma;
+          const url = this.getMapUrl(paramsWithoutEffects, api);
 
-        // apply effects:
-        if (params.gain !== undefined || params.gamma !== undefined) {
-          let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
-          blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
-        }
+          const requestConfig: AxiosRequestConfig = {
+            // 'blob' responseType does not work with Node.js:
+            responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
+            useCache: true,
+            ...getAxiosReqParams(innerReqConfig),
+          };
+          const response = await axios.get(url, requestConfig);
+          let blob = response.data;
 
-        return blob;
-      default:
-        const className = this.constructor.name;
-        throw new Error(`API type "${api}" not supported in ${className}`);
-    }
+          // apply effects:
+          if (params.gain !== undefined || params.gamma !== undefined) {
+            let predefinedEffects: PredefinedEffects = { gain: params.gain, gamma: params.gamma };
+            blob = await runPredefinedEffectFunctions(blob, predefinedEffects);
+          }
+
+          return blob;
+
+        default:
+          const className = this.constructor.name;
+          throw new Error(`API type "${api}" not supported in ${className}`);
+      }
+    }, reqConfig);
+    return blob;
   }
 
   public supportsApiType(api: ApiType): boolean {
@@ -107,135 +113,138 @@ export class AbstractLayer {
     tilesPerRequest: number = 50,
     reqConfig?: RequestConfiguration,
   ): Promise<FlyoverInterval[]> {
-    if (!this.dataset || !this.dataset.orbitTimeMinutes) {
-      throw new Error('Orbit time is needed for grouping tiles into flyovers.');
-    }
-    if (bbox.crs !== CRS_EPSG4326) {
-      throw new Error('Currently, only EPSG:4326 in findFlyovers');
-    }
+    const flyOvers = await ensureTimeout(async innerReqConfig => {
+      if (!this.dataset || !this.dataset.orbitTimeMinutes) {
+        throw new Error('Orbit time is needed for grouping tiles into flyovers.');
+      }
+      if (bbox.crs !== CRS_EPSG4326) {
+        throw new Error('Currently, only EPSG:4326 in findFlyovers');
+      }
 
-    const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
-    const bboxGeometry: Geom = this.roundCoordinates([
-      [
-        [bbox.minX, bbox.minY],
-        [bbox.maxX, bbox.minY],
-        [bbox.maxX, bbox.maxY],
-        [bbox.minX, bbox.maxY],
-        [bbox.minX, bbox.minY],
-      ],
-    ]);
-    const bboxArea = area({
-      type: 'Polygon',
-      coordinates: bboxGeometry,
-    });
+      const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
+      const bboxGeometry: Geom = this.roundCoordinates([
+        [
+          [bbox.minX, bbox.minY],
+          [bbox.maxX, bbox.minY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.minX, bbox.maxY],
+          [bbox.minX, bbox.minY],
+        ],
+      ]);
+      const bboxArea = area({
+        type: 'Polygon',
+        coordinates: bboxGeometry,
+      });
 
-    let flyovers: FlyoverInterval[] = [];
-    let flyoverIndex = 0;
-    let currentFlyoverGeometry: Geom = null;
-    let nTilesInFlyover;
-    let sumCloudCoverPercent;
-    for (let i = 0; i < maxFindTilesRequests; i++) {
-      // grab new batch of tiles:
-      const { tiles, hasMore } = await this.findTiles(
-        bbox,
-        fromTime,
-        toTime,
-        tilesPerRequest,
-        i * tilesPerRequest,
-        reqConfig,
-      );
+      let flyovers: FlyoverInterval[] = [];
+      let flyoverIndex = 0;
+      let currentFlyoverGeometry: Geom = null;
+      let nTilesInFlyover;
+      let sumCloudCoverPercent;
+      for (let i = 0; i < maxFindTilesRequests; i++) {
+        // grab new batch of tiles:
+        const { tiles, hasMore } = await this.findTiles(
+          bbox,
+          fromTime,
+          toTime,
+          tilesPerRequest,
+          i * tilesPerRequest,
+          innerReqConfig,
+        );
 
-      // apply each tile to the flyover to calculate coverage:
-      for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
-        // first tile ever? just add its info and continue:
-        if (flyovers.length === 0) {
-          flyovers[flyoverIndex] = {
-            fromTime: tiles[tileIndex].sensingTime,
-            toTime: tiles[tileIndex].sensingTime,
-            coveragePercent: 0,
-            meta: {},
-          };
-          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
-          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-          nTilesInFlyover = 1;
-          continue;
-        }
+        // apply each tile to the flyover to calculate coverage:
+        for (let tileIndex = 0; tileIndex < tiles.length; tileIndex++) {
+          // first tile ever? just add its info and continue:
+          if (flyovers.length === 0) {
+            flyovers[flyoverIndex] = {
+              fromTime: tiles[tileIndex].sensingTime,
+              toTime: tiles[tileIndex].sensingTime,
+              coveragePercent: 0,
+              meta: {},
+            };
+            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            nTilesInFlyover = 1;
+            continue;
+          }
 
-        // append the tile to flyovers:
-        const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
-        const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
-        const diffS = Math.abs(prevDateS - currDateS);
-        if (diffS > orbitTimeS) {
-          // finish the old flyover:
-          try {
-            flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-              bboxGeometry,
-              bboxArea,
-              currentFlyoverGeometry,
+          // append the tile to flyovers:
+          const prevDateS = moment.utc(flyovers[flyoverIndex].fromTime).unix();
+          const currDateS = moment.utc(tiles[tileIndex].sensingTime).unix();
+          const diffS = Math.abs(prevDateS - currDateS);
+          if (diffS > orbitTimeS) {
+            // finish the old flyover:
+            try {
+              flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+                bboxGeometry,
+                bboxArea,
+                currentFlyoverGeometry,
+              );
+            } catch (err) {
+              // if anything goes wrong, play it safe and set coveragePercent to null:
+              flyovers[flyoverIndex].coveragePercent = null;
+            }
+            if (sumCloudCoverPercent !== undefined) {
+              flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+            }
+
+            // and start a new one:
+            flyoverIndex++;
+            flyovers[flyoverIndex] = {
+              fromTime: tiles[tileIndex].sensingTime,
+              toTime: tiles[tileIndex].sensingTime,
+              coveragePercent: 0,
+              meta: {},
+            };
+            currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
+            sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            nTilesInFlyover = 1;
+          } else {
+            // the same flyover:
+            flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
+            currentFlyoverGeometry = union(
+              this.roundCoordinates(currentFlyoverGeometry),
+              this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
             );
-          } catch (err) {
-            // if anything goes wrong, play it safe and set coveragePercent to null:
-            flyovers[flyoverIndex].coveragePercent = null;
+            sumCloudCoverPercent =
+              sumCloudCoverPercent !== undefined
+                ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
+                : undefined;
+            nTilesInFlyover++;
           }
-          if (sumCloudCoverPercent !== undefined) {
-            flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
-          }
+        }
 
-          // and start a new one:
-          flyoverIndex++;
-          flyovers[flyoverIndex] = {
-            fromTime: tiles[tileIndex].sensingTime,
-            toTime: tiles[tileIndex].sensingTime,
-            coveragePercent: 0,
-            meta: {},
-          };
-          currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
-          sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
-          nTilesInFlyover = 1;
-        } else {
-          // the same flyover:
-          flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
-          currentFlyoverGeometry = union(
-            this.roundCoordinates(currentFlyoverGeometry),
-            this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
+        // make sure we exit when there are no more tiles:
+        if (!hasMore) {
+          break;
+        }
+        if (i + 1 === maxFindTilesRequests) {
+          throw new Error(
+            `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
           );
-          sumCloudCoverPercent =
-            sumCloudCoverPercent !== undefined
-              ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
-              : undefined;
-          nTilesInFlyover++;
         }
       }
 
-      // make sure we exit when there are no more tiles:
-      if (!hasMore) {
-        break;
+      // if needed, finish the last flyover:
+      if (flyovers.length > 0) {
+        try {
+          flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
+            bboxGeometry,
+            bboxArea,
+            currentFlyoverGeometry,
+          );
+        } catch (err) {
+          // if anything goes wrong, play it safe and set coveragePercent to null:
+          flyovers[flyoverIndex].coveragePercent = null;
+        }
+        if (sumCloudCoverPercent !== undefined) {
+          flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
+        }
       }
-      if (i + 1 === maxFindTilesRequests) {
-        throw new Error(
-          `Could not fetch all the tiles in [${maxFindTilesRequests}] requests for [${tilesPerRequest}] tiles`,
-        );
-      }
-    }
 
-    // if needed, finish the last flyover:
-    if (flyovers.length > 0) {
-      try {
-        flyovers[flyoverIndex].coveragePercent = this.calculateCoveragePercent(
-          bboxGeometry,
-          bboxArea,
-          currentFlyoverGeometry,
-        );
-      } catch (err) {
-        // if anything goes wrong, play it safe and set coveragePercent to null:
-        flyovers[flyoverIndex].coveragePercent = null;
-      }
-      if (sumCloudCoverPercent !== undefined) {
-        flyovers[flyoverIndex].meta.averageCloudCoverPercent = sumCloudCoverPercent / nTilesInFlyover;
-      }
-    }
-
-    return flyovers;
+      return flyovers;
+    }, reqConfig);
+    return flyOvers;
   }
 
   private calculateCoveragePercent(bboxGeometry: Geom, bboxArea: number, flyoverGeometry: Geom): number {
