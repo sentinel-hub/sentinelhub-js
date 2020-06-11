@@ -110,7 +110,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
 
         payload.input.data.push(datasource);
       }
-      
+
       let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, innerReqConfig);
 
       // apply effects:

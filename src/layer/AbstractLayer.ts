@@ -48,6 +48,7 @@ export class AbstractLayer {
           const paramsWithoutEffects = { ...params };
           delete paramsWithoutEffects.gain;
           delete paramsWithoutEffects.gamma;
+          delete paramsWithoutEffects.effects;
           const url = this.getMapUrl(paramsWithoutEffects, api);
 
           const requestConfig: AxiosRequestConfig = {
