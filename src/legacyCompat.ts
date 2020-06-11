@@ -164,11 +164,17 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
   if (params.quality) {
     getMapParams.quality = parseInt(params.quality);
   }
-  if (params.gain) {
-    getMapParams.gain = parseFloat(params.gain);
+  if (params.gain !== undefined && params.gain !== null && params.gain !== '') {
+    if (!getMapParams.effects) {
+      getMapParams.effects = {};
+    }
+    getMapParams.effects.gain = parseFloat(params.gain);
   }
-  if (params.gamma) {
-    getMapParams.gamma = parseFloat(params.gamma);
+  if (params.gamma !== undefined && params.gamma !== null && params.gamma !== '') {
+    if (!getMapParams.effects) {
+      getMapParams.effects = {};
+    }
+    getMapParams.effects.gamma = parseFloat(params.gamma);
   }
   if (params.nicename) {
     getMapParams.nicename = params.nicename;

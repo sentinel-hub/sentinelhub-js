@@ -46,6 +46,7 @@ export class AbstractLayer {
         const paramsWithoutEffects = { ...params };
         delete paramsWithoutEffects.gain;
         delete paramsWithoutEffects.gamma;
+        delete paramsWithoutEffects.effects;
         const url = this.getMapUrl(paramsWithoutEffects, api);
         const requestConfig: AxiosRequestConfig = {
           // 'blob' responseType does not work with Node.js:
@@ -57,7 +58,7 @@ export class AbstractLayer {
         let blob = response.data;
 
         // apply effects:
-        const effects: Effects = { gain: params.gain, gamma: params.gamma };
+        const effects: Effects = params.effects || { gain: params.gain, gamma: params.gamma };
         blob = await runEffectFunctions(blob, effects);
 
         return blob;

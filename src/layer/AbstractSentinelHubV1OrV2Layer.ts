@@ -101,6 +101,9 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     if (params.gamma) {
       throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
     }
+    if (params.effects) {
+      throw new Error('Parameter effects is not supported in getMapUrl. Use getMap method instead.');
+    }
     const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
     return wmsGetMapUrl(
       baseUrl,

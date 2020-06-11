@@ -214,7 +214,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       let blob = await processingGetMap(shServiceHostname, updatedPayload, reqConfig);
 
       // apply effects:
-      const effects: Effects = { gain: params.gain, gamma: params.gamma };
+      const effects: Effects = params.effects || { gain: params.gain, gamma: params.gamma };
       blob = await runEffectFunctions(blob, effects);
 
       return blob;
@@ -257,6 +257,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     if (params.gamma) {
       throw new Error('Parameter gamma is not supported in getMapUrl. Use getMap method instead.');
+    }
+    if (params.effects) {
+      throw new Error('Parameter effects is not supported in getMapUrl. Use getMap method instead.');
     }
     const shServiceHostname = this.getShServiceHostname();
     const baseUrl = `${shServiceHostname}ogc/wms/${this.instanceId}`;

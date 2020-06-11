@@ -167,10 +167,40 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
-Gain and gamma effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
+### Effects
+
+When requesting an image, effects can be applied to visually improve the image.
+To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
+Supported effects are gain and gamma. 
+
+Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
+
+When retrieving an image URL (via `getMapUrl()`) with effects applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ```javascript
-  const getMapParamsWithGainAndGamma = {
+
+  const getMapParamsWithEffects = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    effects: {
+      gain: 1.2,
+      gamma: 0.9
+    }
+  };
+
+  const imageBlob = await layer.getMap(getMapParamsWithEffects, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParamsWithEffects, ApiType.PROCESSING);
+```
+
+Deprecated: `gain` and `gamma` can be present in `getMapParams` outside of `effects` param.
+
+```javascript
+
+  const deprecatedGetMapParamsWithGainAndGamma = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
     toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
@@ -180,11 +210,10 @@ Gain and gamma effects are applied by the library (client-side) and are thus onl
     gain: 1.2,
     gamma: 0.9
   };
-  const imageBlob = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.WMS);
-  const imageBlob2 = await layer.getMap(getMapParamsWithGainAndGamma, ApiType.PROCESSING);
-```
 
-When retrieving an image URL (via `getMapUrl()`) with gain and gamma applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
+  const imageBlob = await layer.getMap(deprecatedGetMapParamsWithGainAndGamma, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(deprecatedGetMapParamsWithGainAndGamma, ApiType.PROCESSING);
+```
 
 ## Searching for data
 
