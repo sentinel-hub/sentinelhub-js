@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, CancelToken } from 'axios';
+import axios, { AxiosRequestConfig, CancelToken, AxiosError } from 'axios';
 import { stringify } from 'query-string';
 
 import { isDebugEnabled } from 'src/utils/debug';
@@ -206,7 +206,7 @@ const retryRequests = (err: any): any => {
   if (!err.config) {
     return Promise.reject(err);
   }
-  if (shouldRetry(err.response.status)) {
+  if (shouldRetry(err)) {
     err.config.retriesCount = err.config.retriesCount | 0;
     const maxRetries = err.config.retries || RETRIES;
     const shouldRetry = err.config.retriesCount < maxRetries;
@@ -251,7 +251,14 @@ const sha256 = async (message: any): Promise<any> => {
   return hashHex;
 };
 
-const shouldRetry = (errorStatus: number): boolean => errorStatus >= 500 && errorStatus <= 599;
+const shouldRetry = (error: AxiosError): boolean => {
+  // error.response is not always defined, as the error could be thrown before we get a response from the server
+  // https://github.com/axios/axios/issues/960#issuecomment-398269712
+  if (!error.response || !error.response.status) {
+    return false;
+  }
+  return error.response.status >= 500 && error.response.status <= 599;
+};
 
 const cacheStillValid = (response: Response): boolean => {
   if (!response) {

@@ -3,12 +3,13 @@ import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelToke
 export type RequestConfiguration = {
   cancelToken?: CancelToken;
   retries?: number;
+  timeout?: number | null;
 };
 
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;
   protected source: CancelTokenSource | null = null;
-  private constructor() {
+  public constructor() {
     this.source = axios.CancelToken.source();
     this.token = this.source.token;
   }

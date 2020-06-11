@@ -246,9 +246,9 @@ export const getMapProcessingGainGamma = () => {
 
     const gain = 2;
     const gamma = 2;
-    const getMapParamsGainIs2 = { ...getMapParams, gain: gain };
-    const getMapParamsGammaIs2 = { ...getMapParams, gamma: gamma };
-    const getMapParamsGainGammaAre2 = { ...getMapParams, gain: gain, gamma: gamma };
+    const getMapParamsGainIs2 = { ...getMapParams, effects: { gain: gain } };
+    const getMapParamsGammaIs2 = { ...getMapParams, effects: { gamma: gamma } };
+    const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
       const imageBlobNoGainGamma = await layer.getMap(getMapParams, ApiType.PROCESSING);
