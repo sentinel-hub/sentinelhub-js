@@ -58,7 +58,10 @@ export class AbstractLayer {
         let blob = response.data;
 
         // apply effects:
-        const effects: Effects = params.effects || { gain: params.gain, gamma: params.gamma };
+        // support deprecated GetMapParams.gain and .gamma parameters
+        // but override them if they are also present in .effects
+        let effects: Effects = { gain: params.gain, gamma: params.gamma };
+        effects = { ...effects, ...params.effects };
         blob = await runEffectFunctions(blob, effects);
 
         return blob;
