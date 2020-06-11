@@ -165,6 +165,7 @@ export async function processingGetMap(
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
+
   const requestConfig: AxiosRequestConfig = {
     headers: {
       Authorization: 'Bearer ' + authToken,
