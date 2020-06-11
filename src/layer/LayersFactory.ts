@@ -4,6 +4,7 @@ import {
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
 } from 'src/layer/utils';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
 import {
   DATASET_S2L2A,
@@ -100,16 +101,19 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer> {
-    const layers = await LayersFactory.makeLayers(
-      baseUrl,
-      (lId: string) => lId === layerId,
-      overrideConstructorParams,
-      reqConfig,
-    );
-    if (layers.length === 0) {
-      return null;
-    }
-    return layers[0];
+    const layer = await ensureTimeout(async innerReqConfig => {
+      const layers = await LayersFactory.makeLayers(
+        baseUrl,
+        (lId: string) => lId === layerId,
+        overrideConstructorParams,
+        innerReqConfig,
+      );
+      if (layers.length === 0) {
+        return null;
+      }
+      return layers[0];
+    }, reqConfig);
+    return layer;
   }
 
   public static async makeLayers(
@@ -118,19 +122,22 @@ export class LayersFactory {
     overrideConstructorParams?: Record<string, any>,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
-      if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+    const returnValue = await ensureTimeout(async innerReqConfig => {
+      for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
+        if (baseUrl.startsWith(hostname)) {
+          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+        }
       }
-    }
 
-    for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-      if (baseUrl.startsWith(hostname)) {
-        return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+      for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
+        if (baseUrl.startsWith(hostname)) {
+          return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+        }
       }
-    }
 
-    return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, reqConfig);
+      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+    }, reqConfig);
+    return returnValue;
   }
 
   private static async makeLayersSHv3(
@@ -230,6 +237,7 @@ export class LayersFactory {
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {

@@ -15,6 +15,7 @@ import {
 } from 'src/layer/processing';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
@@ -58,66 +59,67 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    if (api !== ApiType.PROCESSING) {
-      throw new Error(`Only API type "PROCESSING" is supported`);
-    }
+    const getMapValue = await ensureTimeout(async innerReqConfig => {
+      if (api !== ApiType.PROCESSING) {
+        throw new Error(`Only API type "PROCESSING" is supported`);
+      }
 
-    await this.fetchEvalscriptUrlIfNeeded();
+      await this.fetchEvalscriptUrlIfNeeded();
 
-    // when constructing the payload, we just take the first layer - we will rewrite its info later:
-    const bogusFirstLayer = this.layers[0].layer;
-    let payload = createProcessingPayload(bogusFirstLayer.dataset, params, this.evalscript);
+      // when constructing the payload, we just take the first layer - we will rewrite its info later:
+      const bogusFirstLayer = this.layers[0].layer;
+      let payload = createProcessingPayload(bogusFirstLayer.dataset, params, this.evalscript);
 
-    // replace payload.input.data with information from this.layers:
-    payload.input.data = [];
-    for (let i = 0; i < this.layers.length; i++) {
-      const layerInfo = this.layers[i];
-      let datasource: ProcessingPayloadDatasource = {
-        dataFilter: {
-          timeRange: {
-            from: layerInfo.fromTime ? layerInfo.fromTime.toISOString() : params.fromTime.toISOString(),
-            to: layerInfo.toTime ? layerInfo.toTime.toISOString() : params.toTime.toISOString(),
+      // replace payload.input.data with information from this.layers:
+      payload.input.data = [];
+      for (let i = 0; i < this.layers.length; i++) {
+        const layerInfo = this.layers[i];
+        let datasource: ProcessingPayloadDatasource = {
+          dataFilter: {
+            timeRange: {
+              from: layerInfo.fromTime ? layerInfo.fromTime.toISOString() : params.fromTime.toISOString(),
+              to: layerInfo.toTime ? layerInfo.toTime.toISOString() : params.toTime.toISOString(),
+            },
+            mosaickingOrder: MosaickingOrder.MOST_RECENT,
           },
-          mosaickingOrder: MosaickingOrder.MOST_RECENT,
-        },
-        processing: {},
-        type: layerInfo.layer.dataset.shProcessingApiDatasourceAbbreviation,
-      };
+          processing: {},
+          type: layerInfo.layer.dataset.shProcessingApiDatasourceAbbreviation,
+        };
 
-      if (layerInfo.id !== undefined) {
-        datasource.id = layerInfo.id;
+        if (layerInfo.id !== undefined) {
+          datasource.id = layerInfo.id;
+        }
+
+        if (layerInfo.preview !== undefined) {
+          datasource.dataFilter.previewMode = convertPreviewToString(layerInfo.preview);
+        } else if (params.preview !== undefined) {
+          datasource.dataFilter.previewMode = convertPreviewToString(params.preview);
+        }
+
+        if (layerInfo.layer.mosaickingOrder) {
+          datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
+        }
+
+        if (layerInfo.layer.upsampling) {
+          datasource.processing.upsampling = layerInfo.layer.upsampling;
+        }
+
+        if (layerInfo.layer.downsampling) {
+          datasource.processing.downsampling = layerInfo.layer.downsampling;
+        }
+
+        payload.input.data.push(datasource);
       }
+      
+      let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, innerReqConfig);
 
-      if (layerInfo.preview !== undefined) {
-        datasource.dataFilter.previewMode = convertPreviewToString(layerInfo.preview);
-      } else if (params.preview !== undefined) {
-        datasource.dataFilter.previewMode = convertPreviewToString(params.preview);
-      }
-
-      if (layerInfo.layer.mosaickingOrder) {
-        datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
-      }
-
-      if (layerInfo.layer.upsampling) {
-        datasource.processing.upsampling = layerInfo.layer.upsampling;
-      }
-
-      if (layerInfo.layer.downsampling) {
-        datasource.processing.downsampling = layerInfo.layer.downsampling;
-      }
-
-      payload.input.data.push(datasource);
-    }
-
-    let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, reqConfig);
-
-    // apply effects:
-    // support deprecated GetMapParams.gain and .gamma parameters
-    // but override them if they are also present in .effects
-    const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
-    blob = await runEffectFunctions(blob, effects);
-
-    return blob;
+      // apply effects:
+      // support deprecated GetMapParams.gain and .gamma parameters
+      // but override them if they are also present in .effects
+      const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
+      blob = await runEffectFunctions(blob, effects);
+    }, reqConfig);
+    return getMapValue;
   }
 
   public supportsApiType(api: ApiType): boolean {
