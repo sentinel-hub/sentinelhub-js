@@ -254,7 +254,7 @@ const sha256 = async (message: any): Promise<any> => {
 const shouldRetry = (error: AxiosError): boolean => {
   // error.response is not always defined, as the error could be thrown before we get a response from the server
   // https://github.com/axios/axios/issues/960#issuecomment-398269712
-  if (!error.response && !error.response.status) {
+  if (!error.response || !error.response.status) {
     return false;
   }
   return error.response.status >= 500 && error.response.status <= 599;
