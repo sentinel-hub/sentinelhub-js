@@ -54,7 +54,7 @@ import {
   parseLegacyWmsGetMapParams,
 } from 'src/legacyCompat';
 import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
-import { LocationIdSHv3, GetMapParams } from 'src/layer/const';
+import { LocationIdSHv3, GetMapParams, LinkType } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
@@ -102,6 +102,7 @@ export {
   requestAuthToken,
   // other:
   GetMapParams,
+  LinkType,
   ApiType,
   SUPPORTED_CRS_OBJ,
   CRS_EPSG4326,
