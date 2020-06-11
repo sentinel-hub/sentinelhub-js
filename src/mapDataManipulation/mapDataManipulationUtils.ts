@@ -8,13 +8,24 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
   };
 }
 
+export function changeRgbMappingArrayWithFunction(
+  rgbMappingArray: number[],
+  transfrormationFunction: Function,
+): number[] {
+  rgbMappingArray = rgbMappingArray.map(x => transfrormationFunction(x));
+  return rgbMappingArray;
+}
+
 export function changeRgbMappingArraysWithFunction(
   rgbMappingArrays: RgbMappingArrays,
   transfrormationFunction: Function,
 ): RgbMappingArrays {
-  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transfrormationFunction(x));
-  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transfrormationFunction(x));
-  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transfrormationFunction(x));
+  rgbMappingArrays.red = changeRgbMappingArrayWithFunction(rgbMappingArrays.red, transfrormationFunction);
+  rgbMappingArrays.green = changeRgbMappingArrayWithFunction(rgbMappingArrays.green, transfrormationFunction);
+  rgbMappingArrays.blue = changeRgbMappingArrayWithFunction(rgbMappingArrays.blue, transfrormationFunction);
+  // rgbMappingArrays.red = rgbMappingArrays.red.map(x => transfrormationFunction(x));
+  // rgbMappingArrays.green = rgbMappingArrays.green.map(x => transfrormationFunction(x));
+  // rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transfrormationFunction(x));
   return rgbMappingArrays;
 }
 
@@ -23,6 +34,27 @@ export function changeRgbMappingArraysWithFunction(
 // a = oldMin, b = oldMax; c = newMin, d = newMax
 // [0,255] to [0,1]: a = 0, b = 255; c = 0, d = 1
 // [0,1] to [0,255]: a = 0, b = 1; c = 0, d = 255
+
+export function changeRgbMappingArrayInterval(
+  rgbMappingArray: number[],
+  oldMin: number,
+  oldMax: number,
+  newMin: number,
+  newMax: number,
+  strictlyLimitValuesToInterval: boolean = false,
+): number[] {
+  const transformValueToInterval = (x: number): number => {
+    let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
+    if (strictlyLimitValuesToInterval) {
+      newX = Math.max(newX, newMin);
+      newX = Math.min(newX, newMax);
+    }
+    return newX;
+  };
+
+  rgbMappingArray = changeRgbMappingArrayWithFunction(rgbMappingArray, transformValueToInterval);
+  return rgbMappingArray;
+}
 
 export function changeRgbMappingArraysInterval(
   rgbMappingArrays: RgbMappingArrays,
@@ -51,7 +83,7 @@ export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Func
   };
 }
 
-export function isEffectSet(effect: number): boolean {
+export function isEffectSet(effect: number | number[]): boolean {
   return effect !== undefined && effect !== null;
 }
 
