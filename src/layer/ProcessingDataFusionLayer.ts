@@ -114,8 +114,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     // apply effects:
     // support deprecated GetMapParams.gain and .gamma parameters
     // but override them if they are also present in .effects
-    let effects: Effects = { gain: params.gain, gamma: params.gamma };
-    effects = { ...effects, ...params.effects };
+    const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
     blob = await runEffectFunctions(blob, effects);
 
     return blob;
