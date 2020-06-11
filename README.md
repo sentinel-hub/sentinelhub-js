@@ -196,25 +196,6 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
   const imageBlob2 = await layer.getMap(getMapParamsWithEffects, ApiType.PROCESSING);
 ```
 
-Deprecated: `gain` and `gamma` can be present in `getMapParams` outside of `effects` param.
-
-```javascript
-
-  const deprecatedGetMapParamsWithGainAndGamma = {
-    bbox: bbox,
-    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-    width: 512,
-    height: 512,
-    format: MimeTypes.JPEG,
-    gain: 1.2,
-    gamma: 0.9
-  };
-
-  const imageBlob = await layer.getMap(deprecatedGetMapParamsWithGainAndGamma, ApiType.WMS);
-  const imageBlob2 = await layer.getMap(deprecatedGetMapParamsWithGainAndGamma, ApiType.PROCESSING);
-```
-
 ## Searching for data
 
 Searching for the data is a domain either of a _layer_ or its _dataset_ (if available). This library supports different services, some of which (ProbaV and GIBS for example) specify availability dates _per layer_ and not dataset.
@@ -245,44 +226,71 @@ We can always use layer to search for data availability:
 ```
 
 
-## Cancelling requests
+## Requests configuration
 
-You can also cancel requests when searching/fetching data.
+You can specify that network requests should be retried by passing the number of retries for network requests used by the method. The default of `retries` is `null` (disabled).
 
-To do so a token needs to be created and passed through a requests configuration object. Other config such as retries can also be defined there.
+```typescript
+const requestsConfig = {
+  retries: 4,
+};
+```
+
+You can specify a timeout in milliseconds for network requests. This will cancel all the network requests triggered by the method after the specified time frame. Default value for `timeout` is `null` (disabled).
+
+Specifying the timeout will limit the time spent in the method, by cancelling the network requests (including retries) that take too long.
+
+```typescript
+import { isCancelled } from '@sentinel-hub/sentinelhub-js';
+
+const requestsConfig = {
+  timeout: 5000,
+};
+
+try {
+  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+  const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestsConfig);
+  const stats = await layer.getStats(getStatsParams, requestsConfig);
+  const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+} catch (err) {
+  // The exception thrown by canceling network requests can be caught and identified by `isCancelled`.
+  if (!isCancelled(err)) {
+    throw err;
+  }
+}
+```
+
+You can also cancel requests explicitly when searching/fetching data. To do so a token needs to be created and passed through the requests configuration object.
 
 In the example below, a cancel token is passed inside the configuration request object. The timeout will cancel the requests after 500 miliseconds, throwing an exception.
-
-This exception can be caught and identified by `isCancelled`.
 
 ```typescript
 import { CancelToken, isCancelled } from '@sentinel-hub/sentinelhub-js';
 
 const token = new CancelToken();
 
-const requestConfig = {
+const requestsConfig = {
   cancelToken: token,
-  retries: 4
-}
+  retries: 4,
+};
 
-setTimeout(() => {
+const requestTimeout = setTimeout(() => {
   token.cancel();
 }, 500);
 
 try {
-  const layer = await LayersFactory.makeLayer('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', '<layer-id>', null, requestConfig);
-  const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', null, null, requestConfig);
-  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestConfig);
-  const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestConfig);
-  const stats = await layer.getStats(getStatsParams, requestConfig);
-  const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestConfig);
-}
-catch(err) {
+  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+  const dates = await layer.findDatesUTC(bbox, fromTime, toTime, requestsConfig);
+  const stats = await layer.getStats(getStatsParams, requestsConfig);
+  const tiles = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+  clearTimeout(requestTimeout);
+} catch (err) {
+  // The exception thrown by canceling network requests can be caught and identified by `isCancelled`.
   if (!isCancelled(err)) {
     throw err;
   }
 }
-````
+```
 
 ## Getting basic statistics and histogram
 

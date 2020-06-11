@@ -6,6 +6,7 @@ import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
+import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -58,31 +59,34 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
-      type: this.dataset.shProcessingApiDatasourceAbbreviation,
-      orbitDirection: this.orbitDirection,
-      view: this.view,
-    };
-    const response = await this.fetchTiles(
-      this.dataset.searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-      findTilesDatasetParameters,
-    );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    const tiles = await ensureTimeout(async innerReqConfig => {
+      const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
+        type: this.dataset.shProcessingApiDatasourceAbbreviation,
+        orbitDirection: this.orbitDirection,
+        view: this.view,
+      };
+      const response = await this.fetchTiles(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        innerReqConfig,
+        this.maxCloudCoverPercent,
+        findTilesDatasetParameters,
+      );
+      return {
+        tiles: response.data.tiles.map(tile => ({
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: this.extractFindTilesMeta(tile),
+          links: this.getTileLinks(tile),
+        })),
+        hasMore: response.data.hasMore,
+      };
+    }, reqConfig);
+    return tiles;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
