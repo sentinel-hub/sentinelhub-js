@@ -11,7 +11,10 @@ import {
 } from 'src';
 import { CRS_EPSG4326 } from 'src/crs';
 
-export function constructFixtureFindTiles({ sensingTime = '2018-11-28T11:12:13Z', hasMore = false }) {
+export function constructFixtureFindTiles({
+  sensingTime = '2018-11-28T11:12:13Z',
+  hasMore = false,
+}): Record<any, any> {
   const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
   const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
