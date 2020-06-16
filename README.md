@@ -172,7 +172,8 @@ It is also possible to determine whether a layer supports a specific ApiType:
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
 Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`. 
-All of them accept the values between 0 and 1.
+Effects `gain` and `gamma` accept values greater than 0. 
+Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1.
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
 Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
