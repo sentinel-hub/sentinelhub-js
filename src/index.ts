@@ -59,6 +59,8 @@ import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
 
+import { Effects, ColorRange } from 'src/mapDataManipulation/const';
+
 registerAxiosCacheRetryInterceptors();
 
 export {
@@ -129,4 +131,7 @@ export {
   parseLegacyWmsGetMapParams,
   // discouraged - temporary solution which will likely break in the future:
   _wmsGetMapUrl,
+  // map data manipulation
+  Effects,
+  ColorRange,
 };
