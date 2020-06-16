@@ -218,11 +218,11 @@ We can always use layer to search for data availability:
 
 ## Requests configuration
 
-You can specify that network requests should be retried by passing the number of retries for network requests used by the method. The default of `retries` is `null` (disabled).
+You can specify that network requests should be retried by passing the max. number of retries for each of the network requests used by the method. If not specified or set to `null`, the default value for `retries` is used (`2` - which means 3 attempts altogether). To disable retrying, set it to `0`.
 
 ```typescript
 const requestsConfig = {
-  retries: 4,
+  retries: 1, // max. 2 attempts for each of the network requests within the called method
 };
 ```
 
