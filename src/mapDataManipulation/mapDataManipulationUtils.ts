@@ -41,8 +41,7 @@ export function changeRgbMappingArrayInterval(
     return newX;
   };
 
-  rgbMappingArray = rgbMappingArray.map(x => transformValueToInterval(x));
-  return rgbMappingArray;
+  return rgbMappingArray.map(x => transformValueToInterval(x));
 }
 
 export function changeRgbMappingArraysInterval(
