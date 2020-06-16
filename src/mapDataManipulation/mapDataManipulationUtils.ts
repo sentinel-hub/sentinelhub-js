@@ -8,14 +8,6 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
   };
 }
 
-// export function changeRgbMappingArrayWithFunction(
-//   rgbMappingArray: number[],
-//   transformationFunction: Function,
-// ): number[] {
-//   rgbMappingArray = rgbMappingArray.map(x => transformationFunction(x));
-//   return rgbMappingArray;
-// }
-
 export function changeRgbMappingArraysWithFunction(
   rgbMappingArrays: RgbMappingArrays,
   transformationFunction: Function,
@@ -50,8 +42,6 @@ export function changeRgbMappingArrayInterval(
   };
 
   rgbMappingArray = rgbMappingArray.map(x => transformValueToInterval(x));
-  // rgbMappingArray = changeRgbMappingArrayWithFunction(rgbMappingArray, transformValueToInterval);
-
   return rgbMappingArray;
 }
 
