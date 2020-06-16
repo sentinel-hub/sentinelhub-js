@@ -30,14 +30,12 @@ export function changeRgbMappingArrayInterval(
   oldMax: number,
   newMin: number,
   newMax: number,
-  strictlyLimitValuesToInterval: boolean = false,
 ): number[] {
   const transformValueToInterval = (x: number): number => {
     let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
-    if (strictlyLimitValuesToInterval) {
-      newX = Math.max(newX, newMin);
-      newX = Math.min(newX, newMax);
-    }
+    newX = Math.max(newX, newMin);
+    newX = Math.min(newX, newMax);
+
     return newX;
   };
 
@@ -50,14 +48,12 @@ export function changeRgbMappingArraysInterval(
   oldMax: number,
   newMin: number,
   newMax: number,
-  strictlyLimitValuesToInterval: boolean = false,
 ): RgbMappingArrays {
   const transformValueToInterval = (x: number): number => {
     let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
-    if (strictlyLimitValuesToInterval) {
-      newX = Math.max(newX, newMin);
-      newX = Math.min(newX, newMax);
-    }
+    newX = Math.max(newX, newMin);
+    newX = Math.min(newX, newMax);
+
     return newX;
   };
 
