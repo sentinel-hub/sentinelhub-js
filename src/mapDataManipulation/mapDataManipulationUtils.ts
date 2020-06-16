@@ -10,22 +10,19 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
 
 export function changeRgbMappingArrayWithFunction(
   rgbMappingArray: number[],
-  transfrormationFunction: Function,
+  transformationFunction: Function,
 ): number[] {
-  rgbMappingArray = rgbMappingArray.map(x => transfrormationFunction(x));
+  rgbMappingArray = rgbMappingArray.map(x => transformationFunction(x));
   return rgbMappingArray;
 }
 
 export function changeRgbMappingArraysWithFunction(
   rgbMappingArrays: RgbMappingArrays,
-  transfrormationFunction: Function,
+  transformationFunction: Function,
 ): RgbMappingArrays {
-  rgbMappingArrays.red = changeRgbMappingArrayWithFunction(rgbMappingArrays.red, transfrormationFunction);
-  rgbMappingArrays.green = changeRgbMappingArrayWithFunction(rgbMappingArrays.green, transfrormationFunction);
-  rgbMappingArrays.blue = changeRgbMappingArrayWithFunction(rgbMappingArrays.blue, transfrormationFunction);
-  // rgbMappingArrays.red = rgbMappingArrays.red.map(x => transfrormationFunction(x));
-  // rgbMappingArrays.green = rgbMappingArrays.green.map(x => transfrormationFunction(x));
-  // rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transfrormationFunction(x));
+  rgbMappingArrays.red = rgbMappingArrays.red.map(x => transformationFunction(x));
+  rgbMappingArrays.green = rgbMappingArrays.green.map(x => transformationFunction(x));
+  rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => transformationFunction(x));
   return rgbMappingArrays;
 }
 
