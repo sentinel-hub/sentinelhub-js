@@ -6,8 +6,8 @@ import { isDebugEnabled } from 'src/utils/debug';
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
 const EXPIRES_IN_SECONDS = 60 * 30;
-const DELAY = 3000;
-const RETRIES = 5;
+const DEFAULT_RETRY_DELAY = 3000;
+const DEFAULT_MAX_RETRIES = 2;
 
 // we are extending axios' AxiosRequestConfig:
 // https://stackoverflow.com/questions/58777924/axios-typescript-customize-axiosrequestconfig
@@ -208,11 +208,14 @@ const retryRequests = (err: any): any => {
   }
   if (shouldRetry(err)) {
     err.config.retriesCount = err.config.retriesCount | 0;
-    const maxRetries = err.config.retries || RETRIES;
+    const maxRetries =
+      err.config.retries === undefined || err.config.retries === null
+        ? DEFAULT_MAX_RETRIES
+        : err.config.retries;
     const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
-      return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DELAY));
+      return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
     }
   }
 

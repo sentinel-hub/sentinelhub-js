@@ -1,7 +1,10 @@
 import 'jest-setup';
-import axios from 'src/layer/__mocks__/axios';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer, setAuthToken } from 'src';
+
+const mockNetwork = new MockAdapter(axios);
 
 test('WmsLayer.getMapUrl returns an URL', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
@@ -38,13 +41,16 @@ test('WmsLayer.getMapUrl returns an URL', () => {
   expect(imageUrl).not.toHaveQueryParams(['transparent']);
 });
 
-test('WmsLayer.getMap makes an appropriate request', () => {
+test('WmsLayer.getMap makes an appropriate request', async () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
   const layerId = 'PROBAV_S1_TOA_333M';
   const layer = new WmsLayer({
     baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
     layerId,
   });
+
+  mockNetwork.reset();
+  mockNetwork.onAny().replyOnce(200, ''); // we don't care about the response, we will just inspect the request params
 
   const getMapParams = {
     bbox: bbox,
@@ -54,13 +60,11 @@ test('WmsLayer.getMap makes an appropriate request', () => {
     height: 512,
     format: MimeTypes.JPEG,
   };
-  layer.getMap(getMapParams, ApiType.WMS);
+  await layer.getMap(getMapParams, ApiType.WMS);
 
-  expect(axios.get).toHaveBeenCalledTimes(1);
+  expect(mockNetwork.history.get.length).toBe(1);
 
-  const call: any = axios.get.mock.calls[0]; // cast to `any` so we can access the parameters
-  const [url, axiosParams] = call;
-
+  const { url } = mockNetwork.history.get[0];
   expect(url).toHaveOrigin('https://proba-v-mep.esa.int');
   expect(url).toHaveQueryParamsValues({
     service: 'WMS',
@@ -74,14 +78,9 @@ test('WmsLayer.getMap makes an appropriate request', () => {
     width: '512',
     height: '512',
   });
-  expect(axiosParams).toEqual({
-    responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-    useCache: true,
-  });
 });
 
-test('WmsLayer.findDates should not include auth token in GetCapabilities request', () => {
-  axios.get.mockReset();
+test('WmsLayer.findDates should not include auth token in GetCapabilities request', async () => {
   const layerId = 'PROBAV_S1_TOA_333M';
   const layer = new WmsLayer({
     baseUrl: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
@@ -93,21 +92,23 @@ test('WmsLayer.findDates should not include auth token in GetCapabilities reques
 
   setAuthToken('asdf1234'); // this should not have any effect
 
-  layer.findDatesUTC(bbox, fromTime, toTime);
+  mockNetwork.reset();
+  // we just test that the request is correct, we don't mock the response data:
+  mockNetwork.onAny().replyOnce(200, '');
 
-  expect(axios.get).toHaveBeenCalledTimes(1);
+  try {
+    await layer.findDatesUTC(bbox, fromTime, toTime);
+  } catch (ex) {
+    // we don't care about success, we will just inspect the request
+  }
 
-  const call: any = axios.get.mock.calls[0]; // cast to `any` so we can access the parameters
-  const [url, axiosParams] = call;
+  expect(mockNetwork.history.get.length).toBe(1);
 
+  const { url } = mockNetwork.history.get[0];
   expect(url).toHaveOrigin('https://proba-v-mep.esa.int');
   expect(url).toHaveQueryParamsValues({
     service: 'wms',
     request: 'GetCapabilities',
     format: 'text/xml',
-  });
-  expect(axiosParams).toEqual({
-    responseType: 'text',
-    useCache: true,
   });
 });
