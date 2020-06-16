@@ -42,7 +42,7 @@ export function runGammaEffectFunction(
   return rgbMappingArrays;
 }
 
-export function runSimpleColorEffectFunction(
+export function runColorEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
   effects: Effects,
 ): RgbMappingArrays {

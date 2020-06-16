@@ -9,7 +9,7 @@ import {
 import {
   runGainEffectFunction,
   runGammaEffectFunction,
-  runSimpleColorEffectFunction,
+  runColorEffectFunction,
 } from 'src/mapDataManipulation/effectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
@@ -34,7 +34,7 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   rgbMappingArrays = runGammaEffectFunction(rgbMappingArrays, effects);
 
   // change the values according to the algorithm (r,g,b effects)
-  rgbMappingArrays = runSimpleColorEffectFunction(rgbMappingArrays, effects);
+  rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
   rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255);
