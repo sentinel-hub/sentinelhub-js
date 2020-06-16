@@ -7,7 +7,7 @@ const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
 const EXPIRES_IN_SECONDS = 60 * 30;
 const DELAY = 3000;
-const RETRIES = 5;
+const RETRIES = 2;
 
 // we are extending axios' AxiosRequestConfig:
 // https://stackoverflow.com/questions/58777924/axios-typescript-customize-axiosrequestconfig
