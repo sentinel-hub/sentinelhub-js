@@ -49,9 +49,9 @@ const geometryMultiPolygon = {
 
 const gain = 2;
 const gamma = 2;
-const redRange = [0.2, 0.8];
-const greenRange = [0.2, 0.8];
-const blueRange = [0.2, 0.8];
+const redRange = { from: 0.2, to: 0.8 };
+const greenRange = { from: 0.2, to: 0.8 };
+const blueRange = { from: 0.2, to: 0.8 };
 
 export default {
   title: 'Sentinel 2 L2A',
