@@ -18,20 +18,20 @@ export function changeRgbMappingArraysWithFunction(
   return rgbMappingArrays;
 }
 
-// from one interval to another
+// from one range to another
 // f(x) = c + ((d - c) / (b - a)) * (x - a)
 // a = oldMin, b = oldMax; c = newMin, d = newMax
 // [0,255] to [0,1]: a = 0, b = 255; c = 0, d = 1
 // [0,1] to [0,255]: a = 0, b = 1; c = 0, d = 255
 
-export function changeRgbMappingArrayInterval(
+export function changeRgbMappingArrayRange(
   rgbMappingArray: number[],
   oldMin: number,
   oldMax: number,
   newMin: number,
   newMax: number,
 ): number[] {
-  const transformValueToInterval = (x: number): number => {
+  const transformValueToRange = (x: number): number => {
     let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
     newX = Math.max(newX, newMin);
     newX = Math.min(newX, newMax);
@@ -39,17 +39,17 @@ export function changeRgbMappingArrayInterval(
     return newX;
   };
 
-  return rgbMappingArray.map(x => transformValueToInterval(x));
+  return rgbMappingArray.map(x => transformValueToRange(x));
 }
 
-export function changeRgbMappingArraysInterval(
+export function changeRgbMappingArraysRange(
   rgbMappingArrays: RgbMappingArrays,
   oldMin: number,
   oldMax: number,
   newMin: number,
   newMax: number,
 ): RgbMappingArrays {
-  const transformValueToInterval = (x: number): number => {
+  const transformValueToRange = (x: number): number => {
     let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
     newX = Math.max(newX, newMin);
     newX = Math.min(newX, newMax);
@@ -57,7 +57,7 @@ export function changeRgbMappingArraysInterval(
     return newX;
   };
 
-  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueToInterval);
+  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueToRange);
   return rgbMappingArrays;
 }
 
