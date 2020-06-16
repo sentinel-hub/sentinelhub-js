@@ -53,8 +53,8 @@ export function runSimpleColorEffectFunction(
   if (isEffectSet(effects.redRange)) {
     rgbMappingArrays.red = changeRgbMappingArrayInterval(
       rgbMappingArrays.red,
-      effects.redRange[0],
-      effects.redRange[1],
+      effects.redRange.from,
+      effects.redRange.to,
       0,
       1,
       true,
@@ -64,8 +64,8 @@ export function runSimpleColorEffectFunction(
   if (isEffectSet(effects.greenRange)) {
     rgbMappingArrays.green = changeRgbMappingArrayInterval(
       rgbMappingArrays.green,
-      effects.greenRange[0],
-      effects.greenRange[1],
+      effects.greenRange.from,
+      effects.greenRange.to,
       0,
       1,
       true,
@@ -75,8 +75,8 @@ export function runSimpleColorEffectFunction(
   if (isEffectSet(effects.blueRange)) {
     rgbMappingArrays.blue = changeRgbMappingArrayInterval(
       rgbMappingArrays.blue,
-      effects.blueRange[0],
-      effects.blueRange[1],
+      effects.blueRange.from,
+      effects.blueRange.to,
       0,
       1,
       true,
