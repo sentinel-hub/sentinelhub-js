@@ -57,7 +57,6 @@ export function runSimpleColorEffectFunction(
       effects.redRange.to,
       0,
       1,
-      true,
     );
   }
 
@@ -68,7 +67,6 @@ export function runSimpleColorEffectFunction(
       effects.greenRange.to,
       0,
       1,
-      true,
     );
   }
 
@@ -79,7 +77,6 @@ export function runSimpleColorEffectFunction(
       effects.blueRange.to,
       0,
       1,
-      true,
     );
   }
 
