@@ -50,7 +50,7 @@ test('WmsLayer.getMap makes an appropriate request', async () => {
   });
 
   mockNetwork.reset();
-  mockNetwork.onAny().replyOnce(200, ''); // we don't care about response
+  mockNetwork.onAny().replyOnce(200, ''); // we don't care about the response, we will just inspect the request params
 
   const getMapParams = {
     bbox: bbox,
