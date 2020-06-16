@@ -2,7 +2,7 @@ import { Effects, RgbMappingArrays } from 'src/mapDataManipulation/const';
 import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
-  changeRgbMappingArrayInterval,
+  changeRgbMappingArrayRange,
 } from 'src/mapDataManipulation/mapDataManipulationUtils';
 
 export function runGainEffectFunction(
@@ -51,7 +51,7 @@ export function runSimpleColorEffectFunction(
   }
 
   if (isEffectSet(effects.redRange)) {
-    rgbMappingArrays.red = changeRgbMappingArrayInterval(
+    rgbMappingArrays.red = changeRgbMappingArrayRange(
       rgbMappingArrays.red,
       effects.redRange.from,
       effects.redRange.to,
@@ -61,7 +61,7 @@ export function runSimpleColorEffectFunction(
   }
 
   if (isEffectSet(effects.greenRange)) {
-    rgbMappingArrays.green = changeRgbMappingArrayInterval(
+    rgbMappingArrays.green = changeRgbMappingArrayRange(
       rgbMappingArrays.green,
       effects.greenRange.from,
       effects.greenRange.to,
@@ -71,7 +71,7 @@ export function runSimpleColorEffectFunction(
   }
 
   if (isEffectSet(effects.blueRange)) {
-    rgbMappingArrays.blue = changeRgbMappingArrayInterval(
+    rgbMappingArrays.blue = changeRgbMappingArrayRange(
       rgbMappingArrays.blue,
       effects.blueRange.from,
       effects.blueRange.to,
