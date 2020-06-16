@@ -8,13 +8,13 @@ export function prepareRgbMappingArrays(): RgbMappingArrays {
   };
 }
 
-export function changeRgbMappingArrayWithFunction(
-  rgbMappingArray: number[],
-  transformationFunction: Function,
-): number[] {
-  rgbMappingArray = rgbMappingArray.map(x => transformationFunction(x));
-  return rgbMappingArray;
-}
+// export function changeRgbMappingArrayWithFunction(
+//   rgbMappingArray: number[],
+//   transformationFunction: Function,
+// ): number[] {
+//   rgbMappingArray = rgbMappingArray.map(x => transformationFunction(x));
+//   return rgbMappingArray;
+// }
 
 export function changeRgbMappingArraysWithFunction(
   rgbMappingArrays: RgbMappingArrays,
@@ -49,7 +49,9 @@ export function changeRgbMappingArrayInterval(
     return newX;
   };
 
-  rgbMappingArray = changeRgbMappingArrayWithFunction(rgbMappingArray, transformValueToInterval);
+  rgbMappingArray = rgbMappingArray.map(x => transformValueToInterval(x));
+  // rgbMappingArray = changeRgbMappingArrayWithFunction(rgbMappingArray, transformValueToInterval);
+
   return rgbMappingArray;
 }
 
