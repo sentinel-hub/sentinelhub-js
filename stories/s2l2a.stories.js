@@ -49,6 +49,9 @@ const geometryMultiPolygon = {
 
 const gain = 2;
 const gamma = 2;
+const redRange = { from: 0.2, to: 0.8 };
+const greenRange = { from: 0.2, to: 0.8 };
+const blueRange = { from: 0.2, to: 0.8 };
 
 export default {
   title: 'Sentinel 2 L2A',
@@ -595,6 +598,75 @@ export const getMapWMSGainNotSetOptions = () => {
       imgGainHasValue.src = URL.createObjectURL(imageBlobGainHasValue);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapWMSBasicColorManipulation = () => {
+  const imgNoEffects = document.createElement('img');
+  imgNoEffects.width = '256';
+  imgNoEffects.height = '256';
+
+  const imgRed = document.createElement('img');
+  imgRed.width = '256';
+  imgRed.height = '256';
+
+  const imgGreen = document.createElement('img');
+  imgGreen.width = '256';
+  imgGreen.height = '256';
+
+  const imgBlue = document.createElement('img');
+  imgBlue.width = '256';
+  imgBlue.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapWMSEffects</h2>';
+  wrapperEl.innerHTML += '<h4>no effects | red | green | blue</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoEffects);
+  wrapperEl.insertAdjacentElement('beforeend', imgRed);
+  wrapperEl.insertAdjacentElement('beforeend', imgGreen);
+  wrapperEl.insertAdjacentElement('beforeend', imgBlue);
+
+  const perform = async () => {
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 0 });
+
+    // go to the url and set the time range t0 2020-05-09 - 2020-06-09
+    // change R,G,B sliders to 0.2 and 0.8 to check if it works correctly
+    // this story uses the bbox that is used for timelapse
+    // https://webdev.sentinel-hub.com/eo-browser2/?lat=42.1616&lng=11.7773&zoom=11&time=2020-06-09&preset=1_TRUE_COLOR&datasource=Sentinel-2%20L1C
+    const customBBox = new BBox(CRS_EPSG3857, 1275237, 5149410, 1346858.494277954, 5221031.49427795);
+
+    const getMapParams = {
+      bbox: customBBox,
+      fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 5 - 1, 31, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsRed = { ...getMapParams, effects: { redRange: redRange } };
+    const getMapParamsGreen = { ...getMapParams, effects: { greenRange: greenRange } };
+    const getMapParamsBlue = { ...getMapParams, effects: { blueRange: blueRange } };
+
+    try {
+      const imageBlobNoEffects = await layerS2L2A.getMap(getMapParams, ApiType.WMS);
+      imgNoEffects.src = URL.createObjectURL(imageBlobNoEffects);
+
+      const imageBlobRed = await layerS2L2A.getMap(getMapParamsRed, ApiType.WMS);
+      imgRed.src = URL.createObjectURL(imageBlobRed);
+
+      const imageBlobGreen = await layerS2L2A.getMap(getMapParamsGreen, ApiType.WMS);
+      imgGreen.src = URL.createObjectURL(imageBlobGreen);
+
+      const imageBlobBlue = await layerS2L2A.getMap(getMapParamsBlue, ApiType.WMS);
+      imgBlue.src = URL.createObjectURL(imageBlobBlue);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+      throw err;
     }
   };
   perform().then(() => {});
