@@ -2,7 +2,7 @@ import { Effects, RgbMappingArrays } from 'src/mapDataManipulation/const';
 import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
-  changeRgbMappingArrayRange,
+  transformValueToRange,
 } from 'src/mapDataManipulation/mapDataManipulationUtils';
 
 export function runGainEffectFunction(
@@ -46,37 +46,21 @@ export function runColorEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
   effects: Effects,
 ): RgbMappingArrays {
-  if (!isEffectSet(effects.redRange) && !isEffectSet(effects.greenRange) && !isEffectSet(effects.blueRange)) {
-    return rgbMappingArrays;
-  }
-
   if (isEffectSet(effects.redRange)) {
-    rgbMappingArrays.red = changeRgbMappingArrayRange(
-      rgbMappingArrays.red,
-      effects.redRange.from,
-      effects.redRange.to,
-      0,
-      1,
+    rgbMappingArrays.red = rgbMappingArrays.red.map(x =>
+      transformValueToRange(x, effects.redRange.from, effects.redRange.to, 0, 1),
     );
   }
 
   if (isEffectSet(effects.greenRange)) {
-    rgbMappingArrays.green = changeRgbMappingArrayRange(
-      rgbMappingArrays.green,
-      effects.greenRange.from,
-      effects.greenRange.to,
-      0,
-      1,
+    rgbMappingArrays.green = rgbMappingArrays.green.map(x =>
+      transformValueToRange(x, effects.greenRange.from, effects.greenRange.to, 0, 1),
     );
   }
 
   if (isEffectSet(effects.blueRange)) {
-    rgbMappingArrays.blue = changeRgbMappingArrayRange(
-      rgbMappingArrays.blue,
-      effects.blueRange.from,
-      effects.blueRange.to,
-      0,
-      1,
+    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x =>
+      transformValueToRange(x, effects.blueRange.from, effects.blueRange.to, 0, 1),
     );
   }
 
