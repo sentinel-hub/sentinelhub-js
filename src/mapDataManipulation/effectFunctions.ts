@@ -2,6 +2,7 @@ import { Effects, RgbMappingArrays } from 'src/mapDataManipulation/const';
 import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
+  transformValueToRange,
 } from 'src/mapDataManipulation/mapDataManipulationUtils';
 
 export function runGainEffectFunction(
@@ -38,5 +39,30 @@ export function runGammaEffectFunction(
 
   const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
   rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGamma);
+  return rgbMappingArrays;
+}
+
+export function runColorEffectFunction(
+  rgbMappingArrays: RgbMappingArrays,
+  effects: Effects,
+): RgbMappingArrays {
+  if (isEffectSet(effects.redRange)) {
+    rgbMappingArrays.red = rgbMappingArrays.red.map(x =>
+      transformValueToRange(x, effects.redRange.from, effects.redRange.to, 0, 1),
+    );
+  }
+
+  if (isEffectSet(effects.greenRange)) {
+    rgbMappingArrays.green = rgbMappingArrays.green.map(x =>
+      transformValueToRange(x, effects.greenRange.from, effects.greenRange.to, 0, 1),
+    );
+  }
+
+  if (isEffectSet(effects.blueRange)) {
+    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x =>
+      transformValueToRange(x, effects.blueRange.from, effects.blueRange.to, 0, 1),
+    );
+  }
+
   return rgbMappingArrays;
 }

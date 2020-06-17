@@ -171,7 +171,10 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
-Supported effects are gain and gamma. 
+Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`. 
+Effects `gain` and `gamma` accept values equal or greater than 0. 
+Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1, including both 0 and 1.
+Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
 Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
 
@@ -188,7 +191,10 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
     format: MimeTypes.JPEG,
     effects: {
       gain: 1.2,
-      gamma: 0.9
+      gamma: 0.9,
+      redRange: {from: 0.2, to: 0.8},
+      greenRange: {from: 0.2, to: 0.8},
+      blueRange: {from: 0.2, to: 0.8},
     }
   };
 
