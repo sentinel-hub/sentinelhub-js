@@ -349,7 +349,7 @@ Getting the authentication token by calling `requestAuthToken()` with the OAuth 
   const after = isAuthTokenSet(); // true
 ```
 
-Alternatively, authentication token can be set on a per-request basis, which also overrides any global (`setAuthToken()`) token:
+Alternatively, authentication token can be set on a per-request basis, which also overrides any global token that was set by `setAuthToken`:
 
 ```javascript
   const requestsConfig = {
