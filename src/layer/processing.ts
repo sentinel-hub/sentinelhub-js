@@ -161,7 +161,7 @@ export async function processingGetMap(
   payload: ProcessingPayload,
   reqConfig: RequestConfiguration,
 ): Promise<Blob> {
-  const authToken = getAuthToken();
+  const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
   if (!authToken) {
     throw new Error('Must be authenticated to use Processing API');
   }
