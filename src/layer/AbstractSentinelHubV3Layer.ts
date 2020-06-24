@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { getAuthToken, isAuthTokenSet } from 'src/auth';
+import { getAuthToken } from 'src/auth';
 import { BBox } from 'src/bbox';
 import {
   GetMapParams,
@@ -96,10 +96,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not support Processing API (unknown dataset)');
     }
-    if (!isAuthTokenSet) {
-      throw new Error('authToken is not set');
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      throw new Error('Must be authenticated to fetch layer params');
     }
-    const authToken = getAuthToken();
     // Note that for SH v3 service, the endpoint for fetching the list of layers is always
     // https://services.sentinel-hub.com/, even for creodias datasets:
     const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
@@ -496,7 +496,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     evalscript: string,
     reqConfig: RequestConfiguration,
   ): Promise<string> {
-    const authToken = getAuthToken();
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      throw new Error('Must be authenticated to convert evalscript to V3');
+    }
     const url = this.getConvertEvalscriptBaseUrl();
     const requestConfig: AxiosRequestConfig = {
       headers: {

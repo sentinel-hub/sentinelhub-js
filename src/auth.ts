@@ -6,10 +6,7 @@ export function getAuthToken(): string | null {
   return authToken;
 }
 
-export function setAuthToken(newAuthToken: string): void {
-  if (!newAuthToken) {
-    throw new Error('Parameter newAuthToken must be a non-empty string');
-  }
+export function setAuthToken(newAuthToken: string | null): void {
   authToken = newAuthToken;
 }
 
