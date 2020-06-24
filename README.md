@@ -3,7 +3,10 @@
 - [Usage](#usage)
   - [Layers](#layers)
   - [Fetching images](#fetching-images)
+    - [Effects](#effects)
   - [Searching for data](#searching-for-data)
+  - [Requests configuration](#requests-configuration)
+  - [Getting basic statistics and histogram](#getting-basic-statistics-and-histogram)
   - [Backwards compatibility](#backwards-compatibility)
   - [Authentication for Processing API](#authentication-for-processing-api)
   - [Debugging](#debugging)
@@ -116,17 +119,7 @@ Some additional layer information can be passed to `makeLayer` and `makeLayers` 
   const layers = await LayersFactory.makeLayers('https://services.sentinel-hub.com/ogc/wms/<your-instance-id>', null, { maxCloudCoverPercent: 30 });
   ```
 
-Some information about the layer is only accessible to authenticated users. In case of Playground and EO Browser, ReCaptcha auth token is sufficient to fetch layer information (such as evalscript / dataProduct). To avoid updating every layer when auth token changes, we have a global function for updating it:
-
-```javascript
-  import { isAuthTokenSet, setAuthToken } from '@sentinel-hub/sentinelhub-js';
-
-  const before = isAuthTokenSet(); // false
-  setAuthToken(newAuthToken);
-  const after = isAuthTokenSet(); // true
-```
-
-The process of getting the authentication token is described in [Authentication for Processing API](#authentication-for-processing-api).
+Some information about the layer is only accessible to authenticated users. The process of getting the authentication token and authenticating is described in [Authentication for Processing API](#authentication-for-processing-api).
 
 ## Fetching images
 
@@ -171,8 +164,8 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
-Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`. 
-Effects `gain` and `gamma` accept values equal or greater than 0. 
+Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`.
+Effects `gain` and `gamma` accept values equal or greater than 0.
 Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1, including both 0 and 1.
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
@@ -350,7 +343,19 @@ Getting the authentication token by calling `requestAuthToken()` with the OAuth 
   const clientId = /* OAuth Client's id, best to put it in .env file and use it from there */;
   const clientSecret = /* OAuth client's secret, best to put it in .env file and use it from there */;
   const authToken = await requestAuthToken(clientId, clientSecret);
+
+  const before = isAuthTokenSet(); // false
   setAuthToken(authToken);
+  const after = isAuthTokenSet(); // true
+```
+
+Alternatively, authentication token can be set on a per-request basis, which also overrides any global token that was set by `setAuthToken`:
+
+```javascript
+  const requestsConfig = {
+    authToken: authToken,
+  };
+  const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
 ```
 
 ## Debugging

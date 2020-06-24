@@ -1,9 +1,10 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
 
 export type RequestConfiguration = {
-  cancelToken?: CancelToken;
+  authToken?: string | null;
   retries?: number;
   timeout?: number | null;
+  cancelToken?: CancelToken;
 };
 
 export class CancelToken {
