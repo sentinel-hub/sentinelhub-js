@@ -119,7 +119,7 @@ export class LayersFactory {
   public static async makeLayers(
     baseUrl: string,
     filterLayers: Function | null = null,
-    overrideConstructorParams?: Record<string, any>,
+    overrideConstructorParams?: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async innerReqConfig => {
