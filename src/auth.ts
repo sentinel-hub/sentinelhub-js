@@ -15,11 +15,13 @@ export function isAuthTokenSet(): boolean {
 }
 
 export async function requestAuthToken(clientId: string, clientSecret: string): Promise<any> {
-  let response = await axios({
+  const response = await axios({
     method: 'post',
     url: 'https://services.sentinel-hub.com/oauth/token',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
-    data: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+    data: `grant_type=client_credentials&client_id=${encodeURIComponent(
+      clientId,
+    )}&client_secret=${encodeURIComponent(clientSecret)}`,
   });
   return response.data.access_token;
 }
