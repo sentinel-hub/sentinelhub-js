@@ -12,7 +12,6 @@ const DEFAULT_MAX_RETRIES = 2;
 // https://stackoverflow.com/questions/58777924/axios-typescript-customize-axiosrequestconfig
 declare module 'axios' {
   export interface AxiosRequestConfig {
-    useCache?: boolean;
     retries?: number;
     cancelToken?: CancelToken;
     cacheKey?: string;

@@ -40,7 +40,6 @@ export async function fetchGetCapabilitiesXml(
   };
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'text',
-    useCache: true,
     ...getAxiosReqParams(reqConfig),
   };
   const queryString = stringify(query, { sort: false });
@@ -62,7 +61,6 @@ export async function fetchGetCapabilitiesJson(
   const url = `${baseUrl}?${queryString}`;
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
-    useCache: true,
     ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);
@@ -77,7 +75,6 @@ export async function fetchGetCapabilitiesJsonV1(
   const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
-    useCache: true,
     ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);

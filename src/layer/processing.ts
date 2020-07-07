@@ -174,7 +174,6 @@ export async function processingGetMap(
     },
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-    useCache: true,
     ...getAxiosReqParams(reqConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
