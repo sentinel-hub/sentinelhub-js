@@ -5,7 +5,6 @@ import { isDebugEnabled } from 'src/utils/debug';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
-const EXPIRES_IN_SECONDS = 60 * 30;
 const DEFAULT_RETRY_DELAY = 3000;
 const DEFAULT_MAX_RETRIES = 2;
 
@@ -17,6 +16,7 @@ declare module 'axios' {
     retries?: number;
     cancelToken?: CancelToken;
     cacheKey?: string;
+    expiresIn?: number;
   }
 }
 
@@ -90,9 +90,10 @@ function curlify(
 }
 
 const fetchCachedResponse = async (request: any): Promise<any> => {
-  if (!(request && request.useCache)) {
+  if (!(request && request.expiresIn)) {
     return request;
   }
+
   // do not perform caching if Cache API is not supported:
   if (typeof window === 'undefined' || !window.caches) {
     return request;
@@ -155,7 +156,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
 
 const saveCacheResponse = async (response: any): Promise<any> => {
   // not using cache?
-  if (!response.config.useCache) {
+  if (!response.config.expiresIn) {
     return response;
   }
   // do not perform caching if Cache API is not supported:
@@ -175,7 +176,7 @@ const saveCacheResponse = async (response: any): Promise<any> => {
   }
 
   // before saving response, set an artificial header that tells when it should expire:
-  const expiresMs = new Date().getTime() + EXPIRES_IN_SECONDS * 1000;
+  const expiresMs = new Date().getTime() + response.config.expiresIn * 1000;
   response.headers = {
     ...response.headers,
     [EXPIRY_HEADER_KEY]: expiresMs,
