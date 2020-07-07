@@ -2,7 +2,7 @@ import 'jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { constructFixtureFindTiles } from './retries.fixtures';
+import { constructFixtureFindTiles } from './fixtures.findTiles';
 
 const mockNetwork = new MockAdapter(axios);
 
