@@ -3,32 +3,9 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
 
-import { constructFixtureFindTiles } from './retries.fixtures';
+import { constructFixtureFindTiles } from './fixtures.findTiles';
 
 const mockNetwork = new MockAdapter(axios);
-const mockServiceWorker = makeServiceWorkerEnv();
-// test('Retries correctly on network errors', async () => {
-//   // we need to adjust jest timeout until we have support for setting the delay when retrying,
-//   // otherwise the test will time out:
-//   jest.setTimeout(7000);
-//   const {
-//     fromTime,
-//     toTime,
-//     bbox,
-//     layer,
-//     mockedResponse,
-//     expectedResultTiles,
-//     expectedResultHasMore,
-//   } = constructFixtureFindTiles({});
-
-//   mockNetwork.onPost().replyOnce(200, mockedResponse);
-
-//   const { tiles, hasMore } = await layer.findTiles(bbox, fromTime, toTime);
-
-//   expect(mockNetwork.history.post.length).toBe(1);
-//   expect(tiles).toStrictEqual(expectedResultTiles);
-//   expect(hasMore).toBe(expectedResultHasMore);
-// });
 
 describe('Service worker', () => {
   beforeEach(() => {
@@ -36,7 +13,7 @@ describe('Service worker', () => {
     jest.resetModules();
   });
 
-  it('should delete old caches on activate', async () => {
+  it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
     jest.setTimeout(7000);
     const {
       fromTime,
@@ -44,17 +21,35 @@ describe('Service worker', () => {
       bbox,
       layer,
       mockedResponse,
-      //   expectedResultTiles,
-      //   expectedResultHasMore,
+      expectedResultTiles,
+      expectedResultHasMore,
     } = constructFixtureFindTiles({});
     const requestsConfig = {
       expiresIn: 60,
     };
     mockNetwork.onPost().replyOnce(200, mockedResponse);
-    const response = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    console.log(response);
-    const cache = await self.caches.open('sentinelhub-v1');
-    cache.keys().then(function(keys) {});
-    expect(self.snapshot().caches['sentinelhub-v1']).toBeDefined();
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
+    expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
+  });
+
+  it('should cache a response and make a 2nd request after cache expires, where a 2nd network call will be made', async () => {
+    jest.setTimeout(7000);
+    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const requestsConfig = {
+      expiresIn: 1,
+    };
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    jest.setTimeout(2000);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(2);
   });
 });
