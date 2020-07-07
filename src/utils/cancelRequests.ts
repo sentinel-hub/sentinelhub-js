@@ -5,6 +5,7 @@ export type RequestConfiguration = {
   retries?: number;
   timeout?: number | null;
   cancelToken?: CancelToken;
+  expiresIn?: number;
 };
 
 export class CancelToken {
@@ -37,5 +38,6 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
     axiosReqConfig.cancelToken = reqConfig.cancelToken.getToken();
   }
   axiosReqConfig.retries = reqConfig.retries;
+  axiosReqConfig.expiresIn = reqConfig.expiresIn;
   return axiosReqConfig;
 };
