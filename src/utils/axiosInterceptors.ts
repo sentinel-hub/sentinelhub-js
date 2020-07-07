@@ -230,7 +230,7 @@ const generateCacheKey = async (request: AxiosRequestConfig): Promise<string | n
     // idea taken from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
     case 'post':
       const body = JSON.stringify(request.data);
-      const hash = await sha256(body);
+      const hash = await stringToHash(body);
       return `${request.url}?${hash}`;
     case 'get':
       return `${request.url}?${stringify(request.params)}`;
@@ -239,21 +239,15 @@ const generateCacheKey = async (request: AxiosRequestConfig): Promise<string | n
   }
 };
 
-//https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
-// example from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
-const sha256 = async (message: any): Promise<any> => {
-  // encode as UTF-8
-  const msgBuffer = new TextEncoder().encode(message);
-
-  // hash the message
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-
-  // convert ArrayBuffer to Array
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-  // convert bytes to hex string
-  const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
-  return hashHex;
+//https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript
+const stringToHash = async (message: string): Promise<any> => {
+  let hash = 0;
+  for (let i = 0; i < message.length; i++) {
+    let chr = message.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
 };
 
 const shouldRetry = (error: AxiosError): boolean => {
