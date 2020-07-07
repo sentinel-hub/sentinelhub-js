@@ -134,6 +134,7 @@ const fetchCachedResponse = async (request: any): Promise<any> => {
         responseData = await cachedResponse.text();
         break;
       case 'json':
+      case undefined: // axios defaults to json https://github.com/axios/axios#request-config
         responseData = await cachedResponse.json();
         break;
       default:
@@ -192,6 +193,7 @@ const saveCacheResponse = async (response: any): Promise<any> => {
       responseData = response.data;
       break;
     case 'json':
+    case undefined: // axios defaults to json https://github.com/axios/axios#request-config
       // but json was converted by axios to an object - and we want to save a string:
       responseData = JSON.stringify(response.data);
       break;
