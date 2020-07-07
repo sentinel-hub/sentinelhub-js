@@ -54,7 +54,6 @@ export class AbstractLayer {
           const requestConfig: AxiosRequestConfig = {
             // 'blob' responseType does not work with Node.js:
             responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-            useCache: true,
             ...getAxiosReqParams(innerReqConfig),
           };
           const response = await axios.get(url, requestConfig);

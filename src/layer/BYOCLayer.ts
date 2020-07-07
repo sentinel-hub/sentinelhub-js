@@ -80,7 +80,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         const res = await axios.get(url, {
           responseType: 'json',
           headers: headers,
-          useCache: true,
           ...getAxiosReqParams(innerReqConfig),
         });
 
@@ -204,7 +203,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       const res = await axios.get(url, {
         responseType: 'json',
         headers: headers,
-        useCache: true,
         ...getAxiosReqParams(innerReqConfig),
       });
       return res.data.bands;
