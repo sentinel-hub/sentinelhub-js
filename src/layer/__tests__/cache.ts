@@ -7,7 +7,7 @@ import { constructFixtureFindTiles } from './fixtures.findTiles';
 
 const mockNetwork = new MockAdapter(axios);
 
-describe('Service worker', () => {
+describe('Testing caching', () => {
   beforeEach(() => {
     Object.assign(global, makeServiceWorkerEnv());
     jest.resetModules();
