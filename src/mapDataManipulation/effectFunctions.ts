@@ -42,6 +42,23 @@ export function runGammaEffectFunction(
   return rgbMappingArrays;
 }
 
+export function runHighlightEffect(rgbMappingArrays: RgbMappingArrays, effects: Effects): RgbMappingArrays {
+  const minValue = 0.0;
+  const maxValue = 0.4;
+  const clipPoint = 2.0;
+
+  const highlightPoint = 0 < maxValue && maxValue < 1 ? 0.92 : Number.NaN;
+  const highlightFactor = (1.0 - highlightPoint) / (clipPoint - highlightPoint);
+  const highlightOffset = highlightPoint * (1.0 - highlightFactor);
+
+  // highlightPoint can be NaN (see the constructor) in which case original value will be used
+  const transformValueWithHighlightEffect = (x: number): number =>
+    x > highlightPoint ? x * highlightFactor + highlightOffset : x;
+
+  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithHighlightEffect);
+  return rgbMappingArrays;
+}
+
 export function runColorEffectFunction(
   rgbMappingArrays: RgbMappingArrays,
   effects: Effects,

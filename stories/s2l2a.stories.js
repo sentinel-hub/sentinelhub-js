@@ -605,6 +605,65 @@ export const getMapWMSGainNotSetOptions = () => {
   return wrapperEl;
 };
 
+export const getMapWMSGainValues = () => {
+  const imgNoGain = document.createElement('img');
+  imgNoGain.width = '256';
+  imgNoGain.height = '256';
+
+  const imgGain2 = document.createElement('img');
+  imgGain2.width = '256';
+  imgGain2.height = '256';
+
+  const imgGain09 = document.createElement('img');
+  imgGain09.width = '256';
+  imgGain09.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapWMSGainValues</h2>';
+  wrapperEl.innerHTML += '<h4>no gain param | gain = 2 | gain = 0.5</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoGain);
+  wrapperEl.insertAdjacentElement('beforeend', imgGain2);
+  wrapperEl.insertAdjacentElement('beforeend', imgGain09);
+
+  const perform = async () => {
+    const layerS2L2A = new S2L2ALayer({ instanceId, layerId, maxCloudCoverPercent: 100 });
+    const customBBox = new BBox(
+      CRS_EPSG3857,
+      1408887.3053523686,
+      5087648.558446192,
+      1487158.822316389,
+      5165920.069801417,
+    );
+    const getMapParamsNoGain = {
+      bbox: customBBox,
+      fromTime: new Date(Date.UTC(2020, 6 - 1, 14, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2020, 6 - 1, 14, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsGain2 = { ...getMapParamsNoGain, effects: { gain: 2 } };
+    const getMapParamsGain09 = { ...getMapParamsNoGain, effects: { gain: 0.5 } };
+
+    try {
+      const imageBlobNoGain = await layerS2L2A.getMap(getMapParamsNoGain, ApiType.WMS);
+      imgNoGain.src = URL.createObjectURL(imageBlobNoGain);
+
+      const imageBlobGain2 = await layerS2L2A.getMap(getMapParamsGain2, ApiType.WMS);
+      imgGain2.src = URL.createObjectURL(imageBlobGain2);
+
+      const imageBlobGain09 = await layerS2L2A.getMap(getMapParamsGain09, ApiType.WMS);
+      imgGain09.src = URL.createObjectURL(imageBlobGain09);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const getMapWMSBasicColorManipulation = () => {
   const imgNoEffects = document.createElement('img');
   imgNoEffects.width = '256';
