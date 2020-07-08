@@ -55,4 +55,17 @@ describe('Testing caching', () => {
 
     expect(mockNetwork.history.post.length).toBe(2);
   });
+
+  it('test that no responses are cached', async () => {
+    jest.setTimeout(7000);
+    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    await layer.findTiles(bbox, fromTime, toTime);
+    await layer.findTiles(bbox, fromTime, toTime);
+
+    expect(mockNetwork.history.post.length).toBe(2);
+  });
 });
