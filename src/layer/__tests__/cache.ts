@@ -47,9 +47,10 @@ describe('Service worker', () => {
     };
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    jest.setTimeout(2000);
+    await new Promise(r => setTimeout(r, 2000));
     await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
 
     expect(mockNetwork.history.post.length).toBe(2);
