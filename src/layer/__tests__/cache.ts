@@ -27,6 +27,7 @@ describe('Service worker', () => {
     const requestsConfig = {
       expiresIn: 60,
     };
+    mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
@@ -44,6 +45,7 @@ describe('Service worker', () => {
     const requestsConfig = {
       expiresIn: 1,
     };
+    mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
