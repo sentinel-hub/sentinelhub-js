@@ -39,7 +39,7 @@ describe('Testing caching', () => {
     expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
   });
 
-  it('should cache a response and make a 2nd request after cache expires, where a 2nd network call will be made', async () => {
+  it('should make a 2nd request after the cache has expired', async () => {
     jest.setTimeout(7000);
     const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
     const requestsConfig = {
