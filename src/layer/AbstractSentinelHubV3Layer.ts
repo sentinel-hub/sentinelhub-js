@@ -26,6 +26,7 @@ import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
+import { DEFAULT_CACHE_CONFIG } from 'src/utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -109,6 +110,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
+      cache: DEFAULT_CACHE_CONFIG,
       ...getAxiosReqParams(reqConfig),
     };
     const res = await axios.get(url, requestConfig);
@@ -146,7 +148,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
-      const response = await axios.get(this.evalscriptUrl, { responseType: 'text' });
+      const response = await axios.get(this.evalscriptUrl, {
+        responseType: 'text',
+        cache: DEFAULT_CACHE_CONFIG,
+      });
       this.evalscript = response.data;
     }
   }
@@ -505,6 +510,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/ecmascript',
       },
+      cache: DEFAULT_CACHE_CONFIG,
       responseType: 'text',
       ...getAxiosReqParams(reqConfig),
     };

@@ -4,6 +4,7 @@ import { parseStringPromise } from 'xml2js';
 
 import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { DEFAULT_CACHE_CONFIG } from 'src/utils/cacheHandlers';
 
 export type GetCapabilitiesXml = {
   WMS_Capabilities: {
@@ -40,6 +41,7 @@ export async function fetchGetCapabilitiesXml(
   };
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'text',
+    cache: DEFAULT_CACHE_CONFIG,
     ...getAxiosReqParams(reqConfig),
   };
   const queryString = stringify(query, { sort: false });
@@ -61,6 +63,7 @@ export async function fetchGetCapabilitiesJson(
   const url = `${baseUrl}?${queryString}`;
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
+    cache: DEFAULT_CACHE_CONFIG,
     ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);
@@ -75,6 +78,7 @@ export async function fetchGetCapabilitiesJsonV1(
   const url = `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'json',
+    cache: DEFAULT_CACHE_CONFIG,
     ...getAxiosReqParams(reqConfig),
   };
   const res = await axios.get(url, axiosReqConfig);
