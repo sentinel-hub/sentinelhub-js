@@ -9,7 +9,7 @@ export type CacheConfig = {
 };
 
 export const fetchCachedResponse = async (request: any): Promise<any> => {
-  if (!(request && request.cache)) {
+  if (!isRequestCachable) {
     return request;
   }
 
@@ -75,7 +75,7 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
 
 export const saveCacheResponse = async (response: AxiosResponse): Promise<any> => {
   // not using cache?
-  if (!response.config.cache) {
+  if (!isRequestCachable(response.config)) {
     return response;
   }
   // do not perform caching if Cache API is not supported:
@@ -174,4 +174,16 @@ export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
       cache.delete(key);
     }
   });
+};
+
+const isRequestCachable = (request: AxiosRequestConfig): boolean => {
+  if (!(request && request.cache && request.cache.expiresIn)) {
+    return false;
+  }
+  // cache can be disbabled with expiresIn: 0;
+  if (request.cache.expiresIn === 0) {
+    return false;
+  }
+
+  return true;
 };
