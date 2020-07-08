@@ -13,8 +13,7 @@ const getMapParams: GetMapParams = {
 
 const mockedLayersResponse = [
   {
-    '@id':
-      'https://services.sentinel-hub.com/configuration/v1/wms/instances/bd86bcc0-f318-402b-a145-015f85b9427e/layers/1_TRUE_COLOR',
+    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers/LAYER_ID',
     id: 'LAYER_ID',
     title: 'Title',
     description: 'Description',
@@ -28,8 +27,7 @@ const mockedLayersResponse = [
     ],
     orderHint: 0,
     instance: {
-      '@id':
-        'https://services.sentinel-hub.com/configuration/v1/wms/instances/bd86bcc0-f318-402b-a145-015f85b9427e',
+      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID',
     },
     dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
     datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
