@@ -295,7 +295,18 @@ To enable caching for the requests, one can add `expiresIn` to the requests conf
 ```
 // cache is valid for 30 minutes
 const requestsConfig = {
+  cache: {
   expiresIn: 1800,
+  }
+};
+```
+
+To disbale caching for the requests that are enbaled by default, you can assign 0 to expiresIn.
+```
+const requestsConfig = {
+  cache: {
+  expiresIn: 1800,
+  }
 };
 ```
 

@@ -6,6 +6,7 @@ import { getAuthToken } from 'src/auth';
 import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { DEFAULT_CACHE_CONFIG } from 'src/utils/cacheHandlers';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
@@ -174,6 +175,7 @@ export async function processingGetMap(
     },
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
+    cache: DEFAULT_CACHE_CONFIG,
     ...getAxiosReqParams(reqConfig),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
