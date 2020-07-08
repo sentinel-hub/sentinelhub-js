@@ -1,11 +1,15 @@
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
 
 const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
 const EXPIRY_HEADER_KEY = 'Cache_Expires';
 
+export type CacheConfig = {
+  expiresIn: number;
+};
+
 export const fetchCachedResponse = async (request: any): Promise<any> => {
-  if (!(request && request.expiresIn)) {
+  if (!(request && request.cache)) {
     return request;
   }
 
@@ -69,9 +73,9 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   return request;
 };
 
-export const saveCacheResponse = async (response: any): Promise<any> => {
+export const saveCacheResponse = async (response: AxiosResponse): Promise<any> => {
   // not using cache?
-  if (!response.config.expiresIn) {
+  if (!response.config.cache) {
     return response;
   }
   // do not perform caching if Cache API is not supported:
@@ -91,7 +95,7 @@ export const saveCacheResponse = async (response: any): Promise<any> => {
   }
 
   // before saving response, set an artificial header that tells when it should expire:
-  const expiresMs = new Date().getTime() + response.config.expiresIn * 1000;
+  const expiresMs = new Date().getTime() + response.config.cache.expiresIn * 1000;
   response.headers = {
     ...response.headers,
     [EXPIRY_HEADER_KEY]: expiresMs,

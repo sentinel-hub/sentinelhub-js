@@ -25,7 +25,9 @@ describe('Testing caching', () => {
       expectedResultHasMore,
     } = constructFixtureFindTiles({});
     const requestsConfig = {
-      expiresIn: 60,
+      cache: {
+        expiresIn: 60,
+      },
     };
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -46,7 +48,9 @@ describe('Testing caching', () => {
     jest.setTimeout(7000);
     const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
     const requestsConfig = {
-      expiresIn: 1,
+      cache: {
+        expiresIn: 1,
+      },
     };
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
