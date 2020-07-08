@@ -16,6 +16,8 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  SUPPORTED_DATA_PRODUCTS_PROCESSING,
+  DataProduct,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -32,7 +34,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProduct | null;
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
@@ -47,7 +49,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected layerId: string | null;
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
-  protected dataProduct: string | null;
+  protected dataProduct: DataProduct | null;
   public legend?: any[] | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
@@ -232,7 +234,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
-    if (this.dataProduct) {
+    if (this.dataProduct && !SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(this.dataProduct['@id'])) {
       return api === ApiType.WMS;
     }
     return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
