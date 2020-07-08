@@ -195,9 +195,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           if (!layerParams) {
             layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
           }
-          this.mosaickingOrder = layerParams.mosaickingOrder;
-          this.upsampling = layerParams.upsampling;
-          this.downsampling = layerParams.downsampling;
+          if (!this.mosaickingOrder && layerParams && layerParams.mosaickingOrder) {
+            this.mosaickingOrder = layerParams.mosaickingOrder;
+          }
+          if (!this.upsampling && layerParams && layerParams.upsampling) {
+            this.upsampling = layerParams.upsampling;
+          }
+          if (!this.downsampling && layerParams && layerParams.downsampling) {
+            this.downsampling = layerParams.downsampling;
+          }
         }
 
         await this.convertEvalscriptToV3IfNeeded(innerReqConfig);
