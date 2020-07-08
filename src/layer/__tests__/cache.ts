@@ -31,9 +31,12 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-
     expect(mockNetwork.history.post.length).toBe(1);
+
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(0);
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
     expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
