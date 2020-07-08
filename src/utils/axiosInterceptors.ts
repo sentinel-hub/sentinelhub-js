@@ -5,6 +5,7 @@ import {
   fetchCachedResponse,
   saveCacheResponse,
   findAndDeleteExpiredCachedItems,
+  CacheConfig,
 } from 'src/utils/cacheHandlers';
 
 const DEFAULT_RETRY_DELAY = 3000;
@@ -17,7 +18,7 @@ declare module 'axios' {
     retries?: number;
     cancelToken?: CancelToken;
     cacheKey?: string;
-    expiresIn?: number;
+    cache?: CacheConfig;
   }
 }
 

@@ -1,11 +1,12 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
+import { CacheConfig } from 'src/utils/cacheHandlers';
 
 export type RequestConfiguration = {
   authToken?: string | null;
   retries?: number;
   timeout?: number | null;
   cancelToken?: CancelToken;
-  expiresIn?: number;
+  cache?: CacheConfig;
 };
 
 export class CancelToken {
@@ -38,6 +39,6 @@ export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequest
     axiosReqConfig.cancelToken = reqConfig.cancelToken.getToken();
   }
   axiosReqConfig.retries = reqConfig.retries;
-  axiosReqConfig.expiresIn = reqConfig.expiresIn;
+  axiosReqConfig.cache = reqConfig.cache;
   return axiosReqConfig;
 };
