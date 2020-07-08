@@ -43,9 +43,9 @@ const mockedLayersResponse = [
   },
 ];
 
-export const constructFixtureMosaickingOrder = () => {
+export function constructFixtureMosaickingOrder(): Record<any, any> {
   return {
     getMapParams: getMapParams,
     mockedLayersResponse: mockedLayersResponse,
   };
-};
+}
