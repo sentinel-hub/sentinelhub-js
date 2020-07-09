@@ -11,6 +11,8 @@ import { setAuthToken } from 'src/auth';
 
 const mockNetwork = new MockAdapter(axios);
 
+const EXAMPLE_TOKEN = 'TOKEN111';
+
 describe('Testing caching', () => {
   beforeEach(() => {
     Object.assign(global, makeServiceWorkerEnv(), fetch);
@@ -84,7 +86,7 @@ describe('Testing caching', () => {
     // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
     window.Blob = undefined;
     const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
-    setAuthToken('1234');
+    setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
 
     mockNetwork.onPost().reply(mockedResponse);
@@ -108,7 +110,7 @@ describe('Testing caching', () => {
       },
     };
 
-    setAuthToken('1234');
+    setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
 
     mockNetwork.onPost().reply(mockedResponse);
