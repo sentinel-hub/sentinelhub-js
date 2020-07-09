@@ -15,11 +15,10 @@ export function constructFixtureGetMap(): Record<any, any> {
     format: MimeTypes.JPEG,
   };
 
-  const u8 = new Uint8Array([21, 31, 25, 255, 210, 81, 45, 255]);
-  const blob = new Blob([u8], { type: 'image/jpeg' });
+  const buffer = new ArrayBuffer(8);
   const mockedResponse = (config: any): any => {
-    if (config.responseType === 'Blob') {
-      return [200, blob];
+    if (config.responseType === 'arraybuffer') {
+      return [200, buffer];
     }
   };
 

@@ -2,14 +2,18 @@ import 'jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
+import fetch from 'node-fetch';
 
 import { constructFixtureFindTiles } from './fixtures.findTiles';
+import { constructFixtureGetMap } from './fixtures.getMap';
+import { ApiType } from 'src';
+import { setAuthToken } from 'src/auth';
 
 const mockNetwork = new MockAdapter(axios);
 
 describe('Testing caching', () => {
   beforeEach(() => {
-    Object.assign(global, makeServiceWorkerEnv());
+    Object.assign(global, makeServiceWorkerEnv(), fetch);
     jest.resetModules();
   });
 
@@ -74,5 +78,23 @@ describe('Testing caching', () => {
     await layer.findTiles(bbox, fromTime, toTime);
 
     expect(mockNetwork.history.post.length).toBe(2);
+  });
+
+  it('test that getMap caching is enabled by default', async () => {
+    // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
+    window.Blob = undefined;
+    const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
+    setAuthToken('1234');
+    mockNetwork.reset();
+
+    mockNetwork.onPost().reply(mockedResponse);
+    await layer.getMap(getMapParams, ApiType.PROCESSING);
+    expect(mockNetwork.history.post.length).toBe(1);
+
+    mockNetwork.reset();
+
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    await layer.getMap(getMapParams, ApiType.PROCESSING);
+    expect(mockNetwork.history.post.length).toBe(0);
   });
 });
