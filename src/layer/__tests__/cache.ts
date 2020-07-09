@@ -36,14 +36,12 @@ describe('Testing caching', () => {
     };
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    expect(mockNetwork.history.post.length).toBe(1);
-
-    mockNetwork.reset();
-    mockNetwork.onPost().replyOnce(200, mockedResponse);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    expect(mockNetwork.history.post.length).toBe(0);
+
+    expect(mockNetwork.history.post.length).toBe(1);
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
     expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
@@ -85,16 +83,13 @@ describe('Testing caching', () => {
     const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
     setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
-
-    mockNetwork.onPost().reply(mockedResponse);
-    await layer.getMap(getMapParams, ApiType.PROCESSING);
-    expect(mockNetwork.history.post.length).toBe(1);
-
-    mockNetwork.reset();
-
     mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
     await layer.getMap(getMapParams, ApiType.PROCESSING);
-    expect(mockNetwork.history.post.length).toBe(0);
+    await layer.getMap(getMapParams, ApiType.PROCESSING);
+
+    expect(mockNetwork.history.post.length).toBe(1);
   });
 
   it('test disabling default cache', async () => {
@@ -109,15 +104,12 @@ describe('Testing caching', () => {
 
     setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
-
     mockNetwork.onPost().reply(mockedResponse);
-    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
-    expect(mockNetwork.history.post.length).toBe(1);
-
-    mockNetwork.reset();
-
     mockNetwork.onPost().replyOnce(200, mockedResponse);
+
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
-    expect(mockNetwork.history.post.length).toBe(1);
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(2);
   });
 });
