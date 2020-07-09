@@ -59,7 +59,7 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, 1100));
     await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
 
     expect(mockNetwork.history.post.length).toBe(2);
