@@ -20,7 +20,6 @@ describe('Testing caching', () => {
   });
 
   it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
-    jest.setTimeout(7000);
     const {
       fromTime,
       toTime,
@@ -51,7 +50,6 @@ describe('Testing caching', () => {
   });
 
   it('should make a 2nd request after the cache has expired', async () => {
-    jest.setTimeout(7000);
     const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
     const requestsConfig = {
       cache: {
@@ -70,7 +68,6 @@ describe('Testing caching', () => {
   });
 
   it('test that no responses are cached', async () => {
-    jest.setTimeout(7000);
     const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
