@@ -2,7 +2,14 @@ import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 
-import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
+import {
+  BackscatterCoeff,
+  PaginatedTiles,
+  OrbitDirection,
+  Link,
+  LinkType,
+  DataProduct,
+} from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -34,7 +41,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProduct | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;

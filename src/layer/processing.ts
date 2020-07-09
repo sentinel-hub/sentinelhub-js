@@ -3,7 +3,14 @@ import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
 import { getAuthToken } from 'src/auth';
 
-import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
+import {
+  MimeType,
+  GetMapParams,
+  Interpolator,
+  PreviewMode,
+  MosaickingOrder,
+  DataProduct,
+} from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 
@@ -37,7 +44,7 @@ export type ProcessingPayload = {
     ];
   };
   evalscript?: string;
-  dataProduct?: string;
+  dataProduct?: DataProduct;
 };
 
 export type ProcessingPayloadDatasource = {
@@ -86,7 +93,7 @@ export function createProcessingPayload(
   dataset: Dataset,
   params: GetMapParams,
   evalscript: string | null = null,
-  dataProduct: string | null = null,
+  dataProduct: DataProduct | null = null,
   mosaickingOrder: MosaickingOrder | null = null,
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,

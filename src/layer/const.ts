@@ -193,3 +193,11 @@ export type Stats = {
 };
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
+
+export const SUPPORTED_DATA_PRODUCTS_PROCESSING = [
+  'https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643',
+];
+
+export type DataProduct = {
+  '@id': string;
+};
