@@ -97,4 +97,28 @@ describe('Testing caching', () => {
     await layer.getMap(getMapParams, ApiType.PROCESSING);
     expect(mockNetwork.history.post.length).toBe(0);
   });
+
+  it('test disabling default cache', async () => {
+    // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
+    window.Blob = undefined;
+    const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
+    const requestsConfig = {
+      cache: {
+        expiresIn: 0,
+      },
+    };
+
+    setAuthToken('1234');
+    mockNetwork.reset();
+
+    mockNetwork.onPost().reply(mockedResponse);
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+
+    mockNetwork.reset();
+
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+  });
 });
