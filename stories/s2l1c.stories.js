@@ -119,7 +119,9 @@ export const GetMapProcessing = () => {
     `,
     });
     const reqConfig = {
-      expiresIn: 5000,
+      cache: {
+        expiresIn: 5000,
+      },
     };
 
     const getMapParams = {
@@ -194,7 +196,9 @@ export const FindTiles = () => {
   wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
   const requestsConfig = {
-    expiresIn: 5000,
+    cache: {
+      expiresIn: 5000,
+    },
   };
 
   const perform = async () => {
