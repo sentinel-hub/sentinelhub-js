@@ -12,7 +12,7 @@ import {
   ApiType,
   GetStatsParams,
   Stats,
-  DataProduct,
+  DataProductId,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -25,7 +25,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: DataProduct | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   collectionId?: string | null;

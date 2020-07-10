@@ -2,7 +2,7 @@ import moment from 'moment';
 
 import { BBox } from 'src/bbox';
 
-import { PaginatedTiles, MosaickingOrder, DataProduct } from 'src/layer/const';
+import { PaginatedTiles, MosaickingOrder, DataProductId } from 'src/layer/const';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
 import { RequestConfiguration } from 'src/utils/cancelRequests';
@@ -13,7 +13,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: DataProduct | null;
+  dataProduct?: DataProductId | null;
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
