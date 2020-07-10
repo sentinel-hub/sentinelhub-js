@@ -1,6 +1,6 @@
 import { setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { legacyGetMapFromParams, ApiType } from '../dist/sentinelHub.esm';
+import { legacyGetMapFromParams, ApiType, Interpolator } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -10,8 +10,13 @@ if (!process.env.S2L2A_LAYER_ID) {
   throw new Error('S2L2A_LAYER_ID environment variable is not defined!');
 }
 
+if (!process.env.S5PL2_LAYER_ID) {
+  throw new Error('S5PL2_LAYER_ID environment variable is not defined!');
+}
+
 const instanceId = process.env.INSTANCE_ID;
 const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
+const s5pLayerId = process.env.S5PL2_LAYER_ID;
 const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
 
 export default {
@@ -27,6 +32,15 @@ const madridBboxAsArrayEPSG3857 = [
 const maxCC = 0;
 const gain = 2;
 const gamma = 2;
+const upsamplingNearest = Interpolator.NEAREST;
+const upsamplingBilinear = Interpolator.BILINEAR;
+const upsamplingBicubic = Interpolator.BICUBIC;
+
+const redRange = [0.2, 0.8];
+const greenRange = [0.2, 0.8];
+const blueRange = [0.2, 0.8];
+const minQa = 25;
+
 const timeString = '2019-10-01/2020-04-23';
 
 const basicParams = {
@@ -56,6 +70,20 @@ const paramsWithGamma = { ...basicParams, gamma: gamma };
 const paramsWithGainAndGamma = { ...basicParams, gain: gain, gamma: gamma };
 // EOBrowser example for GAIN AND GAMMA:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=2.0&gammaOverride=2&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
+
+const paramsS5P = {
+  maxcc: maxCC,
+  layers: s5pLayerId,
+  time: timeString,
+  showlogo: false,
+  width: 512,
+  height: 512,
+  bbox: [1400000, 5100000, 1600000, 5300000],
+  format: 'image/jpeg',
+  crs: 'EPSG:3857',
+  preview: 2,
+  bgcolor: '000000',
+};
 
 // PROCESSING API
 
@@ -126,6 +154,141 @@ export const ProcessingLegacyGetMapFromParamsGainGamma = () => {
         ApiType.PROCESSING,
       );
       imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const ProcessingLegacyGetMapFromParamsUpsamplingS5p = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const imgDefaultUpsampling = document.createElement('img');
+  imgDefaultUpsampling.width = '256';
+  imgDefaultUpsampling.height = '256';
+
+  const imgNearest = document.createElement('img');
+  imgNearest.width = '256';
+  imgNearest.height = '256';
+
+  const imgBilinear = document.createElement('img');
+  imgBilinear.width = '256';
+  imgBilinear.height = '256';
+
+  const imgBicubic = document.createElement('img');
+  imgBicubic.width = '256';
+  imgBicubic.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML += '<h4>default upsampling | nearest | bilinear | bicubic</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgDefaultUpsampling);
+  wrapperEl.insertAdjacentElement('beforeend', imgNearest);
+  wrapperEl.insertAdjacentElement('beforeend', imgBilinear);
+  wrapperEl.insertAdjacentElement('beforeend', imgBicubic);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    paramsS5P.evalscript =
+      'dmFyIHZhbCA9IENMT1VEX0JBU0VfUFJFU1NVUkU7CiAgICAgIHZhciBtaW5WYWwgPSAxMDAwMC4wOwogICAgICB2YXIgbWF4VmFsID0gMTEwMDAwLjA7CiAgICAgIHZhciBkaWZmID0gbWF4VmFsIC0gbWluVmFsOwogICAgICB2YXIgbGltaXRzID0gW21pblZhbCwgbWluVmFsICsgMC4xMjUgKiBkaWZmLCBtaW5WYWwgKyAwLjM3NSAqIGRpZmYsIG1pblZhbCArIDAuNjI1ICogZGlmZiwgbWluVmFsICsgMC44NzUgKiBkaWZmLCBtYXhWYWxdOwogICAgICB2YXIgY29sb3JzID0gW1swLCAwLCAwLjVdLCBbMCwgMCwgMV0sIFswLCAxLCAxXSwgWzEsIDEsIDBdLCBbMSwgMCwgMF0sIFswLjUsIDAsIDBdXTsKICAgICAgcmV0dXJuIGNvbG9yQmxlbmQodmFsLCBsaW1pdHMsIGNvbG9ycyk7';
+
+    try {
+      const imageBlobDefaultUpsampling = await legacyGetMapFromParams(baseUrl, paramsS5P, ApiType.PROCESSING);
+      imgDefaultUpsampling.src = URL.createObjectURL(imageBlobDefaultUpsampling);
+
+      const imageBlobNearest = await legacyGetMapFromParams(
+        baseUrl,
+        { ...paramsS5P, upsampling: upsamplingNearest },
+        ApiType.PROCESSING,
+      );
+      imgNearest.src = URL.createObjectURL(imageBlobNearest);
+
+      const imageBlobBilinear = await legacyGetMapFromParams(
+        baseUrl,
+        { ...paramsS5P, upsampling: upsamplingBilinear },
+        ApiType.PROCESSING,
+      );
+      imgBilinear.src = URL.createObjectURL(imageBlobBilinear);
+
+      const imageBlobBicubic = await legacyGetMapFromParams(
+        baseUrl,
+        { ...paramsS5P, upsampling: upsamplingBicubic },
+        ApiType.PROCESSING,
+      );
+      imgBicubic.src = URL.createObjectURL(imageBlobBicubic);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const ProcessingLegacyGetMapFromParamsMinQaS5p = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const imgDefaultMinQa = document.createElement('img');
+  imgDefaultMinQa.width = '256';
+  imgDefaultMinQa.height = '256';
+
+  const imgMinQa0 = document.createElement('img');
+  imgMinQa0.width = '256';
+  imgMinQa0.height = '256';
+
+  const imgMinQa100 = document.createElement('img');
+  imgMinQa100.width = '256';
+  imgMinQa100.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML += '<h4>default minQa | minQa=0 | minQa=100</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgDefaultMinQa);
+  wrapperEl.insertAdjacentElement('beforeend', imgMinQa0);
+  wrapperEl.insertAdjacentElement('beforeend', imgMinQa100);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    paramsS5P.evalscript =
+      'dmFyIHZhbCA9IEhDSE87CiAgICAgIHZhciBtaW5WYWwgPSAxMDAwMC4wOwogICAgICB2YXIgbWF4VmFsID0gMTEwMDAwLjA7CiAgICAgIHZhciBsaW1pdHMgPSBbbWluVmFsLCBtYXhWYWxdOwogICAgICB2YXIgY29sb3JzID0gW1swLCAwLCAxXSwgWzEsIDAsIDBdXTsKICAgICAgcmV0dXJuIGNvbG9yQmxlbmQodmFsLCBsaW1pdHMsIGNvbG9ycyk7';
+    paramsS5P.bbox = [1000000, 5000000, 2000000, 6000000];
+
+    try {
+      const imageBlobDefaultMinQa = await legacyGetMapFromParams(baseUrl, paramsS5P, ApiType.PROCESSING);
+      imgDefaultMinQa.src = URL.createObjectURL(imageBlobDefaultMinQa);
+
+      const imageBlobMinQa0 = await legacyGetMapFromParams(
+        baseUrl,
+        paramsS5P,
+        ApiType.PROCESSING,
+        null,
+        null,
+        {
+          minQa: 0,
+        },
+      );
+      imgMinQa0.src = URL.createObjectURL(imageBlobMinQa0);
+
+      const imageBlobMinQa100 = await legacyGetMapFromParams(
+        baseUrl,
+        paramsS5P,
+        ApiType.PROCESSING,
+        null,
+        null,
+        {
+          minQa: 100,
+        },
+      );
+      imgMinQa100.src = URL.createObjectURL(imageBlobMinQa100);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
