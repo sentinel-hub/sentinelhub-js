@@ -8,7 +8,7 @@ import {
   OrbitDirection,
   Link,
   LinkType,
-  DataProduct,
+  DataProductId,
 } from 'src/layer/const';
 import { ProcessingPayload } from 'src/layer/processing';
 import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
@@ -41,7 +41,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: DataProduct | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
