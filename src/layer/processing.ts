@@ -9,7 +9,7 @@ import {
   Interpolator,
   PreviewMode,
   MosaickingOrder,
-  DataProduct,
+  DataProductId,
 } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
@@ -19,6 +19,10 @@ enum PreviewModeString {
   PREVIEW = 'PREVIEW',
   EXTENDED_PREVIEW = 'EXTENDED_PREVIEW',
 }
+
+type DataProduct = {
+  '@id': DataProductId;
+};
 
 export type ProcessingPayload = {
   input: {
@@ -93,7 +97,7 @@ export function createProcessingPayload(
   dataset: Dataset,
   params: GetMapParams,
   evalscript: string | null = null,
-  dataProduct: DataProduct | null = null,
+  dataProduct: DataProductId | null = null,
   mosaickingOrder: MosaickingOrder | null = null,
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,
@@ -154,7 +158,9 @@ export function createProcessingPayload(
   if (evalscript) {
     payload.evalscript = evalscript;
   } else if (dataProduct) {
-    payload.dataProduct = dataProduct;
+    payload.dataProduct = {
+      '@id': dataProduct,
+    };
     payload.evalscript = ''; // evalscript must not be null
   } else {
     throw new Error('Either evalscript or dataProduct should be defined with Processing API');
