@@ -3,7 +3,7 @@ import { Polygon } from '@turf/helpers';
 
 import { BBox } from 'src/bbox';
 import { CRS_IDS, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
-import { ApiType, MimeType, GetMapParams } from 'src/layer/const';
+import { ApiType, MimeType, GetMapParams, OverrideGetMapParams } from 'src/layer/const';
 import { ServiceType } from 'src/layer/wms';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { LayersFactory } from 'src/layer/LayersFactory';
@@ -34,6 +34,8 @@ export async function legacyGetMapFromParams(
   wmsParams: Record<string, any>,
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
+  overrideGetMapParams?: OverrideGetMapParams,
+  overrideLayerConstructorParams?: Record<string, any>,
 ): Promise<Blob> {
   const {
     layers,
@@ -53,8 +55,10 @@ export async function legacyGetMapFromParams(
   } else {
     const layerId = layers;
 
-    // Warning: otherLayerParams override layer's params that are retrieved from service.
-    layer = await LayersFactory.makeLayer(baseUrl, layerId, otherLayerParams);
+    const overrideConstructorParams = { ...otherLayerParams, ...overrideLayerConstructorParams };
+
+    // Warning: overrideConstructorParams override layer's params that are retrieved from service.
+    layer = await LayersFactory.makeLayer(baseUrl, layerId, overrideConstructorParams);
     if (!layer) {
       throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
     }
@@ -74,9 +78,11 @@ export async function legacyGetMapFromParams(
     }
   }
 
+  const updatedGetMapParams = { ...getMapParams, ...overrideGetMapParams };
+
   switch (api) {
     case ApiType.WMS:
-      return layer.getMap(getMapParams, api);
+      return layer.getMap(updatedGetMapParams, api);
 
     case ApiType.PROCESSING:
       try {
@@ -87,11 +93,17 @@ export async function legacyGetMapFromParams(
         if (!(layer instanceof AbstractSentinelHubV3Layer)) {
           throw new Error('Processing API is only possible with SH V3 layers');
         }
-        return layer.getMap(getMapParams, api);
+        return layer.getMap(updatedGetMapParams, api);
       } catch (ex) {
         if (fallbackToWmsApi) {
           //console.debug(`Processing API could not be used, will retry with WMS. Error was: [${ex.message}]`)
-          return legacyGetMapFromParams(baseUrl, wmsParams, ApiType.WMS);
+          return legacyGetMapFromParams(
+            baseUrl,
+            wmsParams,
+            ApiType.WMS,
+            fallbackToWmsApi,
+            overrideGetMapParams,
+          );
         } else {
           throw ex;
         }

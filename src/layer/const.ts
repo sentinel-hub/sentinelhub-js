@@ -38,6 +38,8 @@ export type GetMapParams = {
   };
 };
 
+export type OverrideGetMapParams = Partial<GetMapParams>;
+
 export enum Interpolator {
   BILINEAR = 'BILINEAR',
   BICUBIC = 'BICUBIC',
