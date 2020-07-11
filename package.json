@@ -68,9 +68,9 @@
       "[.]fixtures[.]ts"
     ]
   },
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "files": [
     "dist",
-    "dist/index.d.ts"
+    "dist/src/index.d.ts"
   ]
 }
