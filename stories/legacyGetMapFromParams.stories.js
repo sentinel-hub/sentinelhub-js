@@ -36,10 +36,9 @@ const upsamplingNearest = Interpolator.NEAREST;
 const upsamplingBilinear = Interpolator.BILINEAR;
 const upsamplingBicubic = Interpolator.BICUBIC;
 
-const redRange = [0.2, 0.8];
-const greenRange = [0.2, 0.8];
-const blueRange = [0.2, 0.8];
-const minQa = 25;
+const redRange = { from: 0.2, to: 0.8 };
+const greenRange = { from: 0.2, to: 0.8 };
+const blueRange = { from: 0.2, to: 0.8 };
 
 const timeString = '2019-10-01/2020-04-23';
 
@@ -78,7 +77,6 @@ const paramsS5P = {
   showlogo: false,
   width: 512,
   height: 512,
-  bbox: [1400000, 5100000, 1600000, 5300000],
   format: 'image/jpeg',
   crs: 'EPSG:3857',
   preview: 2,
@@ -163,6 +161,65 @@ export const ProcessingLegacyGetMapFromParamsGainGamma = () => {
   return wrapperEl;
 };
 
+export const ProcessingLegacyGetMapFromParamsRGB = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const imgNoRGB = document.createElement('img');
+  imgNoRGB.width = '256';
+  imgNoRGB.height = '256';
+
+  const imgR = document.createElement('img');
+  imgR.width = '256';
+  imgR.height = '256';
+
+  const imgG = document.createElement('img');
+  imgG.width = '256';
+  imgG.height = '256';
+
+  const imgB = document.createElement('img');
+  imgB.width = '256';
+  imgB.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML += '<h4>no RGB | R | G | B</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoRGB);
+  wrapperEl.insertAdjacentElement('beforeend', imgR);
+  wrapperEl.insertAdjacentElement('beforeend', imgG);
+  wrapperEl.insertAdjacentElement('beforeend', imgB);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    try {
+      const imageBlobNoRGB = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING);
+      imgNoRGB.src = URL.createObjectURL(imageBlobNoRGB);
+
+      const imageBlobR = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+        effects: { redRange: redRange },
+      });
+      imgR.src = URL.createObjectURL(imageBlobR);
+
+      const imageBlobG = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+        effects: { greenRange: greenRange },
+      });
+      imgG.src = URL.createObjectURL(imageBlobG);
+
+      const imageBlobB = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+        effects: { blueRange: blueRange },
+      });
+      imgB.src = URL.createObjectURL(imageBlobB);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const ProcessingLegacyGetMapFromParamsUpsamplingS5p = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
@@ -195,6 +252,7 @@ export const ProcessingLegacyGetMapFromParamsUpsamplingS5p = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
+    paramsS5P.bbox = [1400000, 5100000, 1600000, 5300000];
     paramsS5P.evalscript =
       'dmFyIHZhbCA9IENMT1VEX0JBU0VfUFJFU1NVUkU7CiAgICAgIHZhciBtaW5WYWwgPSAxMDAwMC4wOwogICAgICB2YXIgbWF4VmFsID0gMTEwMDAwLjA7CiAgICAgIHZhciBkaWZmID0gbWF4VmFsIC0gbWluVmFsOwogICAgICB2YXIgbGltaXRzID0gW21pblZhbCwgbWluVmFsICsgMC4xMjUgKiBkaWZmLCBtaW5WYWwgKyAwLjM3NSAqIGRpZmYsIG1pblZhbCArIDAuNjI1ICogZGlmZiwgbWluVmFsICsgMC44NzUgKiBkaWZmLCBtYXhWYWxdOwogICAgICB2YXIgY29sb3JzID0gW1swLCAwLCAwLjVdLCBbMCwgMCwgMV0sIFswLCAxLCAxXSwgWzEsIDEsIDBdLCBbMSwgMCwgMF0sIFswLjUsIDAsIDBdXTsKICAgICAgcmV0dXJuIGNvbG9yQmxlbmQodmFsLCBsaW1pdHMsIGNvbG9ycyk7';
 
@@ -272,9 +330,7 @@ export const ProcessingLegacyGetMapFromParamsMinQaS5p = () => {
         ApiType.PROCESSING,
         null,
         null,
-        {
-          minQa: 0,
-        },
+        { minQa: 0 },
       );
       imgMinQa0.src = URL.createObjectURL(imageBlobMinQa0);
 
@@ -284,9 +340,7 @@ export const ProcessingLegacyGetMapFromParamsMinQaS5p = () => {
         ApiType.PROCESSING,
         null,
         null,
-        {
-          minQa: 100,
-        },
+        { minQa: 100 },
       );
       imgMinQa100.src = URL.createObjectURL(imageBlobMinQa100);
     } catch (err) {
