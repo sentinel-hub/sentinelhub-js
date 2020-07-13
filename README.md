@@ -368,6 +368,29 @@ Alternatively, authentication token can be set on a per-request basis, which als
   const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
 ```
 
+## Utility functions
+
+### Async conversion between Blob and Canvas
+
+Function `drawBlobOnCanvas` allows drawing a Blob on existing canvas element:
+
+```javascript
+  const blob = await layer.getMap(params, ApiType.WMS);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = params.width;
+  canvas.height = params.height;
+  const ctx = canvas.getContext('2d');
+
+  await drawBlobOnCanvas(ctx, blob, 0, 0);
+```
+
+Function `canvasToBlob` converts an existing canvas to Blob:
+
+```javascript
+  const blob = await canvasToBlob(canvas);
+```
+
 ## Debugging
 
 This library is an abstraction layer that provides nice interface for accessing the underlying services, which simplifies development - but when requests fail, it is sometimes difficult to understand why. To enable easier debugging, `setDebugEnabled` can be used:

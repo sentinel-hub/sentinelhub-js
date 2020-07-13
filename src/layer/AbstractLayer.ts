@@ -12,6 +12,7 @@ import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
+import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -112,7 +113,6 @@ export class AbstractLayer {
         const xTo = Math.min(x + chunkWidth, width);
         for (let y = 0; y < height; y += chunkHeight) {
           const yTo = Math.min(y + chunkHeight, height);
-          console.log(xToLng(x), yToLat(yTo), xToLng(xTo), yToLat(y));
           const paramsChunk: GetMapParams = {
             ...params,
             width: xTo - x,
@@ -121,28 +121,12 @@ export class AbstractLayer {
             preview: PreviewMode.EXTENDED_PREVIEW,
           };
           const blob = await this.getMap(paramsChunk, api, innerReqConfig);
-          await this.drawBlobOnCanvas(ctx, blob, x, y);
+          await drawBlobOnCanvas(ctx, blob, x, y);
         }
       }
 
-      return await new Promise(resolve => canvas.toBlob(resolve, params.format));
+      return await canvasToBlob(canvas, params.format);
     }, reqConfig);
-  }
-
-  private async drawBlobOnCanvas(ctx: CanvasRenderingContext2D, blob: Blob, x: number, y: number) {
-    const objectURL = URL.createObjectURL(blob);
-    try {
-      // wait until objectUrl is drawn on the image, so you can safely draw img on canvas:
-      const imgDrawn: HTMLImageElement = await new Promise((resolve, reject) => {
-        const img = document.createElement('img');
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = objectURL;
-      });
-      ctx.drawImage(imgDrawn, x, y);
-    } finally {
-      URL.revokeObjectURL(objectURL);
-    }
   }
 
   public supportsApiType(api: ApiType): boolean {
