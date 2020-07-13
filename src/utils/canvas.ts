@@ -5,7 +5,7 @@ export async function drawBlobOnCanvas(
   blob: Blob,
   x: number = 0,
   y: number = 0,
-) {
+): Promise<void> {
   const objectURL = URL.createObjectURL(blob);
   try {
     // wait until objectUrl is drawn on the image, so you can safely draw img on canvas:

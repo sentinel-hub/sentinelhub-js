@@ -106,8 +106,8 @@ export class AbstractLayer {
       const chunkHeight = Math.ceil(height / ySplitBy);
 
       const { minX: lng0, minY: lat0, maxX: lng1, maxY: lat1 } = bbox;
-      const xToLng = (x: number) => Math.min(lng0, lng1) + (x / width) * Math.abs(lng1 - lng0);
-      const yToLat = (y: number) => Math.max(lat0, lat1) - (y / height) * Math.abs(lat1 - lat0);
+      const xToLng = (x: number): number => Math.min(lng0, lng1) + (x / width) * Math.abs(lng1 - lng0);
+      const yToLat = (y: number): number => Math.max(lat0, lat1) - (y / height) * Math.abs(lat1 - lat0);
 
       for (let x = 0; x < width; x += chunkWidth) {
         const xTo = Math.min(x + chunkWidth, width);
