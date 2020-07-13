@@ -5,13 +5,14 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { BBox } from 'src/bbox';
 import { CRS_EPSG4326 } from 'src/crs';
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval } from 'src/layer/const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode } from 'src/layer/const';
 import { Dataset } from 'src/layer/dataset';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
+import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -74,6 +75,58 @@ export class AbstractLayer {
       }
     }, reqConfig);
     return blob;
+  }
+
+  public async getHugeMap(
+    params: GetMapParams,
+    api: ApiType,
+    reqConfig?: RequestConfiguration,
+  ): Promise<Blob> {
+    return await ensureTimeout(async innerReqConfig => {
+      const { width, height, bbox } = params;
+      if (!width || !height) {
+        throw new Error(
+          'Method getHugeMap() requests that width and height of resulting image are specified',
+        );
+      }
+
+      const LIMIT_DIM = 2000;
+      if (width <= LIMIT_DIM && height <= LIMIT_DIM) {
+        return await this.getMap(params, api, innerReqConfig);
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      const xSplitBy = Math.ceil(width / LIMIT_DIM);
+      const chunkWidth = Math.ceil(width / xSplitBy);
+      const ySplitBy = Math.ceil(height / LIMIT_DIM);
+      const chunkHeight = Math.ceil(height / ySplitBy);
+
+      const { minX: lng0, minY: lat0, maxX: lng1, maxY: lat1 } = bbox;
+      const xToLng = (x: number): number => Math.min(lng0, lng1) + (x / width) * Math.abs(lng1 - lng0);
+      const yToLat = (y: number): number => Math.max(lat0, lat1) - (y / height) * Math.abs(lat1 - lat0);
+
+      for (let x = 0; x < width; x += chunkWidth) {
+        const xTo = Math.min(x + chunkWidth, width);
+        for (let y = 0; y < height; y += chunkHeight) {
+          const yTo = Math.min(y + chunkHeight, height);
+          const paramsChunk: GetMapParams = {
+            ...params,
+            width: xTo - x,
+            height: yTo - y,
+            bbox: new BBox(bbox.crs, xToLng(x), yToLat(yTo), xToLng(xTo), yToLat(y)),
+            preview: PreviewMode.EXTENDED_PREVIEW,
+          };
+          const blob = await this.getMap(paramsChunk, api, innerReqConfig);
+          await drawBlobOnCanvas(ctx, blob, x, y);
+        }
+      }
+
+      return await canvasToBlob(canvas, params.format);
+    }, reqConfig);
   }
 
   public supportsApiType(api: ApiType): boolean {
