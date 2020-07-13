@@ -197,7 +197,7 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
 
 ### Stitching images
 
-Services limit the size of the output image per request (5000px for OGC and 2500px for Processing API). If we need a bigger image, we can issue multiple requests and stitch the results together in a canvas. A utility method `getHugeMap` allows us to do that seemlessly.
+Services limit the size of the output image per request (5000px for OGC and 2500px for Processing API). If we need a bigger image, we can issue multiple requests and stitch the results together in a canvas. A utility method `getHugeMap` allows us to do that seamlessly.
 
 IMPORTANT: be careful with the image sizes as a big image could consume a lot of processing units. There is no limit imposed by this method.
 
@@ -372,7 +372,7 @@ Alternatively, authentication token can be set on a per-request basis, which als
 
 ### Async conversion between Blob and Canvas
 
-Function `drawBlobOnCanvas` allows drawing a Blob on existing canvas element:
+Function `drawBlobOnCanvas` allows drawing a `Blob` on existing canvas element:
 
 ```javascript
   const blob = await layer.getMap(params, ApiType.WMS);
@@ -385,7 +385,7 @@ Function `drawBlobOnCanvas` allows drawing a Blob on existing canvas element:
   await drawBlobOnCanvas(ctx, blob, 0, 0);
 ```
 
-Function `canvasToBlob` converts an existing canvas to Blob:
+Function `canvasToBlob` converts an existing canvas to `Blob`:
 
 ```javascript
   const blob = await canvasToBlob(canvas);
