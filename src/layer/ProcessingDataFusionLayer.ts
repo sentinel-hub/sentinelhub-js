@@ -64,7 +64,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         throw new Error(`Only API type "PROCESSING" is supported`);
       }
 
-      await this.fetchEvalscriptUrlIfNeeded();
+      await this.fetchEvalscriptUrlIfNeeded(innerReqConfig);
 
       // when constructing the payload, we just take the first layer - we will rewrite its info later:
       const bogusFirstLayer = this.layers[0].layer;
