@@ -18,7 +18,7 @@ import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer
 import { ProcessingPayload } from 'src/layer/processing';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 import { ensureTimeout } from 'src/utils/ensureTimeout';
-import { DEFAULT_CACHE_CONFIG } from 'src/utils/cacheHandlers';
+import { CACHE_CONFIG_30MIN } from 'src/utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -81,8 +81,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         const res = await axios.get(url, {
           responseType: 'json',
           headers: headers,
-          cache: DEFAULT_CACHE_CONFIG,
-          ...getAxiosReqParams(innerReqConfig),
+          ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
         });
 
         this.locationId = res.data.location.id;
@@ -205,8 +204,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       const res = await axios.get(url, {
         responseType: 'json',
         headers: headers,
-        cache: DEFAULT_CACHE_CONFIG,
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       });
       return res.data.bands;
     }, reqConfig);

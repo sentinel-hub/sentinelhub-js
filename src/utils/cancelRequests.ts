@@ -30,15 +30,24 @@ export const isCancelled = (err: Error): boolean => {
   return axios.isCancel(err);
 };
 
-export const getAxiosReqParams = (reqConfig: RequestConfiguration): AxiosRequestConfig => {
-  let axiosReqConfig: AxiosRequestConfig = {};
+export const getAxiosReqParams = (
+  reqConfig: RequestConfiguration,
+  defaultCache: CacheConfig,
+): AxiosRequestConfig => {
+  let axiosReqConfig: AxiosRequestConfig = {
+    cache: defaultCache,
+  };
+
   if (!reqConfig) {
     return axiosReqConfig;
   }
+
   if (reqConfig.cancelToken) {
     axiosReqConfig.cancelToken = reqConfig.cancelToken.getToken();
   }
   axiosReqConfig.retries = reqConfig.retries;
-  axiosReqConfig.cache = reqConfig.cache;
+  if (reqConfig.cache) {
+    axiosReqConfig.cache = reqConfig.cache;
+  }
   return axiosReqConfig;
 };

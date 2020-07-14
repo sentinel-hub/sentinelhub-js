@@ -26,7 +26,7 @@ import { ensureTimeout } from 'src/utils/ensureTimeout';
 
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
-import { DEFAULT_CACHE_CONFIG } from 'src/utils/cacheHandlers';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from 'src/utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -110,8 +110,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
-      cache: DEFAULT_CACHE_CONFIG,
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
     const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
@@ -146,11 +145,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
-  protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
+  protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
       const response = await axios.get(this.evalscriptUrl, {
         responseType: 'text',
-        cache: DEFAULT_CACHE_CONFIG,
+        ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
       });
       this.evalscript = response.data;
     }
@@ -176,7 +175,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error('This layer does not support Processing API (unknown dataset)');
         }
 
-        await this.fetchEvalscriptUrlIfNeeded();
+        await this.fetchEvalscriptUrlIfNeeded(innerReqConfig);
 
         let layerParams = null;
         if (!this.evalscript && !this.dataProduct) {
@@ -298,7 +297,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected createSearchIndexRequestConfig(reqConfig: RequestConfiguration): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
     };
     return requestConfig;
   }
@@ -418,7 +417,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       };
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
       const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
       const found: Moment[] = response.data.map((date: string) => moment.utc(date));
@@ -475,7 +474,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       };
 
       const shServiceHostname = this.getShServiceHostname();
@@ -510,9 +509,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/ecmascript',
       },
-      cache: DEFAULT_CACHE_CONFIG,
       responseType: 'text',
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
     const res = await axios.post(url, evalscript, requestConfig);
     return res.data;
