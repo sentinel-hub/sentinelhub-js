@@ -181,7 +181,7 @@ const isRequestCachable = (request: AxiosRequestConfig): boolean => {
   if (!(request && request.cache && request.cache.expiresIn)) {
     return false;
   }
-  // cache can be disbabled with expiresIn: 0;
+  // cache can be disabled with expiresIn: 0;
   if (request.cache.expiresIn === 0) {
     return false;
   }
