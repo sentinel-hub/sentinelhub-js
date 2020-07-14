@@ -54,6 +54,7 @@ const basicParams = {
   crs: 'EPSG:3857',
   preview: 2,
   bgcolor: '000000',
+  evalscript: 'cmV0dXJuIFtCMDQqMi41LEIwMyoyLjUsQjAyKjIuNV07',
 };
 // EOBrowser example:
 // https://apps.sentinel-hub.com/eo-browser/?lat=40.5486&lng=-3.7824&zoom=12&time=2020-02-23&preset=1_TRUE_COLOR&gainOverride=1&gammaOverride=1&redRangeOverride=[0,1]&greenRangeOverride=[0,1]&blueRangeOverride=[0,1]&datasource=Sentinel-2%20L2A
@@ -197,17 +198,17 @@ export const ProcessingLegacyGetMapFromParamsRGB = () => {
       const imageBlobNoRGB = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING);
       imgNoRGB.src = URL.createObjectURL(imageBlobNoRGB);
 
-      const imageBlobR = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+      const imageBlobR = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, null, {
         effects: { redRange: redRange },
       });
       imgR.src = URL.createObjectURL(imageBlobR);
 
-      const imageBlobG = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+      const imageBlobG = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, null, {
         effects: { greenRange: greenRange },
       });
       imgG.src = URL.createObjectURL(imageBlobG);
 
-      const imageBlobB = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, {
+      const imageBlobB = await legacyGetMapFromParams(baseUrl, basicParams, ApiType.PROCESSING, null, null, {
         effects: { blueRange: blueRange },
       });
       imgB.src = URL.createObjectURL(imageBlobB);
@@ -324,24 +325,14 @@ export const ProcessingLegacyGetMapFromParamsMinQaS5p = () => {
       const imageBlobDefaultMinQa = await legacyGetMapFromParams(baseUrl, paramsS5P, ApiType.PROCESSING);
       imgDefaultMinQa.src = URL.createObjectURL(imageBlobDefaultMinQa);
 
-      const imageBlobMinQa0 = await legacyGetMapFromParams(
-        baseUrl,
-        paramsS5P,
-        ApiType.PROCESSING,
-        null,
-        null,
-        { minQa: 0 },
-      );
+      const imageBlobMinQa0 = await legacyGetMapFromParams(baseUrl, paramsS5P, ApiType.PROCESSING, null, {
+        minQa: 0,
+      });
       imgMinQa0.src = URL.createObjectURL(imageBlobMinQa0);
 
-      const imageBlobMinQa100 = await legacyGetMapFromParams(
-        baseUrl,
-        paramsS5P,
-        ApiType.PROCESSING,
-        null,
-        null,
-        { minQa: 100 },
-      );
+      const imageBlobMinQa100 = await legacyGetMapFromParams(baseUrl, paramsS5P, ApiType.PROCESSING, null, {
+        minQa: 100,
+      });
       imgMinQa100.src = URL.createObjectURL(imageBlobMinQa100);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
