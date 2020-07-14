@@ -125,6 +125,7 @@ test.each([
           polarization: Polarization.DV,
           resolution: Resolution.HIGH,
           orbitDirection: OrbitDirection.ASCENDING,
+          tileId: 1293846,
         },
         links: [
           {
