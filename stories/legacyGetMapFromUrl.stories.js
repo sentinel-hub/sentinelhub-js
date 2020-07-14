@@ -1,5 +1,5 @@
 import { setAuthTokenWithOAuthCredentials } from './storiesUtils';
-import { legacyGetMapFromUrl, ApiType } from '../dist/sentinelHub.esm';
+import { legacyGetMapFromUrl, ApiType, Interpolator } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -15,13 +15,17 @@ const s2l2aLayerId = process.env.S2L2A_LAYER_ID;
 const gain = 2;
 const gamma = 2;
 
+const redRange = { from: 0.2, to: 0.8 };
+const greenRange = { from: 0.2, to: 0.8 };
+const blueRange = { from: 0.2, to: 0.8 };
+
 export default {
   title: 'legacyGetMapFromUrl',
 };
 
 const baseUrl = `https://services.sentinel-hub.com/ogc/wms/${instanceId}`;
 
-const queryParams = `version=1.1.1&service=WMS&request=GetMap&format=image%2Fjpeg&crs=EPSG%3A3857&layers=${s2l2aLayerId}&bbox=-430493.3433021127%2C4931105.568733289%2C-410925.4640611076%2C4950673.447974297&time=2019-07-01T00%3A00%3A00.000Z%2F2020-01-15T23%3A59%3A59.000Z&width=512&height=512&showlogo=false&transparent=true&maxcc=20&preview=3&bgcolor=000000`;
+const queryParams = `version=1.1.1&service=WMS&request=GetMap&format=image%2Fjpeg&crs=EPSG%3A3857&layers=${s2l2aLayerId}&bbox=-430493.3433021127%2C4931105.568733289%2C-410925.4640611076%2C4950673.447974297&time=2019-07-01T00%3A00%3A00.000Z%2F2020-01-15T23%3A59%3A59.000Z&width=512&height=512&showlogo=false&transparent=true&maxcc=20&preview=3&bgcolor=000000&evalscript=cmV0dXJuIFtCMDQqMi41LEIwMyoyLjUsQjAyKjIuNV07`;
 const queryParamsGain = queryParams + `&gain=${gain}`;
 const queryParamsGamma = queryParams + `&gamma=${gamma}`;
 const queryParamsGainGamma = queryParams + `&gain=${gain}` + `&gamma=${gamma}`;
@@ -112,6 +116,77 @@ export const ProcessingLegacyGetMapFromUrlGainGamma = () => {
         true,
       );
       imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const ProcessingLegacyGetMapFromUrlRGB = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const imgNoRGB = document.createElement('img');
+  imgNoRGB.width = '256';
+  imgNoRGB.height = '256';
+
+  const imgR = document.createElement('img');
+  imgR.width = '256';
+  imgR.height = '256';
+
+  const imgG = document.createElement('img');
+  imgG.width = '256';
+  imgG.height = '256';
+
+  const imgB = document.createElement('img');
+  imgB.width = '256';
+  imgB.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML += '<h4>no RGB | R | G | B</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgNoRGB);
+  wrapperEl.insertAdjacentElement('beforeend', imgR);
+  wrapperEl.insertAdjacentElement('beforeend', imgG);
+  wrapperEl.insertAdjacentElement('beforeend', imgB);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    try {
+      const imageBlobNoRGB = await legacyGetMapFromUrl(`${baseUrl}?${queryParams}`, ApiType.PROCESSING, true);
+      imgNoRGB.src = URL.createObjectURL(imageBlobNoRGB);
+
+      const imageBlobR = await legacyGetMapFromUrl(
+        `${baseUrl}?${queryParams}`,
+        ApiType.PROCESSING,
+        true,
+        null,
+        { effects: { redRange: redRange } },
+      );
+      imgR.src = URL.createObjectURL(imageBlobR);
+
+      const imageBlobG = await legacyGetMapFromUrl(
+        `${baseUrl}?${queryParams}`,
+        ApiType.PROCESSING,
+        true,
+        null,
+        { effects: { greenRange: greenRange } },
+      );
+      imgG.src = URL.createObjectURL(imageBlobG);
+
+      const imageBlobB = await legacyGetMapFromUrl(
+        `${baseUrl}?${queryParams}`,
+        ApiType.PROCESSING,
+        true,
+        null,
+        { effects: { blueRange: blueRange } },
+      );
+      imgB.src = URL.createObjectURL(imageBlobB);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }

@@ -13,6 +13,8 @@ export async function legacyGetMapFromUrl(
   urlWithQueryParams: string,
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
+  overrideLayerConstructorParams?: Record<string, any>,
+  overrideGetMapParams?: OverrideGetMapParams,
 ): Promise<Blob> {
   const url = new URL(urlWithQueryParams);
   let params: Record<string, any> = {};
@@ -20,7 +22,14 @@ export async function legacyGetMapFromUrl(
     params[key] = value;
   });
   const baseUrl = `${url.origin}${url.pathname}`;
-  return legacyGetMapFromParams(baseUrl, params, api, fallbackToWmsApi);
+  return legacyGetMapFromParams(
+    baseUrl,
+    params,
+    api,
+    fallbackToWmsApi,
+    overrideLayerConstructorParams,
+    overrideGetMapParams,
+  );
 }
 
 export function legacyGetMapWmsUrlFromParams(baseUrl: string, wmsParams: Record<string, any>): string {
