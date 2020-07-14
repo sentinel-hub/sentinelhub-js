@@ -34,8 +34,8 @@ export async function legacyGetMapFromParams(
   wmsParams: Record<string, any>,
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
-  overrideGetMapParams?: OverrideGetMapParams,
   overrideLayerConstructorParams?: Record<string, any>,
+  overrideGetMapParams?: OverrideGetMapParams,
 ): Promise<Blob> {
   const {
     layers,

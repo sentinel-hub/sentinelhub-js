@@ -325,6 +325,21 @@ If we already have a WMS GetMap URL, we can use it directly:
 
 Gain and gamma effects are also supported in these two functions as a part of `wmsParams` or `fullUrlWithWmsQueryString`.
 
+`legacyGetMapFromParams` and `legacyGetMapFromUrl` also accept the parameters that are not supported in WMS GetMap URL but are supported.
+Parameters that are needed when instantiating a `Layer` can be passed inside of `overrideLayerConstructorParams`.
+Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`.
+
+```javascript
+  const imageBlob5 = await legacyGetMapFromParams(
+    rootUrl, 
+    wmsParams, 
+    ApiType.PROCESSING
+    fallbackToWmsApi,
+    overrideLayerConstructorParams,
+    overrideGetMapParams,
+  );
+```
+
 ## Authentication for Processing API
 
 Requests to Processing API need to be authenticated.
