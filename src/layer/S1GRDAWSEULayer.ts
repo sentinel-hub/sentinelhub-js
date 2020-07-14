@@ -172,6 +172,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
           geometry: tile.dataGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),
           meta: {
+            tileId: tile.id,
             orbitDirection: tile.orbitDirection,
             polarization: tile.polarization,
             acquisitionMode: tile.acquisitionMode,
