@@ -10,7 +10,7 @@ export type CacheConfig = {
 };
 
 export const fetchCachedResponse = async (request: any): Promise<any> => {
-  if (!isRequestCachable) {
+  if (!isRequestCachable(request)) {
     return request;
   }
 
