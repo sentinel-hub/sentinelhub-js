@@ -17,10 +17,6 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
-  // do not perform caching if Cache API is not supported:
-  if (typeof window === 'undefined' || !window.caches) {
-    return request;
-  }
   const cacheKey = await generateCacheKey(request);
   // resource not cacheable? It couldn't have been saved to cache:
   if (cacheKey === null) {
@@ -76,10 +72,6 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     return response;
   }
   const shCache = new CacheFactory(response.config.cache.targets);
-  // do not perform caching if Cache API is not supported:
-  if (typeof window === 'undefined' || !window.caches) {
-    return response;
-  }
   // resource not cacheable?
   if (!response.config.cacheKey) {
     return response;
