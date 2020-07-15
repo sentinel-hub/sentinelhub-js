@@ -1,5 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
+import { CacheTargets, CacheFactory } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
@@ -8,6 +9,7 @@ const EXPIRY_HEADER_KEY = 'Cache_Expires';
 
 export type CacheConfig = {
   expiresIn: number;
+  targets?: CacheTargets;
 };
 
 export const fetchCachedResponse = async (request: any): Promise<any> => {
@@ -24,16 +26,9 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   if (cacheKey === null) {
     return request;
   }
+  const shCache = new CacheFactory(request.cache.targets);
 
-  let cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    console.warn('Caching failed', err);
-    return request;
-  }
-
-  const cachedResponse = await cache.match(cacheKey);
+  const cachedResponse = await shCache.cacheWrapper.get(cacheKey);
   if (!cachedResponse || !cacheStillValid(cachedResponse)) {
     request.cacheKey = cacheKey;
     return request;
@@ -80,19 +75,13 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   if (!isRequestCachable(response.config)) {
     return response;
   }
+  const shCache = new CacheFactory(response.config.cache.targets);
   // do not perform caching if Cache API is not supported:
   if (typeof window === 'undefined' || !window.caches) {
     return response;
   }
   // resource not cacheable?
   if (!response.config.cacheKey) {
-    return response;
-  }
-  let cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    console.warn('Caching failed', err);
     return response;
   }
 
@@ -122,7 +111,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     default:
       throw new Error('Unsupported response type: ' + request.responseType);
   }
-  cache.put(response.config.cacheKey, new Response(responseData, response));
+  shCache.cacheWrapper.set(response.config.cacheKey, new Response(responseData, response));
   return response;
 };
 
