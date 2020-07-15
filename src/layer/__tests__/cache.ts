@@ -208,3 +208,36 @@ describe('Testing cache targets', () => {
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
   });
 });
+
+describe('Testing cache targets when cache_api is not available', () => {
+  beforeEach(() => {
+    Object.assign(global, fetch);
+    jest.resetModules();
+    memoryCache.clear();
+  });
+
+  it('should default to memory if window.caches is undefined', async () => {
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
+    const requestsConfig = {
+      cache: {
+        expiresIn: 60,
+      },
+    };
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const cacheFromMemoryItem = memoryCache.has(mockNetwork.history.post[0].cacheKey);
+
+    expect(self.caches).toBeUndefined();
+    expect(cacheFromMemoryItem).toBeTruthy();
+    expect(cacheFromMemoryItem).not.toEqual(null);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+  });
+});
