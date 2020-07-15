@@ -10,6 +10,7 @@ import {
   PreviewMode,
   CancelToken,
   isCancelled,
+  CacheTarget,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -121,6 +122,7 @@ export const GetMapProcessing = () => {
     const reqConfig = {
       cache: {
         expiresIn: 5000,
+        targets: [CacheTarget.MEMORY],
       },
     };
 
