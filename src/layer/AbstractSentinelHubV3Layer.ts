@@ -119,7 +119,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       layerId: l.id,
       ...l.datasourceDefaults,
       evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct,
+      dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
       legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
         ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
         : null,
