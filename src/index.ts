@@ -57,6 +57,7 @@ import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEUL
 import { LocationIdSHv3, GetMapParams, LinkType } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
+import { CacheTarget } from 'src/utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
 
 import { Effects, ColorRange } from 'src/mapDataManipulation/const';
@@ -124,6 +125,7 @@ export {
   setDebugEnabled,
   CancelToken,
   isCancelled,
+  CacheTarget,
   RequestConfiguration,
   // legacy:
   legacyGetMapFromUrl,
