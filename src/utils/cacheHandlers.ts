@@ -71,12 +71,11 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   if (!isRequestCachable(response.config)) {
     return response;
   }
-  const shCache = cacheFactory(response.config.cache.targets);
   // resource not cacheable?
   if (!response.config.cacheKey) {
     return response;
   }
-
+  const shCache = cacheFactory(response.config.cache.targets);
   if (await shCache.has(response.config.cacheKey)) {
     return response;
   }
