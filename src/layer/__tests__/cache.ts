@@ -8,7 +8,7 @@ import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
 import { ApiType } from 'src';
 import { setAuthToken } from 'src/auth';
-import { memoryCache, CacheTarget, CACHE_API_KEY } from 'src/utils/Cache';
+import { invalidateCaches, memoryCache, CacheTarget, CACHE_API_KEY } from 'src/utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -38,7 +38,6 @@ describe('Testing caching', () => {
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
-
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
 
@@ -206,6 +205,35 @@ describe('Testing cache targets', () => {
     expect(mockNetwork.history.post.length).toBe(1);
     expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+  });
+
+  it('should invalidate caches', async () => {
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
+    const reqConfig = {
+      cache: {
+        expiresIn: 60,
+        targets: [CacheTarget.CACHE_API],
+      },
+    };
+
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+
+    invalidateCaches();
+
+    const responseFromMockNetwork2 = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork2.tiles).toStrictEqual(expectedResultTiles);
   });
 });
 
