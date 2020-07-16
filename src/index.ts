@@ -58,6 +58,7 @@ import { LocationIdSHv3, GetMapParams, LinkType } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
+import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
 
 import { Effects, ColorRange } from 'src/mapDataManipulation/const';
 
@@ -125,6 +126,8 @@ export {
   CancelToken,
   isCancelled,
   RequestConfiguration,
+  drawBlobOnCanvas,
+  canvasToBlob,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,

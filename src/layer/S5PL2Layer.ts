@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, Link, LinkType } from 'src/layer/const';
+import { PaginatedTiles, Link, LinkType, DataProductId } from 'src/layer/const';
 import { DATASET_S5PL2 } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -30,7 +30,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
