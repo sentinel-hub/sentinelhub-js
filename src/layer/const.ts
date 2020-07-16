@@ -199,3 +199,8 @@ export type DataProductId = string;
 export const SUPPORTED_DATA_PRODUCTS_PROCESSING: DataProductId[] = [
   'https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643',
 ];
+
+export type BYOCBand = {
+  name: string;
+  sampleType: string;
+};
