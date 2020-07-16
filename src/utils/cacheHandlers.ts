@@ -77,6 +77,10 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     return response;
   }
 
+  if (await shCache.has(response.config.cacheKey)) {
+    return response;
+  }
+
   // before saving response, set an artificial header that tells when it should expire:
   const expiresMs = new Date().getTime() + response.config.cache.expiresIn * 1000;
   response.headers = {
