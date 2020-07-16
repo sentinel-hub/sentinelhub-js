@@ -38,17 +38,17 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     let responseData;
     switch (request.responseType) {
       case 'blob':
-        responseData = await cachedResponse.blob();
+        responseData = await cachedResponse.clone().blob();
         break;
       case 'arraybuffer':
-        responseData = await cachedResponse.arrayBuffer();
+        responseData = await cachedResponse.clone().arrayBuffer();
         break;
       case 'text':
-        responseData = await cachedResponse.text();
+        responseData = await cachedResponse.clone().text();
         break;
       case 'json':
       case undefined: // axios defaults to json https://github.com/axios/axios#request-config
-        responseData = await cachedResponse.json();
+        responseData = await cachedResponse.clone().json();
         break;
       default:
         throw new Error('Unsupported response type: ' + request.responseType);
