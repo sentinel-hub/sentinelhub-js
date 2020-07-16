@@ -102,9 +102,9 @@ class CacheApi implements ShCache {
   public async invalidate(): Promise<void> {
     const cache = await this.cache;
     const cacheKeys = await cache.keys();
-    cacheKeys.forEach(async (key: string) => {
-      this.cache.delete(key);
-    });
+    for (let key of cacheKeys) {
+      await cache.delete(key);
+    }
   }
 }
 
