@@ -211,7 +211,7 @@ describe('Testing cache targets', () => {
 
 describe('Testing cache targets when cache_api is not available', () => {
   beforeEach(() => {
-    Object.assign(global, fetch);
+    Object.assign(global, { caches: undefined }, fetch);
     jest.resetModules();
     memoryCache.clear();
   });
@@ -228,7 +228,6 @@ describe('Testing cache targets when cache_api is not available', () => {
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
-
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const cacheFromMemoryItem = memoryCache.has(mockNetwork.history.post[0].cacheKey);
