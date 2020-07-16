@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
-import { CacheTargets, CacheFactory } from './Cache';
+import { CacheTargets, cacheFactory } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
@@ -22,9 +22,9 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   if (cacheKey === null) {
     return request;
   }
-  const shCache = new CacheFactory(request.cache.targets);
+  const shCache = cacheFactory(request.cache.targets);
 
-  const cachedResponse = await shCache.cacheWrapper.get(cacheKey);
+  const cachedResponse = await shCache.get(cacheKey);
   if (!cachedResponse || !cacheStillValid(cachedResponse)) {
     request.cacheKey = cacheKey;
     return request;
@@ -71,7 +71,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   if (!isRequestCachable(response.config)) {
     return response;
   }
-  const shCache = new CacheFactory(response.config.cache.targets);
+  const shCache = cacheFactory(response.config.cache.targets);
   // resource not cacheable?
   if (!response.config.cacheKey) {
     return response;
@@ -103,7 +103,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     default:
       throw new Error('Unsupported response type: ' + request.responseType);
   }
-  shCache.cacheWrapper.set(response.config.cacheKey, new Response(responseData, response));
+  shCache.set(response.config.cacheKey, new Response(responseData, response));
   return response;
 };
 
