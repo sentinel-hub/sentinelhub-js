@@ -5,48 +5,44 @@ export enum CacheTarget {
 }
 export const CACHE_API_KEY = 'sentinelhub-v1';
 export const memoryCache = new Map();
-const defaultTargets = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
 
-export class CacheFactory {
-  public target: CacheTarget;
-  public cacheWrapper: ShCache;
-  public constructor(optionalTargets?: CacheTargets) {
-    const targets = optionalTargets || defaultTargets;
-    this.target = this.getFirstUsuableTarget(targets);
-    this.cacheWrapper = this.constructCache(this.target);
-  }
+export function cacheFactory(optionalTargets: CacheTargets): ShCache {
+  const defaultTargets = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
+  const targets = optionalTargets || defaultTargets;
+  const target = getFirstUsuableTarget(targets);
+  return constructCache(target);
+}
 
-  private constructCache(target: CacheTarget): ShCache {
-    switch (target) {
-      case CacheTarget.CACHE_API:
-        return new CacheApi();
-      case CacheTarget.MEMORY:
-        return new MemoryCache();
-      default:
-        throw new Error('Target not supported');
+function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
+  let firstTargetToUse = CacheTarget.MEMORY;
+  for (const key of targets) {
+    if (doesTargetExist(key)) {
+      firstTargetToUse = key;
+      break;
     }
   }
+  return firstTargetToUse;
+}
 
-  private getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
-    let firstTargetToUse = CacheTarget.MEMORY;
-    for (const key of targets) {
-      if (this.doesTargetExist(key)) {
-        firstTargetToUse = key;
-        break;
-      }
-    }
-    return firstTargetToUse;
+function doesTargetExist(target: CacheTarget): boolean {
+  switch (target) {
+    case CacheTarget.CACHE_API:
+      return Boolean(window.caches);
+    case CacheTarget.MEMORY:
+      return true;
+    default:
+      return false;
   }
+}
 
-  private doesTargetExist(target: CacheTarget): boolean {
-    switch (target) {
-      case CacheTarget.CACHE_API:
-        return Boolean(window.caches);
-      case CacheTarget.MEMORY:
-        return true;
-      default:
-        return false;
-    }
+function constructCache(target: CacheTarget): ShCache {
+  switch (target) {
+    case CacheTarget.CACHE_API:
+      return new CacheApi();
+    case CacheTarget.MEMORY:
+      return new MemoryCache();
+    default:
+      throw new Error('Target not supported');
   }
 }
 
