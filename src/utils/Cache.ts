@@ -96,3 +96,16 @@ class CacheApi implements ShCache {
     });
   }
 }
+
+export async function invalidateCaches(): Promise<void> {
+  for (const target of DEFAULT_TARGETS) {
+    switch (target) {
+      case CacheTarget.CACHE_API:
+        await new CacheApi().invalidate();
+      case CacheTarget.MEMORY:
+        await new MemoryCache().invalidate();
+      default:
+        break;
+    }
+  }
+}
