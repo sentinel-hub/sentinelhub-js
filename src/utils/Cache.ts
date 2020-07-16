@@ -50,6 +50,7 @@ function constructCache(target: CacheTarget): ShCache {
 interface ShCache {
   set(key: string, value: Response): void;
   get(key: string): Promise<Response>;
+  has(key: string): Promise<boolean>;
   invalidate(): void;
 }
 
@@ -65,6 +66,10 @@ class MemoryCache implements ShCache {
 
   public get(key: string): any {
     return this.cache.get(key);
+  }
+
+  public has(key: string): any {
+    return this.cache.has(key);
   }
 
   public invalidate(): void {
@@ -86,6 +91,12 @@ class CacheApi implements ShCache {
   public async get(key: string): Promise<Response> {
     const cache = await this.cache;
     return await cache.match(key);
+  }
+
+  public async has(key: string): Promise<boolean> {
+    const cache = await this.cache;
+    const response = await cache.match(key);
+    return Boolean(response);
   }
 
   public async invalidate(): Promise<void> {
