@@ -23,6 +23,7 @@ import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
 import { fetchGetCapabilitiesXml } from 'src/layer/utils';
 import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
 import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { CACHE_CONFIG_NOCACHE } from 'src/utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -169,7 +170,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
           'Content-Type': 'application/json',
           'Accept-CRS': 'EPSG:4326',
         },
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       });
 
       const responseTiles: any[] = response.data.tiles;
@@ -222,7 +223,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         headers: {
           'Content-Type': 'application/json',
         },
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       });
 
       return response.data.map((date: string) => moment.utc(date).toDate());
@@ -276,7 +277,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
       const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
         params: payload,
-        ...getAxiosReqParams(innerParams),
+        ...getAxiosReqParams(innerParams, CACHE_CONFIG_NOCACHE),
       });
       // convert date strings to Date objects
       for (let channel in data) {

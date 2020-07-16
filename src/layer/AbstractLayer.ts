@@ -13,6 +13,7 @@ import { ensureTimeout } from 'src/utils/ensureTimeout';
 import { Effects } from 'src/mapDataManipulation/const';
 import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
 import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   title?: string | null;
@@ -55,8 +56,7 @@ export class AbstractLayer {
           const requestConfig: AxiosRequestConfig = {
             // 'blob' responseType does not work with Node.js:
             responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-            useCache: true,
-            ...getAxiosReqParams(innerReqConfig),
+            ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
           };
           const response = await axios.get(url, requestConfig);
           let blob = response.data;
