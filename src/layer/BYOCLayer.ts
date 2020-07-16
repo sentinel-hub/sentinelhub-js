@@ -92,7 +92,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     const getMapValue = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+      if (api !== ApiType.WMS) {
+        await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+      }
       return await super.getMap(params, api, innerReqConfig);
     }, reqConfig);
     return getMapValue;
