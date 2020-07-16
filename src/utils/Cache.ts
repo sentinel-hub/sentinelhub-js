@@ -4,11 +4,12 @@ export enum CacheTarget {
   MEMORY = 'MEMORY',
 }
 export const CACHE_API_KEY = 'sentinelhub-v1';
+const DEFAULT_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
+
 export const memoryCache = new Map();
 
 export function cacheFactory(optionalTargets: CacheTargets): ShCache {
-  const defaultTargets = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
-  const targets = optionalTargets || defaultTargets;
+  const targets = optionalTargets || DEFAULT_TARGETS;
   const target = getFirstUsuableTarget(targets);
   return constructCache(target);
 }
