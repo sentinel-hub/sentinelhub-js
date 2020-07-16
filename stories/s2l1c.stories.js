@@ -118,6 +118,11 @@ export const GetMapProcessing = () => {
       }
     `,
     });
+    const reqConfig = {
+      cache: {
+        expiresIn: 5000,
+      },
+    };
 
     const getMapParams = {
       bbox: bbox4326,
@@ -128,7 +133,7 @@ export const GetMapProcessing = () => {
       format: MimeTypes.JPEG,
       preview: PreviewMode.EXTENDED_PREVIEW,
     };
-    const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING);
+    const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.PROCESSING, reqConfig);
     img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
@@ -190,6 +195,11 @@ export const FindTiles = () => {
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
+  const requestsConfig = {
+    cache: {
+      expiresIn: 5000,
+    },
+  };
 
   const perform = async () => {
     const data = await layerS2L1C.findTiles(
@@ -198,6 +208,7 @@ export const FindTiles = () => {
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       0,
+      requestsConfig,
     );
     renderTilesList(containerEl, data.tiles);
   };

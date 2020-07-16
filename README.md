@@ -301,6 +301,25 @@ try {
 }
 ```
 
+To enable caching for the requests, one can add `expiresIn` to the requests configuration object. The values are in seconds.
+```
+// cache is valid for 30 minutes
+const requestsConfig = {
+  cache: {
+    expiresIn: 1800,
+  }
+};
+```
+
+To disable caching for the requests that are enabled by default, you can assign 0 to `expiresIn`.
+```
+const requestsConfig = {
+  cache: {
+    expiresIn: 1800,
+  }
+};
+```
+
 ## Getting basic statistics and histogram
 
 Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).
