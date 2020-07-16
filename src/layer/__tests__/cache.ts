@@ -208,13 +208,18 @@ describe('Testing cache targets', () => {
   });
 
   it('should invalidate caches', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
-    const reqConfig = {
+    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const reqConfigCacheApi = {
       cache: {
-        expiresIn: 60,
+        expiresIn: 1,
         targets: [CacheTarget.CACHE_API],
+      },
+    };
+
+    const reqConfigMemory = {
+      cache: {
+        expiresIn: 1,
+        targets: [CacheTarget.MEMORY],
       },
     };
 
@@ -222,18 +227,19 @@ describe('Testing cache targets', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
-    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
-    expect(mockNetwork.history.post.length).toBe(1);
-    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
-    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    expect(mockNetwork.history.post.length).toBe(2);
 
-    invalidateCaches(reqConfig.cache.targets);
+    await invalidateCaches();
 
-    const responseFromMockNetwork2 = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
-    expect(mockNetwork.history.post.length).toBe(1);
-    expect(responseFromMockNetwork2.tiles).toStrictEqual(expectedResultTiles);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
+    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    expect(mockNetwork.history.post.length).toBe(4);
   });
 });
 
