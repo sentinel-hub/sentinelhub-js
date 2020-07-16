@@ -793,16 +793,16 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
         //VERSION=3
         let minVal = 0.0;
         let maxVal = 0.4;
-        
+
         let viz = new HighlightCompressVisualizer(minVal, maxVal);
-        
+
         function setup() {
           return {
             input: ["B04", "B03", "B02","dataMask"],
             output: { bands: 4 }
           };
         }
-        
+
         function evaluatePixel(samples) {
           let val = [samples.B04, samples.B03, samples.B02,samples.dataMask];
           return viz.processList(val);
@@ -837,6 +837,58 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetHugeMap = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '3000';
+  img.height = '3000';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      evalscript: `
+        //VERSION=3
+        function setup() {
+          return {
+            input: ["B02", "B03", "B04"],
+            output: { bands: 3 }
+          };
+        }
+
+        function evaluatePixel(sample) {
+          return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+        }
+      `,
+      maxCloudCoverPercent: 100,
+    });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 3000,
+      height: 3000,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layerS2L2A.getHugeMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 

@@ -74,6 +74,7 @@
   },
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "dist/index.d.ts"
   ]
 }

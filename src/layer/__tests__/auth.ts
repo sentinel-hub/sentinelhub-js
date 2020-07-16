@@ -3,7 +3,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { constructFixtureGetMap } from './fixtures.auth';
-import { ApiType, setAuthToken } from 'src';
+import { ApiType, setAuthToken, requestAuthToken } from 'src';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -58,4 +58,15 @@ test('reqConfig overrides setAuthToken', async () => {
   expect(mockNetwork.history.post.length).toBe(1);
   const req = mockNetwork.history.post[0];
   expect(req.headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN2}`);
+});
+
+test('requestAuthToken correctly encodes URI parameters', async () => {
+  mockNetwork.reset();
+  mockNetwork.onPost().replyOnce(200, ''); // we only check the request
+
+  await requestAuthToken('asd,321', './*&');
+
+  expect(mockNetwork.history.post.length).toBe(1);
+  const req = mockNetwork.history.post[0];
+  expect(req.data).toBe('grant_type=client_credentials&client_id=asd%2C321&client_secret=.%2F*%26');
 });

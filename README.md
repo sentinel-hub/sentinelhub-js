@@ -195,6 +195,16 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
   const imageBlob2 = await layer.getMap(getMapParamsWithEffects, ApiType.PROCESSING);
 ```
 
+### Stitching images
+
+Services limit the size of the output image per request (2500px in each direction). If we need a bigger image, we can issue multiple requests and stitch the results together in a canvas. A utility method `getHugeMap` allows us to do that seamlessly.
+
+IMPORTANT: be careful with the image sizes as a big image could consume a lot of processing units. There is no limit imposed by this method.
+
+```javascript
+  const imageBlob = await layer.getHugeMap(getMapParams, ApiType.PROCESSING, reqConfig);
+```
+
 ## Searching for data
 
 Searching for the data is a domain either of a _layer_ or its _dataset_ (if available). This library supports different services, some of which (ProbaV and GIBS for example) specify availability dates _per layer_ and not dataset.
@@ -375,6 +385,29 @@ Alternatively, authentication token can be set on a per-request basis, which als
     authToken: authToken,
   };
   const img = await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+```
+
+## Utility functions
+
+### Async conversion between Blob and Canvas
+
+Function `drawBlobOnCanvas` allows drawing a `Blob` on existing canvas element:
+
+```javascript
+  const blob = await layer.getMap(params, ApiType.WMS);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = params.width;
+  canvas.height = params.height;
+  const ctx = canvas.getContext('2d');
+
+  await drawBlobOnCanvas(ctx, blob, 0, 0);
+```
+
+Function `canvasToBlob` converts the provided canvas to `Blob`:
+
+```javascript
+  const blob = await canvasToBlob(canvas);
 ```
 
 ## Debugging
