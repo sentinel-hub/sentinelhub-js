@@ -229,7 +229,7 @@ describe('Testing cache targets', () => {
     expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
 
-    invalidateCaches();
+    invalidateCaches(reqConfig.cache.targets);
 
     const responseFromMockNetwork2 = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfig);
     expect(mockNetwork.history.post.length).toBe(1);
