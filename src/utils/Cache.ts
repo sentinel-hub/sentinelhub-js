@@ -13,18 +13,19 @@ export type CacheResponse = {
 };
 
 export const CACHE_API_KEY = 'sentinelhub-v1';
-export const DEFAULT_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
+export const SUPPORTED_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
+const DEFAULT_TARGET = CacheTarget.MEMORY;
 
 export const memoryCache = new Map();
 
 export function cacheFactory(optionalTargets: CacheTargets): ShCache {
-  const targets = optionalTargets || DEFAULT_TARGETS;
+  const targets = optionalTargets || SUPPORTED_TARGETS;
   const target = getFirstUsuableTarget(targets);
   return constructCache(target);
 }
 
 function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
-  let firstTargetToUse = CacheTarget.MEMORY;
+  let firstTargetToUse = DEFAULT_TARGET; // default to memory if target is not supported
   for (const key of targets) {
     if (doesTargetExist(key)) {
       firstTargetToUse = key;
@@ -57,11 +58,11 @@ function constructCache(target: CacheTarget): ShCache {
 }
 
 interface ShCache {
-  set(key: string, response: AxiosResponse): void;
+  set(key: string, response: AxiosResponse): Promise<void>;
   get(key: string, responseType: AxiosRequestConfig['responseType']): Promise<CacheResponse>;
   has(key: string): Promise<boolean>;
   keys(): Promise<string[]>;
-  delete(key: string): void;
+  delete(key: string): Promise<void>;
   getHeaders(key: string): Promise<Record<string, any>>;
   invalidate(): void;
 }
@@ -72,7 +73,7 @@ class MemoryCache implements ShCache {
     this.cache = memoryCache;
   }
 
-  public set(key: string, response: AxiosResponse): void {
+  public async set(key: string, response: AxiosResponse): Promise<void> {
     this.cache.set(key, response);
   }
 
@@ -97,7 +98,7 @@ class MemoryCache implements ShCache {
     return Array.from(this.cache.keys());
   }
 
-  public delete(key: string): void {
+  public async delete(key: string): Promise<void> {
     this.cache.delete(key);
   }
 
@@ -223,7 +224,7 @@ class CacheApi implements ShCache {
 }
 
 export async function invalidateCaches(optionalTargets?: CacheTargets): Promise<void> {
-  const targets = optionalTargets || DEFAULT_TARGETS;
+  const targets = optionalTargets || SUPPORTED_TARGETS;
   for (const target of targets) {
     if (!doesTargetExist(target)) {
       continue;

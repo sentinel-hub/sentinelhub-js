@@ -1,6 +1,6 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
-import { CacheTargets, cacheFactory, DEFAULT_TARGETS } from './Cache';
+import { CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
@@ -103,7 +103,7 @@ const stringToHash = async (message: string): Promise<any> => {
 };
 
 export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
-  for (const target of DEFAULT_TARGETS) {
+  for (const target of SUPPORTED_TARGETS) {
     const shCache = cacheFactory([target]);
     const cacheKeys = await shCache.keys();
     cacheKeys.forEach(async key => {
