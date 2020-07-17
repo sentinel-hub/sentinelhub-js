@@ -1,8 +1,17 @@
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
+
 export type CacheTargets = CacheTarget[];
 export enum CacheTarget {
   CACHE_API = 'CACHE_API',
   MEMORY = 'MEMORY',
 }
+export type CacheResponse = {
+  data: any;
+  status: number;
+  statusText: string;
+  headers: any;
+};
+
 export const CACHE_API_KEY = 'sentinelhub-v1';
 const DEFAULT_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
 
@@ -48,8 +57,8 @@ function constructCache(target: CacheTarget): ShCache {
 }
 
 interface ShCache {
-  set(key: string, value: Response): void;
-  get(key: string): Promise<Response>;
+  set(key: string, response: AxiosResponse): void;
+  get(key: string, responseType: AxiosRequestConfig['responseType']): Promise<CacheResponse>;
   has(key: string): Promise<boolean>;
   invalidate(): void;
 }
@@ -60,12 +69,21 @@ class MemoryCache implements ShCache {
     this.cache = memoryCache;
   }
 
-  public set(key: string, value: Response): void {
-    this.cache.set(key, value);
+  public set(key: string, response: AxiosResponse): void {
+    this.cache.set(key, response);
   }
 
-  public get(key: string): any {
-    return this.cache.get(key);
+  public async get(key: string): Promise<CacheResponse> {
+    const cachedResponse: AxiosResponse = this.cache.get(key);
+    if (!cachedResponse) {
+      return null;
+    }
+    return {
+      data: cachedResponse.data,
+      status: cachedResponse.status,
+      statusText: cachedResponse.statusText,
+      headers: cachedResponse.headers,
+    };
   }
 
   public has(key: string): any {
@@ -83,14 +101,28 @@ class CacheApi implements ShCache {
     this.cache = caches.open(CACHE_API_KEY);
   }
 
-  public async set(key: string, value: Response): Promise<void> {
+  public async set(key: string, response: AxiosResponse): Promise<void> {
     const cache = await this.cache;
-    cache.put(key, value);
+    const responseData = this.serializeResponseData(response);
+    cache.put(key, responseData);
   }
 
-  public async get(key: string): Promise<Response> {
+  public async get(key: string, responseType: ResponseType): Promise<CacheResponse> {
     const cache = await this.cache;
-    return await cache.match(key);
+    const response: Response = await cache.match(key);
+    if (!response) {
+      return null;
+    }
+    const headers: Record<string, any> = {};
+    for (let key of response.headers.keys()) {
+      headers[key] = response.headers.get(key);
+    }
+    return {
+      data: await this.deSerializeResponseData(response, responseType),
+      status: response.status,
+      statusText: response.statusText,
+      headers: headers,
+    };
   }
 
   public async has(key: string): Promise<boolean> {
@@ -104,6 +136,45 @@ class CacheApi implements ShCache {
     const cacheKeys = await cache.keys();
     for (let key of cacheKeys) {
       await cache.delete(key);
+    }
+  }
+
+  private serializeResponseData(response: AxiosResponse): any {
+    let responseData;
+    switch (response.request.responseType) {
+      case 'blob':
+      case 'arraybuffer':
+      case 'text':
+        // we can save usual responses as they are:
+        responseData = response.data;
+        break;
+      case 'json':
+      case undefined: // axios defaults to json https://github.com/axios/axios#request-config
+        // but json was converted by axios to an object - and we want to save a string:
+        responseData = JSON.stringify(response.data);
+        break;
+      default:
+        throw new Error('Unsupported response type: ' + response.request.responseType);
+    }
+    return new Response(responseData, response);
+  }
+
+  private async deSerializeResponseData(
+    cachedResponse: Response,
+    responseType: AxiosRequestConfig['responseType'],
+  ): Promise<any> {
+    switch (responseType) {
+      case 'blob':
+        return await cachedResponse.clone().blob();
+      case 'arraybuffer':
+        return await cachedResponse.clone().arrayBuffer();
+      case 'text':
+        return await cachedResponse.clone().text();
+      case 'json':
+      case undefined: // axios defaults to json https://github.com/axios/axios#request-config
+        return await cachedResponse.clone().json();
+      default:
+        throw new Error('Unsupported response type: ' + responseType);
     }
   }
 }
