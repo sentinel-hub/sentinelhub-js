@@ -13,7 +13,7 @@ export type CacheResponse = {
 };
 
 export const CACHE_API_KEY = 'sentinelhub-v1';
-const DEFAULT_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
+export const DEFAULT_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
 
 export const memoryCache = new Map();
 
@@ -34,7 +34,7 @@ function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
   return firstTargetToUse;
 }
 
-function doesTargetExist(target: CacheTarget): boolean {
+export function doesTargetExist(target: CacheTarget): boolean {
   switch (target) {
     case CacheTarget.CACHE_API:
       return Boolean(window.caches);
@@ -60,6 +60,9 @@ interface ShCache {
   set(key: string, response: AxiosResponse): void;
   get(key: string, responseType: AxiosRequestConfig['responseType']): Promise<CacheResponse>;
   has(key: string): Promise<boolean>;
+  keys(): Promise<string[]>;
+  delete(key: string): void;
+  getHeaders(key: string): Promise<Record<string, any>>;
   invalidate(): void;
 }
 
@@ -86,8 +89,24 @@ class MemoryCache implements ShCache {
     };
   }
 
-  public has(key: string): any {
+  public has(key: string): Promise<boolean> {
     return this.cache.has(key);
+  }
+
+  public async keys(): Promise<string[]> {
+    return Array.from(this.cache.keys());
+  }
+
+  public delete(key: string): void {
+    this.cache.delete(key);
+  }
+
+  public async getHeaders(key: string): Promise<Record<string, any>> {
+    const cachedResponse: AxiosResponse = this.cache.get(key);
+    if (!cachedResponse) {
+      return null;
+    }
+    return cachedResponse.headers;
   }
 
   public invalidate(): void {
@@ -113,15 +132,12 @@ class CacheApi implements ShCache {
     if (!response) {
       return null;
     }
-    const headers: Record<string, any> = {};
-    for (let key of response.headers.keys()) {
-      headers[key] = response.headers.get(key);
-    }
+
     return {
       data: await this.deSerializeResponseData(response, responseType),
       status: response.status,
       statusText: response.statusText,
-      headers: headers,
+      headers: await this.deSeriarialeHeaders(response.headers),
     };
   }
 
@@ -129,6 +145,25 @@ class CacheApi implements ShCache {
     const cache = await this.cache;
     const response = await cache.match(key);
     return Boolean(response);
+  }
+
+  public async keys(): Promise<string[]> {
+    const cache = await this.cache;
+    return await cache.keys();
+  }
+
+  public async delete(key: string): Promise<void> {
+    const cache = await this.cache;
+    await cache.delete(key);
+  }
+
+  public async getHeaders(key: string): Promise<Record<string, any>> {
+    const cache = await this.cache;
+    const response: Response = await cache.match(key);
+    if (!response) {
+      return null;
+    }
+    return await this.deSeriarialeHeaders(response.headers);
   }
 
   public async invalidate(): Promise<void> {
@@ -176,6 +211,14 @@ class CacheApi implements ShCache {
       default:
         throw new Error('Unsupported response type: ' + responseType);
     }
+  }
+
+  private async deSeriarialeHeaders(headers: Response['headers']): Promise<Record<string, any>> {
+    const newHeaders: Record<string, any> = {};
+    for (let key of headers.keys()) {
+      newHeaders[key] = headers.get(key);
+    }
+    return newHeaders;
   }
 }
 
