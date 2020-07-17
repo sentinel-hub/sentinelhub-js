@@ -8,7 +8,7 @@ import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
 import { ApiType } from 'src';
 import { setAuthToken } from 'src/auth';
-import { invalidateCaches, memoryCache, CacheTarget, CACHE_API_KEY } from 'src/utils/Cache';
+import { invalidateCaches, memoryCache, CacheTarget } from 'src/utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 
