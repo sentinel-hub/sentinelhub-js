@@ -111,6 +111,9 @@ class CacheApi implements ShCache {
 export async function invalidateCaches(optionalTargets?: CacheTargets): Promise<void> {
   const targets = optionalTargets || DEFAULT_TARGETS;
   for (const target of targets) {
+    if (!doesTargetExist(target)) {
+      continue;
+    }
     switch (target) {
       case CacheTarget.CACHE_API:
         await new CacheApi().invalidate();
