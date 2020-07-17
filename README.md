@@ -310,6 +310,33 @@ const requestsConfig = {
 };
 ```
 
+Requests can be cached to [CACHE_API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) or to memory, where the target can be specified with.
+```
+  const requestsConfig = {
+    cache: {
+      expiresIn: 5000,
+      targets: [CacheTarget.CACHE_API],
+    },
+  };
+```
+```
+  const requestsConfig = {
+    cache: {
+      expiresIn: 5000,
+      targets: [CacheTarget.MEMORY],
+    },
+  };
+```
+A list of targets can be provided which is ordered by priority, and the first available target in the list will be used. This example will fallback to caching to memory if [CACHE_API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) is not available:
+
+```
+  const requestsConfig = {
+    cache: {
+      expiresIn: 5000,
+      targets: [CacheTarget.CACHE_API, CacheTarget.MEMORY],
+    },
+  };
+```
 ## Getting basic statistics and histogram
 
 Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).
