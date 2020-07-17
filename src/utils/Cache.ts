@@ -14,7 +14,7 @@ export type CacheResponse = {
 
 export const CACHE_API_KEY = 'sentinelhub-v1';
 export const SUPPORTED_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
-const DEFAULT_TARGET = CacheTarget.MEMORY;
+const FALLBACK_TARGET = CacheTarget.MEMORY;
 
 export const memoryCache = new Map();
 
@@ -25,7 +25,7 @@ export function cacheFactory(optionalTargets: CacheTargets): ShCache {
 }
 
 function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
-  let firstTargetToUse = DEFAULT_TARGET; // default to memory if target is not supported
+  let firstTargetToUse = FALLBACK_TARGET; // default to memory if target is not supported
   for (const key of targets) {
     if (doesTargetExist(key)) {
       firstTargetToUse = key;
