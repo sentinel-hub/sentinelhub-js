@@ -4,11 +4,16 @@ import MockAdapter from 'axios-mock-adapter';
 
 import { constructFixtureGetMap } from './fixtures.auth';
 import { ApiType, setAuthToken } from 'src';
+import { invalidateCaches } from 'src/utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 
 const EXAMPLE_TOKEN1 = 'TOKEN111';
 const EXAMPLE_TOKEN2 = 'TOKEN222';
+
+beforeEach(async () => {
+  await invalidateCaches();
+});
 
 test('getMap + Processing throws an exception if authToken is not set', async () => {
   const { layer, getMapParams } = constructFixtureGetMap();
