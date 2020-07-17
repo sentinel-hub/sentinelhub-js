@@ -1,10 +1,10 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
-import { CacheTargets, cacheFactory, CacheResponse } from './Cache';
+import { CacheTargets, cacheFactory, DEFAULT_TARGETS } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
-const EXPIRY_HEADER_KEY = 'cache_expires';
+export const EXPIRY_HEADER_KEY = 'cache_expires';
 
 export type CacheConfig = {
   expiresIn: number;
@@ -24,7 +24,7 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   const shCache = cacheFactory(request.cache.targets);
 
   const cachedResponse = await shCache.get(cacheKey, request.responseType);
-  if (!cachedResponse || !cacheStillValid(cachedResponse)) {
+  if (!cachedResponse || !cacheStillValid(cachedResponse.headers)) {
     request.cacheKey = cacheKey;
     return request;
   }
@@ -67,12 +67,12 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   return response;
 };
 
-const cacheStillValid = (response: CacheResponse): boolean => {
-  if (!response) {
+const cacheStillValid = (headers: Record<string, any>): boolean => {
+  if (!headers) {
     return true;
   }
   const now = new Date();
-  const expirationDate = Number(response.headers[EXPIRY_HEADER_KEY]);
+  const expirationDate = Number(headers[EXPIRY_HEADER_KEY]);
   return expirationDate > now.getTime();
 };
 
@@ -103,20 +103,16 @@ const stringToHash = async (message: string): Promise<any> => {
 };
 
 export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
-  let cache: Cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    return; // when running tests, `caches` is not defined
+  for (const target of DEFAULT_TARGETS) {
+    const shCache = cacheFactory([target]);
+    const cacheKeys = await shCache.keys();
+    cacheKeys.forEach(async key => {
+      const headers = await shCache.getHeaders(key);
+      if (!cacheStillValid(headers)) {
+        await shCache.delete(key);
+      }
+    });
   }
-
-  const cacheKeys = await cache.keys();
-  cacheKeys.forEach(async key => {
-    const cachedResponse = await cache.match(key);
-    if (!cacheStillValid(cachedResponse)) {
-      cache.delete(key);
-    }
-  });
 };
 
 const isRequestCachable = (request: AxiosRequestConfig): boolean => {
