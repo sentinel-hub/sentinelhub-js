@@ -18,6 +18,11 @@ const FALLBACK_TARGET = CacheTarget.MEMORY;
 
 export const memoryCache = new Map();
 
+// Factory will return an instance of a Cache interface.
+// The first availble target will be used
+// By default we will use cache_api if availble, if not we will cache in memory
+// user can also specify to just use in memory caching
+// If user provides a CacheTarget.CACHE_API and cache_api is not availble we will fallback to memory
 export function cacheFactory(optionalTargets: CacheTargets): ShCache {
   const targets = optionalTargets || SUPPORTED_TARGETS;
   const target = getFirstUsuableTarget(targets);
