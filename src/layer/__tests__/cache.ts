@@ -265,7 +265,7 @@ describe('Testing cache targets when cache_api is not available', () => {
     memoryCache.clear();
   });
 
-  it('should default to memory if window.caches is undefined', async () => {
+  it('should default to memory if window.caches is undefined and no targets were defined', async () => {
     const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
       {},
     );
@@ -296,5 +296,35 @@ describe('Testing cache targets when cache_api is not available', () => {
     expect(mockNetwork.history.post.length).toBe(2);
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(afterMemCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
+  });
+
+  it('should not use cache if cache-api is specified as target', async () => {
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
+    const requestsConfig = {
+      cache: {
+        expiresIn: 60,
+        targets: [CacheTarget.CACHE_API],
+      },
+    };
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const shouldNotBeCachedResponse = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      requestsConfig,
+    );
+
+    expect(mockNetwork.history.post.length).toBe(2);
+    expect(shouldNotBeCachedResponse.tiles).toStrictEqual(expectedResultTiles);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
   });
 });
