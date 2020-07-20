@@ -142,7 +142,7 @@ class CacheApi implements ShCache {
       data: await this.deSerializeResponseData(response, responseType),
       status: response.status,
       statusText: response.statusText,
-      headers: await this.deSeriarialeHeaders(response.headers),
+      headers: await this.deserializeHeaders(response.headers),
     };
   }
 
@@ -168,7 +168,7 @@ class CacheApi implements ShCache {
     if (!response) {
       return null;
     }
-    return await this.deSeriarialeHeaders(response.headers);
+    return await this.deserializeHeaders(response.headers);
   }
 
   public async invalidate(): Promise<void> {
@@ -218,7 +218,7 @@ class CacheApi implements ShCache {
     }
   }
 
-  private async deSeriarialeHeaders(headers: Response['headers']): Promise<Record<string, any>> {
+  private async deserializeHeaders(headers: Response['headers']): Promise<Record<string, any>> {
     const newHeaders: Record<string, any> = {};
     for (let key of headers.keys()) {
       newHeaders[key] = headers.get(key);
