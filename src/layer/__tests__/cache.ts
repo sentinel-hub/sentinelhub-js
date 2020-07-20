@@ -352,3 +352,65 @@ describe('Testing cache targets when cache_api is not available', () => {
     expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
   });
 });
+
+// reading from a Response body twice can throw an error
+describe('Reading from cache twice', () => {
+  beforeEach(async () => {
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object and removes caches from global object
+    await invalidateCaches();
+  });
+
+  it('should read from cache-api twice', async () => {
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
+    const requestsConfig = {
+      cache: {
+        expiresIn: 60,
+        targets: [CacheTarget.CACHE_API],
+      },
+    };
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+
+    const fromCacheResponse2 = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
+  });
+
+  it('should read from memory cache twice', async () => {
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
+    const requestsConfig = {
+      cache: {
+        expiresIn: 60,
+        targets: [CacheTarget.MEMORY],
+      },
+    };
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+
+    const fromCacheResponse2 = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
+  });
+});
