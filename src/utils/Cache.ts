@@ -24,11 +24,11 @@ const memoryCache = new Map();
 // If user provides a CacheTarget.CACHE_API and cache_api is not availble we will fallback to memory
 export function cacheFactory(optionalTargets: CacheTargets): ShCache {
   const targets = optionalTargets || SUPPORTED_TARGETS;
-  const target = getFirstUsuableTarget(targets);
+  const target = getFirstUseableTarget(targets);
   return constructCache(target);
 }
 
-function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
+function getFirstUseableTarget(targets: CacheTargets): CacheTarget {
   let firstTargetToUse = undefined; // default to memory if target is not supported
   for (const key of targets) {
     if (doesTargetExist(key)) {
