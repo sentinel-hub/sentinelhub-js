@@ -65,24 +65,19 @@ interface ShCache {
   set(key: string, response: AxiosResponse): Promise<void>;
   get(key: string, responseType: AxiosRequestConfig['responseType']): Promise<CacheResponse>;
   has(key: string): Promise<boolean>;
-  keys(): Promise<string[]>;
-  delete(key: string): Promise<void>;
-  getHeaders(key: string): Promise<Record<string, any>>;
+  keys(): Promise<readonly Request[]> | Promise<string[]>;
+  delete(key: Request | string): Promise<void>;
+  getHeaders(key: Request | string): Promise<Record<string, any>>;
   invalidate(): void;
 }
 
 class MemoryCache implements ShCache {
-  private cache: Record<string, any>;
-  public constructor() {
-    this.cache = memoryCache;
-  }
-
   public async set(key: string, response: AxiosResponse): Promise<void> {
-    this.cache.set(key, response);
+    memoryCache.set(key, response);
   }
 
   public async get(key: string): Promise<CacheResponse> {
-    const cachedResponse: AxiosResponse = this.cache.get(key);
+    const cachedResponse: AxiosResponse = memoryCache.get(key);
     if (!cachedResponse) {
       return null;
     }
@@ -94,20 +89,20 @@ class MemoryCache implements ShCache {
     };
   }
 
-  public has(key: string): Promise<boolean> {
-    return this.cache.has(key);
+  public async has(key: string): Promise<boolean> {
+    return memoryCache.has(key);
   }
 
   public async keys(): Promise<string[]> {
-    return Array.from(this.cache.keys());
+    return Array.from(memoryCache.keys());
   }
 
   public async delete(key: string): Promise<void> {
-    this.cache.delete(key);
+    memoryCache.delete(key);
   }
 
   public async getHeaders(key: string): Promise<Record<string, any>> {
-    const cachedResponse: AxiosResponse = this.cache.get(key);
+    const cachedResponse: AxiosResponse = memoryCache.get(key);
     if (!cachedResponse) {
       return null;
     }
@@ -115,7 +110,7 @@ class MemoryCache implements ShCache {
   }
 
   public invalidate(): void {
-    this.cache.clear();
+    memoryCache.clear();
   }
 }
 
@@ -152,17 +147,18 @@ class CacheApi implements ShCache {
     return Boolean(response);
   }
 
-  public async keys(): Promise<string[]> {
-    const cache = await this.cache;
-    return await cache.keys();
+  public async keys(): Promise<readonly Request[]> {
+    const cache = await caches.open(CACHE_API_KEY);
+    const keys = await cache.keys();
+    return keys;
   }
 
-  public async delete(key: string): Promise<void> {
+  public async delete(key: Request): Promise<void> {
     const cache = await this.cache;
     await cache.delete(key);
   }
 
-  public async getHeaders(key: string): Promise<Record<string, any>> {
+  public async getHeaders(key: Request): Promise<Record<string, any>> {
     const cache = await this.cache;
     const response: Response = await cache.match(key);
     if (!response) {

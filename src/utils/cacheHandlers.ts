@@ -114,7 +114,7 @@ export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
       continue;
     }
     const cacheKeys = await shCache.keys();
-    cacheKeys.forEach(async key => {
+    cacheKeys.forEach(async (key: Request | string) => {
       const headers = await shCache.getHeaders(key);
       if (!cacheStillValid(headers)) {
         await shCache.delete(key);
