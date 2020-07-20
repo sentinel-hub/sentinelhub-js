@@ -9,6 +9,7 @@ import { constructFixtureGetMap } from './fixtures.getMap';
 import { ApiType } from 'src';
 import { setAuthToken } from 'src/auth';
 import { invalidateCaches, CacheTarget } from 'src/utils/Cache';
+import { cacheStillValid, EXPIRY_HEADER_KEY } from '../../utils/cacheHandlers';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -412,5 +413,23 @@ describe('Reading from cache twice', () => {
 
     expect(mockNetwork.history.post.length).toBe(1);
     expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
+  });
+});
+
+describe('Unit test for cacheStillValid', () => {
+  it('It should be valid', async () => {
+    const header = {
+      [EXPIRY_HEADER_KEY]: new Date().getTime() + 100,
+    };
+    const isValid = cacheStillValid(header);
+    expect(isValid).toBeTruthy();
+  });
+
+  it('It should be invalid', async () => {
+    const header = {
+      [EXPIRY_HEADER_KEY]: new Date().getTime() - 100,
+    };
+    const isValid = cacheStillValid(header);
+    expect(isValid).toBeFalsy();
   });
 });
