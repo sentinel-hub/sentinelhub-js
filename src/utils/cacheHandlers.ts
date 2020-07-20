@@ -72,7 +72,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   return response;
 };
 
-const cacheStillValid = (headers: Record<string, any>): boolean => {
+export const cacheStillValid = (headers: Record<string, any>): boolean => {
   if (!headers) {
     return true;
   }
