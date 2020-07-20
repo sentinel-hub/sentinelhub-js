@@ -15,7 +15,7 @@ export type CacheResponse = {
 export const CACHE_API_KEY = 'sentinelhub-v1';
 export const SUPPORTED_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
 
-export const memoryCache = new Map();
+const memoryCache = new Map();
 
 // Factory will return an instance of a Cache interface.
 // The first availble target will be used

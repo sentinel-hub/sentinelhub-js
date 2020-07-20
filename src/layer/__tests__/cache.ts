@@ -8,16 +8,17 @@ import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
 import { ApiType } from 'src';
 import { setAuthToken } from 'src/auth';
-import { invalidateCaches, memoryCache, CacheTarget } from 'src/utils/Cache';
+import { invalidateCaches, CacheTarget } from 'src/utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 
 const EXAMPLE_TOKEN = 'TOKEN111';
 
 describe('Testing caching', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch);
     jest.resetModules();
+    await invalidateCaches();
   });
 
   it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
@@ -115,10 +116,10 @@ describe('Testing caching', () => {
 });
 
 describe('Testing cache targets', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch);
     jest.resetModules();
-    memoryCache.clear();
+    await invalidateCaches();
   });
 
   it('should cache to cache api', async () => {
@@ -259,10 +260,10 @@ describe('Testing cache targets', () => {
 });
 
 describe('Testing cache targets when cache_api is not available', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     Object.assign(global, { caches: undefined }, fetch);
     jest.resetModules();
-    memoryCache.clear();
+    await invalidateCaches();
   });
 
   it('should default to memory if window.caches is undefined and no targets were defined', async () => {
