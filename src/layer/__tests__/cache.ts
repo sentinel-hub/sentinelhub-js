@@ -16,7 +16,7 @@ const EXAMPLE_TOKEN = 'TOKEN111';
 
 describe('Testing caching', () => {
   beforeEach(async () => {
-    Object.assign(global, makeServiceWorkerEnv(), fetch);
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
   });
 
@@ -116,7 +116,7 @@ describe('Testing caching', () => {
 
 describe('Testing cache targets', () => {
   beforeEach(async () => {
-    Object.assign(global, makeServiceWorkerEnv(), fetch);
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
   });
 
@@ -259,7 +259,7 @@ describe('Testing cache targets', () => {
 
 describe('Testing cache targets when cache_api is not available', () => {
   beforeEach(async () => {
-    Object.assign(global, { caches: undefined }, fetch);
+    Object.assign(global, { caches: undefined }, fetch); // adds these functions to the global object and removes caches from global object
     await invalidateCaches();
   });
 
