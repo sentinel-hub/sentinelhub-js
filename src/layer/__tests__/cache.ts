@@ -136,22 +136,15 @@ describe('Testing cache targets', () => {
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
 
     invalidateCaches([CacheTarget.CACHE_API]);
 
-    const afterMemCacheInvalidated = await layer.findTiles(
-      bbox,
-      fromTime,
-      toTime,
-      null,
-      null,
-      requestsConfig,
-    );
-
+    const afterCacheInvalidated = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     expect(mockNetwork.history.post.length).toBe(2);
-    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
-    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
-    expect(afterMemCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
+    expect(afterCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
   });
 
   it('should cache to memory', async () => {
@@ -170,8 +163,12 @@ describe('Testing cache targets', () => {
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
 
     invalidateCaches([CacheTarget.MEMORY]);
+
     const afterMemCacheInvalidated = await layer.findTiles(
       bbox,
       fromTime,
@@ -180,10 +177,7 @@ describe('Testing cache targets', () => {
       null,
       requestsConfig,
     );
-
     expect(mockNetwork.history.post.length).toBe(2);
-    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
-    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(afterMemCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
   });
 
@@ -203,26 +197,21 @@ describe('Testing cache targets', () => {
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
 
     invalidateCaches([CacheTarget.CACHE_API]);
 
-    const afterMemCacheInvalidated = await layer.findTiles(
-      bbox,
-      fromTime,
-      toTime,
-      null,
-      null,
-      requestsConfig,
-    );
-
+    const afterCacheInvalidated = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     expect(mockNetwork.history.post.length).toBe(2);
-    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
-    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
-    expect(afterMemCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
+    expect(afterCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
   });
 
   it('should invalidate caches', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
+      {},
+    );
     const reqConfigCacheApi = {
       cache: {
         expiresIn: 1,
@@ -243,17 +232,52 @@ describe('Testing cache targets', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    const responseFromMockNetwork1 = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      reqConfigCacheApi,
+    );
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
+    expect(responseFromMockNetwork1.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+
+    const responseFromMockNetwork2 = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      reqConfigMemory,
+    );
+    const fromMemCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    expect(responseFromMockNetwork2.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromMemCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(mockNetwork.history.post.length).toBe(2);
 
     await invalidateCaches();
 
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigCacheApi);
-    await layer.findTiles(bbox, fromTime, toTime, null, null, reqConfigMemory);
+    const shouldNotBeCachedFromCacheApi = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      reqConfigCacheApi,
+    );
+    const shouldNotBeCachedFromMem = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      reqConfigMemory,
+    );
     expect(mockNetwork.history.post.length).toBe(4);
+    expect(shouldNotBeCachedFromCacheApi.tiles).toStrictEqual(expectedResultTiles);
+    expect(shouldNotBeCachedFromMem.tiles).toStrictEqual(expectedResultTiles);
   });
 });
 
@@ -277,8 +301,11 @@ describe('Testing cache targets when cache_api is not available', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+    expect(responseFromMockNetwork.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
 
     invalidateCaches([CacheTarget.MEMORY]);
 
@@ -292,7 +319,6 @@ describe('Testing cache targets when cache_api is not available', () => {
     );
 
     expect(mockNetwork.history.post.length).toBe(2);
-    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(afterMemCacheInvalidated.tiles).toStrictEqual(expectedResultTiles);
   });
 
