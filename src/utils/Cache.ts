@@ -14,7 +14,6 @@ export type CacheResponse = {
 
 export const CACHE_API_KEY = 'sentinelhub-v1';
 export const SUPPORTED_TARGETS = [CacheTarget.CACHE_API, CacheTarget.MEMORY];
-const FALLBACK_TARGET = CacheTarget.MEMORY;
 
 export const memoryCache = new Map();
 
