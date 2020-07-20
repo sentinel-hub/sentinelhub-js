@@ -30,7 +30,7 @@ export function cacheFactory(optionalTargets: CacheTargets): ShCache {
 }
 
 function getFirstUsuableTarget(targets: CacheTargets): CacheTarget {
-  let firstTargetToUse = FALLBACK_TARGET; // default to memory if target is not supported
+  let firstTargetToUse = undefined; // default to memory if target is not supported
   for (const key of targets) {
     if (doesTargetExist(key)) {
       firstTargetToUse = key;
@@ -58,7 +58,7 @@ function constructCache(target: CacheTarget): ShCache {
     case CacheTarget.MEMORY:
       return new MemoryCache();
     default:
-      throw new Error('Target not supported');
+      return null;
   }
 }
 

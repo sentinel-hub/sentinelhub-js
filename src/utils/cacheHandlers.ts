@@ -22,7 +22,9 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
   const shCache = cacheFactory(request.cache.targets);
-
+  if (!shCache) {
+    return request;
+  }
   const cachedResponse = await shCache.get(cacheKey, request.responseType);
   if (!cachedResponse || !cacheStillValid(cachedResponse.headers)) {
     request.cacheKey = cacheKey;
@@ -53,6 +55,9 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     return response;
   }
   const shCache = cacheFactory(response.config.cache.targets);
+  if (!shCache) {
+    return response;
+  }
   if (await shCache.has(response.config.cacheKey)) {
     return response;
   }
@@ -105,6 +110,9 @@ const stringToHash = async (message: string): Promise<any> => {
 export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
   for (const target of SUPPORTED_TARGETS) {
     const shCache = cacheFactory([target]);
+    if (!shCache) {
+      continue;
+    }
     const cacheKeys = await shCache.keys();
     cacheKeys.forEach(async key => {
       const headers = await shCache.getHeaders(key);
