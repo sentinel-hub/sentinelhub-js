@@ -13,6 +13,7 @@ import {
   GetStatsParams,
   Stats,
   DataProductId,
+  BYOCBand,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -194,7 +195,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
   }
 
-  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<void> {
+  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       if (this.collectionId === null) {
         throw new Error('Parameter collectionId is not set');
