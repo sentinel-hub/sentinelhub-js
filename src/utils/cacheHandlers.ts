@@ -1,13 +1,14 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
+import { CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
-const SENTINEL_HUB_CACHE = 'sentinelhub-v1';
-const EXPIRY_HEADER_KEY = 'Cache_Expires';
+export const EXPIRY_HEADER_KEY = 'cache_expires';
 
 export type CacheConfig = {
   expiresIn: number;
+  targets?: CacheTargets;
 };
 
 export const fetchCachedResponse = async (request: any): Promise<any> => {
@@ -15,56 +16,25 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
-  // do not perform caching if Cache API is not supported:
-  if (typeof window === 'undefined' || !window.caches) {
-    return request;
-  }
   const cacheKey = await generateCacheKey(request);
   // resource not cacheable? It couldn't have been saved to cache:
   if (cacheKey === null) {
     return request;
   }
-
-  let cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    console.warn('Caching failed', err);
+  const shCache = cacheFactory(request.cache.targets);
+  if (!shCache) {
     return request;
   }
-
-  const cachedResponse = await cache.match(cacheKey);
-  if (!cachedResponse || !cacheStillValid(cachedResponse)) {
+  const cachedResponse = await shCache.get(cacheKey, request.responseType);
+  if (!cachedResponse || !cacheStillValid(cachedResponse.headers)) {
     request.cacheKey = cacheKey;
     return request;
   }
 
   // serve from cache:
   request.adapter = async () => {
-    // when we get data (Response) from cache (Cache API), we want to return it in the
-    // same form as the original axios request (without cache) would, so we convert it
-    // appropriately:
-    let responseData;
-    switch (request.responseType) {
-      case 'blob':
-        responseData = await cachedResponse.blob();
-        break;
-      case 'arraybuffer':
-        responseData = await cachedResponse.arrayBuffer();
-        break;
-      case 'text':
-        responseData = await cachedResponse.text();
-        break;
-      case 'json':
-      case undefined: // axios defaults to json https://github.com/axios/axios#request-config
-        responseData = await cachedResponse.json();
-        break;
-      default:
-        throw new Error('Unsupported response type: ' + request.responseType);
-    }
-
     return Promise.resolve({
-      data: responseData,
+      data: cachedResponse.data,
       headers: request.headers,
       request: request,
       config: request,
@@ -80,19 +50,15 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   if (!isRequestCachable(response.config)) {
     return response;
   }
-  // do not perform caching if Cache API is not supported:
-  if (typeof window === 'undefined' || !window.caches) {
-    return response;
-  }
   // resource not cacheable?
   if (!response.config.cacheKey) {
     return response;
   }
-  let cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    console.warn('Caching failed', err);
+  const shCache = cacheFactory(response.config.cache.targets);
+  if (!shCache) {
+    return response;
+  }
+  if (await shCache.has(response.config.cacheKey)) {
     return response;
   }
 
@@ -102,36 +68,16 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     ...response.headers,
     [EXPIRY_HEADER_KEY]: expiresMs,
   };
-
-  const request = response.config;
-  // axios has already converted the response data according to responseType, which means that for example with
-  // json, we have an object. We must convert data back to original form before saving to cache:
-  let responseData;
-  switch (request.responseType) {
-    case 'blob':
-    case 'arraybuffer':
-    case 'text':
-      // we can save usual responses as they are:
-      responseData = response.data;
-      break;
-    case 'json':
-    case undefined: // axios defaults to json https://github.com/axios/axios#request-config
-      // but json was converted by axios to an object - and we want to save a string:
-      responseData = JSON.stringify(response.data);
-      break;
-    default:
-      throw new Error('Unsupported response type: ' + request.responseType);
-  }
-  cache.put(response.config.cacheKey, new Response(responseData, response));
+  shCache.set(response.config.cacheKey, response);
   return response;
 };
 
-const cacheStillValid = (response: Response): boolean => {
-  if (!response) {
+export const cacheStillValid = (headers: Record<string, any>): boolean => {
+  if (!headers) {
     return true;
   }
   const now = new Date();
-  const expirationDate = Number(response.headers.get(EXPIRY_HEADER_KEY));
+  const expirationDate = Number(headers[EXPIRY_HEADER_KEY]);
   return expirationDate > now.getTime();
 };
 
@@ -162,20 +108,19 @@ const stringToHash = async (message: string): Promise<any> => {
 };
 
 export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
-  let cache: Cache;
-  try {
-    cache = await caches.open(SENTINEL_HUB_CACHE);
-  } catch (err) {
-    return; // when running tests, `caches` is not defined
-  }
-
-  const cacheKeys = await cache.keys();
-  cacheKeys.forEach(async key => {
-    const cachedResponse = await cache.match(key);
-    if (!cacheStillValid(cachedResponse)) {
-      cache.delete(key);
+  for (const target of SUPPORTED_TARGETS) {
+    const shCache = cacheFactory([target]);
+    if (!shCache) {
+      continue;
     }
-  });
+    const cacheKeys = await shCache.keys();
+    cacheKeys.forEach(async (key: Request | string) => {
+      const headers = await shCache.getHeaders(key);
+      if (!cacheStillValid(headers)) {
+        await shCache.delete(key);
+      }
+    });
+  }
 };
 
 const isRequestCachable = (request: AxiosRequestConfig): boolean => {

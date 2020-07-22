@@ -3,8 +3,13 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer, setAuthToken } from 'src';
+import { invalidateCaches } from 'src/utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
+
+beforeEach(async () => {
+  await invalidateCaches();
+});
 
 test('WmsLayer.getMapUrl returns an URL', () => {
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
