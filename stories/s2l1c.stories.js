@@ -10,6 +10,7 @@ import {
   PreviewMode,
   CancelToken,
   isCancelled,
+  CacheTarget,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -121,6 +122,7 @@ export const GetMapProcessing = () => {
     const reqConfig = {
       cache: {
         expiresIn: 5000,
+        targets: [CacheTarget.MEMORY],
       },
     };
 
@@ -195,9 +197,38 @@ export const FindTiles = () => {
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    const data = await layerS2L1C.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const FindCachedToMemoryTiles = () => {
+  const maxCloudCoverPercent = 60;
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent,
+  });
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
   const requestsConfig = {
     cache: {
       expiresIn: 5000,
+      targets: [CacheTarget.MEMORY],
     },
   };
 

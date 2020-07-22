@@ -57,6 +57,7 @@ import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEUL
 import { LocationIdSHv3, GetMapParams, LinkType } from 'src/layer/const';
 import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
+import { CacheTarget, invalidateCaches } from 'src/utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
 
@@ -125,6 +126,8 @@ export {
   setDebugEnabled,
   CancelToken,
   isCancelled,
+  CacheTarget,
+  invalidateCaches,
   RequestConfiguration,
   drawBlobOnCanvas,
   canvasToBlob,
