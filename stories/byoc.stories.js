@@ -510,3 +510,29 @@ export const findDatesUTCAuth = () => {
 
   return wrapperEl;
 };
+
+export const getAvailableBandsAuth = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+  if (!process.env.BYOC_COLLECTION_ID) {
+    throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
+  }
+
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>getAvailableBands for BYOC</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const layer = new BYOCLayer({ instanceId, layerId, collectionId: process.env.BYOC_COLLECTION_ID });
+
+    const availableBands = await layer.getAvailableBands();
+    renderTilesList(containerEl, availableBands);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

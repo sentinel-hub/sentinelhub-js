@@ -16,6 +16,8 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  SUPPORTED_DATA_PRODUCTS_PROCESSING,
+  DataProductId,
 } from 'src/layer/const';
 import { wmsGetMapUrl } from 'src/layer/wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
@@ -33,7 +35,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
@@ -48,7 +50,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected layerId: string | null;
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
-  protected dataProduct: string | null;
+  protected dataProduct: DataProductId | null;
   public legend?: any[] | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
@@ -117,7 +119,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       layerId: l.id,
       ...l.datasourceDefaults,
       evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct,
+      dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
       legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
         ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
         : null,
@@ -198,9 +200,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           if (!layerParams) {
             layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
           }
-          this.mosaickingOrder = layerParams.mosaickingOrder;
-          this.upsampling = layerParams.upsampling;
-          this.downsampling = layerParams.downsampling;
+          if (!this.mosaickingOrder && layerParams && layerParams.mosaickingOrder) {
+            this.mosaickingOrder = layerParams.mosaickingOrder;
+          }
+          if (!this.upsampling && layerParams && layerParams.upsampling) {
+            this.upsampling = layerParams.upsampling;
+          }
+          if (!this.downsampling && layerParams && layerParams.downsampling) {
+            this.downsampling = layerParams.downsampling;
+          }
         }
 
         await this.convertEvalscriptToV3IfNeeded(innerReqConfig);
@@ -235,7 +243,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
-    if (this.dataProduct) {
+    if (this.dataProduct && !SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(this.dataProduct)) {
       return api === ApiType.WMS;
     }
     return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
