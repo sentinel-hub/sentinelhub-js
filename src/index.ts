@@ -59,6 +59,7 @@ import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors
 import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
 import { CacheTarget, invalidateCaches } from 'src/utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
+import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
 
 import { Effects, ColorRange } from 'src/mapDataManipulation/const';
 
@@ -128,6 +129,8 @@ export {
   CacheTarget,
   invalidateCaches,
   RequestConfiguration,
+  drawBlobOnCanvas,
+  canvasToBlob,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,

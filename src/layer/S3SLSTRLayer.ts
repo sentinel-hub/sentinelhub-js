@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection, Link, LinkType } from 'src/layer/const';
+import { PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from 'src/layer/const';
 import { DATASET_S3SLSTR } from 'src/layer/dataset';
 import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from 'src/layer/processing';
@@ -13,7 +13,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;

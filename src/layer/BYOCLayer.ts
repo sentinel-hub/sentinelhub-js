@@ -12,6 +12,8 @@ import {
   ApiType,
   GetStatsParams,
   Stats,
+  DataProductId,
+  BYOCBand,
 } from 'src/layer/const';
 import { DATASET_BYOC } from 'src/layer/dataset';
 import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
@@ -25,7 +27,7 @@ interface ConstructorParameters {
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   collectionId?: string | null;
@@ -193,7 +195,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
   }
 
-  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<void> {
+  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       if (this.collectionId === null) {
         throw new Error('Parameter collectionId is not set');

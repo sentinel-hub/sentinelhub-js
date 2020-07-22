@@ -193,3 +193,14 @@ export type Stats = {
 };
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
+
+export type DataProductId = string;
+
+export const SUPPORTED_DATA_PRODUCTS_PROCESSING: DataProductId[] = [
+  'https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643',
+];
+
+export type BYOCBand = {
+  name: string;
+  sampleType: string;
+};
