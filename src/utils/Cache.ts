@@ -177,7 +177,7 @@ class CacheApi implements ShCache {
 
   private serializeResponseData(response: AxiosResponse): any {
     let responseData;
-    switch (response.request.responseType) {
+    switch (response.config.responseType) {
       case 'blob':
       case 'arraybuffer':
       case 'text':
