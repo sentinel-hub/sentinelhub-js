@@ -1,9 +1,9 @@
-import 'jest-setup';
+import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { constructFixtureFindTiles } from './fixtures.findTiles';
-import { invalidateCaches } from 'src/utils/Cache';
+import { invalidateCaches } from '../../utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 

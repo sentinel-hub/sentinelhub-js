@@ -3,16 +3,16 @@ import moment from 'moment';
 import area from '@turf/area';
 import { union, intersection, Geom } from 'polygon-clipping';
 
-import { BBox } from 'src/bbox';
-import { CRS_EPSG4326 } from 'src/crs';
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode } from 'src/layer/const';
-import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { BBox } from '../bbox';
+import { CRS_EPSG4326 } from '../crs';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode } from './const';
+import { Dataset } from './dataset';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
-import { Effects } from 'src/mapDataManipulation/const';
-import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
-import { drawBlobOnCanvas, canvasToBlob } from 'src/utils/canvas';
+import { Effects } from '../mapDataManipulation/const';
+import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { drawBlobOnCanvas, canvasToBlob } from '../utils/canvas';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {

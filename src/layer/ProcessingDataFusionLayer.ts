@@ -1,24 +1,17 @@
-import { BBox } from 'src/bbox';
-import {
-  GetMapParams,
-  Interpolator,
-  PreviewMode,
-  ApiType,
-  PaginatedTiles,
-  MosaickingOrder,
-} from 'src/layer/const';
+import { BBox } from '../bbox';
+import { GetMapParams, Interpolator, PreviewMode, ApiType, PaginatedTiles, MosaickingOrder } from './const';
 import {
   createProcessingPayload,
   convertPreviewToString,
   processingGetMap,
   ProcessingPayloadDatasource,
-} from 'src/layer/processing';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+} from './processing';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
-import { Effects } from 'src/mapDataManipulation/const';
-import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
+import { Effects } from '../mapDataManipulation/const';
+import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 
 /*
   This layer allows using Processing API "data fusion". It takes a list of layers and

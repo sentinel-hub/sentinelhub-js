@@ -1,20 +1,13 @@
 import moment from 'moment';
 
-import { BBox } from 'src/bbox';
+import { BBox } from '../bbox';
 
-import {
-  BackscatterCoeff,
-  PaginatedTiles,
-  OrbitDirection,
-  Link,
-  LinkType,
-  DataProductId,
-} from 'src/layer/const';
-import { ProcessingPayload } from 'src/layer/processing';
-import { DATASET_AWSEU_S1GRD } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from './const';
+import { ProcessingPayload } from './processing';
+import { DATASET_AWSEU_S1GRD } from './dataset';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
 */

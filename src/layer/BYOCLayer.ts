@@ -2,8 +2,8 @@ import { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import axios from 'axios';
 
-import { getAuthToken } from 'src/auth';
-import { BBox } from 'src/bbox';
+import { getAuthToken } from '../auth';
+import { BBox } from '../bbox';
 import {
   PaginatedTiles,
   LocationIdSHv3,
@@ -14,13 +14,13 @@ import {
   Stats,
   DataProductId,
   BYOCBand,
-} from 'src/layer/const';
-import { DATASET_BYOC } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from 'src/layer/processing';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
-import { CACHE_CONFIG_30MIN } from 'src/utils/cacheHandlers';
+} from './const';
+import { DATASET_BYOC } from './dataset';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from './processing';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;

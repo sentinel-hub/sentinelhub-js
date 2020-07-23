@@ -1,4 +1,4 @@
-import { S2L2ALayer, BBox, CRS_EPSG4326 } from 'src';
+import { S2L2ALayer, BBox, CRS_EPSG4326 } from '../../index';
 import { MimeTypes } from '../const';
 
 export function constructFixtureGetMap(): Record<any, any> {

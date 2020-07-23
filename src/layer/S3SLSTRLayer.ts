@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { BBox } from 'src/bbox';
-import { PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from 'src/layer/const';
-import { DATASET_S3SLSTR } from 'src/layer/dataset';
-import { AbstractSentinelHubV3WithCCLayer } from 'src/layer/AbstractSentinelHubV3WithCCLayer';
-import { ProcessingPayload } from 'src/layer/processing';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { BBox } from '../bbox';
+import { PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from './const';
+import { DATASET_S3SLSTR } from './dataset';
+import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
+import { ProcessingPayload } from './processing';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;

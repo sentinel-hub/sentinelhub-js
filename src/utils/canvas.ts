@@ -1,4 +1,4 @@
-import { MimeType } from 'src/layer/const';
+import { MimeType } from '../layer/const';
 
 export async function drawBlobOnCanvas(
   ctx: CanvasRenderingContext2D,

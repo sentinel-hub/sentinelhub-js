@@ -1,5 +1,5 @@
-import 'jest-setup';
-import { ApiType, MosaickingOrder, S2L2ALayer, setAuthToken } from '../../../src';
+import '../../../jest-setup';
+import { ApiType, MosaickingOrder, S2L2ALayer, setAuthToken } from '../../index';
 import { ProcessingPayload, ProcessingPayloadDatasource } from '../processing';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
