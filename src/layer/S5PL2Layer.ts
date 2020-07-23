@@ -1,12 +1,12 @@
 import moment from 'moment';
 
-import { BBox } from 'src/bbox';
-import { PaginatedTiles, Link, LinkType, DataProductId } from 'src/layer/const';
-import { DATASET_S5PL2 } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from 'src/layer/processing';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { BBox } from '../bbox';
+import { PaginatedTiles, Link, LinkType, DataProductId } from './const';
+import { DATASET_S5PL2 } from './dataset';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from './processing';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching

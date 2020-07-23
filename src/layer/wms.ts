@@ -2,8 +2,8 @@ import { stringify } from 'query-string';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { CRS_EPSG4326, CRS_IDS } from 'src/crs';
-import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from 'src/layer/const';
+import { CRS_EPSG4326, CRS_IDS } from '../crs';
+import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
 
 export enum ServiceType {
   WMS = 'WMS',

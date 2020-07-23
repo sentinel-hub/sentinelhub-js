@@ -1,4 +1,4 @@
-import 'jest-setup';
+import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
@@ -6,9 +6,9 @@ import fetch from 'node-fetch';
 
 import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
-import { ApiType } from 'src';
-import { setAuthToken } from 'src/auth';
-import { invalidateCaches, CacheTarget } from 'src/utils/Cache';
+import { ApiType } from '../../index';
+import { setAuthToken } from '../../auth';
+import { invalidateCaches, CacheTarget } from '../../utils/Cache';
 import { cacheStillValid, EXPIRY_HEADER_KEY } from '../../utils/cacheHandlers';
 
 const mockNetwork = new MockAdapter(axios);

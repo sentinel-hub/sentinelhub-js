@@ -1,5 +1,5 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
-import { CacheConfig } from 'src/utils/cacheHandlers';
+import { CacheConfig } from './cacheHandlers';
 
 export type RequestConfiguration = {
   authToken?: string | null;

@@ -1,4 +1,4 @@
-import 'jest-setup';
+import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -11,7 +11,7 @@ import {
   Resolution,
   OrbitDirection,
   LinkType,
-} from 'src';
+} from '../../index';
 
 const mockNetwork = new MockAdapter(axios);
 

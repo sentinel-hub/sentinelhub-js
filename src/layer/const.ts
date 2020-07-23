@@ -1,8 +1,8 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
-import { BBox } from 'src/bbox';
-import { CRS_IDS } from 'src/crs';
-import { Effects } from 'src/mapDataManipulation/const';
+import { BBox } from '../bbox';
+import { CRS_IDS } from '../crs';
+import { Effects } from '../mapDataManipulation/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).

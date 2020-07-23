@@ -1,5 +1,5 @@
-import { DATASET_MODIS } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
+import { DATASET_MODIS } from './dataset';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 
 export class MODISLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_MODIS;

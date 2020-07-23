@@ -1,5 +1,5 @@
-import { MosaickingOrder } from 'src/layer/const';
-import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
+import { MosaickingOrder } from './const';
+import { AbstractSentinelHubV1OrV2Layer } from './AbstractSentinelHubV1OrV2Layer';
 
 interface ConstructorParameters {
   instanceId?: string | null;

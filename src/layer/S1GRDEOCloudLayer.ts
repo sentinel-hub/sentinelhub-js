@@ -1,9 +1,9 @@
-import { DATASET_EOCLOUD_S1GRD } from 'src/layer/dataset';
+import { DATASET_EOCLOUD_S1GRD } from './dataset';
 
-import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
-import { AcquisitionMode, Polarization } from 'src/layer/S1GRDAWSEULayer';
-import { OrbitDirection, MosaickingOrder, Link, LinkType } from 'src/layer/const';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
+import { AbstractSentinelHubV1OrV2Layer } from './AbstractSentinelHubV1OrV2Layer';
+import { AcquisitionMode, Polarization } from './S1GRDAWSEULayer';
+import { OrbitDirection, MosaickingOrder, Link, LinkType } from './const';
+import { RequestConfiguration } from '../utils/cancelRequests';
 
 /*
   Note: the usual combinations are IW + DV/SV + HIGH and EW + DH/SH + MEDIUM.
