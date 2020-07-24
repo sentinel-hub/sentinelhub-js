@@ -3,7 +3,7 @@ import moment from 'moment';
 import { stringify } from 'query-string';
 import WKT from 'terraformer-wkt-parser';
 
-import { BBox } from 'src/bbox';
+import { BBox } from '../bbox';
 import {
   GetMapParams,
   ApiType,
@@ -16,14 +16,14 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-} from 'src/layer/const';
-import { wmsGetMapUrl } from 'src/layer/wms';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
-import { fetchGetCapabilitiesXml } from 'src/layer/utils';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
-import { CACHE_CONFIG_NOCACHE } from 'src/utils/cacheHandlers';
+} from './const';
+import { wmsGetMapUrl } from './wms';
+import { AbstractLayer } from './AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
+import { fetchGetCapabilitiesXml } from './utils';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;

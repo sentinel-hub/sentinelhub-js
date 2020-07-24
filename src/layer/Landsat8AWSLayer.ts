@@ -1,6 +1,6 @@
-import { DATASET_AWS_L8L1C } from 'src/layer/dataset';
+import { DATASET_AWS_L8L1C } from './dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
-import { Link, LinkType } from 'src/layer/const';
+import { Link, LinkType } from './const';
 
 export class Landsat8AWSLayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_AWS_L8L1C;

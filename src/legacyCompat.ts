@@ -1,13 +1,13 @@
 import WKT from 'terraformer-wkt-parser';
 import { Polygon } from '@turf/helpers';
 
-import { BBox } from 'src/bbox';
-import { CRS_IDS, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
-import { ApiType, MimeType, GetMapParams } from 'src/layer/const';
-import { ServiceType } from 'src/layer/wms';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { LayersFactory } from 'src/layer/LayersFactory';
-import { WmsLayer } from 'src/layer/WmsLayer';
+import { BBox } from './bbox';
+import { CRS_IDS, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs';
+import { ApiType, MimeType, GetMapParams } from './layer/const';
+import { ServiceType } from './layer/wms';
+import { AbstractSentinelHubV3Layer } from './layer/AbstractSentinelHubV3Layer';
+import { LayersFactory } from './layer/LayersFactory';
+import { WmsLayer } from './layer/WmsLayer';
 
 export async function legacyGetMapFromUrl(
   urlWithQueryParams: string,

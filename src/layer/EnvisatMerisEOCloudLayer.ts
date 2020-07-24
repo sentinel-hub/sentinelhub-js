@@ -1,6 +1,6 @@
-import { DATASET_EOCLOUD_ENVISAT_MERIS } from 'src/layer/dataset';
-import { Link, LinkType } from 'src/layer/const';
-import { AbstractSentinelHubV1OrV2Layer } from 'src/layer/AbstractSentinelHubV1OrV2Layer';
+import { DATASET_EOCLOUD_ENVISAT_MERIS } from './dataset';
+import { Link, LinkType } from './const';
+import { AbstractSentinelHubV1OrV2Layer } from './AbstractSentinelHubV1OrV2Layer';
 
 export class EnvisatMerisEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
   public readonly dataset = DATASET_EOCLOUD_ENVISAT_MERIS;

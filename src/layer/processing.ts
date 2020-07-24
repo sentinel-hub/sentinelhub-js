@@ -1,19 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
-import { getAuthToken } from 'src/auth';
+import { getAuthToken } from '../auth';
 
-import {
-  MimeType,
-  GetMapParams,
-  Interpolator,
-  PreviewMode,
-  MosaickingOrder,
-  DataProductId,
-} from 'src/layer/const';
-import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { CACHE_CONFIG_30MIN } from 'src/utils/cacheHandlers';
+import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder, DataProductId } from './const';
+import { Dataset } from './dataset';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',

@@ -1,4 +1,4 @@
-import { BBox, CRS_EPSG4326, GetMapParams, MimeTypes } from 'src';
+import { BBox, CRS_EPSG4326, GetMapParams, MimeTypes } from '../../index';
 
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 

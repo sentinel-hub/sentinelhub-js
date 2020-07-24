@@ -2,9 +2,9 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { CACHE_CONFIG_30MIN } from 'src/utils/cacheHandlers';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 export type GetCapabilitiesXml = {
   WMS_Capabilities: {
