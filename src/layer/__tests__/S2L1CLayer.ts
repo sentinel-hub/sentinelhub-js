@@ -1,5 +1,4 @@
-import { S2L1CLayer } from '../S2L1CLayer';
-import { ApiType } from '../const';
+import { S2L1CLayer, ApiType } from '../../index';
 import '../../../jest-setup';
 
 test.each([
