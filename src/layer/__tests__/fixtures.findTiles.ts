@@ -8,8 +8,8 @@ import {
   AcquisitionMode,
   S1GRDAWSEULayer,
   BBox,
+  CRS_EPSG4326,
 } from '../../index';
-import { CRS_EPSG4326 } from '../../crs';
 
 export function constructFixtureFindTiles({
   sensingTime = '2018-11-28T11:12:13Z',

@@ -1,5 +1,4 @@
-import { S2L2ALayer, BBox, CRS_EPSG4326 } from '../../index';
-import { MimeTypes } from '../const';
+import { S2L2ALayer, BBox, CRS_EPSG4326, MimeTypes } from '../../index';
 
 export function constructFixtureGetMap(): Record<any, any> {
   const layer = new S2L2ALayer({

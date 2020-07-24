@@ -1,4 +1,3 @@
-import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -12,6 +11,7 @@ import {
   OrbitDirection,
   LinkType,
 } from '../../index';
+import '../../../jest-setup';
 
 const mockNetwork = new MockAdapter(axios);
 
