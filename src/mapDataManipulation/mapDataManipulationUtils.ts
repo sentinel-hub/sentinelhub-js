@@ -1,4 +1,4 @@
-import { RgbMappingArrays, Effects, ColorRange } from 'src/mapDataManipulation/const';
+import { RgbMappingArrays, Effects, ColorRange } from './const';
 
 export function prepareRgbMappingArrays(): RgbMappingArrays {
   return {

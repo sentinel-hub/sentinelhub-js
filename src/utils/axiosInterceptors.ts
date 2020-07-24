@@ -1,12 +1,12 @@
 import axios, { AxiosRequestConfig, CancelToken, AxiosError } from 'axios';
 
-import { isDebugEnabled } from 'src/utils/debug';
+import { isDebugEnabled } from './debug';
 import {
   fetchCachedResponse,
   saveCacheResponse,
   findAndDeleteExpiredCachedItems,
   CacheConfig,
-} from 'src/utils/cacheHandlers';
+} from './cacheHandlers';
 
 const DEFAULT_RETRY_DELAY = 3000;
 const DEFAULT_MAX_RETRIES = 2;

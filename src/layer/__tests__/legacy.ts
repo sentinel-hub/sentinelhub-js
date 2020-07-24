@@ -1,7 +1,7 @@
-import 'jest-setup';
 import moment from 'moment';
+import '../../../jest-setup';
 
-import { parseLegacyWmsGetMapParams, BBox, CRS_EPSG3857, GetMapParams, PreviewMode } from 'src';
+import { parseLegacyWmsGetMapParams, BBox, CRS_EPSG3857, GetMapParams, PreviewMode } from '../../index';
 
 test('parseLegacyWmsGetMapParams with evalscripturl', () => {
   const evalscriptUrlOriginal =

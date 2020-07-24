@@ -2,8 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { getAuthToken } from 'src/auth';
-import { BBox } from 'src/bbox';
+import { getAuthToken } from '../auth';
+import { BBox } from '../bbox';
 import {
   GetMapParams,
   ApiType,
@@ -18,17 +18,17 @@ import {
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
-} from 'src/layer/const';
-import { wmsGetMapUrl } from 'src/layer/wms';
-import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
+} from './const';
+import { wmsGetMapUrl } from './wms';
+import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
+import { AbstractLayer } from './AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
-import { Effects } from 'src/mapDataManipulation/const';
-import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
-import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from 'src/utils/cacheHandlers';
+import { Effects } from '../mapDataManipulation/const';
+import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;

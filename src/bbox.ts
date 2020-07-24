@@ -1,4 +1,4 @@
-import { CRS } from 'src/crs';
+import { CRS } from './crs';
 import { Polygon } from '@turf/helpers';
 
 export class BBox {
