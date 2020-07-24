@@ -1,9 +1,17 @@
-import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmsLayer, setAuthToken } from '../../index';
-import { invalidateCaches } from '../../utils/Cache';
+import {
+  BBox,
+  CRS_EPSG4326,
+  ApiType,
+  MimeTypes,
+  WmsLayer,
+  setAuthToken,
+  invalidateCaches,
+} from '../../index';
+
+import '../../../jest-setup';
 
 const mockNetwork = new MockAdapter(axios);
 

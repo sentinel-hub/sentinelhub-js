@@ -1,5 +1,5 @@
-import '../../../jest-setup';
 import moment from 'moment';
+import '../../../jest-setup';
 
 import { parseLegacyWmsGetMapParams, BBox, CRS_EPSG3857, GetMapParams, PreviewMode } from '../../index';
 

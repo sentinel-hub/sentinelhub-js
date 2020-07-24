@@ -1,10 +1,10 @@
-import '../../../jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
+import { ApiType, setAuthToken, requestAuthToken, invalidateCaches } from '../../index';
+
+import '../../../jest-setup';
 import { constructFixtureGetMap } from './fixtures.auth';
-import { ApiType, setAuthToken, requestAuthToken } from '../../index';
-import { invalidateCaches } from '../../utils/Cache';
 
 const mockNetwork = new MockAdapter(axios);
 

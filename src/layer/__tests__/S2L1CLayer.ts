@@ -1,7 +1,6 @@
-import '../../../jest-setup';
-
 import { S2L1CLayer } from '../S2L1CLayer';
 import { ApiType } from '../const';
+import '../../../jest-setup';
 
 test.each([
   ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/99999', false],
