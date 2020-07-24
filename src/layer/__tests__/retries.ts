@@ -1,7 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { invalidateCaches } from '../../utils/Cache';
+import { invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
 import { constructFixtureFindTiles } from './fixtures.findTiles';
