@@ -379,11 +379,14 @@ If we already have a WMS GetMap URL, we can use it directly:
   const imageBlob4 = await legacyGetMapFromUrl(fullUrlWithWmsQueryString, ApiType.PROCESSING);
 ```
 
-Gain and gamma effects are also supported in these two functions as a part of `wmsParams` or `fullUrlWithWmsQueryString`.
+`legacyGetMapFromParams` and `legacyGetMapFromUrl` accept all parameters that are supported in [OGC WMS GetMap standard](https://www.sentinel-hub.com/develop/api/ogc/standard-parameters/wms/) or [Sentinel hub OGC API](https://www.sentinel-hub.com/develop/api/ogc/custom-parameters/), either as a property inside `wmsParams` object or as a substring of the `fullUrlWithWmsQueryString`.
+Example params: `gain`, `gamma`, `upsampling`, `downsampling`, etc.
 
-`legacyGetMapFromParams` and `legacyGetMapFromUrl` also accept the parameters that are not supported in WMS GetMap URL but are supported.
-Parameters that are needed when instantiating a `Layer` can be passed inside of `overrideLayerConstructorParams`.
-Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`.
+`legacyGetMapFromParams` and `legacyGetMapFromUrl` also accept the parameters that are used for creating a dataset-specific layer object or for getting the data with `getMap()` function but are not supported in [OGC WMS GetMap standard](https://www.sentinel-hub.com/develop/api/ogc/standard-parameters/wms/) or [Sentinel hub OGC API](https://www.sentinel-hub.com/develop/api/ogc/custom-parameters/).
+- Parameters that are used for instantiating a `Layer` can be passed inside of `overrideLayerConstructorParams`. 
+Example params: dataset-specific params for  creating [layers](#Layers)
+- Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`. 
+Example params: [effects](#Effects)
 
 ```javascript
   const imageBlob5 = await legacyGetMapFromParams(
