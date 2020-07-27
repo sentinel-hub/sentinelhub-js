@@ -1,16 +1,12 @@
-import { mapDataManipulation } from 'src/mapDataManipulation/mapDataManipulation';
-import { Effects } from 'src/mapDataManipulation/const';
+import { mapDataManipulation } from './mapDataManipulation';
+import { Effects } from './const';
 import {
   isAnyEffectSet,
   prepareRgbMappingArrays,
   changeRgbMappingArraysRange,
   prepareManipulatePixel,
-} from 'src/mapDataManipulation/mapDataManipulationUtils';
-import {
-  runGainEffectFunction,
-  runGammaEffectFunction,
-  runColorEffectFunction,
-} from 'src/mapDataManipulation/effectFunctions';
+} from './mapDataManipulationUtils';
+import { runGainEffectFunction, runGammaEffectFunction, runColorEffectFunction } from './effectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the range of the values from [0, 255] to [0, 1]

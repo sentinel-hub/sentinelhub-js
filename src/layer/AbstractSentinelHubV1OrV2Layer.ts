@@ -3,7 +3,7 @@ import moment from 'moment';
 import { stringify } from 'query-string';
 import WKT from 'terraformer-wkt-parser';
 
-import { BBox } from 'src/bbox';
+import { BBox } from '../bbox';
 import {
   GetMapParams,
   ApiType,
@@ -16,13 +16,14 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-} from 'src/layer/const';
-import { wmsGetMapUrl } from 'src/layer/wms';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
-import { fetchGetCapabilitiesXml } from 'src/layer/utils';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+} from './const';
+import { wmsGetMapUrl } from './wms';
+import { AbstractLayer } from './AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
+import { fetchGetCapabilitiesXml } from './utils';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -169,7 +170,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
           'Content-Type': 'application/json',
           'Accept-CRS': 'EPSG:4326',
         },
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       });
 
       const responseTiles: any[] = response.data.tiles;
@@ -222,7 +223,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         headers: {
           'Content-Type': 'application/json',
         },
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       });
 
       return response.data.map((date: string) => moment.utc(date).toDate());
@@ -276,7 +277,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
       const { data } = await axios.get(this.dataset.shServiceHostname + 'v1/fis/' + this.instanceId, {
         params: payload,
-        ...getAxiosReqParams(innerParams),
+        ...getAxiosReqParams(innerParams, CACHE_CONFIG_NOCACHE),
       });
       // convert date strings to Date objects
       for (let channel in data) {

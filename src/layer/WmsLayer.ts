@@ -1,12 +1,12 @@
 import moment, { Moment } from 'moment';
 
-import { BBox } from 'src/bbox';
-import { GetMapParams, ApiType } from 'src/layer/const';
-import { wmsGetMapUrl } from 'src/layer/wms';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
+import { BBox } from '../bbox';
+import { GetMapParams, ApiType } from './const';
+import { wmsGetMapUrl } from './wms';
+import { AbstractLayer } from './AbstractLayer';
 import { fetchGetCapabilitiesXml } from './utils';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
 interface ConstructorParameters {
   baseUrl?: string;

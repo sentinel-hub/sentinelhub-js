@@ -1,8 +1,8 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
-import { BBox } from 'src/bbox';
-import { CRS_IDS } from 'src/crs';
-import { Effects } from 'src/mapDataManipulation/const';
+import { BBox } from '../bbox';
+import { CRS_IDS } from '../crs';
+import { Effects } from '../mapDataManipulation/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -195,3 +195,14 @@ export type Stats = {
 };
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
+
+export type DataProductId = string;
+
+export const SUPPORTED_DATA_PRODUCTS_PROCESSING: DataProductId[] = [
+  'https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643',
+];
+
+export type BYOCBand = {
+  name: string;
+  sampleType: string;
+};

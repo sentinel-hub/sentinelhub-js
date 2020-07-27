@@ -2,8 +2,8 @@ import { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import axios from 'axios';
 
-import { getAuthToken } from 'src/auth';
-import { BBox } from 'src/bbox';
+import { getAuthToken } from '../auth';
+import { BBox } from '../bbox';
 import {
   PaginatedTiles,
   LocationIdSHv3,
@@ -12,19 +12,22 @@ import {
   ApiType,
   GetStatsParams,
   Stats,
-} from 'src/layer/const';
-import { DATASET_BYOC } from 'src/layer/dataset';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from 'src/layer/processing';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+  DataProductId,
+  BYOCBand,
+} from './const';
+import { DATASET_BYOC } from './dataset';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from './processing';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   title?: string | null;
   description?: string | null;
   collectionId?: string | null;
@@ -80,8 +83,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         const res = await axios.get(url, {
           responseType: 'json',
           headers: headers,
-          useCache: true,
-          ...getAxiosReqParams(innerReqConfig),
+          ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
         });
 
         this.locationId = res.data.location.id;
@@ -193,7 +195,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
   }
 
-  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<void> {
+  public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       if (this.collectionId === null) {
         throw new Error('Parameter collectionId is not set');
@@ -204,8 +206,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       const res = await axios.get(url, {
         responseType: 'json',
         headers: headers,
-        useCache: true,
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       });
       return res.data.bands;
     }, reqConfig);

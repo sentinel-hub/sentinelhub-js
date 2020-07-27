@@ -3,9 +3,9 @@ import {
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
-} from 'src/layer/utils';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from 'src/layer/const';
+} from './utils';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -23,25 +23,25 @@ import {
   DATASET_EOCLOUD_LANDSAT8,
   DATASET_EOCLOUD_ENVISAT_MERIS,
   Dataset,
-} from 'src/layer/dataset';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { WmsLayer } from 'src/layer/WmsLayer';
-import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
-import { S2L2ALayer } from 'src/layer/S2L2ALayer';
-import { S2L1CLayer } from 'src/layer/S2L1CLayer';
-import { S3SLSTRLayer } from 'src/layer/S3SLSTRLayer';
-import { S3OLCILayer } from 'src/layer/S3OLCILayer';
-import { S5PL2Layer } from 'src/layer/S5PL2Layer';
-import { MODISLayer } from 'src/layer/MODISLayer';
-import { DEMLayer } from 'src/layer/DEMLayer';
-import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
-import { BYOCLayer } from 'src/layer/BYOCLayer';
-import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
-import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
-import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
+} from './dataset';
+import { AbstractLayer } from './AbstractLayer';
+import { WmsLayer } from './WmsLayer';
+import { S1GRDAWSEULayer } from './S1GRDAWSEULayer';
+import { S2L2ALayer } from './S2L2ALayer';
+import { S2L1CLayer } from './S2L1CLayer';
+import { S3SLSTRLayer } from './S3SLSTRLayer';
+import { S3OLCILayer } from './S3OLCILayer';
+import { S5PL2Layer } from './S5PL2Layer';
+import { MODISLayer } from './MODISLayer';
+import { DEMLayer } from './DEMLayer';
+import { Landsat8AWSLayer } from './Landsat8AWSLayer';
+import { BYOCLayer } from './BYOCLayer';
+import { S1GRDEOCloudLayer } from './S1GRDEOCloudLayer';
+import { Landsat5EOCloudLayer } from './Landsat5EOCloudLayer';
+import { Landsat7EOCloudLayer } from './Landsat7EOCloudLayer';
+import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
+import { EnvisatMerisEOCloudLayer } from './EnvisatMerisEOCloudLayer';
+import { RequestConfiguration } from '../utils/cancelRequests';
 
 export class LayersFactory {
   /*

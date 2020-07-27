@@ -1,14 +1,19 @@
-import 'jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { constructFixtureGetMap } from './auth.fixtures';
-import { ApiType, setAuthToken, requestAuthToken } from 'src';
+import { ApiType, setAuthToken, requestAuthToken, invalidateCaches } from '../../index';
+
+import '../../../jest-setup';
+import { constructFixtureGetMap } from './fixtures.auth';
 
 const mockNetwork = new MockAdapter(axios);
 
 const EXAMPLE_TOKEN1 = 'TOKEN111';
 const EXAMPLE_TOKEN2 = 'TOKEN222';
+
+beforeEach(async () => {
+  await invalidateCaches();
+});
 
 test('getMap + Processing throws an exception if authToken is not set', async () => {
   const { layer, getMapParams } = constructFixtureGetMap();

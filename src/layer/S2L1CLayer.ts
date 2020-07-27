@@ -1,6 +1,6 @@
-import { DATASET_S2L1C } from 'src/layer/dataset';
+import { DATASET_S2L1C } from './dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
-import { Link, LinkType } from 'src/layer/const';
+import { Link, LinkType } from './const';
 
 export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_S2L1C;
