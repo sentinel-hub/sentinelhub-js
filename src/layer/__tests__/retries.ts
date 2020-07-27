@@ -1,10 +1,16 @@
-import 'jest-setup';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { constructFixtureFindTiles } from './retries.fixtures';
+import { invalidateCaches } from '../../index';
+
+import '../../../jest-setup';
+import { constructFixtureFindTiles } from './fixtures.findTiles';
 
 const mockNetwork = new MockAdapter(axios);
+
+beforeEach(async () => {
+  await invalidateCaches();
+});
 
 test('Retries correctly on network errors', async () => {
   // we need to adjust jest timeout until we have support for setting the delay when retrying,

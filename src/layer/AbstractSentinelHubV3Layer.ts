@@ -2,8 +2,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { getAuthToken } from 'src/auth';
-import { BBox } from 'src/bbox';
+import { getAuthToken } from '../auth';
+import { BBox } from '../bbox';
 import {
   GetMapParams,
   ApiType,
@@ -16,23 +16,26 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-} from 'src/layer/const';
-import { wmsGetMapUrl } from 'src/layer/wms';
-import { processingGetMap, createProcessingPayload, ProcessingPayload } from 'src/layer/processing';
-import { AbstractLayer } from 'src/layer/AbstractLayer';
-import { CRS_EPSG4326, findCrsFromUrn } from 'src/crs';
+  SUPPORTED_DATA_PRODUCTS_PROCESSING,
+  DataProductId,
+} from './const';
+import { wmsGetMapUrl } from './wms';
+import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
+import { AbstractLayer } from './AbstractLayer';
+import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
-import { Effects } from 'src/mapDataManipulation/const';
-import { runEffectFunctions } from 'src/mapDataManipulation/runEffectFunctions';
+import { Effects } from '../mapDataManipulation/const';
+import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
@@ -47,7 +50,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected layerId: string | null;
   protected evalscript: string | null;
   protected evalscriptUrl: string | null;
-  protected dataProduct: string | null;
+  protected dataProduct: DataProductId | null;
   public legend?: any[] | null;
   protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
@@ -109,15 +112,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
-      useCache: true,
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
     const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
       layerId: l.id,
       ...l.datasourceDefaults,
       evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct,
+      dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
       legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
         ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
         : null,
@@ -145,9 +147,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
-  protected async fetchEvalscriptUrlIfNeeded(): Promise<void> {
+  protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
-      const response = await axios.get(this.evalscriptUrl, { responseType: 'text', useCache: true });
+      const response = await axios.get(this.evalscriptUrl, {
+        responseType: 'text',
+        ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+      });
       this.evalscript = response.data;
     }
   }
@@ -172,7 +177,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           throw new Error('This layer does not support Processing API (unknown dataset)');
         }
 
-        await this.fetchEvalscriptUrlIfNeeded();
+        await this.fetchEvalscriptUrlIfNeeded(innerReqConfig);
 
         let layerParams = null;
         if (!this.evalscript && !this.dataProduct) {
@@ -195,9 +200,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           if (!layerParams) {
             layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
           }
-          this.mosaickingOrder = layerParams.mosaickingOrder;
-          this.upsampling = layerParams.upsampling;
-          this.downsampling = layerParams.downsampling;
+          if (!this.mosaickingOrder && layerParams && layerParams.mosaickingOrder) {
+            this.mosaickingOrder = layerParams.mosaickingOrder;
+          }
+          if (!this.upsampling && layerParams && layerParams.upsampling) {
+            this.upsampling = layerParams.upsampling;
+          }
+          if (!this.downsampling && layerParams && layerParams.downsampling) {
+            this.downsampling = layerParams.downsampling;
+          }
         }
 
         await this.convertEvalscriptToV3IfNeeded(innerReqConfig);
@@ -232,7 +243,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
-    if (this.dataProduct) {
+    if (this.dataProduct && !SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(this.dataProduct)) {
       return api === ApiType.WMS;
     }
     return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
@@ -294,7 +305,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected createSearchIndexRequestConfig(reqConfig: RequestConfiguration): AxiosRequestConfig {
     const requestConfig: AxiosRequestConfig = {
       headers: { 'Accept-CRS': 'EPSG:4326' },
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
     };
     return requestConfig;
   }
@@ -414,7 +425,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       };
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
       const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
       const found: Moment[] = response.data.map((date: string) => moment.utc(date));
@@ -471,7 +482,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       }
 
       const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig),
+        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
       };
 
       const shServiceHostname = this.getShServiceHostname();
@@ -506,9 +517,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         Authorization: `Bearer ${authToken}`,
         'Content-Type': 'application/ecmascript',
       },
-      useCache: true,
       responseType: 'text',
-      ...getAxiosReqParams(reqConfig),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
     const res = await axios.post(url, evalscript, requestConfig);
     return res.data;

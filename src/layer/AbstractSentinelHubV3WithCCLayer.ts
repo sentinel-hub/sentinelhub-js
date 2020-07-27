@@ -1,19 +1,19 @@
 import moment from 'moment';
 
-import { BBox } from 'src/bbox';
+import { BBox } from '../bbox';
 
-import { PaginatedTiles, MosaickingOrder } from 'src/layer/const';
-import { AbstractSentinelHubV3Layer } from 'src/layer/AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from 'src/layer/processing';
-import { RequestConfiguration } from 'src/utils/cancelRequests';
-import { ensureTimeout } from 'src/utils/ensureTimeout';
+import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
+import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
+import { ProcessingPayload } from './processing';
+import { RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
   evalscript?: string | null;
   evalscriptUrl?: string | null;
-  dataProduct?: string | null;
+  dataProduct?: DataProductId | null;
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;

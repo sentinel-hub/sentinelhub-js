@@ -1,9 +1,9 @@
-import { Effects, RgbMappingArrays } from 'src/mapDataManipulation/const';
+import { Effects, RgbMappingArrays } from './const';
 import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
   transformValueToRange,
-} from 'src/mapDataManipulation/mapDataManipulationUtils';
+} from './mapDataManipulationUtils';
 
 export function runGainEffectFunction(
   rgbMappingArrays: RgbMappingArrays,

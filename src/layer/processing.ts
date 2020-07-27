@@ -1,17 +1,22 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
 
-import { getAuthToken } from 'src/auth';
+import { getAuthToken } from '../auth';
 
-import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder } from 'src/layer/const';
-import { Dataset } from 'src/layer/dataset';
-import { getAxiosReqParams, RequestConfiguration } from 'src/utils/cancelRequests';
+import { MimeType, GetMapParams, Interpolator, PreviewMode, MosaickingOrder, DataProductId } from './const';
+import { Dataset } from './dataset';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 enum PreviewModeString {
   DETAIL = 'DETAIL',
   PREVIEW = 'PREVIEW',
   EXTENDED_PREVIEW = 'EXTENDED_PREVIEW',
 }
+
+type DataProduct = {
+  '@id': DataProductId;
+};
 
 export type ProcessingPayload = {
   input: {
@@ -37,7 +42,7 @@ export type ProcessingPayload = {
     ];
   };
   evalscript?: string;
-  dataProduct?: string;
+  dataProduct?: DataProduct;
 };
 
 export type ProcessingPayloadDatasource = {
@@ -86,7 +91,7 @@ export function createProcessingPayload(
   dataset: Dataset,
   params: GetMapParams,
   evalscript: string | null = null,
-  dataProduct: string | null = null,
+  dataProduct: DataProductId | null = null,
   mosaickingOrder: MosaickingOrder | null = null,
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,
@@ -147,7 +152,9 @@ export function createProcessingPayload(
   if (evalscript) {
     payload.evalscript = evalscript;
   } else if (dataProduct) {
-    payload.dataProduct = dataProduct;
+    payload.dataProduct = {
+      '@id': dataProduct,
+    };
     payload.evalscript = ''; // evalscript must not be null
   } else {
     throw new Error('Either evalscript or dataProduct should be defined with Processing API');
@@ -174,8 +181,7 @@ export async function processingGetMap(
     },
     // 'blob' responseType does not work with Node.js:
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
-    useCache: true,
-    ...getAxiosReqParams(reqConfig),
+    ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
   };
   const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
   return response.data;

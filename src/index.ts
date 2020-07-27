@@ -1,6 +1,6 @@
-import { BBox } from 'src/bbox';
-import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from 'src/crs';
-import { setAuthToken, isAuthTokenSet, requestAuthToken } from 'src/auth';
+import { BBox } from './bbox';
+import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs';
+import { setAuthToken, isAuthTokenSet, requestAuthToken } from './auth';
 import {
   ApiType,
   MimeTypes,
@@ -8,10 +8,10 @@ import {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
-} from 'src/layer/const';
-import { setDebugEnabled } from 'src/utils/debug';
+} from './layer/const';
+import { setDebugEnabled } from './utils/debug';
 
-import { LayersFactory } from 'src/layer/LayersFactory';
+import { LayersFactory } from './layer/LayersFactory';
 import {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
@@ -28,38 +28,41 @@ import {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-} from 'src/layer/dataset';
-import { WmsLayer } from 'src/layer/WmsLayer';
-import { S1GRDAWSEULayer } from 'src/layer/S1GRDAWSEULayer';
-import { S1GRDEOCloudLayer } from 'src/layer/S1GRDEOCloudLayer';
-import { S2L2ALayer } from 'src/layer/S2L2ALayer';
-import { S2L1CLayer } from 'src/layer/S2L1CLayer';
-import { S3SLSTRLayer, S3SLSTRView } from 'src/layer/S3SLSTRLayer';
-import { S3OLCILayer } from 'src/layer/S3OLCILayer';
-import { S5PL2Layer } from 'src/layer/S5PL2Layer';
-import { EnvisatMerisEOCloudLayer } from 'src/layer/EnvisatMerisEOCloudLayer';
-import { MODISLayer } from 'src/layer/MODISLayer';
-import { DEMLayer } from 'src/layer/DEMLayer';
-import { Landsat5EOCloudLayer } from 'src/layer/Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from 'src/layer/Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from 'src/layer/Landsat8EOCloudLayer';
-import { Landsat8AWSLayer } from 'src/layer/Landsat8AWSLayer';
-import { BYOCLayer } from 'src/layer/BYOCLayer';
-import { ProcessingDataFusionLayer } from 'src/layer/ProcessingDataFusionLayer';
+} from './layer/dataset';
+import { WmsLayer } from './layer/WmsLayer';
+import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
+import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
+import { S2L2ALayer } from './layer/S2L2ALayer';
+import { S2L1CLayer } from './layer/S2L1CLayer';
+import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
+import { S3OLCILayer } from './layer/S3OLCILayer';
+import { S5PL2Layer } from './layer/S5PL2Layer';
+import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
+import { MODISLayer } from './layer/MODISLayer';
+import { DEMLayer } from './layer/DEMLayer';
+import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
+import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
+import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
+import { Landsat8AWSLayer } from './layer/Landsat8AWSLayer';
+import { BYOCLayer } from './layer/BYOCLayer';
+import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
 import {
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
-} from 'src/legacyCompat';
-import { AcquisitionMode, Polarization, Resolution } from 'src/layer/S1GRDAWSEULayer';
-import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from 'src/layer/const';
-import { registerAxiosCacheRetryInterceptors } from 'src/utils/axiosInterceptors';
-import { CancelToken, isCancelled, RequestConfiguration } from 'src/utils/cancelRequests';
-import { wmsGetMapUrl as _wmsGetMapUrl } from 'src/layer/wms';
+} from './legacyCompat';
 
-import { Effects, ColorRange } from 'src/mapDataManipulation/const';
+import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
+import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from './layer/const';
+import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
+import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
+import { CacheTarget, invalidateCaches } from './utils/Cache';
+import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
+import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
+
+import { Effects, ColorRange } from './mapDataManipulation/const';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -125,7 +128,11 @@ export {
   setDebugEnabled,
   CancelToken,
   isCancelled,
+  CacheTarget,
+  invalidateCaches,
   RequestConfiguration,
+  drawBlobOnCanvas,
+  canvasToBlob,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
