@@ -383,8 +383,8 @@ If we already have a WMS GetMap URL, we can use it directly:
 Example params: `gain`, `gamma`, `upsampling`, `downsampling`, etc.
 
 `legacyGetMapFromParams` and `legacyGetMapFromUrl` also accept the parameters that are used for creating a dataset-specific layer object or for getting the data with `getMap()` function but are not supported in [OGC WMS GetMap standard](https://www.sentinel-hub.com/develop/api/ogc/standard-parameters/wms/) and [Sentinel hub OGC API](https://www.sentinel-hub.com/develop/api/ogc/custom-parameters/).
-- Parameters that are used for instantiating a `Layer` can be passed inside of `overrideLayerConstructorParams`. 
-Example params: dataset-specific params for  creating [layers](#layers)
+- Parameters which would be used for creating a `Layer` can be passed inside of `overrideLayerConstructorParams`. 
+Example params: dataset-specific params for creating [layers](#layers)
 - Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`. 
 Example params: [effects](#effects)
 
