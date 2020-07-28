@@ -53,8 +53,9 @@ import {
   legacyGetMapFromParams,
   parseLegacyWmsGetMapParams,
 } from './legacyCompat';
+
 import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
-import { LocationIdSHv3, GetMapParams, LinkType } from './layer/const';
+import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from './layer/const';
 import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { CacheTarget, invalidateCaches } from './utils/Cache';
@@ -106,6 +107,7 @@ export {
   requestAuthToken,
   // other:
   GetMapParams,
+  OverrideGetMapParams,
   LinkType,
   ApiType,
   SUPPORTED_CRS_OBJ,

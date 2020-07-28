@@ -3,7 +3,7 @@ import { Polygon } from '@turf/helpers';
 
 import { BBox } from './bbox';
 import { CRS_IDS, CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs';
-import { ApiType, MimeType, GetMapParams } from './layer/const';
+import { ApiType, MimeType, GetMapParams, OverrideGetMapParams } from './layer/const';
 import { ServiceType } from './layer/wms';
 import { AbstractSentinelHubV3Layer } from './layer/AbstractSentinelHubV3Layer';
 import { LayersFactory } from './layer/LayersFactory';
@@ -13,6 +13,8 @@ export async function legacyGetMapFromUrl(
   urlWithQueryParams: string,
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
+  overrideLayerConstructorParams?: Record<string, any>,
+  overrideGetMapParams?: OverrideGetMapParams,
 ): Promise<Blob> {
   const url = new URL(urlWithQueryParams);
   let params: Record<string, any> = {};
@@ -20,7 +22,14 @@ export async function legacyGetMapFromUrl(
     params[key] = value;
   });
   const baseUrl = `${url.origin}${url.pathname}`;
-  return legacyGetMapFromParams(baseUrl, params, api, fallbackToWmsApi);
+  return legacyGetMapFromParams(
+    baseUrl,
+    params,
+    api,
+    fallbackToWmsApi,
+    overrideLayerConstructorParams,
+    overrideGetMapParams,
+  );
 }
 
 export function legacyGetMapWmsUrlFromParams(baseUrl: string, wmsParams: Record<string, any>): string {
@@ -34,6 +43,8 @@ export async function legacyGetMapFromParams(
   wmsParams: Record<string, any>,
   api: ApiType = ApiType.WMS,
   fallbackToWmsApi: boolean = false,
+  overrideLayerConstructorParams?: Record<string, any>,
+  overrideGetMapParams?: OverrideGetMapParams,
 ): Promise<Blob> {
   const {
     layers,
@@ -53,8 +64,10 @@ export async function legacyGetMapFromParams(
   } else {
     const layerId = layers;
 
-    // Warning: otherLayerParams override layer's params that are retrieved from service.
-    layer = await LayersFactory.makeLayer(baseUrl, layerId, otherLayerParams);
+    const overrideConstructorParams = { ...otherLayerParams, ...overrideLayerConstructorParams };
+
+    // Warning: overrideConstructorParams override layer's params that are retrieved from service.
+    layer = await LayersFactory.makeLayer(baseUrl, layerId, overrideConstructorParams);
     if (!layer) {
       throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
     }
@@ -74,9 +87,11 @@ export async function legacyGetMapFromParams(
     }
   }
 
+  const updatedGetMapParams = { ...getMapParams, ...overrideGetMapParams };
+
   switch (api) {
     case ApiType.WMS:
-      return layer.getMap(getMapParams, api);
+      return layer.getMap(updatedGetMapParams, api);
 
     case ApiType.PROCESSING:
       try {
@@ -87,11 +102,17 @@ export async function legacyGetMapFromParams(
         if (!(layer instanceof AbstractSentinelHubV3Layer)) {
           throw new Error('Processing API is only possible with SH V3 layers');
         }
-        return layer.getMap(getMapParams, api);
+        return layer.getMap(updatedGetMapParams, api);
       } catch (ex) {
         if (fallbackToWmsApi) {
           //console.debug(`Processing API could not be used, will retry with WMS. Error was: [${ex.message}]`)
-          return legacyGetMapFromParams(baseUrl, wmsParams, ApiType.WMS);
+          return legacyGetMapFromParams(
+            baseUrl,
+            wmsParams,
+            ApiType.WMS,
+            fallbackToWmsApi,
+            overrideGetMapParams,
+          );
         } else {
           throw ex;
         }
