@@ -111,6 +111,7 @@ export async function legacyGetMapFromParams(
             wmsParams,
             ApiType.WMS,
             fallbackToWmsApi,
+            overrideLayerConstructorParams,
             overrideGetMapParams,
           );
         } else {
