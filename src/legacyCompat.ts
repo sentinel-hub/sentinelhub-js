@@ -89,6 +89,21 @@ export async function legacyGetMapFromParams(
 
   const updatedGetMapParams = { ...getMapParams, ...overrideGetMapParams };
 
+  let combinedEffects = {};
+  if (getMapParams.effects && Object.keys(getMapParams.effects).length > 0) {
+    combinedEffects = { ...combinedEffects, ...getMapParams.effects };
+  }
+  if (
+    overrideGetMapParams &&
+    overrideGetMapParams.effects &&
+    Object.keys(overrideGetMapParams.effects).length > 0
+  ) {
+    combinedEffects = { ...combinedEffects, ...overrideGetMapParams.effects };
+  }
+  if (Object.keys(combinedEffects).length > 0) {
+    updatedGetMapParams.effects = combinedEffects;
+  }
+
   switch (api) {
     case ApiType.WMS:
       return layer.getMap(updatedGetMapParams, api);
