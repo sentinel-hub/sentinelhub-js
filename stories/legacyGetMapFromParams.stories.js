@@ -127,7 +127,7 @@ export const ProcessingLegacyGetMapFromParamsGainGamma = () => {
   imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromParams With WMS Fallback</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
@@ -184,7 +184,7 @@ export const ProcessingLegacyGetMapFromParamsRGB = () => {
   imgB.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromParams With WMS Fallback</h2>';
   wrapperEl.innerHTML += '<h4>no RGB | R | G | B</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoRGB);
   wrapperEl.insertAdjacentElement('beforeend', imgR);
@@ -221,6 +221,44 @@ export const ProcessingLegacyGetMapFromParamsRGB = () => {
   return wrapperEl;
 };
 
+export const ProcessingLegacyGetMapFromParamsEffects = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '256';
+  img.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromParams With WMS Fallback</h2>';
+  wrapperEl.innerHTML += '<h4>effects (gain, gamma, r, g, b)</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    try {
+      const imgblob = await legacyGetMapFromParams(
+        baseUrl,
+        paramsWithGainAndGamma,
+        ApiType.PROCESSING,
+        null,
+        null,
+        {
+          effects: { redRange: redRange, greenRange: greenRange, blueRange: blueRange },
+        },
+      );
+      img.src = URL.createObjectURL(imgblob);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const ProcessingLegacyGetMapFromParamsUpsamplingS5p = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
@@ -243,7 +281,7 @@ export const ProcessingLegacyGetMapFromParamsUpsamplingS5p = () => {
   imgBicubic.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromParams With WMS Fallback</h2>';
   wrapperEl.innerHTML += '<h4>default upsampling | nearest | bilinear | bicubic</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgDefaultUpsampling);
   wrapperEl.insertAdjacentElement('beforeend', imgNearest);
@@ -308,7 +346,7 @@ export const ProcessingLegacyGetMapFromParamsMinQaS5p = () => {
   imgMinQa100.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromUrl With WMS Fallback</h2>';
+  wrapperEl.innerHTML = '<h2>Processing LegacyGetMapFromParams With WMS Fallback</h2>';
   wrapperEl.innerHTML += '<h4>default minQa | minQa=0 | minQa=100</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgDefaultMinQa);
   wrapperEl.insertAdjacentElement('beforeend', imgMinQa0);
@@ -383,7 +421,7 @@ export const WMSLegacyGetMapFromParamsGainGamma = () => {
   imgGainGammaAre2.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>WMS LegacyGetMapFromUrl</h2>';
+  wrapperEl.innerHTML = '<h2>WMS LegacyGetMapFromParams</h2>';
   wrapperEl.innerHTML += '<h4>no gain/gamma | gain | gamma | gain and gamma</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgNoGainGamma);
   wrapperEl.insertAdjacentElement('beforeend', imgGainIs2);
