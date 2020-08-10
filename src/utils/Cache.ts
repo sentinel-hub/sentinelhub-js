@@ -22,16 +22,16 @@ const memoryCache = new Map();
 // By default we will use cache_api if availble, if not we will cache in memory
 // user can also specify to just use in memory caching
 // If user provides a CacheTarget.CACHE_API and cache_api is not availble we will fallback to memory
-export function cacheFactory(optionalTargets: CacheTargets): ShCache {
+export async function cacheFactory(optionalTargets: CacheTargets): Promise<ShCache> {
   const targets = optionalTargets || SUPPORTED_TARGETS;
-  const target = getFirstUseableTarget(targets);
+  const target = await getFirstUseableTarget(targets);
   return constructCache(target);
 }
 
-function getFirstUseableTarget(targets: CacheTargets): CacheTarget {
+async function getFirstUseableTarget(targets: CacheTargets): Promise<CacheTarget> {
   let firstTargetToUse = undefined; // default to memory if target is not supported
   for (const key of targets) {
-    if (doesTargetExist(key)) {
+    if (await doesTargetExist(key)) {
       firstTargetToUse = key;
       break;
     }
@@ -39,10 +39,25 @@ function getFirstUseableTarget(targets: CacheTargets): CacheTarget {
   return firstTargetToUse;
 }
 
-export function doesTargetExist(target: CacheTarget): boolean {
+async function checkIfCacheApiAvailable(): Promise<boolean> {
+  if (!window.caches) {
+    return false;
+  }
+  try {
+    const caches = window.caches;
+    //make request to cacheApi to check if it is available
+    await caches.keys();
+    return true;
+  } catch (err) {
+    console.error('CacheApi is not available', err);
+    return false;
+  }
+}
+
+export async function doesTargetExist(target: CacheTarget): Promise<boolean> {
   switch (target) {
     case CacheTarget.CACHE_API:
-      return Boolean(window.caches);
+      return await checkIfCacheApiAvailable();
     case CacheTarget.MEMORY:
       return true;
     default:
@@ -226,7 +241,7 @@ class CacheApi implements ShCache {
 export async function invalidateCaches(optionalTargets?: CacheTargets): Promise<void> {
   const targets = optionalTargets || SUPPORTED_TARGETS;
   for (const target of targets) {
-    if (!doesTargetExist(target)) {
+    if (!(await doesTargetExist(target))) {
       continue;
     }
     switch (target) {
