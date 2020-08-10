@@ -49,7 +49,7 @@ async function checkIfCacheApiAvailable(): Promise<boolean> {
     await caches.keys();
     return true;
   } catch (err) {
-    console.error('CacheApi is not available', err);
+    console.warn('CacheApi is not available', err);
     return false;
   }
 }
