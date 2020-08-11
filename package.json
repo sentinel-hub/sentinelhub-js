@@ -48,7 +48,7 @@
     "test": "TZ=Europe/Ljubljana jest",
     "lint": "eslint --max-warnings 0 --ext .ts,js src/",
     "prettier": "prettier --write \"{src,example,stories}/**/*.{ts,js}\"",
-    "storybook": "concurrently --kill-others \"rollup -c -w\" \"start-storybook -p 6006\"",
+    "storybook": "concurrently --kill-others \"rollup -c -w\" \"start-storybook -p 6006 --quiet\"",
     "build-storybook": "build-storybook",
     "build-doc": "typedoc --excludePrivate --excludeProtected --excludeNotExported --exclude '**/*__*' --out doc/ src/"
   },
