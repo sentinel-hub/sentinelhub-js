@@ -9,6 +9,8 @@ import { cacheStillValid, EXPIRY_HEADER_KEY } from '../../utils/cacheHandlers';
 import '../../../jest-setup';
 import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
+import { fetchGetCapabilitiesJson } from '../utils';
+import { constructFixtureGetCapabilities } from './fixtures.getCapabilities';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -48,7 +50,15 @@ describe('Testing caching', () => {
   });
 
   it('should make a 2nd request after the cache has expired', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const {
+      fromTime,
+      toTime,
+      bbox,
+      layer,
+      mockedResponse,
+      expectedResultTiles,
+      expectedResultHasMore,
+    } = constructFixtureFindTiles({});
     const requestsConfig = {
       cache: {
         expiresIn: 1,
@@ -58,9 +68,26 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
+    expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
+
     await new Promise(r => setTimeout(r, 1100));
-    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+
+    const responseFromMockNetwork2 = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      requestsConfig,
+    );
+    const fromCacheResponse2 = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse2.hasMore).toBe(expectedResultHasMore);
+    expect(fromCacheResponse2).toStrictEqual(responseFromMockNetwork2);
 
     expect(mockNetwork.history.post.length).toBe(2);
   });
@@ -90,6 +117,33 @@ describe('Testing caching', () => {
     await layer.getMap(getMapParams, ApiType.PROCESSING);
 
     expect(mockNetwork.history.post.length).toBe(1);
+  });
+
+  it('test that a 2nd request is made after cache expires', async () => {
+    // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
+    window.Blob = undefined;
+    const requestsConfig = {
+      cache: {
+        expiresIn: 1,
+      },
+    };
+    const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
+    setAuthToken(EXAMPLE_TOKEN);
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+
+    await new Promise(r => setTimeout(r, 1100));
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+
+    expect(mockNetwork.history.post.length).toBe(2);
   });
 
   it('test disabling default cache', async () => {
@@ -430,5 +484,64 @@ describe('Unit test for cacheStillValid', () => {
     };
     const isValid = cacheStillValid(header);
     expect(isValid).toBeFalsy();
+  });
+});
+
+describe('test getCapabilities', () => {
+  beforeEach(async () => {
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object and removes caches from global object
+    await invalidateCaches();
+  });
+  it('It should cache getCapabilities', async () => {
+    const { url, mockedResponse, expectedCapabilities } = constructFixtureGetCapabilities();
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+
+    const requestsConfig = {
+      cache: {
+        expiresIn: 60,
+        targets: [CacheTarget.CACHE_API],
+      },
+    };
+
+    const capabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
+    const fromCacheCapabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
+
+    expect(mockNetwork.history.get.length).toBe(1);
+    expect(capabilities).toStrictEqual(expectedCapabilities);
+    expect(fromCacheCapabilities).toStrictEqual(expectedCapabilities);
+  });
+
+  it('It should fetch a new response after  ', async () => {
+    const { url, mockedResponse, expectedCapabilities } = constructFixtureGetCapabilities();
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+    mockNetwork.onGet().replyOnce(200, mockedResponse);
+
+    const requestsConfig = {
+      cache: {
+        expiresIn: 1,
+        targets: [CacheTarget.CACHE_API],
+      },
+    };
+
+    const capabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
+    const fromCacheCapabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
+
+    expect(mockNetwork.history.get.length).toBe(1);
+    expect(capabilities).toStrictEqual(expectedCapabilities);
+    expect(fromCacheCapabilities).toStrictEqual(expectedCapabilities);
+
+    await new Promise(r => setTimeout(r, 1100));
+
+    const capabilities2 = await fetchGetCapabilitiesJson(url, requestsConfig);
+    const fromCacheCapabilities2 = await fetchGetCapabilitiesJson(url, requestsConfig);
+
+    expect(mockNetwork.history.get.length).toBe(2);
+    expect(capabilities2).toStrictEqual(expectedCapabilities);
+    expect(fromCacheCapabilities2).toStrictEqual(expectedCapabilities);
   });
 });
