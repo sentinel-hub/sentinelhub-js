@@ -58,7 +58,10 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
   if (!shCache) {
     return response;
   }
-  if (await shCache.has(response.config.cacheKey)) {
+  if (
+    (await shCache.has(response.config.cacheKey)) &&
+    cacheStillValid(await shCache.getHeaders(response.config.cacheKey))
+  ) {
     return response;
   }
 
