@@ -9,8 +9,6 @@ import { cacheStillValid, EXPIRY_HEADER_KEY } from '../../utils/cacheHandlers';
 import '../../../jest-setup';
 import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { constructFixtureGetMap } from './fixtures.getMap';
-import { fetchGetCapabilitiesJson } from '../utils';
-import { constructFixtureGetCapabilities } from './fixtures.getCapabilities';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -484,64 +482,5 @@ describe('Unit test for cacheStillValid', () => {
     };
     const isValid = cacheStillValid(header);
     expect(isValid).toBeFalsy();
-  });
-});
-
-describe('test getCapabilities', () => {
-  beforeEach(async () => {
-    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object and removes caches from global object
-    await invalidateCaches();
-  });
-  it('It should cache getCapabilities', async () => {
-    const { url, mockedResponse, expectedCapabilities } = constructFixtureGetCapabilities();
-    mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-
-    const requestsConfig = {
-      cache: {
-        expiresIn: 60,
-        targets: [CacheTarget.CACHE_API],
-      },
-    };
-
-    const capabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
-    const fromCacheCapabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
-
-    expect(mockNetwork.history.get.length).toBe(1);
-    expect(capabilities).toStrictEqual(expectedCapabilities);
-    expect(fromCacheCapabilities).toStrictEqual(expectedCapabilities);
-  });
-
-  it('It should fetch a new response after  ', async () => {
-    const { url, mockedResponse, expectedCapabilities } = constructFixtureGetCapabilities();
-    mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-
-    const requestsConfig = {
-      cache: {
-        expiresIn: 1,
-        targets: [CacheTarget.CACHE_API],
-      },
-    };
-
-    const capabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
-    const fromCacheCapabilities = await fetchGetCapabilitiesJson(url, requestsConfig);
-
-    expect(mockNetwork.history.get.length).toBe(1);
-    expect(capabilities).toStrictEqual(expectedCapabilities);
-    expect(fromCacheCapabilities).toStrictEqual(expectedCapabilities);
-
-    await new Promise(r => setTimeout(r, 1100));
-
-    const capabilities2 = await fetchGetCapabilitiesJson(url, requestsConfig);
-    const fromCacheCapabilities2 = await fetchGetCapabilitiesJson(url, requestsConfig);
-
-    expect(mockNetwork.history.get.length).toBe(2);
-    expect(capabilities2).toStrictEqual(expectedCapabilities);
-    expect(fromCacheCapabilities2).toStrictEqual(expectedCapabilities);
   });
 });
