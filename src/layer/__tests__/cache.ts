@@ -67,7 +67,10 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+
     const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1); // no network request - cache was used
     expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
     expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
@@ -82,12 +85,13 @@ describe('Testing caching', () => {
       null,
       requestsConfig,
     );
+    expect(mockNetwork.history.post.length).toBe(2);
+
     const fromCacheResponse2 = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(2); // no network request - cache was used
     expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
     expect(fromCacheResponse2.hasMore).toBe(expectedResultHasMore);
     expect(fromCacheResponse2).toStrictEqual(responseFromMockNetwork2);
-
-    expect(mockNetwork.history.post.length).toBe(2);
   });
 
   it('test that no responses are cached', async () => {
@@ -134,14 +138,18 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1); // no network request - cache was used
 
     await new Promise(r => setTimeout(r, 1100));
 
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
-    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
-
     expect(mockNetwork.history.post.length).toBe(2);
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(2); // no network request - cache was used
   });
 
   it('test disabling default cache', async () => {
