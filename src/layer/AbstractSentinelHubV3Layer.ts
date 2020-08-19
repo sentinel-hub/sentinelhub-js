@@ -29,6 +29,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
+import { CacheTarget } from '../utils/Cache';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -112,7 +113,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+      ...getAxiosReqParams(
+        {
+          ...reqConfig,
+          cache: { expiresIn: 1800, targets: [CacheTarget.MEMORY] },
+        },
+        null,
+      ),
     };
     const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
