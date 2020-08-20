@@ -843,6 +843,80 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
   return wrapperEl;
 };
 
+export const getMapProcessingAdvancedRGB = () => {
+  const imgOriginal = document.createElement('img');
+  imgOriginal.width = '256';
+  imgOriginal.height = '256';
+
+  const imgRGB = document.createElement('img');
+  imgRGB.width = '256';
+  imgRGB.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
+  wrapperEl.innerHTML += '<h4>original | changed</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      maxCloudCoverPercent: 0,
+      evalscript: `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+      }
+    `,
+    });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 9 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const arr1 = Array.from({ length: 256 }, () => Math.floor(Math.random() * 255));
+    const arr2 = Array.from(Array(256).keys()).reverse();
+
+    const getMapParamsRGB = {
+      ...getMapParams,
+      effects: {
+        customEffect: {
+          redFunction: pixelValue => arr1[pixelValue],
+          greenFunction: pixelValue => arr2[pixelValue],
+        },
+      },
+    };
+
+    try {
+      const imageBlobOriginal = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+      imgOriginal.src = URL.createObjectURL(imageBlobOriginal);
+
+      const imageBlobRGB = await layerS2L2A.getMap(getMapParamsRGB, ApiType.PROCESSING);
+      imgRGB.src = URL.createObjectURL(imageBlobRGB);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const GetHugeMap = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";

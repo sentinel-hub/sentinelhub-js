@@ -1,4 +1,4 @@
-import { RgbMappingArrays, Effects, ColorRange } from './const';
+import { RgbMappingArrays, Effects, ColorRange, CustomEffectFunctions } from './const';
 
 export function prepareRgbMappingArrays(): RgbMappingArrays {
   return {
@@ -64,7 +64,7 @@ export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Func
   };
 }
 
-export function isEffectSet(effect: number | ColorRange): boolean {
+export function isEffectSet(effect: number | ColorRange | CustomEffectFunctions | Function): boolean {
   return effect !== undefined && effect !== null;
 }
 

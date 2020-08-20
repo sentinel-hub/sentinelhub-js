@@ -66,3 +66,28 @@ export function runColorEffectFunction(
 
   return rgbMappingArrays;
 }
+
+export function runCustomEffectFunction(
+  rgbMappingArrays: RgbMappingArrays,
+  effects: Effects,
+): RgbMappingArrays {
+  if (!isEffectSet(effects.customEffect)) {
+    return rgbMappingArrays;
+  }
+
+  const customEffect = effects.customEffect;
+
+  if (isEffectSet(customEffect.redFunction)) {
+    rgbMappingArrays.red = rgbMappingArrays.red.map(x => customEffect.redFunction(x));
+  }
+
+  if (isEffectSet(customEffect.greenFunction)) {
+    rgbMappingArrays.green = rgbMappingArrays.green.map(x => customEffect.greenFunction(x));
+  }
+
+  if (isEffectSet(customEffect.blueFunction)) {
+    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => customEffect.blueFunction(x));
+  }
+
+  return rgbMappingArrays;
+}
