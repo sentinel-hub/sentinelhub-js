@@ -48,7 +48,15 @@ describe('Testing caching', () => {
   });
 
   it('should make a 2nd request after the cache has expired', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const {
+      fromTime,
+      toTime,
+      bbox,
+      layer,
+      mockedResponse,
+      expectedResultTiles,
+      expectedResultHasMore,
+    } = constructFixtureFindTiles({});
     const requestsConfig = {
       cache: {
         expiresIn: 1,
@@ -58,11 +66,32 @@ describe('Testing caching', () => {
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
-    await new Promise(r => setTimeout(r, 1100));
-    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    const responseFromMockNetwork = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
 
+    const fromCacheResponse = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1); // no network request - cache was used
+    expect(fromCacheResponse.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
+    expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
+
+    await new Promise(r => setTimeout(r, 1100));
+
+    const responseFromMockNetwork2 = await layer.findTiles(
+      bbox,
+      fromTime,
+      toTime,
+      null,
+      null,
+      requestsConfig,
+    );
     expect(mockNetwork.history.post.length).toBe(2);
+
+    const fromCacheResponse2 = await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(2); // no network request - cache was used
+    expect(fromCacheResponse2.tiles).toStrictEqual(expectedResultTiles);
+    expect(fromCacheResponse2.hasMore).toBe(expectedResultHasMore);
+    expect(fromCacheResponse2).toStrictEqual(responseFromMockNetwork2);
   });
 
   it('test that no responses are cached', async () => {
@@ -90,6 +119,37 @@ describe('Testing caching', () => {
     await layer.getMap(getMapParams, ApiType.PROCESSING);
 
     expect(mockNetwork.history.post.length).toBe(1);
+  });
+
+  it('test that a 2nd request is made after cache expires', async () => {
+    // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
+    window.Blob = undefined;
+    const requestsConfig = {
+      cache: {
+        expiresIn: 1,
+      },
+    };
+    const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
+    setAuthToken(EXAMPLE_TOKEN);
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1);
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(1); // no network request - cache was used
+
+    await new Promise(r => setTimeout(r, 1100));
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(2);
+
+    await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
+    expect(mockNetwork.history.post.length).toBe(2); // no network request - cache was used
   });
 
   it('test disabling default cache', async () => {
