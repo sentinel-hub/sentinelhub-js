@@ -6,7 +6,12 @@ import {
   changeRgbMappingArraysRange,
   prepareManipulatePixel,
 } from './mapDataManipulationUtils';
-import { runGainEffectFunction, runGammaEffectFunction, runColorEffectFunction } from './effectFunctions';
+import {
+  runGainEffectFunction,
+  runGammaEffectFunction,
+  runColorEffectFunction,
+  runCustomEffectFunction,
+} from './effectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the range of the values from [0, 255] to [0, 1]
@@ -31,6 +36,9 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
 
   // change the values according to the algorithm (r,g,b effects)
   rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
+
+  // run custom effect function
+  rgbMappingArrays = runCustomEffectFunction(rgbMappingArrays, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
   rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255);
