@@ -12,6 +12,8 @@ export function runGainEffectFunction(
   // change the values according to the algorithm (gain)
   const minValue = 0.0;
   const maxValue = 1.0;
+  // const maxValue = 0.4;
+
   const gain = isEffectSet(effects.gain) ? effects.gain : 1.0;
   const factor = gain / (maxValue - minValue);
   let offset = 0.0;
@@ -43,19 +45,25 @@ export function runGammaEffectFunction(
 }
 
 export function runHighlightEffect(rgbMappingArrays: RgbMappingArrays, effects: Effects): RgbMappingArrays {
-  const minValue = 0.0;
+  const minValue = 0.1;
   const maxValue = 0.4;
   const clipPoint = 2.0;
+
+  console.log('rgbMappingArrays', { e: effects.gain, r: rgbMappingArrays.red });
 
   const highlightPoint = 0 < maxValue && maxValue < 1 ? 0.92 : Number.NaN;
   const highlightFactor = (1.0 - highlightPoint) / (clipPoint - highlightPoint);
   const highlightOffset = highlightPoint * (1.0 - highlightFactor);
+
+  console.log('runHighlightEffect', { e: effects.gain, highlightPoint, highlightFactor, highlightOffset });
 
   // highlightPoint can be NaN (see the constructor) in which case original value will be used
   const transformValueWithHighlightEffect = (x: number): number =>
     x > highlightPoint ? x * highlightFactor + highlightOffset : x;
 
   rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithHighlightEffect);
+  console.log('runHighlightEffect', { e: effects.gain, r: rgbMappingArrays.red });
+
   return rgbMappingArrays;
 }
 

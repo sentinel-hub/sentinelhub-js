@@ -19,14 +19,19 @@ import {
 // - change the range of the values from [0, 1] back to [0, 255]
 
 export async function runEffectFunctions(originalBlob: Blob, effects: Effects): Promise<Blob> {
-  if (!isAnyEffectSet(effects)) {
-    return originalBlob;
-  }
+  // if (!isAnyEffectSet(effects)) {
+  //   return originalBlob;
+  // }
 
   let rgbMappingArrays = prepareRgbMappingArrays();
 
   // change the range of the values from [0, 255] to [0, 1]
   rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 255, 0, 1);
+
+  console.log('runEffectFunctions', { r: rgbMappingArrays.red });
+
+  // highlight compress before gain
+  // rgbMappingArrays = runHighlightEffect(rgbMappingArrays, effects);
 
   // change the values according to the algorithm (gain)
   rgbMappingArrays = runGainEffectFunction(rgbMappingArrays, effects);
@@ -34,7 +39,8 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   // change the values according to the algorithm (gamma)
   rgbMappingArrays = runGammaEffectFunction(rgbMappingArrays, effects);
 
-  rgbMappingArrays = runHighlightEffect(rgbMappingArrays, effects);
+  // original location of highlight compress
+  // rgbMappingArrays = runHighlightEffect(rgbMappingArrays, effects);
 
   // change the values according to the algorithm (r,g,b effects)
   rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
