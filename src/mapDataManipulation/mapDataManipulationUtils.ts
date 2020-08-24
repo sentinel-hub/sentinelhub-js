@@ -1,4 +1,4 @@
-import { RgbMappingArrays, Effects, ColorRange, CustomEffectFunctions } from './const';
+import { RgbMappingArrays, Effects, ColorRange, CustomEffectFunctions, NumberType } from './const';
 
 export function prepareRgbMappingArrays(): RgbMappingArrays {
   return {
@@ -31,10 +31,16 @@ export function transformValueToRange(
   oldMax: number,
   newMin: number,
   newMax: number,
+  numberType: NumberType = NumberType.FLOAT,
 ): number {
   let newX = newMin + ((newMax - newMin) / (oldMax - oldMin)) * (x - oldMin);
   newX = Math.max(newX, newMin);
   newX = Math.min(newX, newMax);
+
+  if (numberType === NumberType.INT) {
+    newX = Math.round(newX);
+  }
+
   return newX;
 }
 
@@ -44,16 +50,17 @@ export function changeRgbMappingArraysRange(
   oldMax: number,
   newMin: number,
   newMax: number,
+  numberType: NumberType = NumberType.FLOAT,
 ): RgbMappingArrays {
   const newRgbMappingArrays = { ...rgbMappingArrays };
   newRgbMappingArrays.red = newRgbMappingArrays.red.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
+    transformValueToRange(x, oldMin, oldMax, newMin, newMax, numberType),
   );
   newRgbMappingArrays.green = newRgbMappingArrays.green.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
+    transformValueToRange(x, oldMin, oldMax, newMin, newMax, numberType),
   );
   newRgbMappingArrays.blue = newRgbMappingArrays.blue.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
+    transformValueToRange(x, oldMin, oldMax, newMin, newMax, numberType),
   );
   return newRgbMappingArrays;
 }
