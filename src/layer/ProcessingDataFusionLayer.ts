@@ -37,6 +37,8 @@ export type DataFusionLayerInfo = {
   downsampling?: Interpolator;
 };
 
+export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
+
 export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   protected layers: DataFusionLayerInfo[];
 
@@ -104,7 +106,20 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         payload.input.data.push(datasource);
       }
 
-      let blob = await processingGetMap(bogusFirstLayer.dataset.shServiceHostname, payload, innerReqConfig);
+      // If all layers share the common endpoint, it is used for the request.
+      // However, data fusion only works reliably using services.sentinel-hub if data is deployed on different endpoints
+      let shServiceHostname;
+      if (
+        this.layers.every(
+          layer => layer.layer.dataset.shServiceHostname === bogusFirstLayer.dataset.shServiceHostname,
+        )
+      ) {
+        shServiceHostname = bogusFirstLayer.dataset.shServiceHostname;
+      } else {
+        shServiceHostname = DEFAULT_SH_SERVICE_HOSTNAME;
+      }
+
+      let blob = await processingGetMap(shServiceHostname, payload, innerReqConfig);
 
       // apply effects:
       // support deprecated GetMapParams.gain and .gamma parameters
