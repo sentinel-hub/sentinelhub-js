@@ -6,6 +6,7 @@ export type ColorRange = {
 export type ValueRange = {
   from: number;
   to: number;
+  numberType: NumberType;
 };
 
 export type CustomEffectFunctions = {
@@ -29,3 +30,8 @@ export type RgbMappingArrays = {
   green: number[];
   blue: number[];
 };
+
+export enum NumberType {
+  INT = 'INT',
+  FLOAT = 'FLOAT',
+}

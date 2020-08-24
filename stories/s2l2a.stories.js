@@ -1,6 +1,14 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L2ALayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, CRS_EPSG3857 } from '../dist/sentinelHub.esm';
+import {
+  S2L2ALayer,
+  CRS_EPSG4326,
+  BBox,
+  MimeTypes,
+  ApiType,
+  CRS_EPSG3857,
+  NumberType,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -845,12 +853,12 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
 
 export const getMapProcessingAdvancedRGB = () => {
   const imgOriginal = document.createElement('img');
-  imgOriginal.width = '256';
-  imgOriginal.height = '256';
+  imgOriginal.width = '512';
+  imgOriginal.height = '512';
 
   const imgRGB = document.createElement('img');
-  imgRGB.width = '256';
-  imgRGB.height = '256';
+  imgRGB.width = '512';
+  imgRGB.height = '512';
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
@@ -889,16 +897,31 @@ export const getMapProcessingAdvancedRGB = () => {
       format: MimeTypes.JPEG,
     };
 
-    const arr1 = Array.from({ length: 256 }, () => Math.floor(Math.random() * 255));
-    const arr2 = Array.from(Array(256).keys()).reverse();
+    const arrRandom = Array.from({ length: 256 }, () => Math.floor(Math.random() * 255));
+    const arrAsc = Array.from(Array(256).keys());
+    const arrDesc = Array.from(Array(256).keys()).reverse();
+    const arr0 = Array(256).fill(255);
+
+    console.log('getMapProcessingAdvancedRGB', { arrAsc, arr0 });
+
+    const useArr = arrAsc;
+
+    const ff = pixelValue => {
+      console.log('ff', {
+        v: pixelValue,
+        a: useArr[pixelValue],
+      });
+      return useArr[pixelValue];
+    };
 
     const getMapParamsRGB = {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: pixelValue => arr1[pixelValue],
-          greenFunction: pixelValue => arr2[pixelValue],
-          range: { from: 0, to: 255 },
+          redFunction: ff,
+          greenFunction: ff,
+          blueFunction: ff,
+          range: { from: 0, to: 255, numberType: NumberType.INT },
         },
       },
     };
