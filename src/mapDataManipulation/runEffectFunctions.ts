@@ -37,7 +37,7 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   // change the values according to the algorithm (r,g,b effects)
   rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
 
-  // run custom effect function
+  // run custom effect function (with custom range of values)
   rgbMappingArrays = runCustomEffectFunction(rgbMappingArrays, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]

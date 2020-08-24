@@ -3,6 +3,7 @@ import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
   transformValueToRange,
+  changeRgbMappingArraysRange,
 } from './mapDataManipulationUtils';
 
 export function runGainEffectFunction(
@@ -75,19 +76,23 @@ export function runCustomEffectFunction(
     return rgbMappingArrays;
   }
 
-  const customEffect = effects.customEffect;
+  const { range, redFunction, greenFunction, blueFunction } = effects.customEffect;
 
-  if (isEffectSet(customEffect.redFunction)) {
-    rgbMappingArrays.red = rgbMappingArrays.red.map(x => customEffect.redFunction(x));
+  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, range.from, range.to);
+
+  if (isEffectSet(redFunction)) {
+    rgbMappingArrays.red = rgbMappingArrays.red.map(x => redFunction(x));
   }
 
-  if (isEffectSet(customEffect.greenFunction)) {
-    rgbMappingArrays.green = rgbMappingArrays.green.map(x => customEffect.greenFunction(x));
+  if (isEffectSet(greenFunction)) {
+    rgbMappingArrays.green = rgbMappingArrays.green.map(x => greenFunction(x));
   }
 
-  if (isEffectSet(customEffect.blueFunction)) {
-    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => customEffect.blueFunction(x));
+  if (isEffectSet(blueFunction)) {
+    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => blueFunction(x));
   }
+
+  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, range.from, range.to, 0, 1);
 
   return rgbMappingArrays;
 }
