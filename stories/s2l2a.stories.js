@@ -898,6 +898,7 @@ export const getMapProcessingAdvancedRGB = () => {
         customEffect: {
           redFunction: pixelValue => arr1[pixelValue],
           greenFunction: pixelValue => arr2[pixelValue],
+          range: { from: 0, to: 255 },
         },
       },
     };
