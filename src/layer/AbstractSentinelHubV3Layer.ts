@@ -462,9 +462,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('Must be authenticated to use Catalog service');
     }
 
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      throw new Error('Must be authenticated to use Processing API');
+    if (!this.dataset.catalogCollection) {
+      throw new Error('Cannot use Catalog service without collection');
     }
 
     const headers = {
@@ -479,11 +478,25 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
-      collections: ['sentinel-2-l2a'],
+      collections: [this.dataset.catalogCollection],
       limit: maxCount,
     };
     if (offset > 0) {
       payload.next = offset;
+    }
+
+    let payloadQuery: any;
+    if (maxCloudCoverPercent !== undefined && maxCloudCoverPercent !== null) {
+      payloadQuery = {
+        ...payloadQuery,
+        'eo:cloud_cover': {
+          lte: maxCloudCoverPercent,
+        },
+      };
+    }
+
+    if (payloadQuery) {
+      payload.query = payloadQuery;
     }
 
     const response = await axios.post(
@@ -491,7 +504,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload,
       requestConfig,
     );
-    console.log('AbstractSentinelHubV3Layer -> fetchTilesCatalogApi');
 
     return {
       tiles: response.data.features.map((feature: Record<string, any>) => ({
