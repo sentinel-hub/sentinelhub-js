@@ -5,7 +5,6 @@ import { PaginatedTiles, Link, LinkType } from './const';
 import { DATASET_S3OLCI } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3OLCI;

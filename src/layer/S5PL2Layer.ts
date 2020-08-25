@@ -6,7 +6,6 @@ import { DATASET_S5PL2 } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching

@@ -6,7 +6,6 @@ import { DATASET_S3SLSTR } from './dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
