@@ -319,7 +319,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const fetchTilesResponse = await ensureTimeout(async innerReqConfig => {
-      const response = await this.fetchTiles(
+      const response = await this.fetchTilesSearchIndex(
         this.dataset.searchIndexUrl,
         bbox,
         fromTime,
@@ -349,7 +349,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return [];
   }
 
-  protected fetchTiles(
+  protected fetchTilesSearchIndex(
     searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,

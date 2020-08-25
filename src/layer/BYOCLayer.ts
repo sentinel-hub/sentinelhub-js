@@ -126,7 +126,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       // searchIndex URL depends on the locationId:
       const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
       const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-      const response = await this.fetchTiles(
+      const response = await this.fetchTilesSearchIndex(
         searchIndexUrl,
         bbox,
         fromTime,

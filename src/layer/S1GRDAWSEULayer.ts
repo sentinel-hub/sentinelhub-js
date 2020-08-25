@@ -149,7 +149,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         orbitDirection: this.orbitDirection,
         resolution: this.resolution,
       };
-      const response = await this.fetchTiles(
+      const response = await this.fetchTilesSearchIndex(
         this.dataset.searchIndexUrl,
         bbox,
         fromTime,
