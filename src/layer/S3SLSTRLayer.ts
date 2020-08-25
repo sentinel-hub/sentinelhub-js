@@ -78,8 +78,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       orbitDirection: this.orbitDirection,
       view: this.view,
     };
-    const response = await this.fetchTilesSearchIndex(
-      this.dataset.searchIndexUrl,
+    const response = await this.fetchTilesFromSearchIndexOrCatalog(
       bbox,
       fromTime,
       toTime,

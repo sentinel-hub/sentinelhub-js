@@ -332,20 +332,15 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      const response = await this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-      );
-      return response;
-    }
-    return await this.fetchTilesCatalogApi(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    const response = await this.fetchTilesFromSearchIndexOrCatalog(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+    );
+    return response;
   }
 
   public async findTiles(
@@ -369,6 +364,43 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
+  }
+
+  protected async fetchTilesFromSearchIndexOrCatalog(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig: RequestConfiguration,
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Promise<PaginatedTiles> {
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!(authToken && this.dataset.catalogCollection)) {
+      return this.fetchTilesSearchIndex(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        maxCloudCoverPercent,
+        datasetParameters,
+      );
+    }
+    return this.fetchTilesCatalog(
+      authToken,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      maxCloudCoverPercent,
+      datasetParameters,
+    );
   }
 
   protected async fetchTilesSearchIndex(
@@ -415,8 +447,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     );
     return this.convertResponseFromSearchIndex(response);
   }
-
-  protected async fetchTilesCatalogApi(
+  protected async fetchTilesCatalog(
+    authToken: string,
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -426,7 +458,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Promise<PaginatedTiles> {
-    console.log('fetchTiles');
+    if (!authToken) {
+      throw new Error('Must be authenticated to use Catalog service');
+    }
 
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     if (!authToken) {
