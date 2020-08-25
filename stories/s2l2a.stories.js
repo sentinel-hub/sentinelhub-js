@@ -895,7 +895,7 @@ export const GetHugeMap = () => {
   return wrapperEl;
 };
 
-export const FindTiles = () => {
+export const FindTilesSearchIndex = () => {
   const maxCloudCoverPercent = 60;
   const layerS2L2A = new S2L2ALayer({
     instanceId,
@@ -909,6 +909,36 @@ export const FindTiles = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    const data = await layerS2L2A.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const FindTilesCatalog = () => {
+  const maxCloudCoverPercent = 60;
+  const layerS2L2A = new S2L2ALayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent,
+  });
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
     const data = await layerS2L2A.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
