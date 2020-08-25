@@ -125,6 +125,45 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     };
   }
 
+  protected async fetchTilesFromSearchIndexOrCatalog(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig: RequestConfiguration,
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Promise<PaginatedTiles> {
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
+      const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
+      return this.fetchTilesSearchIndex(
+        searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        maxCloudCoverPercent,
+        datasetParameters,
+      );
+    }
+    return this.fetchTilesCatalog(
+      authToken,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      maxCloudCoverPercent,
+      datasetParameters,
+    );
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
