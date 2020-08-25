@@ -310,6 +310,34 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return requestConfig;
   }
 
+  protected async fetchTiles(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
+  ): Promise<PaginatedTiles> {
+    const response = await this.fetchTilesSearchIndex(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+    );
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   public async findTiles(
     bbox: BBox,
     fromTime: Date,
@@ -318,26 +346,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(async innerReqConfig => {
-      const response = await this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: this.extractFindTilesMeta(tile),
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
+    const fetchTilesResponse = await ensureTimeout(
+      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
+      reqConfig,
+    );
     return fetchTilesResponse;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

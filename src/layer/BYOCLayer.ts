@@ -108,7 +108,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -116,41 +116,38 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-      const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
-        type: 'BYOC',
-        collectionId: this.collectionId,
-      };
-      // searchIndex URL depends on the locationId:
-      const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-      const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-      const response = await this.fetchTilesSearchIndex(
-        searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        null,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => {
-          return {
-            geometry: tile.dataGeometry,
-            sensingTime: moment.utc(tile.sensingTime).toDate(),
-            meta: {
-              cloudCoverPercent: tile.cloudCoverPercentage,
-            },
-          };
-        }),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
+      type: 'BYOC',
+      collectionId: this.collectionId,
+    };
+    // searchIndex URL depends on the locationId:
+    const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
+    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
+    const response = await this.fetchTilesSearchIndex(
+      searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      null,
+      findTilesDatasetParameters,
+    );
+    return {
+      tiles: response.data.tiles.map(tile => {
+        return {
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {
+            cloudCoverPercent: tile.cloudCoverPercentage,
+          },
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected getShServiceHostname(): string {
