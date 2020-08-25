@@ -310,23 +310,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return requestConfig;
   }
 
-  protected async fetchTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const response = await this.fetchTilesSearchIndex(
-      this.dataset.searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-    );
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
     return {
       tiles: response.data.tiles.map(tile => ({
         geometry: tile.dataGeometry,
@@ -336,6 +322,30 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       })),
       hasMore: response.data.hasMore,
     };
+  }
+
+  protected async fetchTiles(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig?: RequestConfiguration,
+  ): Promise<PaginatedTiles> {
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      const response = await this.fetchTilesSearchIndex(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+      );
+      return response;
+    }
+    return await this.fetchTilesCatalogApi(bbox, fromTime, toTime, maxCount, offset, reqConfig);
   }
 
   public async findTiles(
@@ -361,7 +371,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return [];
   }
 
-  protected fetchTilesSearchIndex(
+  protected async fetchTilesSearchIndex(
     searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,
@@ -371,7 +381,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig: RequestConfiguration,
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
-  ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
+  ): Promise<PaginatedTiles> {
     if (maxCount === null) {
       maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
     }
@@ -396,8 +406,69 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (datasetParameters) {
       payload.datasetParameters = datasetParameters;
     }
+    console.log('AbstractSentinelHubV3Layer -> fetchTilesSearchIndex');
 
-    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig(reqConfig));
+    const response = await axios.post(
+      searchIndexUrl,
+      payload,
+      this.createSearchIndexRequestConfig(reqConfig),
+    );
+    return this.convertResponseFromSearchIndex(response);
+  }
+
+  protected async fetchTilesCatalogApi(
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig: RequestConfiguration,
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Promise<PaginatedTiles> {
+    console.log('fetchTiles');
+
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      throw new Error('Must be authenticated to use Processing API');
+    }
+
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    };
+    const requestConfig: AxiosRequestConfig = {
+      headers: headers,
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+    };
+
+    const payload: any = {
+      bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
+      datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
+      collections: ['sentinel-2-l2a'],
+      limit: maxCount,
+    };
+    if (offset > 0) {
+      payload.next = offset;
+    }
+
+    const response = await axios.post(
+      `https://services.sentinel-hub.com/api/v1/catalog/search`,
+      payload,
+      requestConfig,
+    );
+    console.log('AbstractSentinelHubV3Layer -> fetchTilesCatalogApi');
+
+    return {
+      tiles: response.data.features.map((feature: Record<string, any>) => ({
+        geometry: feature.geometry,
+        sensingTime: moment.utc(feature.properties.datetime),
+        meta: {
+          cloudCoverPercent: feature.properties['eo:cloud_cover'],
+        },
+      })),
+      hasMore: false,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(

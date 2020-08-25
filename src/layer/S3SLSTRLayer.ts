@@ -51,6 +51,20 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     return payload;
   }
 
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -76,15 +90,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       findTilesDatasetParameters,
     );
 
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    return response;
   }
 
   protected async getFindDatesUTCAdditionalParameters(

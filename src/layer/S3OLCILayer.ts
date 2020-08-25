@@ -10,6 +10,20 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3OLCI;
 
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: {},
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -27,15 +41,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
       offset,
       reqConfig,
     );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {},
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    return response;
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {

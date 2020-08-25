@@ -131,6 +131,26 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: {
+          tileId: tile.id,
+          orbitDirection: tile.orbitDirection,
+          polarization: tile.polarization,
+          acquisitionMode: tile.acquisitionMode,
+          resolution: tile.resolution,
+        },
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -159,21 +179,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       null,
       findTilesDatasetParameters,
     );
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: {
-          tileId: tile.id,
-          orbitDirection: tile.orbitDirection,
-          polarization: tile.polarization,
-          acquisitionMode: tile.acquisitionMode,
-          resolution: tile.resolution,
-        },
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
+    return response;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
