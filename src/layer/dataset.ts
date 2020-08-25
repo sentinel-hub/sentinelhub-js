@@ -10,6 +10,7 @@ export type Dataset = {
   orbitTimeMinutes: number;
   minDate: Date | null;
   maxDate: Date | null;
+  catalogCollection?: string | null;
 };
 
 export const DATASET_AWSEU_S1GRD: Dataset = {
@@ -24,6 +25,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   orbitTimeMinutes: 49.3,
   minDate: new Date(Date.UTC(2014, 12 - 1, 7, 4, 14, 15)), // 2014-12-07T04:14:15
   maxDate: null,
+  catalogCollection: 'sentinel-1-grd',
 };
 
 export const DATASET_EOCLOUD_S1GRD: Dataset = {
@@ -52,6 +54,7 @@ export const DATASET_S2L2A: Dataset = {
   orbitTimeMinutes: 50.3,
   minDate: new Date(Date.UTC(2016, 10 - 1, 20, 8, 9, 58)), // 2016-10-20T08:09:58
   maxDate: null,
+  catalogCollection: 'sentinel-2-l2a',
 };
 
 export const DATASET_S2L1C: Dataset = {
@@ -66,6 +69,7 @@ export const DATASET_S2L1C: Dataset = {
   orbitTimeMinutes: 50.3,
   minDate: new Date(Date.UTC(2015, 6 - 1, 27, 10, 25, 31)), // 2015-06-27T10:25:31
   maxDate: null,
+  catalogCollection: 'sentinel-2-l1c',
 };
 
 export const DATASET_S3SLSTR: Dataset = {
