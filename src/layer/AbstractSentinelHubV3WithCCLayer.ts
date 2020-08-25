@@ -6,7 +6,6 @@ import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { getAuthToken } from '../auth';
 
 interface ConstructorParameters {
   instanceId?: string | null;

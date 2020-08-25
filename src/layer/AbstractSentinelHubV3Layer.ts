@@ -438,7 +438,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (datasetParameters) {
       payload.datasetParameters = datasetParameters;
     }
-    console.log('AbstractSentinelHubV3Layer -> fetchTilesSearchIndex');
 
     const response = await axios.post(
       searchIndexUrl,
@@ -456,7 +455,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig: RequestConfiguration,
     maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
+    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
