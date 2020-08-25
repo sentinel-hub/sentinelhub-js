@@ -80,7 +80,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -88,40 +88,37 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      if (this.productType === null) {
-        throw new Error('Parameter productType must be specified!');
-      }
+    if (this.productType === null) {
+      throw new Error('Parameter productType must be specified!');
+    }
 
-      const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-        type: this.dataset.datasetParametersType,
-        productType: this.productType,
-        // minQa: this.minQa,
-      };
-      const response = await this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        this.maxCloudCoverPercent,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => {
-          return {
-            geometry: tile.tileDrawRegionGeometry,
-            sensingTime: moment.utc(tile.sensingTime).toDate(),
-            meta: {},
-            links: this.getTileLinks(tile),
-          };
-        }),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      productType: this.productType,
+      // minQa: this.minQa,
+    };
+    const response = await this.fetchTilesSearchIndex(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      this.maxCloudCoverPercent,
+      findTilesDatasetParameters,
+    );
+    return {
+      tiles: response.data.tiles.map(tile => {
+        return {
+          geometry: tile.tileDrawRegionGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {},
+          links: this.getTileLinks(tile),
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(

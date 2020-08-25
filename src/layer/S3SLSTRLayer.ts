@@ -51,7 +51,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     return payload;
   }
 
-  public async findTiles(
+  protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -59,34 +59,32 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
-        type: this.dataset.shProcessingApiDatasourceAbbreviation,
-        orbitDirection: this.orbitDirection,
-        view: this.view,
-      };
-      const response = await this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        this.maxCloudCoverPercent,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: this.extractFindTilesMeta(tile),
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
+      type: this.dataset.shProcessingApiDatasourceAbbreviation,
+      orbitDirection: this.orbitDirection,
+      view: this.view,
+    };
+    const response = await this.fetchTilesSearchIndex(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      this.maxCloudCoverPercent,
+      findTilesDatasetParameters,
+    );
+
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(

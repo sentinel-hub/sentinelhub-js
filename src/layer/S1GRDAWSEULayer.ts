@@ -131,7 +131,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -139,44 +139,41 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-      const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-        type: this.dataset.datasetParametersType,
-        acquisitionMode: this.acquisitionMode,
-        polarization: this.polarization,
-        orbitDirection: this.orbitDirection,
-        resolution: this.resolution,
-      };
-      const response = await this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        null,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: {
-            tileId: tile.id,
-            orbitDirection: tile.orbitDirection,
-            polarization: tile.polarization,
-            acquisitionMode: tile.acquisitionMode,
-            resolution: tile.resolution,
-          },
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+      orbitDirection: this.orbitDirection,
+      resolution: this.resolution,
+    };
+    const response = await this.fetchTilesSearchIndex(
+      this.dataset.searchIndexUrl,
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      null,
+      findTilesDatasetParameters,
+    );
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: {
+          tileId: tile.id,
+          orbitDirection: tile.orbitDirection,
+          polarization: tile.polarization,
+          acquisitionMode: tile.acquisitionMode,
+          resolution: tile.resolution,
+        },
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(
