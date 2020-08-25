@@ -52,7 +52,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const tilesResponse = await ensureTimeout(async innerReqConfig => {
-      const response = await this.fetchTiles(
+      const response = await this.fetchTilesSearchIndex(
         this.dataset.searchIndexUrl,
         bbox,
         fromTime,
