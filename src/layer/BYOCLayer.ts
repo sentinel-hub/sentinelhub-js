@@ -108,6 +108,23 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => {
+        return {
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {
+            cloudCoverPercent: tile.cloudCoverPercentage,
+          },
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -136,18 +153,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       null,
       findTilesDatasetParameters,
     );
-    return {
-      tiles: response.data.tiles.map(tile => {
-        return {
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: {
-            cloudCoverPercent: tile.cloudCoverPercentage,
-          },
-        };
-      }),
-      hasMore: response.data.hasMore,
-    };
+    return response;
   }
 
   protected getShServiceHostname(): string {
