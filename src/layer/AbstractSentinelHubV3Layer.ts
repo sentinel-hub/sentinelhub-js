@@ -515,6 +515,41 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       };
     }
 
+    if (datasetParameters && datasetParameters.acquisitionMode) {
+      payloadQuery = {
+        ...payloadQuery,
+        'sar:instrument_mode': {
+          eq: datasetParameters.acquisitionMode,
+        },
+      };
+    }
+
+    if (datasetParameters && datasetParameters.polarization) {
+      payloadQuery = {
+        ...payloadQuery,
+        polarization: {
+          eq: datasetParameters.polarization,
+        },
+      };
+    }
+
+    if (datasetParameters && datasetParameters.resolution) {
+      payloadQuery = {
+        ...payloadQuery,
+        resolution: {
+          eq: datasetParameters.resolution,
+        },
+      };
+    }
+
+    if (datasetParameters && datasetParameters.orbitDirection) {
+      payloadQuery = {
+        ...payloadQuery,
+        'sat:orbit_state': {
+          eq: datasetParameters.orbitDirection,
+        },
+      };
+    }
     if (payloadQuery) {
       payload.query = payloadQuery;
     }
