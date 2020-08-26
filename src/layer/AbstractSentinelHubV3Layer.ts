@@ -324,9 +324,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
     return {};
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
     return [];
   }
@@ -335,7 +338,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {
       tiles: response.data.features.map((feature: Record<string, any>) => ({
         geometry: feature.geometry,
-        sensingTime: moment.utc(feature.properties.datetime),
+        sensingTime: moment.utc(feature.properties.datetime).toDate(),
         meta: this.extractFindTilesMetaFromCatalog(feature),
         links: this.getTileLinksFromCatalog(feature),
       })),
@@ -550,6 +553,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         },
       };
     }
+
     if (payloadQuery) {
       payload.query = payloadQuery;
     }
