@@ -1,6 +1,14 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L2ALayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, CRS_EPSG3857 } from '../dist/sentinelHub.esm';
+import {
+  setAuthToken,
+  S2L2ALayer,
+  CRS_EPSG4326,
+  BBox,
+  MimeTypes,
+  ApiType,
+  CRS_EPSG3857,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -909,6 +917,7 @@ export const FindTilesSearchIndex = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
     const data = await layerS2L2A.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),

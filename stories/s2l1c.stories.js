@@ -1,4 +1,5 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
   S2L1CLayer,
@@ -199,6 +200,8 @@ export const FindTilesSearchIndex = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
+
     const data = await layerS2L1C.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),

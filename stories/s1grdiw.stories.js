@@ -1,4 +1,5 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
   S1GRDAWSEULayer,
@@ -300,8 +301,14 @@ export const GetMapProcessingEvalscripturl = () => {
   return wrapperEl;
 };
 
-export const findTilesEPSG3857 = () => {
-  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
+export const findTilesEPSG3857SearchIndex = () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId,
+    layerId,
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
 
   const containerEl = document.createElement('pre');
 
@@ -310,7 +317,7 @@ export const findTilesEPSG3857 = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
-    await setAuthTokenWithOAuthCredentials();
+    setAuthToken(null);
     const data = await layer.findTiles(
       bbox3857,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -325,8 +332,44 @@ export const findTilesEPSG3857 = () => {
   return wrapperEl;
 };
 
-export const findTilesEPSG4326 = () => {
-  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
+export const findTilesEPSG4326SearchIndex = () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId,
+    layerId,
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    setAuthToken(null);
+    const data = await layer.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findTilesEPSG4326Catalog = () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId,
+    layerId,
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
 
   const containerEl = document.createElement('pre');
 
@@ -394,7 +437,7 @@ export const findDatesUTCEPSG4326 = () => {
     layerId,
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
-    orbitDirection: OrbitDirection.DESCENDING,
+    resolution: Resolution.HIGH,
   });
 
   const wrapperEl = document.createElement('div');
