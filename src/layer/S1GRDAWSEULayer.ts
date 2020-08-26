@@ -151,6 +151,18 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
   }
 
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    if (!feature) {
+      return {};
+    }
+    return {
+      orbitDirection: feature.properties['sat:orbit_state'].toUpperCase(),
+      polarization: feature.properties['polarization'],
+      acquisitionMode: feature.properties['sar:instrument_mode'],
+      resolution: feature.properties['resolution'],
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
