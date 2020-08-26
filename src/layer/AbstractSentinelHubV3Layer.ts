@@ -377,7 +377,20 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     datasetParameters?: Record<string, any> | null,
   ): Promise<PaginatedTiles> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!(authToken && this.dataset.catalogCollection)) {
+    const canUseCatalog = authToken && !!this.dataset.catalogCollection;
+    if (canUseCatalog) {
+      return this.fetchTilesCatalog(
+        authToken,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        maxCloudCoverPercent,
+        datasetParameters,
+      );
+    } else {
       return this.fetchTilesSearchIndex(
         this.dataset.searchIndexUrl,
         bbox,
@@ -390,17 +403,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         datasetParameters,
       );
     }
-    return this.fetchTilesCatalog(
-      authToken,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      maxCloudCoverPercent,
-      datasetParameters,
-    );
   }
 
   protected async fetchTilesSearchIndex(
