@@ -324,6 +324,25 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
   }
 
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    return {};
+  }
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    return [];
+  }
+
+  protected convertResponseFromCatalog(response: any): PaginatedTiles {
+    return {
+      tiles: response.data.features.map((feature: Record<string, any>) => ({
+        geometry: feature.geometry,
+        sensingTime: moment.utc(feature.properties.datetime),
+        meta: this.extractFindTilesMetaFromCatalog(feature),
+        links: this.getTileLinksFromCatalog(feature),
+      })),
+      hasMore: !!response.data.context.next,
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
@@ -506,16 +525,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       requestConfig,
     );
 
-    return {
-      tiles: response.data.features.map((feature: Record<string, any>) => ({
-        geometry: feature.geometry,
-        sensingTime: moment.utc(feature.properties.datetime),
-        meta: {
-          cloudCoverPercent: feature.properties['eo:cloud_cover'],
-        },
-      })),
-      hasMore: false,
-    };
+    return this.convertResponseFromCatalog(response);
   }
 
   protected async getFindDatesUTCAdditionalParameters(

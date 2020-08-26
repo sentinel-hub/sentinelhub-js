@@ -56,6 +56,15 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
   }
 
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    if (!feature) {
+      return {};
+    }
+    return {
+      cloudCoverPercent: feature.properties['eo:cloud_cover'],
+    };
+  }
+
   protected async fetchTiles(
     bbox: BBox,
     fromTime: Date,
