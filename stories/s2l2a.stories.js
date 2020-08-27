@@ -1,14 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import {
-  S2L2ALayer,
-  CRS_EPSG3857,
-  CRS_EPSG4326,
-  BBox,
-  MimeTypes,
-  ApiType,
-  NumberType,
-} from '../dist/sentinelHub.esm';
+import { S2L2ALayer, CRS_EPSG3857, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -853,24 +845,24 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
 
 export const getMapProcessingAdvancedRGB = () => {
   const imgOriginal = document.createElement('img');
-  imgOriginal.width = '512';
-  imgOriginal.height = '512';
+  imgOriginal.width = '256';
+  imgOriginal.height = '256';
 
   const imgRGB1 = document.createElement('img');
-  imgRGB1.width = '512';
-  imgRGB1.height = '512';
+  imgRGB1.width = '256';
+  imgRGB1.height = '256';
 
   const imgRGB2 = document.createElement('img');
-  imgRGB2.width = '512';
-  imgRGB2.height = '512';
+  imgRGB2.width = '256';
+  imgRGB2.height = '256';
 
   const imgRGB3 = document.createElement('img');
-  imgRGB3.width = '512';
-  imgRGB3.height = '512';
+  imgRGB3.width = '256';
+  imgRGB3.height = '256';
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
-  wrapperEl.innerHTML += '<h4>original | changed</h4>';
+  wrapperEl.innerHTML += '<h4>no effects | same value, [0,255] | value * 2.4, [0,255] | function, [0,1]</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB1);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB2);
@@ -907,18 +899,14 @@ export const getMapProcessingAdvancedRGB = () => {
       format: MimeTypes.JPEG,
     };
 
-    const arrAsc = Array.from(Array(256).keys());
-    const arrDesc = Array.from(Array(256).keys()).reverse();
-    const arr0 = Array(256).fill(127);
-
     const getMapParamsRGB1 = {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: pixelValue => arrAsc[pixelValue],
-          greenFunction: pixelValue => arrAsc[pixelValue],
-          blueFunction: pixelValue => arrAsc[pixelValue],
-          range: { from: 0, to: 255, numberType: NumberType.INT },
+          redFunction: pixelValue => pixelValue,
+          greenFunction: pixelValue => pixelValue,
+          blueFunction: pixelValue => pixelValue,
+          range: { from: 0, to: 255 },
         },
       },
     };
@@ -927,10 +915,10 @@ export const getMapProcessingAdvancedRGB = () => {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: pixelValue => arrDesc[pixelValue],
-          greenFunction: pixelValue => arrDesc[pixelValue],
-          blueFunction: pixelValue => arrDesc[pixelValue],
-          range: { from: 0, to: 255, numberType: NumberType.INT },
+          redFunction: pixelValue => pixelValue * 2.4,
+          greenFunction: pixelValue => pixelValue * 2.4,
+          blueFunction: pixelValue => pixelValue * 2.4,
+          range: { from: 0, to: 255 },
         },
       },
     };
@@ -939,10 +927,10 @@ export const getMapProcessingAdvancedRGB = () => {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: pixelValue => arr0[pixelValue],
-          greenFunction: pixelValue => arr0[pixelValue],
-          blueFunction: pixelValue => arr0[pixelValue],
-          range: { from: 0, to: 255, numberType: NumberType.INT },
+          redFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
+          greenFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
+          blueFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
+          range: { from: 0, to: 1 },
         },
       },
     };

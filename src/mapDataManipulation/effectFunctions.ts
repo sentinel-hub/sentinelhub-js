@@ -78,14 +78,7 @@ export function runCustomEffectFunctions(
 
   const { range, redFunction, greenFunction, blueFunction } = effects.customEffect;
 
-  rgbMappingArrays = changeRgbMappingArraysRange(
-    rgbMappingArrays,
-    0,
-    1,
-    range.from,
-    range.to,
-    range.numberType,
-  );
+  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, range.from, range.to);
 
   if (isEffectSet(redFunction)) {
     rgbMappingArrays.red = rgbMappingArrays.red.map(x => redFunction(x));

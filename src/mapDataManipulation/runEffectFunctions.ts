@@ -1,5 +1,5 @@
 import { mapDataManipulation } from './mapDataManipulation';
-import { Effects, NumberType } from './const';
+import { Effects } from './const';
 import {
   isAnyEffectSet,
   prepareRgbMappingArrays,
@@ -41,7 +41,7 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   rgbMappingArrays = runCustomEffectFunctions(rgbMappingArrays, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
-  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255, NumberType.INT);
+  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255);
 
   // prepare manipulatePixel function for mapDataManipulation
   const manipulatePixel = prepareManipulatePixel(rgbMappingArrays);
