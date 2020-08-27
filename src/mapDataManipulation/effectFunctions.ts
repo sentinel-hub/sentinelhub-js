@@ -3,7 +3,6 @@ import {
   isEffectSet,
   changeRgbMappingArraysWithFunction,
   transformValueToRange,
-  changeRgbMappingArraysRange,
 } from './mapDataManipulationUtils';
 
 export function runGainEffectFunction(
