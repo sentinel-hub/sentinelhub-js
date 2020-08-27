@@ -173,7 +173,7 @@ Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
 Effect `customEffect` consists of four parameters, `redFunction`, `greenFunction`, `blueFunction`, `range`.
-Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functions that transform the pixel values.
+Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functions that transform the values of red, green and blue color component respectively.
  Parameter `range` determines the value range on which the functions operate.
 
 ```javascript
