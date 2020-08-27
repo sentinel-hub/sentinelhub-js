@@ -164,7 +164,6 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
-
 Supported effects are `gain`, `gamma`, `redRange`, `greenRange`, `blueRange` and `customEffect`.
 
 Effects `gain` and `gamma` accept values equal or greater than 0.
