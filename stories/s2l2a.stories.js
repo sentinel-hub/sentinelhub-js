@@ -2,11 +2,11 @@ import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtil
 
 import {
   S2L2ALayer,
+  CRS_EPSG3857,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
-  CRS_EPSG3857,
   NumberType,
 } from '../dist/sentinelHub.esm';
 
@@ -856,15 +856,25 @@ export const getMapProcessingAdvancedRGB = () => {
   imgOriginal.width = '512';
   imgOriginal.height = '512';
 
-  const imgRGB = document.createElement('img');
-  imgRGB.width = '512';
-  imgRGB.height = '512';
+  const imgRGB1 = document.createElement('img');
+  imgRGB1.width = '512';
+  imgRGB1.height = '512';
+
+  const imgRGB2 = document.createElement('img');
+  imgRGB2.width = '512';
+  imgRGB2.height = '512';
+
+  const imgRGB3 = document.createElement('img');
+  imgRGB3.width = '512';
+  imgRGB3.height = '512';
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
   wrapperEl.innerHTML += '<h4>original | changed</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
-  wrapperEl.insertAdjacentElement('beforeend', imgRGB);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB1);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB2);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB3);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -897,30 +907,41 @@ export const getMapProcessingAdvancedRGB = () => {
       format: MimeTypes.JPEG,
     };
 
-    const arrRandom = Array.from({ length: 256 }, () => Math.floor(Math.random() * 255));
     const arrAsc = Array.from(Array(256).keys());
     const arrDesc = Array.from(Array(256).keys()).reverse();
-    const arr0 = Array(256).fill(255);
+    const arr0 = Array(256).fill(127);
 
-    console.log('getMapProcessingAdvancedRGB', { arrAsc, arr0 });
-
-    const useArr = arrAsc;
-
-    const ff = pixelValue => {
-      console.log('ff', {
-        v: pixelValue,
-        a: useArr[pixelValue],
-      });
-      return useArr[pixelValue];
-    };
-
-    const getMapParamsRGB = {
+    const getMapParamsRGB1 = {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: ff,
-          greenFunction: ff,
-          blueFunction: ff,
+          redFunction: pixelValue => arrAsc[pixelValue],
+          greenFunction: pixelValue => arrAsc[pixelValue],
+          blueFunction: pixelValue => arrAsc[pixelValue],
+          range: { from: 0, to: 255, numberType: NumberType.INT },
+        },
+      },
+    };
+
+    const getMapParamsRGB2 = {
+      ...getMapParams,
+      effects: {
+        customEffect: {
+          redFunction: pixelValue => arrDesc[pixelValue],
+          greenFunction: pixelValue => arrDesc[pixelValue],
+          blueFunction: pixelValue => arrDesc[pixelValue],
+          range: { from: 0, to: 255, numberType: NumberType.INT },
+        },
+      },
+    };
+
+    const getMapParamsRGB3 = {
+      ...getMapParams,
+      effects: {
+        customEffect: {
+          redFunction: pixelValue => arr0[pixelValue],
+          greenFunction: pixelValue => arr0[pixelValue],
+          blueFunction: pixelValue => arr0[pixelValue],
           range: { from: 0, to: 255, numberType: NumberType.INT },
         },
       },
@@ -930,8 +951,14 @@ export const getMapProcessingAdvancedRGB = () => {
       const imageBlobOriginal = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
       imgOriginal.src = URL.createObjectURL(imageBlobOriginal);
 
-      const imageBlobRGB = await layerS2L2A.getMap(getMapParamsRGB, ApiType.PROCESSING);
-      imgRGB.src = URL.createObjectURL(imageBlobRGB);
+      const imageBlobRGB1 = await layerS2L2A.getMap(getMapParamsRGB1, ApiType.PROCESSING);
+      imgRGB1.src = URL.createObjectURL(imageBlobRGB1);
+
+      const imageBlobRGB2 = await layerS2L2A.getMap(getMapParamsRGB2, ApiType.PROCESSING);
+      imgRGB2.src = URL.createObjectURL(imageBlobRGB2);
+
+      const imageBlobRGB3 = await layerS2L2A.getMap(getMapParamsRGB3, ApiType.PROCESSING);
+      imgRGB3.src = URL.createObjectURL(imageBlobRGB3);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }
