@@ -164,14 +164,17 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
-Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`.
+
+Supported effects are `gain`, `gamma`, `redRange`, `greenRange`, `blueRange` and `customEffect`.
+
 Effects `gain` and `gamma` accept values equal or greater than 0.
+
 Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1, including both 0 and 1.
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
-Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
-
-When retrieving an image URL (via `getMapUrl()`) with effects applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
+Effect `customEffect` consists of four parameters, `redFunction`, `greenFunction`, `blueFunction`, `range`.
+Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functions that transform the pixel values.
+ Parameter `range` determines the value range on which the functions operate.
 
 ```javascript
 
@@ -194,6 +197,9 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
   const imageBlob = await layer.getMap(getMapParamsWithEffects, ApiType.WMS);
   const imageBlob2 = await layer.getMap(getMapParamsWithEffects, ApiType.PROCESSING);
 ```
+
+**Note:** Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
+When retrieving an image URL (via `getMapUrl()`) with effects in the parameters, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ### Stitching images
 
