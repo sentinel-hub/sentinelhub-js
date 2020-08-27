@@ -177,6 +177,15 @@ Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functio
 
 ```javascript
 
+  const someValue;
+  const exampleFunction = value => {
+    if(value > someValue) {
+      return 0;
+    }
+    return value;
+  };
+
+
   const getMapParamsWithEffects = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
@@ -190,6 +199,12 @@ Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functio
       redRange: {from: 0.2, to: 0.8},
       greenRange: {from: 0.2, to: 0.8},
       blueRange: {from: 0.2, to: 0.8},
+      customEffect: {
+        redFunction: pixelValue => exampleFunction[pixelValue],
+        greenFunction: pixelValue => exampleFunction[pixelValue],
+        blueFunction: pixelValue => exampleFunction[pixelValue],
+        range: { from: 0, to: 1 },
+      }
     }
   };
 
