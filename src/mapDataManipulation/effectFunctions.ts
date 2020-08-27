@@ -68,7 +68,7 @@ export function runColorEffectFunction(
   return rgbMappingArrays;
 }
 
-export function runCustomEffectFunction(
+export function runCustomEffectFunctions(
   rgbMappingArrays: RgbMappingArrays,
   effects: Effects,
 ): RgbMappingArrays {
