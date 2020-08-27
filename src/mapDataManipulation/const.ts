@@ -3,16 +3,10 @@ export type ColorRange = {
   to: number;
 };
 
-export type ValueRange = {
-  from: number;
-  to: number;
-};
-
 export type CustomEffectFunctions = {
   redFunction?: Function;
   greenFunction?: Function;
   blueFunction?: Function;
-  range: ValueRange;
 };
 
 export type Effects = {

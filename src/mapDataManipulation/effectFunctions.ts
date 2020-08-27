@@ -76,9 +76,7 @@ export function runCustomEffectFunctions(
     return rgbMappingArrays;
   }
 
-  const { range, redFunction, greenFunction, blueFunction } = effects.customEffect;
-
-  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, range.from, range.to);
+  const { redFunction, greenFunction, blueFunction } = effects.customEffect;
 
   if (isEffectSet(redFunction)) {
     rgbMappingArrays.red = rgbMappingArrays.red.map(x => redFunction(x));
@@ -91,8 +89,6 @@ export function runCustomEffectFunctions(
   if (isEffectSet(blueFunction)) {
     rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => blueFunction(x));
   }
-
-  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, range.from, range.to, 0, 1);
 
   return rgbMappingArrays;
 }

@@ -856,17 +856,12 @@ export const getMapProcessingAdvancedRGB = () => {
   imgRGB2.width = '256';
   imgRGB2.height = '256';
 
-  const imgRGB3 = document.createElement('img');
-  imgRGB3.width = '256';
-  imgRGB3.height = '256';
-
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
-  wrapperEl.innerHTML += '<h4>no effects | same value, [0,255] | value * 2.4, [0,255] | function, [0,1]</h4>';
+  wrapperEl.innerHTML += '<h4>no effects | same value | function</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB1);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB2);
-  wrapperEl.insertAdjacentElement('beforeend', imgRGB3);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -906,7 +901,6 @@ export const getMapProcessingAdvancedRGB = () => {
           redFunction: pixelValue => pixelValue,
           greenFunction: pixelValue => pixelValue,
           blueFunction: pixelValue => pixelValue,
-          range: { from: 0, to: 255 },
         },
       },
     };
@@ -915,22 +909,9 @@ export const getMapProcessingAdvancedRGB = () => {
       ...getMapParams,
       effects: {
         customEffect: {
-          redFunction: pixelValue => pixelValue * 2.4,
-          greenFunction: pixelValue => pixelValue * 2.4,
-          blueFunction: pixelValue => pixelValue * 2.4,
-          range: { from: 0, to: 255 },
-        },
-      },
-    };
-
-    const getMapParamsRGB3 = {
-      ...getMapParams,
-      effects: {
-        customEffect: {
           redFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
           greenFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
           blueFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
-          range: { from: 0, to: 1 },
         },
       },
     };
@@ -944,9 +925,6 @@ export const getMapProcessingAdvancedRGB = () => {
 
       const imageBlobRGB2 = await layerS2L2A.getMap(getMapParamsRGB2, ApiType.PROCESSING);
       imgRGB2.src = URL.createObjectURL(imageBlobRGB2);
-
-      const imageBlobRGB3 = await layerS2L2A.getMap(getMapParamsRGB3, ApiType.PROCESSING);
-      imgRGB3.src = URL.createObjectURL(imageBlobRGB3);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }

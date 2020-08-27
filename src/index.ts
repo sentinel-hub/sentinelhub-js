@@ -62,7 +62,7 @@ import { CacheTarget, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
-import { Effects, ColorRange, CustomEffectFunctions, ValueRange } from './mapDataManipulation/const';
+import { Effects, ColorRange, CustomEffectFunctions } from './mapDataManipulation/const';
 
 registerAxiosCacheRetryInterceptors();
 
@@ -144,5 +144,4 @@ export {
   Effects,
   ColorRange,
   CustomEffectFunctions,
-  ValueRange,
 };
