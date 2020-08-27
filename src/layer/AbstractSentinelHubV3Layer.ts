@@ -453,7 +453,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const payload: any = {
       clipping: bboxPolygon,
       maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverPercent ? maxCloudCoverPercent / 100 : null,
+      maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
       timeFrom: fromTime.toISOString(),
       timeTo: toTime.toISOString(),
       offset: offset,
