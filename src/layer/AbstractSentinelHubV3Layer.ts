@@ -559,7 +559,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
 
     const response = await axios.post(
-      `https://services.sentinel-hub.com/api/v1/catalog/search`,
+      `${this.dataset.shServiceHostname}api/v1/catalog/search`,
       payload,
       requestConfig,
     );
