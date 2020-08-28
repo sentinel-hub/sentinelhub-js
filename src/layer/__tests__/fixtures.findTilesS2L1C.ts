@@ -161,6 +161,7 @@ export function constructFixtureFindTilesCatalog({
     query: { 'eo:cloud_cover': { lte: 20 } },
   };
 
+  /* eslint-disable */
   const mockedResponse = {
     type: 'FeatureCollection',
     features: [
@@ -265,6 +266,7 @@ export function constructFixtureFindTilesCatalog({
     ],
     context: { limit: 50, returned: 3 },
   };
+  /* eslint-enable */
 
   const expectedResultTiles = [
     {
