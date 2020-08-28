@@ -167,7 +167,7 @@ describe('Testing find tiles using catalog', () => {
     if (maxCloudCoverPercent !== null) {
       expect(query['eo:cloud_cover']).toEqual({ lte: expectedMaxCloudCoverage });
     } else {
-      expect(query).toBeUndefined();
+      expect(query).toEqual({});
     }
   });
 
