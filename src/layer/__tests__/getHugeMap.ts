@@ -1,5 +1,3 @@
-import 'jest-canvas-mock';
-
 import { ApiType, setAuthToken, invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
