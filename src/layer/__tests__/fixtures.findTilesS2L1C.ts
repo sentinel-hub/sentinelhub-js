@@ -302,6 +302,11 @@ export function constructFixtureFindTilesCatalog({
           target: 'https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles/32/T/QM/2020/8/23/0/preview.jpg',
           type: 'preview',
         },
+        {
+          target:
+            "https://scihub.copernicus.eu/dhus/odata/v1/Products('966aba13-b34f-4563-85ae-356503fb6c7b')/$value",
+          type: LinkType.SCIHUB,
+        },
       ],
     },
   ];
