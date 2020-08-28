@@ -1,13 +1,9 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import 'jest-canvas-mock';
 
 import { ApiType, setAuthToken, invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
-import { constructFixtureGetMapTiff, constructFixtureGetMapJPEG } from './fixtures.getHugeMap';
-
-const mockNetwork = new MockAdapter(axios);
+import { constructFixtureGetMapTiff } from './fixtures.getHugeMap';
 
 const EXAMPLE_TOKEN = 'TOKEN111';
 
