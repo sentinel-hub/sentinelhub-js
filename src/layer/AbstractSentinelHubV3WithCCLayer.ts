@@ -110,4 +110,18 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       cloudCoverPercent: tile.cloudCoverPercentage,
     };
   }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (maxCloudCoverPercent !== null && maxCloudCoverPercent !== undefined) {
+      result['eo:cloud_cover'] = {
+        lte: maxCloudCoverPercent,
+      };
+    }
+    return result;
+  }
 }

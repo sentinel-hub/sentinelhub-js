@@ -493,6 +493,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     );
     return this.convertResponseFromSearchIndex(response);
   }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Record<string, any> {
+    return {};
+  }
+
   protected async fetchTilesCatalog(
     authToken: string,
     bbox: BBox,
@@ -531,52 +539,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.next = offset;
     }
 
-    let payloadQuery: any;
-    if (maxCloudCoverPercent !== undefined && maxCloudCoverPercent !== null) {
-      payloadQuery = {
-        ...payloadQuery,
-        'eo:cloud_cover': {
-          lte: maxCloudCoverPercent,
-        },
-      };
-    }
-
-    if (datasetParameters && datasetParameters.acquisitionMode) {
-      payloadQuery = {
-        ...payloadQuery,
-        'sar:instrument_mode': {
-          eq: datasetParameters.acquisitionMode,
-        },
-      };
-    }
-
-    if (datasetParameters && datasetParameters.polarization) {
-      payloadQuery = {
-        ...payloadQuery,
-        polarization: {
-          eq: datasetParameters.polarization,
-        },
-      };
-    }
-
-    if (datasetParameters && datasetParameters.resolution) {
-      payloadQuery = {
-        ...payloadQuery,
-        resolution: {
-          eq: datasetParameters.resolution,
-        },
-      };
-    }
-
-    if (datasetParameters && datasetParameters.orbitDirection) {
-      payloadQuery = {
-        ...payloadQuery,
-        'sat:orbit_state': {
-          eq: datasetParameters.orbitDirection,
-        },
-      };
-    }
-
+    let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
+    /*
+    
+    
+*/
     if (payloadQuery) {
       payload.query = payloadQuery;
     }
