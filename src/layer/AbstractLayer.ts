@@ -89,7 +89,7 @@ export class AbstractLayer {
           'Method getHugeMap() requests that width and height of resulting image are specified',
         );
       }
-      if (params.format !== MimeTypes.JPEG || params.format !== MimeTypes.PNG) {
+      if (params.format !== MimeTypes.JPEG && params.format !== MimeTypes.PNG) {
         throw new Error('getHugeMap does not support' + params.format + 'only PNG and JPEG are supported');
       }
 
