@@ -40,13 +40,13 @@ describe('Test findTile using searchIndex', () => {
     [0, 0],
     [null, null],
   ])('check if correct request is constructed', async (maxCloudCoverPercent, expectedMaxCloudCoverage) => {
-    const limit: number = 5;
+    const limit = 5;
     const fromDate: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
     const toDate: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
-    const minX: number = 19;
-    const minY: number = 20;
-    const maxX: number = 20;
-    const maxY: number = 21;
+    const minX = 19;
+    const minY = 20;
+    const maxX = 20;
+    const maxY = 21;
 
     const bbox = new BBox(CRS_EPSG4326, minX, minY, maxX, maxY);
     const layer = new S2L1CLayer({
@@ -133,13 +133,13 @@ describe('Testing find tiles using catalog', () => {
     [0, 0],
     [null, null],
   ])('check if correct request is constructed', async (maxCloudCoverPercent, expectedMaxCloudCoverage) => {
-    const limit: number = 5;
+    const limit = 5;
     const fromDate: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
     const toDate: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
-    const minX: number = 19;
-    const minY: number = 20;
-    const maxX: number = 20;
-    const maxY: number = 21;
+    const minX = 19;
+    const minY = 20;
+    const maxX = 20;
+    const maxY = 21;
 
     const bbox = new BBox(CRS_EPSG4326, minX, minY, maxX, maxY);
     const layer = new S2L1CLayer({
