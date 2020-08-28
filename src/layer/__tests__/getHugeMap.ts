@@ -17,6 +17,6 @@ test('getHugeMap should throw an error when format is not supported', async () =
   try {
     await layer.getHugeMap(getMapParams, ApiType.PROCESSING);
   } catch (e) {
-    expect(e.message).toBe('getHugeMap does not support image/tiff only PNG and JPEG are supported');
+    expect(e.message).toBe('Format image/tiff not supported, only image/png and image/jpeg are allowed');
   }
 });
