@@ -3,19 +3,13 @@ export type ColorRange = {
   to: number;
 };
 
-export type CustomEffectFunctions = {
-  redFunction?: Function;
-  greenFunction?: Function;
-  blueFunction?: Function;
-};
-
 export type Effects = {
   gain?: number;
   gamma?: number;
   redRange?: ColorRange;
   greenRange?: ColorRange;
   blueRange?: ColorRange;
-  customEffect?: CustomEffectFunctions;
+  customEffect?: Function;
 };
 
 export type RgbMappingArrays = {
