@@ -81,6 +81,7 @@ export enum LinkType {
   AWS = 'aws',
   PREVIEW = 'preview',
   CREODIAS = 'creodias',
+  SCIHUB = 'scihub',
 }
 
 export type Link = {
