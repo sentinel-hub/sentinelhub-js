@@ -57,12 +57,18 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   }
 
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    let result: Record<string, any> = {};
+
     if (!feature) {
-      return {};
+      return result;
     }
-    return {
+
+    result = {
+      ...super.extractFindTilesMetaFromCatalog(feature),
       cloudCoverPercent: feature.properties['eo:cloud_cover'],
     };
+
+    return result;
   }
 
   protected async fetchTiles(

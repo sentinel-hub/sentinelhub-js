@@ -30,4 +30,20 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
         .join(''),
     };
   }
+
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    let result: Record<string, any> = {};
+
+    result = {
+      ...super.extractFindTilesMetaFromCatalog(feature),
+    };
+
+    if (feature.assets && feature.assets.data && feature.assets.data.href) {
+      result.MGRSLocation = feature.assets.data.href
+        .split('/')
+        .slice(4, 7)
+        .join('');
+    }
+    return result;
+  }
 }
