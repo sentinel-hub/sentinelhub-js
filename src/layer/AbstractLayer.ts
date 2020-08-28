@@ -90,7 +90,15 @@ export class AbstractLayer {
         );
       }
       if (params.format !== MimeTypes.JPEG && params.format !== MimeTypes.PNG) {
-        throw new Error('getHugeMap does not support ' + params.format + ' only PNG and JPEG are supported');
+        throw new Error(
+          'Format ' +
+            params.format +
+            ' not supported, only ' +
+            MimeTypes.PNG +
+            ' and ' +
+            MimeTypes.JPEG +
+            ' are allowed',
+        );
       }
 
       const LIMIT_DIM = 2500;
