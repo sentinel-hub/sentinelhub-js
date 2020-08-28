@@ -5,7 +5,7 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { BBox } from '../bbox';
 import { CRS_EPSG4326 } from '../crs';
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode } from './const';
+import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode, MimeTypes } from './const';
 import { Dataset } from './dataset';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
@@ -88,6 +88,9 @@ export class AbstractLayer {
         throw new Error(
           'Method getHugeMap() requests that width and height of resulting image are specified',
         );
+      }
+      if (params.format !== MimeTypes.JPEG || params.format !== MimeTypes.PNG) {
+        throw new Error('getHugeMap does not support' + params.format + 'only PNG and JPEG are supported');
       }
 
       const LIMIT_DIM = 2000;
