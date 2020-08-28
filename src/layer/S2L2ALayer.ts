@@ -11,20 +11,33 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
     return payload;
   }
 
+  private createPreviewLinkFromDataUri(dataUri: string): Link {
+    return {
+      // S-2 L2A doesn't have previews, but we can use corresponding L1C ones instead:
+      target: `https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles${dataUri}preview.jpg`,
+      type: LinkType.PREVIEW,
+    };
+  }
+
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [
       {
         target: tile.dataUri,
         type: LinkType.AWS,
       },
-      {
-        // S-2 L2A doesn't have previews, but we can use corresponding L1C ones instead:
-        target: `https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles${
-          tile.dataUri.split('tiles')[1]
-        }/preview.jpg`,
-        type: LinkType.PREVIEW,
-      },
+      this.createPreviewLinkFromDataUri(`${tile.dataUri.split('tiles')[1]}/`),
     ];
+  }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    let result: Link[] = [...super.getTileLinksFromCatalog(feature)];
+
+    if (feature && feature.assets && feature.assets.data) {
+      const dataUri = feature.assets.data.href.split('tiles')[1];
+      result.push(this.createPreviewLinkFromDataUri(dataUri));
+    }
+
+    return result;
   }
 
   protected extractFindTilesMeta(tile: any): Record<string, any> {
