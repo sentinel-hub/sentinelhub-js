@@ -75,19 +75,19 @@ export function runCustomEffectFunctions(
     return rgbMappingArrays;
   }
 
-  const { redFunction, greenFunction, blueFunction } = effects.customEffect;
+  let newRgbMappingArrays = { ...rgbMappingArrays };
 
-  if (isEffectSet(redFunction)) {
-    rgbMappingArrays.red = rgbMappingArrays.red.map(x => redFunction(x));
+  for (let i = 0; i < rgbMappingArrays.red.length; i++) {
+    const red = rgbMappingArrays.red[i];
+    const green = rgbMappingArrays.green[i];
+    const blue = rgbMappingArrays.blue[i];
+
+    const { r, g, b } = effects.customEffect({ r: red, g: green, b: blue });
+
+    newRgbMappingArrays.red[i] = r;
+    newRgbMappingArrays.green[i] = g;
+    newRgbMappingArrays.blue[i] = b;
   }
 
-  if (isEffectSet(greenFunction)) {
-    rgbMappingArrays.green = rgbMappingArrays.green.map(x => greenFunction(x));
-  }
-
-  if (isEffectSet(blueFunction)) {
-    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x => blueFunction(x));
-  }
-
-  return rgbMappingArrays;
+  return newRgbMappingArrays;
 }

@@ -171,18 +171,18 @@ Effects `gain` and `gamma` accept values equal or greater than 0.
 Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1, including both 0 and 1.
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
-Effect `customEffect` consists of four parameters, `redFunction`, `greenFunction`, `blueFunction`, `range`.
-Parameters `redFunction`, `greenFunction`, `blueFunction` are pixel-wise functions that transform the values of red, green and blue color component respectively.
-They operate with values between 0 and 1, including both 0 and 1.
+Effect `customEffect` is a function that receives red, green and blue values and returns new red, green and blue values.
+It operates with values between 0 and 1, including both 0 and 1.
 
 ```javascript
 
   const someValue;
-  const exampleFunction = value => {
-    if(value > someValue) {
-      return 0;
+  const exampleFunction = {r, g, b} => {
+    let red = r, green = g, blue = b;
+    if(r > someValue) {
+      red = 0;
     }
-    return value;
+    return {r: red, g: green, b: blue};
   };
 
 

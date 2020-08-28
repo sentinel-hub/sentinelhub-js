@@ -897,22 +897,18 @@ export const getMapProcessingAdvancedRGB = () => {
     const getMapParamsRGB1 = {
       ...getMapParams,
       effects: {
-        customEffect: {
-          redFunction: pixelValue => pixelValue,
-          greenFunction: pixelValue => pixelValue,
-          blueFunction: pixelValue => pixelValue,
-        },
+        customEffect: ({ r, g, b }) => ({ r, g, b }),
       },
     };
 
     const getMapParamsRGB2 = {
       ...getMapParams,
       effects: {
-        customEffect: {
-          redFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
-          greenFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
-          blueFunction: pixelValue => (pixelValue < 0.4 ? pixelValue * 2 : pixelValue),
-        },
+        customEffect: ({ r, g, b }) => ({
+          r: r < 0.4 ? r * 2 : r,
+          g: g < 0.4 ? g * 2 : g,
+          b: b < 0.4 ? b * 2 : b,
+        }),
       },
     };
 
