@@ -332,21 +332,29 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
-    const { assets } = feature;
-    let links: Link[] = [];
-    if (!assets) {
+    const { assets, links } = feature;
+    let result: Link[] = [];
+    if (!assets && !links) {
       return [];
     }
 
     if (assets.data) {
-      links.push({ target: assets.data.href, type: LinkType.AWS });
+      result.push({ target: assets.data.href, type: LinkType.AWS });
     }
 
     if (assets.thumbnail) {
-      links.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
+      result.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
     }
 
-    return links;
+    const sciHubLink = links.find((l: Record<string, any>) => {
+      return l.title === 'scihub download';
+    });
+
+    if (sciHubLink) {
+      result.push({ target: sciHubLink.href, type: LinkType.SCIHUB });
+    }
+
+    return result;
   }
 
   protected convertResponseFromCatalog(response: any): PaginatedTiles {
