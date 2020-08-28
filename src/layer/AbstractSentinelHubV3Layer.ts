@@ -15,6 +15,7 @@ import {
   Stats,
   Interpolator,
   Link,
+  LinkType,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
@@ -331,7 +332,21 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
-    return [];
+    const { assets } = feature;
+    let links: Link[] = [];
+    if (!assets) {
+      return [];
+    }
+
+    if (assets.data) {
+      links.push({ target: assets.data.href, type: LinkType.AWS });
+    }
+
+    if (assets.thumbnail) {
+      links.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
+    }
+
+    return links;
   }
 
   protected convertResponseFromCatalog(response: any): PaginatedTiles {
