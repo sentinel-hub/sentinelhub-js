@@ -93,7 +93,7 @@ export class AbstractLayer {
         throw new Error('getHugeMap does not support' + params.format + 'only PNG and JPEG are supported');
       }
 
-      const LIMIT_DIM = 2000;
+      const LIMIT_DIM = 2500;
       if (width <= LIMIT_DIM && height <= LIMIT_DIM) {
         return await this.getMap(params, api, innerReqConfig);
       }
