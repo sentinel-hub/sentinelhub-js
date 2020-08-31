@@ -12,13 +12,6 @@ export type Effects = {
   customEffect?: Function;
 };
 
-export type RgbaArrays = {
-  red: number[];
-  green: number[];
-  blue: number[];
-  alpha: number[];
-};
-
 export type ImageProperties = {
   imageData: Uint8ClampedArray;
   imageWidth: number;
