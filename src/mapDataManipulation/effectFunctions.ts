@@ -75,8 +75,6 @@ export function runCustomEffectFunctions(
     return rgbMappingArrays;
   }
 
-  let newRgbMappingArrays = { ...rgbMappingArrays };
-
   for (let i = 0; i < rgbMappingArrays.red.length; i++) {
     const red = rgbMappingArrays.red[i];
     const green = rgbMappingArrays.green[i];
@@ -84,10 +82,10 @@ export function runCustomEffectFunctions(
 
     const { r, g, b } = effects.customEffect({ r: red, g: green, b: blue });
 
-    newRgbMappingArrays.red[i] = r;
-    newRgbMappingArrays.green[i] = g;
-    newRgbMappingArrays.blue[i] = b;
+    rgbMappingArrays.red[i] = r;
+    rgbMappingArrays.green[i] = g;
+    rgbMappingArrays.blue[i] = b;
   }
 
-  return newRgbMappingArrays;
+  return rgbMappingArrays;
 }
