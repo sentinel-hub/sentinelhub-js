@@ -1,6 +1,15 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { BYOCLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LocationIdSHv3 } from '../dist/sentinelHub.esm';
+import {
+  BYOCLayer,
+  CRS_EPSG3857,
+  CRS_EPSG4326,
+  BBox,
+  MimeTypes,
+  ApiType,
+  LocationIdSHv3,
+  setAuthToken,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -19,6 +28,14 @@ const bbox = new BBox(
   process.env.BYOC_BBOX_EPSG3857_MINY ? process.env.BYOC_BBOX_EPSG3857_MINY : 5165920.119625352,
   process.env.BYOC_BBOX_EPSG3857_MAXX ? process.env.BYOC_BBOX_EPSG3857_MAXX : 1330615.7883883484,
   process.env.BYOC_BBOX_EPSG3857_MAXY ? process.env.BYOC_BBOX_EPSG3857_MAXY : 5244191.636589374,
+);
+
+const bbox4326 = new BBox(
+  CRS_EPSG4326,
+  process.env.BYOC_BBOX_EPSG4326_MINX ? process.env.BYOC_BBOX_EPSG4326_MINX : 11.9,
+  process.env.BYOC_BBOX_EPSG4326_MINY ? process.env.BYOC_BBOX_EPSG4326_MINY : 42.2,
+  process.env.BYOC_BBOX_EPSG4326_MAXX ? process.env.BYOC_BBOX_EPSG4326_MAXX : 12.7,
+  process.env.BYOC_BBOX_EPSG4326_MAXY ? process.env.BYOC_BBOX_EPSG4326_MAXY : 43,
 );
 
 const gain = 2;
@@ -355,7 +372,7 @@ export const getMapProcessingGainGamma = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
+export const findTilesSearchIndex = () => {
   if (!process.env.BYOC_COLLECTION_ID) {
     throw new Error('BYOC_COLLECTION_ID environment variable is not defined!');
   }
@@ -372,8 +389,9 @@ export const findTiles = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
     const data = await layer.findTiles(
-      bbox,
+      bbox4326,
       new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
@@ -386,7 +404,7 @@ export const findTiles = () => {
   return wrapperEl;
 };
 
-export const findTilesAuth = () => {
+export const findTilesCatalog = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
@@ -402,7 +420,7 @@ export const findTilesAuth = () => {
     const layer = new BYOCLayer({ instanceId, layerId });
 
     const data = await layer.findTiles(
-      bbox,
+      bbox4326,
       new Date(Date.UTC(2016, 1 - 1, 0, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
