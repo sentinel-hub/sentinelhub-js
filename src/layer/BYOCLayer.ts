@@ -152,6 +152,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       );
     }
     return this.fetchTilesCatalog(
+      SHV3_LOCATIONS_ROOT_URL[this.locationId],
+      this.collectionId,
       authToken,
       bbox,
       fromTime,

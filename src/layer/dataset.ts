@@ -229,4 +229,5 @@ export const DATASET_BYOC: Dataset = {
   orbitTimeMinutes: null,
   minDate: null,
   maxDate: null,
+  catalogCollectionId: null,
 };

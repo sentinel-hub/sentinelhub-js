@@ -338,11 +338,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       return [];
     }
 
-    if (assets.data) {
+    if (assets && assets.data) {
       result.push({ target: assets.data.href, type: LinkType.AWS });
     }
 
-    if (assets.thumbnail) {
+    if (assets && assets.thumbnail) {
       result.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
     }
 
@@ -425,6 +425,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const canUseCatalog = authToken && !!this.dataset.catalogCollectionId;
     if (canUseCatalog) {
       return this.fetchTilesCatalog(
+        this.dataset.shServiceHostname,
+        this.dataset.catalogCollectionId,
         authToken,
         bbox,
         fromTime,
@@ -502,6 +504,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   protected async fetchTilesCatalog(
+    shServiceHostname: string,
+    catalogCollectionId: string,
     authToken: string,
     bbox: BBox,
     fromTime: Date,
@@ -516,7 +520,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('Must be authenticated to use Catalog service');
     }
 
-    if (!this.dataset.catalogCollectionId) {
+    if (!catalogCollectionId) {
       throw new Error('Cannot use Catalog service without collection');
     }
 
@@ -526,13 +530,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
     const requestConfig: AxiosRequestConfig = {
       headers: headers,
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
     };
 
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
-      collections: [this.dataset.catalogCollectionId],
+      collections: [catalogCollectionId],
       limit: maxCount,
     };
     if (offset > 0) {
@@ -545,11 +549,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.query = payloadQuery;
     }
 
-    const response = await axios.post(
-      `${this.dataset.shServiceHostname}api/v1/catalog/search`,
-      payload,
-      requestConfig,
-    );
+    const response = await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
 
     return this.convertResponseFromCatalog(response);
   }
