@@ -113,6 +113,7 @@ export const DATASET_S5PL2: Dataset = {
   orbitTimeMinutes: 101,
   minDate: new Date(Date.UTC(2018, 4 - 1, 30, 0, 18, 51)), // 2018-04-30T00:18:51
   maxDate: null,
+  catalogCollectionId: 'sentinel-5p-l2',
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
