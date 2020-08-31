@@ -175,17 +175,6 @@ Effect `customEffect` is a function that receives red, green and blue values and
 It operates with values between 0 and 1, including both 0 and 1.
 
 ```javascript
-
-  const someValue;
-  const exampleFunction = {r, g, b} => {
-    let red = r, green = g, blue = b;
-    if(r > someValue) {
-      red = 0;
-    }
-    return {r: red, g: green, b: blue};
-  };
-
-
   const getMapParamsWithEffects = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
@@ -199,10 +188,7 @@ It operates with values between 0 and 1, including both 0 and 1.
       redRange: {from: 0.2, to: 0.8},
       greenRange: {from: 0.2, to: 0.8},
       blueRange: {from: 0.2, to: 0.8},
-      customEffect: {
-        redFunction: pixelValue => exampleFunction[pixelValue],
-        greenFunction: pixelValue => exampleFunction[pixelValue],
-        blueFunction: pixelValue => exampleFunction[pixelValue],
+      customEffect: ({r,g,b}) => ({r,g,b})
       }
     }
   };
