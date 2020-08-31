@@ -9,7 +9,6 @@ import {
 } from './fixtures.findTilesS3SLTR';
 
 const AUTH_TOKEN = 'AUTH_TOKEN';
-const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
 const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/search';
 
 const mockNetwork = new MockAdapter(axios);
