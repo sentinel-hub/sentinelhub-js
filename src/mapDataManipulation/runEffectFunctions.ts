@@ -1,12 +1,5 @@
 import { Effects } from './const';
-import {
-  isAnyEffectSet,
-  getImageData,
-  prepareRgbaArrays,
-  changeRgbaArraysRange,
-  prepareImageData,
-  getBlob,
-} from './mapDataManipulationUtils';
+import { isAnyEffectSet, getImageData, getBlob, transformValueToRange } from './mapDataManipulationUtils';
 import {
   runGainEffectFunction,
   runGammaEffectFunction,
@@ -16,7 +9,7 @@ import {
 
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the range of the values from [0, 255] to [0, 1]
-// - change the values according to the algorithms (gain; gamma; r,g,b effects)
+// - change the values according to the algorithms (gain; gamma; r,g,b effects; custom effect)
 // - change the range of the values from [0, 1] back to [0, 255]
 
 export async function runEffectFunctions(originalBlob: Blob, effects: Effects): Promise<Blob> {
@@ -27,27 +20,27 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   }
 
   const { imageData, imageWidth, imageHeight, imageFormat } = await getImageData(originalBlob);
-  let rgbaArrays = prepareRgbaArrays(imageData);
+  let rgbaArray = Array.from(imageData);
 
   // change the range of the values from [0, 255] to [0, 1]
-  rgbaArrays = changeRgbaArraysRange(rgbaArrays, 0, 255, 0, 1);
+  rgbaArray = rgbaArray.map(x => transformValueToRange(x, 0, 255, 0, 1));
 
   // change the values according to the algorithm (gain)
-  rgbaArrays = runGainEffectFunction(rgbaArrays, effects);
+  rgbaArray = runGainEffectFunction(rgbaArray, effects);
 
   // change the values according to the algorithm (gamma)
-  rgbaArrays = runGammaEffectFunction(rgbaArrays, effects);
+  rgbaArray = runGammaEffectFunction(rgbaArray, effects);
 
   // change the values according to the algorithm (r,g,b effects)
-  rgbaArrays = runColorEffectFunction(rgbaArrays, effects);
+  rgbaArray = runColorEffectFunction(rgbaArray, effects);
 
   // run custom effect function (with custom range of values)
-  rgbaArrays = runCustomEffectFunction(rgbaArrays, effects);
+  rgbaArray = runCustomEffectFunction(rgbaArray, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
-  rgbaArrays = changeRgbaArraysRange(rgbaArrays, 0, 1, 0, 255);
+  rgbaArray = rgbaArray.map(x => transformValueToRange(x, 0, 1, 0, 255));
 
-  const newImgData = prepareImageData(rgbaArrays, imageData);
+  const newImgData = Uint8ClampedArray.from(rgbaArray);
   const newBlob = getBlob({ imageData: newImgData, imageWidth, imageHeight, imageFormat });
 
   var t1 = performance.now();
