@@ -83,6 +83,7 @@ export const DATASET_S3SLSTR: Dataset = {
   orbitTimeMinutes: 50.495,
   minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
   maxDate: null,
+  catalogCollectionId: 'sentinel-3-slstr',
 };
 
 export const DATASET_S3OLCI: Dataset = {
