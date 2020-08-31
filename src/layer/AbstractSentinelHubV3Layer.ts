@@ -540,10 +540,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
 
     let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
-    /*
-    
-    
-*/
+
     if (payloadQuery) {
       payload.query = payloadQuery;
     }
