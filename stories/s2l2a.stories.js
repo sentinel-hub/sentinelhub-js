@@ -858,7 +858,7 @@ export const getMapProcessingAdvancedRGB = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
-  wrapperEl.innerHTML += '<h4>no effects | same value | function</h4>';
+  wrapperEl.innerHTML += '<h4>original | no change | black & white</h4>';
   wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB1);
   wrapperEl.insertAdjacentElement('beforeend', imgRGB2);
@@ -905,9 +905,9 @@ export const getMapProcessingAdvancedRGB = () => {
       ...getMapParams,
       effects: {
         customEffect: ({ r, g, b }) => ({
-          r: r < 0.4 ? r * 2 : r,
-          g: g < 0.4 ? g * 2 : g,
-          b: b < 0.4 ? b * 2 : b,
+          r: r + g + b < 0.6 ? 0 : 1,
+          g: r + g + b < 0.6 ? 0 : 1,
+          b: r + g + b < 0.6 ? 0 : 1,
         }),
       },
     };
