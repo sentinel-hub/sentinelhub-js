@@ -162,7 +162,7 @@ describe('Testing find tiles using catalog', () => {
     expect(bboxRequest).toEqual([minX, minY, maxX, maxY]);
     expect(new Date(timeFrom)).toEqual(fromDate);
     expect(new Date(timeTo)).toEqual(toDate);
-    expect(collections).toEqual([layer.dataset.catalogCollection]);
+    expect(collections).toEqual([layer.dataset.catalogCollectionId]);
     expect(limitRequest).toEqual(limit);
     if (maxCloudCoverPercent !== null) {
       expect(query['eo:cloud_cover']).toEqual({ lte: expectedMaxCloudCoverage });

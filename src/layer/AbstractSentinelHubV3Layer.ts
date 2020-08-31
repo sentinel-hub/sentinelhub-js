@@ -422,7 +422,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     datasetParameters?: Record<string, any> | null,
   ): Promise<PaginatedTiles> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    const canUseCatalog = authToken && !!this.dataset.catalogCollection;
+    const canUseCatalog = authToken && !!this.dataset.catalogCollectionId;
     if (canUseCatalog) {
       return this.fetchTilesCatalog(
         authToken,
@@ -516,7 +516,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('Must be authenticated to use Catalog service');
     }
 
-    if (!this.dataset.catalogCollection) {
+    if (!this.dataset.catalogCollectionId) {
       throw new Error('Cannot use Catalog service without collection');
     }
 
@@ -532,7 +532,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
-      collections: [this.dataset.catalogCollection],
+      collections: [this.dataset.catalogCollectionId],
       limit: maxCount,
     };
     if (offset > 0) {
