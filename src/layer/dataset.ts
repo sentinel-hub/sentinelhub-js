@@ -25,6 +25,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   orbitTimeMinutes: 49.3,
   minDate: new Date(Date.UTC(2014, 12 - 1, 7, 4, 14, 15)), // 2014-12-07T04:14:15
   maxDate: null,
+  catalogCollectionId: 'sentinel-1-grd',
 };
 
 export const DATASET_EOCLOUD_S1GRD: Dataset = {
