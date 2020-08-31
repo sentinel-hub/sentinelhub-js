@@ -126,6 +126,7 @@ export const DATASET_AWS_L8L1C: Dataset = {
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 59, 2)), // 2013-03-18T15:59:02.334
   maxDate: null,
+  catalogCollectionId: 'landsat-8-l1c',
 };
 
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
