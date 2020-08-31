@@ -158,4 +158,19 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       },
     ];
   }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (datasetParameters && datasetParameters.productType) {
+      result['type'] = {
+        eq: datasetParameters.productType,
+      };
+    }
+
+    return result;
+  }
 }
