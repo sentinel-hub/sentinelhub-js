@@ -1,14 +1,7 @@
-import { Effects, RgbMappingArrays } from './const';
-import {
-  isEffectSet,
-  changeRgbMappingArraysWithFunction,
-  transformValueToRange,
-} from './mapDataManipulationUtils';
+import { Effects, RgbaArrays } from './const';
+import { isEffectSet, transformValueToRange } from './mapDataManipulationUtils';
 
-export function runGainEffectFunction(
-  rgbMappingArrays: RgbMappingArrays,
-  effects: Effects,
-): RgbMappingArrays {
+export function runGainEffectFunction(rgbaArrays: RgbaArrays, effects: Effects): RgbaArrays {
   // change the values according to the algorithm (gain)
   const minValue = 0.0;
   const maxValue = 1.0;
@@ -18,74 +11,71 @@ export function runGainEffectFunction(
   offset = offset - factor * minValue;
 
   if (gain === 1.0) {
-    return rgbMappingArrays;
+    return rgbaArrays;
   }
 
   const transformValueWithGain = (x: number): number => Math.max(0.0, x * factor + offset);
-  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGain);
-  return rgbMappingArrays;
+  rgbaArrays.red = rgbaArrays.red.map(x => transformValueWithGain(x));
+  rgbaArrays.green = rgbaArrays.green.map(x => transformValueWithGain(x));
+  rgbaArrays.blue = rgbaArrays.blue.map(x => transformValueWithGain(x));
+  return rgbaArrays;
 }
 
-export function runGammaEffectFunction(
-  rgbMappingArrays: RgbMappingArrays,
-  effects: Effects,
-): RgbMappingArrays {
+export function runGammaEffectFunction(rgbaArrays: RgbaArrays, effects: Effects): RgbaArrays {
   // change the values according to the algorithm (gamma)
   const gamma = isEffectSet(effects.gamma) ? effects.gamma : 1.0;
 
   if (gamma === 1.0) {
-    return rgbMappingArrays;
+    return rgbaArrays;
   }
 
   const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
-  rgbMappingArrays = changeRgbMappingArraysWithFunction(rgbMappingArrays, transformValueWithGamma);
-  return rgbMappingArrays;
+  rgbaArrays.red = rgbaArrays.red.map(x => transformValueWithGamma(x));
+  rgbaArrays.green = rgbaArrays.green.map(x => transformValueWithGamma(x));
+  rgbaArrays.blue = rgbaArrays.blue.map(x => transformValueWithGamma(x));
+  return rgbaArrays;
 }
 
-export function runColorEffectFunction(
-  rgbMappingArrays: RgbMappingArrays,
-  effects: Effects,
-): RgbMappingArrays {
+export function runColorEffectFunction(rgbArrays: RgbaArrays, effects: Effects): RgbaArrays {
   if (isEffectSet(effects.redRange)) {
-    rgbMappingArrays.red = rgbMappingArrays.red.map(x =>
+    rgbArrays.red = rgbArrays.red.map(x =>
       transformValueToRange(x, effects.redRange.from, effects.redRange.to, 0, 1),
     );
   }
 
   if (isEffectSet(effects.greenRange)) {
-    rgbMappingArrays.green = rgbMappingArrays.green.map(x =>
+    rgbArrays.green = rgbArrays.green.map(x =>
       transformValueToRange(x, effects.greenRange.from, effects.greenRange.to, 0, 1),
     );
   }
 
   if (isEffectSet(effects.blueRange)) {
-    rgbMappingArrays.blue = rgbMappingArrays.blue.map(x =>
+    rgbArrays.blue = rgbArrays.blue.map(x =>
       transformValueToRange(x, effects.blueRange.from, effects.blueRange.to, 0, 1),
     );
   }
 
-  return rgbMappingArrays;
+  return rgbArrays;
 }
 
-export function runCustomEffectFunctions(
-  rgbMappingArrays: RgbMappingArrays,
-  effects: Effects,
-): RgbMappingArrays {
+export function runCustomEffectFunction(rgbArrays: RgbaArrays, effects: Effects): RgbaArrays {
   if (!isEffectSet(effects.customEffect)) {
-    return rgbMappingArrays;
+    return rgbArrays;
   }
 
-  for (let i = 0; i < rgbMappingArrays.red.length; i++) {
-    const red = rgbMappingArrays.red[i];
-    const green = rgbMappingArrays.green[i];
-    const blue = rgbMappingArrays.blue[i];
+  for (let i = 0; i < rgbArrays.red.length; i++) {
+    const red = rgbArrays.red[i];
+    const green = rgbArrays.green[i];
+    const blue = rgbArrays.blue[i];
+    const alpha = rgbArrays.alpha[i];
 
-    const { r, g, b } = effects.customEffect({ r: red, g: green, b: blue });
+    const { r, g, b, a } = effects.customEffect({ r: red, g: green, b: blue, a: alpha });
 
-    rgbMappingArrays.red[i] = r;
-    rgbMappingArrays.green[i] = g;
-    rgbMappingArrays.blue[i] = b;
+    rgbArrays.red[i] = r !== undefined ? r : red;
+    rgbArrays.green[i] = g !== undefined ? g : green;
+    rgbArrays.blue[i] = b !== undefined ? b : blue;
+    rgbArrays.alpha[i] = a !== undefined ? a : alpha;
   }
 
-  return rgbMappingArrays;
+  return rgbArrays;
 }
