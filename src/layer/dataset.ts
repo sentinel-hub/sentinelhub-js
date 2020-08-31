@@ -197,6 +197,7 @@ export const DATASET_MODIS: Dataset = {
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2000, 2 - 1, 24, 12, 0, 0)), // 2000-02-24T12:00:00
   maxDate: null,
+  catalogCollectionId: 'modis',
 };
 
 export const DATASET_AWS_DEM: Dataset = {
