@@ -10,7 +10,7 @@ import {
   runGainEffectFunction,
   runGammaEffectFunction,
   runColorEffectFunction,
-  runCustomEffectFunctions,
+  runCustomEffectFunction,
 } from './effectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
@@ -38,7 +38,7 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
 
   // run custom effect function (with custom range of values)
-  rgbMappingArrays = runCustomEffectFunctions(rgbMappingArrays, effects);
+  rgbMappingArrays = runCustomEffectFunction(rgbMappingArrays, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
   rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255);
