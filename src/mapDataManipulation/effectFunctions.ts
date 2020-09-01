@@ -14,11 +14,11 @@ export function runGainEffectFunction(rgbaArray: number[], effects: Effects): nu
     return rgbaArray;
   }
 
+  const transformValueWithGain = (x: number): number => Math.max(0.0, x * factor + offset);
   for (let i = 0; i < rgbaArray.length; i += 4) {
-    rgbaArray[i] = Math.max(0.0, rgbaArray[i] * factor + offset);
-    rgbaArray[i + 1] = Math.max(0.0, rgbaArray[i + 1] * factor + offset);
-    rgbaArray[i + 2] = Math.max(0.0, rgbaArray[i + 2] * factor + offset);
-    rgbaArray[i + 3] = rgbaArray[i + 3]; // alpha stays the same
+    rgbaArray[i] = transformValueWithGain(rgbaArray[i]);
+    rgbaArray[i + 1] = transformValueWithGain(rgbaArray[i + 1]);
+    rgbaArray[i + 2] = transformValueWithGain(rgbaArray[i + 2]);
   }
 
   return rgbaArray;
@@ -32,11 +32,11 @@ export function runGammaEffectFunction(rgbaArray: number[], effects: Effects): n
     return rgbaArray;
   }
 
+  const transformValueWithGamma = (x: number): number => Math.pow(x, gamma);
   for (let i = 0; i < rgbaArray.length; i += 4) {
-    rgbaArray[i] = Math.pow(rgbaArray[i], gamma);
-    rgbaArray[i + 1] = Math.pow(rgbaArray[i + 1], gamma);
-    rgbaArray[i + 2] = Math.pow(rgbaArray[i + 2], gamma);
-    rgbaArray[i + 3] = rgbaArray[i + 3]; // alpha stays the same
+    rgbaArray[i] = transformValueWithGamma(rgbaArray[i]);
+    rgbaArray[i + 1] = transformValueWithGamma(rgbaArray[i + 1]);
+    rgbaArray[i + 2] = transformValueWithGamma(rgbaArray[i + 2]);
   }
 
   return rgbaArray;
@@ -59,8 +59,6 @@ export function runColorEffectFunction(rgbaArray: number[], effects: Effects): n
     if (isEffectSet(effects.blueRange)) {
       rgbaArray[i + 2] = transformValueToRange(blue, effects.blueRange.from, effects.blueRange.to, 0, 1);
     }
-
-    rgbaArray[i + 3] = rgbaArray[i + 3]; // alpha stays the same
   }
 
   return rgbaArray;
@@ -79,10 +77,10 @@ export function runCustomEffectFunction(rgbaArray: number[], effects: Effects): 
 
     const { r, g, b, a } = effects.customEffect({ r: red, g: green, b: blue, a: alpha });
 
-    rgbaArray[i] = r !== undefined ? r : red;
-    rgbaArray[i + 1] = g !== undefined ? g : green;
-    rgbaArray[i + 2] = b !== undefined ? b : blue;
-    rgbaArray[i + 3] = a !== undefined ? a : alpha;
+    rgbaArray[i] = r;
+    rgbaArray[i + 1] = g;
+    rgbaArray[i + 2] = b;
+    rgbaArray[i + 3] = a;
   }
 
   return rgbaArray;
