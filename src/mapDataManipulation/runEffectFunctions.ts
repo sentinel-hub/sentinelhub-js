@@ -20,10 +20,12 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   }
 
   const { imageData, imageWidth, imageHeight, imageFormat } = await getImageData(originalBlob);
-  let rgbaArray = Array.from(imageData);
 
   // change the range of the values from [0, 255] to [0, 1]
-  rgbaArray = rgbaArray.map(x => transformValueToRange(x, 0, 255, 0, 1));
+  let rgbaArray = new Array(imageData.length);
+  for (let i = 0; i < imageData.length; i++) {
+    rgbaArray[i] = transformValueToRange(imageData[i], 0, 255, 0, 1);
+  }
 
   // change the values according to the algorithm (gain)
   rgbaArray = runGainEffectFunction(rgbaArray, effects);
@@ -38,9 +40,11 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
   rgbaArray = runCustomEffectFunction(rgbaArray, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
-  rgbaArray = rgbaArray.map(x => transformValueToRange(x, 0, 1, 0, 255));
+  const newImgData = new Uint8ClampedArray(rgbaArray.length);
+  for (let i = 0; i < rgbaArray.length; i++) {
+    newImgData[i] = transformValueToRange(rgbaArray[i], 0, 1, 0, 255);
+  }
 
-  const newImgData = Uint8ClampedArray.from(rgbaArray);
   const newBlob = getBlob({ imageData: newImgData, imageWidth, imageHeight, imageFormat });
 
   var t1 = performance.now();
