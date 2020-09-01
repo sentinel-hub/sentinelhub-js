@@ -35,6 +35,8 @@ export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
   let imgObjectUrl: any;
   try {
     const imgCanvas = document.createElement('canvas');
+    imgCanvas.width = imageWidth;
+    imgCanvas.height = imageHeight;
     const imgCtx = imgCanvas.getContext('2d');
     const newImg = new ImageData(imageData, imageWidth, imageHeight);
     imgCtx.putImageData(newImg, 0, 0);
