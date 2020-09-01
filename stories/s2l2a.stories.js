@@ -897,17 +897,18 @@ export const getMapProcessingAdvancedRGB = () => {
     const getMapParamsRGB1 = {
       ...getMapParams,
       effects: {
-        customEffect: ({ r, g, b }) => ({ r, g, b }),
+        customEffect: ({ r, g, b, a }) => ({ r, g, b, a }),
       },
     };
 
     const getMapParamsRGB2 = {
       ...getMapParams,
       effects: {
-        customEffect: ({ r, g, b }) => ({
+        customEffect: ({ r, g, b, a }) => ({
           r: r + g + b < 0.6 ? 0 : 1,
           g: r + g + b < 0.6 ? 0 : 1,
           b: r + g + b < 0.6 ? 0 : 1,
+          a: a,
         }),
       },
     };

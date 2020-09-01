@@ -1,22 +1,57 @@
-import { RgbMappingArrays, Effects, ColorRange } from './const';
+import { Effects, ColorRange, ImageProperties } from './const';
 
-export function prepareRgbMappingArrays(): RgbMappingArrays {
-  return {
-    red: [...Array(256).keys()],
-    green: [...Array(256).keys()],
-    blue: [...Array(256).keys()],
-  };
+export async function getImageData(originalBlob: Blob): Promise<ImageProperties> {
+  let imgObjectUrl: any;
+  try {
+    const imgCanvas = document.createElement('canvas');
+    const imgCtx = imgCanvas.getContext('2d');
+    imgObjectUrl = window.URL.createObjectURL(originalBlob);
+    const img: any = await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = imgObjectUrl;
+    });
+
+    imgCanvas.width = img.width;
+    imgCanvas.height = img.height;
+    imgCtx.drawImage(img, 0, 0);
+    const imageData = imgCtx.getImageData(0, 0, img.width, img.height).data;
+    imgCanvas.remove();
+
+    return { imageData, imageWidth: img.width, imageHeight: img.height, imageFormat: originalBlob.type };
+  } catch (e) {
+    console.error(e);
+    return { imageData: new Uint8ClampedArray(), imageWidth: 0, imageHeight: 0, imageFormat: '' };
+  } finally {
+    if (imgObjectUrl) {
+      window.URL.revokeObjectURL(imgObjectUrl);
+    }
+  }
 }
 
-export function changeRgbMappingArraysWithFunction(
-  rgbMappingArrays: RgbMappingArrays,
-  transformationFunction: Function,
-): RgbMappingArrays {
-  const newRgbMappingArrays = { ...rgbMappingArrays };
-  newRgbMappingArrays.red = newRgbMappingArrays.red.map(x => transformationFunction(x));
-  newRgbMappingArrays.green = newRgbMappingArrays.green.map(x => transformationFunction(x));
-  newRgbMappingArrays.blue = newRgbMappingArrays.blue.map(x => transformationFunction(x));
-  return newRgbMappingArrays;
+export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
+  const { imageData, imageWidth, imageHeight, imageFormat } = imageProperties;
+  let imgObjectUrl: any;
+  try {
+    const imgCanvas = document.createElement('canvas');
+    const imgCtx = imgCanvas.getContext('2d');
+    const newImg = new ImageData(imageData, imageWidth, imageHeight);
+    imgCtx.putImageData(newImg, 0, 0);
+    const blob: Blob = await new Promise(resolve => {
+      imgCanvas.toBlob(blob => {
+        resolve(blob);
+      }, imageFormat);
+    });
+    imgCanvas.remove();
+    return blob;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    if (imgObjectUrl) {
+      window.URL.revokeObjectURL(imgObjectUrl);
+    }
+  }
 }
 
 // from one range to another
@@ -36,32 +71,6 @@ export function transformValueToRange(
   newX = Math.max(newX, newMin);
   newX = Math.min(newX, newMax);
   return newX;
-}
-
-export function changeRgbMappingArraysRange(
-  rgbMappingArrays: RgbMappingArrays,
-  oldMin: number,
-  oldMax: number,
-  newMin: number,
-  newMax: number,
-): RgbMappingArrays {
-  const newRgbMappingArrays = { ...rgbMappingArrays };
-  newRgbMappingArrays.red = newRgbMappingArrays.red.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  newRgbMappingArrays.green = newRgbMappingArrays.green.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  newRgbMappingArrays.blue = newRgbMappingArrays.blue.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  return newRgbMappingArrays;
-}
-
-export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Function {
-  return function(r: number, g: number, b: number, a: number): object {
-    return { r: rgbMappingArrays.red[r], g: rgbMappingArrays.green[g], b: rgbMappingArrays.blue[b], a };
-  };
 }
 
 export function isEffectSet(effect: number | ColorRange | Function): boolean {
