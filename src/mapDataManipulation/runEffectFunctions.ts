@@ -13,8 +13,6 @@ import {
 // - change the range of the values from [0, 1] back to [0, 255]
 
 export async function runEffectFunctions(originalBlob: Blob, effects: Effects): Promise<Blob> {
-  var t0 = performance.now();
-
   if (!isAnyEffectSet(effects)) {
     return originalBlob;
   }
@@ -45,10 +43,6 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
     newImgData[i] = transformValueToRange(rgbaArray[i], 0, 1, 0, 255);
   }
 
-  const newBlob = getBlob({ imageData: newImgData, imageWidth, imageHeight, imageFormat });
-
-  var t1 = performance.now();
-  console.log('running effect functions took ' + (t1 - t0) + ' milliseconds.');
-
+  const newBlob = await getBlob({ imageData: newImgData, imageWidth, imageHeight, imageFormat });
   return newBlob;
 }

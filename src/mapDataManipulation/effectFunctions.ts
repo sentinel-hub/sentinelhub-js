@@ -77,6 +77,10 @@ export function runCustomEffectFunction(rgbaArray: number[], effects: Effects): 
 
     const { r, g, b, a } = effects.customEffect({ r: red, g: green, b: blue, a: alpha });
 
+    if (r === undefined || g === undefined || b === undefined || a === undefined) {
+      throw new Error('Custom effect function must return an object with properties r, g, b, a.');
+    }
+
     rgbaArray[i] = r;
     rgbaArray[i + 1] = g;
     rgbaArray[i + 2] = b;
