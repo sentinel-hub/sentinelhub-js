@@ -188,7 +188,7 @@ It operates with values between 0 and 1, including both 0 and 1.
       redRange: {from: 0.2, to: 0.8},
       greenRange: {from: 0.2, to: 0.8},
       blueRange: {from: 0.2, to: 0.8},
-      customEffect: ({r,g,b}) => ({r,g,b})
+      customEffect: ({r,g,b,a}) => ({r,g,b,a})
       }
     }
   };
