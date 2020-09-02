@@ -1,15 +1,14 @@
 import { runColorEffectFunction, runCustomEffectFunction } from '../effectFunctions';
 
 test('apply color effect', () => {
-  const originalPixel = [0.8, 0.8, 0.8, 1];
-  const expectedPixel = [1, 1, 1, 1];
+  const originalPixel = [0.2, 0.8, 1, 1];
+  const expectedPixel = [0, 1, 1, 1];
   const effects = {
     redRange: { from: 0.2, to: 0.8 },
     greenRange: { from: 0.2, to: 0.8 },
     blueRange: { from: 0.2, to: 0.8 },
   };
   const actualPixel = runColorEffectFunction(originalPixel, effects);
-
   expect(actualPixel).toEqual(expectedPixel);
 });
 
@@ -25,7 +24,6 @@ test('custom effect - sum lower than 0.6, all are 0 ', () => {
     }),
   };
   const actualPixel = runCustomEffectFunction(originalPixel, effects);
-
   expect(actualPixel).toEqual(expectedPixel);
 });
 
@@ -41,7 +39,6 @@ test('custom effect - sum higher than 0.6, all are 1', () => {
     }),
   };
   const actualPixel = runCustomEffectFunction(originalPixel, effects);
-
   expect(actualPixel).toEqual(expectedPixel);
 });
 
