@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import { BBox } from '../bbox';
 
 import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
