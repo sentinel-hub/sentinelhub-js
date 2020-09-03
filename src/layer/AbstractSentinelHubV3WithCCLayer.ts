@@ -42,20 +42,6 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return payload;
   }
 
-  protected convertResponseFromSearchIndex(response: {
-    data: { tiles: any[]; hasMore: boolean };
-  }): PaginatedTiles {
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
-  }
-
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
     let result: Record<string, any> = {};
 
