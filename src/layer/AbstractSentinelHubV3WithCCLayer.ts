@@ -1,6 +1,4 @@
-import { BBox } from '../bbox';
-
-import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
+import { MosaickingOrder, DataProductId, FindTilesAdditionalParameters } from './const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
@@ -55,26 +53,6 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return result;
   }
 
-  protected async findTilesInner(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-    );
-    return response;
-  }
-
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
@@ -107,5 +85,12 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       };
     }
     return result;
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: null,
+    };
   }
 }

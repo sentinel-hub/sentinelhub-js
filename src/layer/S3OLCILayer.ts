@@ -1,10 +1,8 @@
 import moment from 'moment';
 
-import { BBox } from '../bbox';
 import { PaginatedTiles, Link, LinkType } from './const';
 import { DATASET_S3OLCI } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
-import { RequestConfiguration } from '../utils/cancelRequests';
 
 export class S3OLCILayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_S3OLCI;
@@ -21,25 +19,6 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
       })),
       hasMore: response.data.hasMore,
     };
-  }
-
-  protected async findTilesInner(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-    );
-    return response;
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {

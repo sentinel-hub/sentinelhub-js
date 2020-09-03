@@ -19,6 +19,7 @@ import {
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
+  FindTilesAdditionalParameters,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
@@ -377,15 +378,35 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-    );
-    return response;
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    const canUseCatalog = authToken && !!this.dataset.catalogCollectionId;
+    //ait this.updateLayerFromServiceIfNeeded(reqConfig);
+    let result: PaginatedTiles = null;
+
+    if (canUseCatalog) {
+      result = await this.fetchTilesCatalog(
+        authToken,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        this.getFindTilesAdditionalParameters(),
+      );
+    } else {
+      result = await this.fetchTilesSearchIndex(
+        this.dataset.searchIndexUrl,
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        this.getFindTilesAdditionalParameters(),
+      );
+    }
+    return result;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -397,45 +418,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return [];
   }
 
-  protected async fetchTilesFromSearchIndexOrCatalog(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig: RequestConfiguration,
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
-  ): Promise<PaginatedTiles> {
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    const canUseCatalog = authToken && !!this.dataset.catalogCollectionId;
-    if (canUseCatalog) {
-      return this.fetchTilesCatalog(
-        authToken,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-        maxCloudCoverPercent,
-        datasetParameters,
-      );
-    } else {
-      return this.fetchTilesSearchIndex(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-        maxCloudCoverPercent,
-        datasetParameters,
-      );
-    }
-  }
-
   protected async fetchTilesSearchIndex(
     searchIndexUrl: string,
     bbox: BBox,
@@ -444,8 +426,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig: RequestConfiguration,
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
+    findTilesAdditionalParameters: FindTilesAdditionalParameters,
   ): Promise<PaginatedTiles> {
     if (maxCount === null) {
       maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
@@ -456,6 +437,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
+
+    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
+
     const bboxPolygon = bbox.toGeoJSON();
     // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
     // the tiles we get cloudCoverPercentage (0..100).
@@ -495,8 +479,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig: RequestConfiguration,
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    findTilesAdditionalParameters: FindTilesAdditionalParameters,
   ): Promise<PaginatedTiles> {
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
@@ -514,6 +497,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       headers: headers,
       ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
+
+    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
 
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
@@ -688,5 +673,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
     return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: null,
+    };
   }
 }

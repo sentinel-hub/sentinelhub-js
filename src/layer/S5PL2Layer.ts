@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import { BBox } from '../bbox';
-import { PaginatedTiles, Link, LinkType, DataProductId } from './const';
+import { PaginatedTiles, Link, LinkType, DataProductId, FindTilesAdditionalParameters } from './const';
 import { DATASET_S5PL2 } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
@@ -95,6 +95,19 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     };
   }
 
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      productType: this.productType,
+      // minQa: this.minQa,
+    };
+
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: findTilesDatasetParameters,
+    };
+  }
+
   protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
@@ -107,21 +120,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       throw new Error('Parameter productType must be specified!');
     }
 
-    const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      productType: this.productType,
-      // minQa: this.minQa,
-    };
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-      findTilesDatasetParameters,
-    );
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
     return response;
   }
 
