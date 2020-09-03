@@ -388,20 +388,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return response;
   }
 
-  public async findTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(
-      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
-      reqConfig,
-    );
-    return fetchTilesResponse;
-  }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {};

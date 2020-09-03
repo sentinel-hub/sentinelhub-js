@@ -184,21 +184,6 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     };
   }
 
-  public async findTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(
-      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
-      reqConfig,
-    );
-    return fetchTilesResponse;
-  }
-
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
