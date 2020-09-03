@@ -207,3 +207,8 @@ export type BYOCBand = {
   name: string;
   sampleType: string;
 };
+
+export type FindTilesAdditionalParameters = {
+  maxCloudCoverPercent?: number | null;
+  datasetParameters?: Record<string, any> | null;
+};
