@@ -135,7 +135,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,

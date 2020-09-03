@@ -148,7 +148,7 @@ export class AbstractLayer {
     throw new Error('EvalscriptUrl is only supported on Sentinel Hub layers');
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -168,7 +168,8 @@ export class AbstractLayer {
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     const fetchTilesResponse = await ensureTimeout(
-      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
+      async innerReqConfig =>
+        await this.findTilesInner(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
       reqConfig,
     );
     return fetchTilesResponse;

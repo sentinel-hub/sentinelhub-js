@@ -164,7 +164,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     );
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,

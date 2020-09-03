@@ -64,7 +64,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     };
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,

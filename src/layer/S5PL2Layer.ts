@@ -95,7 +95,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
