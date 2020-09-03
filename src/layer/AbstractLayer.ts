@@ -156,7 +156,7 @@ export class AbstractLayer {
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
-    throw new Error('fetchTiles() not implemented yet');
+    throw new Error('findTilesInner() not implemented yet');
   }
 
   public async findTiles(
@@ -167,12 +167,12 @@ export class AbstractLayer {
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(
+    const findTilesResponse = await ensureTimeout(
       async innerReqConfig =>
         await this.findTilesInner(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
       reqConfig,
     );
-    return fetchTilesResponse;
+    return findTilesResponse;
   }
 
   public async findFlyovers(

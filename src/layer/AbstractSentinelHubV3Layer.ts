@@ -384,7 +384,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     let result: PaginatedTiles = null;
 
     if (canUseCatalog) {
-      result = await this.fetchTilesCatalog(
+      result = await this.findTilesUsingCatalog(
         authToken,
         bbox,
         fromTime,
@@ -395,7 +395,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         this.getFindTilesAdditionalParameters(),
       );
     } else {
-      result = await this.fetchTilesSearchIndex(
+      result = await this.findTilesUsingSearchIndex(
         this.dataset.searchIndexUrl,
         bbox,
         fromTime,
@@ -418,7 +418,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return [];
   }
 
-  protected async fetchTilesSearchIndex(
+  protected async findTilesUsingSearchIndex(
     searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,
@@ -471,7 +471,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async fetchTilesCatalog(
+  protected async findTilesUsingCatalog(
     authToken: string,
     bbox: BBox,
     fromTime: Date,

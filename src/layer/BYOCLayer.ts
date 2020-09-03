@@ -149,7 +149,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
     const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-    return this.fetchTilesSearchIndex(
+    return this.findTilesUsingSearchIndex(
       searchIndexUrl,
       bbox,
       fromTime,
