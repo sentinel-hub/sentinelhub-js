@@ -71,7 +71,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return result;
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
