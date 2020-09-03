@@ -148,6 +148,17 @@ export class AbstractLayer {
     throw new Error('EvalscriptUrl is only supported on Sentinel Hub layers');
   }
 
+  protected async fetchTiles(
+    bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    toTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Promise<PaginatedTiles> {
+    throw new Error('fetchTiles() not implemented yet');
+  }
+
   public async findTiles(
     bbox: BBox, // eslint-disable-line @typescript-eslint/no-unused-vars
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -156,7 +167,11 @@ export class AbstractLayer {
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
-    throw new Error('findTiles() not implemented yet');
+    const fetchTilesResponse = await ensureTimeout(
+      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
+      reqConfig,
+    );
+    return fetchTilesResponse;
   }
 
   public async findFlyovers(
