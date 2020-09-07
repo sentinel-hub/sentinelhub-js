@@ -17,12 +17,12 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
     return originalBlob;
   }
 
-  const { imageData, imageWidth, imageHeight, imageFormat } = await getImageData(originalBlob);
+  const { rgba, width, height, format } = await getImageData(originalBlob);
 
   // change the range of the values from [0, 255] to [0, 1]
-  let rgbaArray = new Array(imageData.length);
-  for (let i = 0; i < imageData.length; i++) {
-    rgbaArray[i] = transformValueToRange(imageData[i], 0, 255, 0, 1);
+  let rgbaArray = new Array(rgba.length);
+  for (let i = 0; i < rgba.length; i++) {
+    rgbaArray[i] = transformValueToRange(rgba[i], 0, 255, 0, 1);
   }
 
   // change the values according to the algorithm (gain)
@@ -43,6 +43,6 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
     newImgData[i] = transformValueToRange(rgbaArray[i], 0, 1, 0, 255);
   }
 
-  const newBlob = await getBlob({ imageData: newImgData, imageWidth, imageHeight, imageFormat });
+  const newBlob = await getBlob({ rgba: newImgData, width, height, format });
   return newBlob;
 }
