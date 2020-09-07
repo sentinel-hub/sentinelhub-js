@@ -13,8 +13,8 @@ export type Effects = {
 };
 
 export type ImageProperties = {
-  imageData: Uint8ClampedArray;
-  imageWidth: number;
-  imageHeight: number;
-  imageFormat: string;
+  rgba: Uint8ClampedArray;
+  width: number;
+  height: number;
+  format: string;
 };

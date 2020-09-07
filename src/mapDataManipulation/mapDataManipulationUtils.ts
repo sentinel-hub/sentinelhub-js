@@ -16,13 +16,13 @@ export async function getImageData(originalBlob: Blob): Promise<ImageProperties>
     imgCanvas.width = img.width;
     imgCanvas.height = img.height;
     imgCtx.drawImage(img, 0, 0);
-    const imageData = imgCtx.getImageData(0, 0, img.width, img.height).data;
+    const imgData = imgCtx.getImageData(0, 0, img.width, img.height).data;
     imgCanvas.remove();
 
-    return { imageData, imageWidth: img.width, imageHeight: img.height, imageFormat: originalBlob.type };
+    return { rgba: imgData, width: img.width, height: img.height, format: originalBlob.type };
   } catch (e) {
     console.error(e);
-    return { imageData: new Uint8ClampedArray(), imageWidth: 0, imageHeight: 0, imageFormat: '' };
+    return { rgba: new Uint8ClampedArray(), width: 0, height: 0, format: '' };
   } finally {
     if (imgObjectUrl) {
       window.URL.revokeObjectURL(imgObjectUrl);
@@ -31,19 +31,19 @@ export async function getImageData(originalBlob: Blob): Promise<ImageProperties>
 }
 
 export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
-  const { imageData, imageWidth, imageHeight, imageFormat } = imageProperties;
+  const { rgba, width, height, format } = imageProperties;
   let imgObjectUrl: any;
   try {
     const imgCanvas = document.createElement('canvas');
-    imgCanvas.width = imageWidth;
-    imgCanvas.height = imageHeight;
+    imgCanvas.width = width;
+    imgCanvas.height = height;
     const imgCtx = imgCanvas.getContext('2d');
-    const newImg = new ImageData(imageData, imageWidth, imageHeight);
+    const newImg = new ImageData(rgba, width, height);
     imgCtx.putImageData(newImg, 0, 0);
     const blob: Blob = await new Promise(resolve => {
       imgCanvas.toBlob(blob => {
         resolve(blob);
-      }, imageFormat);
+      }, format);
     });
     imgCanvas.remove();
     return blob;
