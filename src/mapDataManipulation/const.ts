@@ -11,10 +11,3 @@ export type Effects = {
   blueRange?: ColorRange;
   customEffect?: Function;
 };
-
-export type ImageProperties = {
-  rgba: Uint8ClampedArray;
-  width: number;
-  height: number;
-  format: string;
-};

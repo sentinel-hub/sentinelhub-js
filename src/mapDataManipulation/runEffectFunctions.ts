@@ -1,5 +1,6 @@
+import { getImageProperties, getBlob } from '../utils/canvas';
 import { Effects } from './const';
-import { isAnyEffectSet, getImageData, getBlob, transformValueToRange } from './mapDataManipulationUtils';
+import { isAnyEffectSet, transformValueToRange } from './mapDataManipulationUtils';
 import {
   runGainEffectFunction,
   runGammaEffectFunction,
@@ -17,7 +18,7 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
     return originalBlob;
   }
 
-  const { rgba, width, height, format } = await getImageData(originalBlob);
+  const { rgba, width, height, format } = await getImageProperties(originalBlob);
 
   // change the range of the values from [0, 255] to [0, 1]
   let rgbaArray = new Array(rgba.length);
