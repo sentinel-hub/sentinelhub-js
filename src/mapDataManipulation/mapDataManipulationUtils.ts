@@ -2,8 +2,8 @@ import { Effects, ColorRange, ImageProperties } from './const';
 
 export async function getImageData(originalBlob: Blob): Promise<ImageProperties> {
   let imgObjectUrl: any;
+  const imgCanvas = document.createElement('canvas');
   try {
-    const imgCanvas = document.createElement('canvas');
     const imgCtx = imgCanvas.getContext('2d');
     imgObjectUrl = window.URL.createObjectURL(originalBlob);
     const img: any = await new Promise((resolve, reject) => {
@@ -17,13 +17,13 @@ export async function getImageData(originalBlob: Blob): Promise<ImageProperties>
     imgCanvas.height = img.height;
     imgCtx.drawImage(img, 0, 0);
     const imgData = imgCtx.getImageData(0, 0, img.width, img.height).data;
-    imgCanvas.remove();
 
     return { rgba: imgData, width: img.width, height: img.height, format: originalBlob.type };
   } catch (e) {
     console.error(e);
-    return { rgba: new Uint8ClampedArray(), width: 0, height: 0, format: '' };
+    throw new Error(e);
   } finally {
+    imgCanvas.remove();
     if (imgObjectUrl) {
       window.URL.revokeObjectURL(imgObjectUrl);
     }
@@ -32,9 +32,8 @@ export async function getImageData(originalBlob: Blob): Promise<ImageProperties>
 
 export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
   const { rgba, width, height, format } = imageProperties;
-  let imgObjectUrl: any;
+  const imgCanvas = document.createElement('canvas');
   try {
-    const imgCanvas = document.createElement('canvas');
     imgCanvas.width = width;
     imgCanvas.height = height;
     const imgCtx = imgCanvas.getContext('2d');
@@ -45,14 +44,12 @@ export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
         resolve(blob);
       }, format);
     });
-    imgCanvas.remove();
     return blob;
   } catch (e) {
     console.error(e);
+    throw new Error(e);
   } finally {
-    if (imgObjectUrl) {
-      window.URL.revokeObjectURL(imgObjectUrl);
-    }
+    imgCanvas.remove();
   }
 }
 
