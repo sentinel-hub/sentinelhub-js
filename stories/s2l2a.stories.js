@@ -1,6 +1,6 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S2L2ALayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, CRS_EPSG3857 } from '../dist/sentinelHub.esm';
+import { S2L2ALayer, CRS_EPSG3857, CRS_EPSG4326, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -834,6 +834,94 @@ export const getMapProcessingGainGammaCheckTransparency = () => {
 
       const imageBlobGainGamaAre2 = await layerS2L2A.getMap(getMapParamsGainGammaAre2, ApiType.PROCESSING);
       imgGainGammaAre2.src = URL.createObjectURL(imageBlobGainGamaAre2);
+    } catch (err) {
+      wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingAdvancedRGB = () => {
+  const imgOriginal = document.createElement('img');
+  imgOriginal.width = '256';
+  imgOriginal.height = '256';
+
+  const imgRGB1 = document.createElement('img');
+  imgRGB1.width = '256';
+  imgRGB1.height = '256';
+
+  const imgRGB2 = document.createElement('img');
+  imgRGB2.width = '256';
+  imgRGB2.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>S2L2A getMapProcessingAdvancedRGB</h2>';
+  wrapperEl.innerHTML += '<h4>original | no change | black & white</h4>';
+  wrapperEl.insertAdjacentElement('beforeend', imgOriginal);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB1);
+  wrapperEl.insertAdjacentElement('beforeend', imgRGB2);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      maxCloudCoverPercent: 0,
+      evalscript: `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+      }
+    `,
+    });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 9 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+
+    const getMapParamsRGB1 = {
+      ...getMapParams,
+      effects: {
+        customEffect: ({ r, g, b, a }) => ({ r, g, b, a }),
+      },
+    };
+
+    const getMapParamsRGB2 = {
+      ...getMapParams,
+      effects: {
+        customEffect: ({ r, g, b, a }) => ({
+          r: r + g + b < 0.6 ? 0 : 1,
+          g: r + g + b < 0.6 ? 0 : 1,
+          b: r + g + b < 0.6 ? 0 : 1,
+          a: a,
+        }),
+      },
+    };
+
+    try {
+      const imageBlobOriginal = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+      imgOriginal.src = URL.createObjectURL(imageBlobOriginal);
+
+      const imageBlobRGB1 = await layerS2L2A.getMap(getMapParamsRGB1, ApiType.PROCESSING);
+      imgRGB1.src = URL.createObjectURL(imageBlobRGB1);
+
+      const imageBlobRGB2 = await layerS2L2A.getMap(getMapParamsRGB2, ApiType.PROCESSING);
+      imgRGB2.src = URL.createObjectURL(imageBlobRGB2);
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
     }

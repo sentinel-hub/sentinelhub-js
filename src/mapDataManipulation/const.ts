@@ -9,10 +9,5 @@ export type Effects = {
   redRange?: ColorRange;
   greenRange?: ColorRange;
   blueRange?: ColorRange;
-};
-
-export type RgbMappingArrays = {
-  red: number[];
-  green: number[];
-  blue: number[];
+  customEffect?: Function;
 };

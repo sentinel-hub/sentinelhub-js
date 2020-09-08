@@ -1,23 +1,4 @@
-import { RgbMappingArrays, Effects, ColorRange } from './const';
-
-export function prepareRgbMappingArrays(): RgbMappingArrays {
-  return {
-    red: [...Array(256).keys()],
-    green: [...Array(256).keys()],
-    blue: [...Array(256).keys()],
-  };
-}
-
-export function changeRgbMappingArraysWithFunction(
-  rgbMappingArrays: RgbMappingArrays,
-  transformationFunction: Function,
-): RgbMappingArrays {
-  const newRgbMappingArrays = { ...rgbMappingArrays };
-  newRgbMappingArrays.red = newRgbMappingArrays.red.map(x => transformationFunction(x));
-  newRgbMappingArrays.green = newRgbMappingArrays.green.map(x => transformationFunction(x));
-  newRgbMappingArrays.blue = newRgbMappingArrays.blue.map(x => transformationFunction(x));
-  return newRgbMappingArrays;
-}
+import { Effects, ColorRange } from './const';
 
 // from one range to another
 // f(x) = c + ((d - c) / (b - a)) * (x - a)
@@ -38,33 +19,7 @@ export function transformValueToRange(
   return newX;
 }
 
-export function changeRgbMappingArraysRange(
-  rgbMappingArrays: RgbMappingArrays,
-  oldMin: number,
-  oldMax: number,
-  newMin: number,
-  newMax: number,
-): RgbMappingArrays {
-  const newRgbMappingArrays = { ...rgbMappingArrays };
-  newRgbMappingArrays.red = newRgbMappingArrays.red.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  newRgbMappingArrays.green = newRgbMappingArrays.green.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  newRgbMappingArrays.blue = newRgbMappingArrays.blue.map(x =>
-    transformValueToRange(x, oldMin, oldMax, newMin, newMax),
-  );
-  return newRgbMappingArrays;
-}
-
-export function prepareManipulatePixel(rgbMappingArrays: RgbMappingArrays): Function {
-  return function(r: number, g: number, b: number, a: number): object {
-    return { r: rgbMappingArrays.red[r], g: rgbMappingArrays.green[g], b: rgbMappingArrays.blue[b], a };
-  };
-}
-
-export function isEffectSet(effect: number | ColorRange): boolean {
+export function isEffectSet(effect: number | ColorRange | Function): boolean {
   return effect !== undefined && effect !== null;
 }
 
