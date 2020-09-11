@@ -45,7 +45,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "TZ=Europe/Ljubljana jest",
+    "test": "TZ=Europe/Ljubljana jest --watch",
     "lint": "eslint --max-warnings 0 --ext .ts,js src/",
     "prettier": "prettier --write \"{src,example,stories}/**/*.{ts,js}\"",
     "storybook": "concurrently --kill-others \"rollup -c -w\" \"start-storybook -p 6006 --quiet\"",
@@ -69,7 +69,8 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
-      "fixtures[.].*[.]ts"
+      "fixtures[.].*[.]ts",
+      "testUtils.findTiles.ts"
     ]
   },
   "types": "dist/src/index.d.ts",
