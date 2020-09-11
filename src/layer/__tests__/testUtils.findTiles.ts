@@ -7,7 +7,7 @@ export const mockNetwork = new MockAdapter(axios);
 export const AUTH_TOKEN = 'AUTH_TOKEN';
 export const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/search';
 
-export async function checkRequestFindTiles(fixtures: Record<string, any>) {
+export async function checkRequestFindTiles(fixtures: Record<string, any>): Promise<void> {
   const { bbox, expectedRequest, fromTime, layer, toTime } = fixtures;
   mockNetwork.onAny().reply(200);
   try {
@@ -19,7 +19,7 @@ export async function checkRequestFindTiles(fixtures: Record<string, any>) {
   expect(request.data).not.toBeNull();
   expect(JSON.parse(request.data)).toMatchObject(expectedRequest);
 }
-export async function checkResponseFindTiles(fixtures: Record<string, any>) {
+export async function checkResponseFindTiles(fixtures: Record<string, any>): Promise<void> {
   const {
     fromTime,
     toTime,
@@ -46,7 +46,7 @@ export async function checkIfCorrectEndpointIsUsed(
   token: string,
   fixture: Record<string, any>,
   endpoint: string,
-) {
+): Promise<void> {
   setAuthToken(token);
   expect(isAuthTokenSet()).toBe(!!token);
 
