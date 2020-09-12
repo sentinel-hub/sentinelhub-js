@@ -45,7 +45,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "TZ=Europe/Ljubljana jest --watch",
+    "test": "TZ=Europe/Ljubljana jest",
     "lint": "eslint --max-warnings 0 --ext .ts,js src/",
     "prettier": "prettier --write \"{src,example,stories}/**/*.{ts,js}\"",
     "storybook": "concurrently --kill-others \"rollup -c -w\" \"start-storybook -p 6006 --quiet\"",
