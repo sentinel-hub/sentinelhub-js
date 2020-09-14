@@ -41,8 +41,8 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     const { assets } = feature;
     let result: Link[] = super.getTileLinksFromCatalog(feature);
 
-    if (assets.data) {
-      result.push({ target: assets.data.href, type: LinkType.CREODIAS });
+    if (assets.data && assets.data.href) {
+      result.push({ target: assets.data.href.replace('s3://DIAS', '/dias'), type: LinkType.CREODIAS });
     }
     return result;
   }
