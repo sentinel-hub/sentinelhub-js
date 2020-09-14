@@ -145,7 +145,7 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     const { assets } = feature;
     let result: Link[] = super.getTileLinksFromCatalog(feature);
 
-    if (assets.data) {
+    if (assets.data && assets.data.href) {
       result.push({ target: assets.data.href.replace('s3://EODATA', '/eodata'), type: LinkType.CREODIAS });
     }
     return result;
