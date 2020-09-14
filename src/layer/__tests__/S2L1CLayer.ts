@@ -16,6 +16,37 @@ import {
 
 const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
 
+const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
+const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
+const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+
+const layerParamsArr: Record<string, any>[] = [
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+  },
+
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: 20,
+  },
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: 0,
+  },
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: null,
+  },
+];
+
 describe('Test findTiles using searchIndex', () => {
   beforeEach(async () => {
     setAuthToken(null);
@@ -26,16 +57,8 @@ describe('Test findTiles using searchIndex', () => {
     await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
   });
 
-  test.each([20, 0, null])('check if correct request is constructed', async maxCloudCoverPercent => {
-    const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
-    const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-    const fixtures = constructFixtureFindTilesSearchIndex({
-      fromTime: fromTime,
-      toTime: toTime,
-      bbox: bbox,
-      maxCloudCoverPercent: maxCloudCoverPercent,
-    });
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
@@ -54,16 +77,8 @@ describe('Test findTiles using catalog', () => {
     await checkIfCorrectEndpointIsUsed(AUTH_TOKEN, constructFixtureFindTilesCatalog({}), CATALOG_URL);
   });
 
-  test.each([[20, 0, null]])('check if correct request is constructed', async maxCloudCoverPercent => {
-    const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
-    const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
-    const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
-    const fixtures = constructFixtureFindTilesCatalog({
-      fromTime: fromTime,
-      toTime: toTime,
-      bbox: bbox,
-      maxCloudCoverPercent: maxCloudCoverPercent,
-    });
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    const fixtures = constructFixtureFindTilesCatalog(layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
