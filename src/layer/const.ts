@@ -207,3 +207,5 @@ export type BYOCBand = {
   name: string;
   sampleType: string;
 };
+
+export type FindTilesAdditionalParameters = Record<string, any>;

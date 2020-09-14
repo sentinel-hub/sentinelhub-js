@@ -58,7 +58,7 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
       ...super.extractFindTilesMetaFromCatalog(feature),
     };
 
-    if (feature.assets && feature.assets.data) {
+    if (feature.assets && feature.assets.data && feature.assets.data.href) {
       result.MGRSLocation = feature.assets.data.href
         .split('/')
         .slice(4, 7)

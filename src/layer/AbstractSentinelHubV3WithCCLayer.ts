@@ -1,8 +1,4 @@
-import moment from 'moment';
-
-import { BBox } from '../bbox';
-
-import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
+import { MosaickingOrder, DataProductId, FindTilesAdditionalParameters } from './const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
@@ -42,20 +38,6 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return payload;
   }
 
-  protected convertResponseFromSearchIndex(response: {
-    data: { tiles: any[]; hasMore: boolean };
-  }): PaginatedTiles {
-    return {
-      tiles: response.data.tiles.map(tile => ({
-        geometry: tile.dataGeometry,
-        sensingTime: moment.utc(tile.sensingTime).toDate(),
-        meta: this.extractFindTilesMeta(tile),
-        links: this.getTileLinks(tile),
-      })),
-      hasMore: response.data.hasMore,
-    };
-  }
-
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
     let result: Record<string, any> = {};
 
@@ -69,26 +51,6 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
 
     return result;
-  }
-
-  protected async fetchTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-    );
-    return response;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -123,5 +85,12 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
       };
     }
     return result;
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: null,
+    };
   }
 }

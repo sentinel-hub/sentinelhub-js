@@ -5,14 +5,15 @@ import { LinkType, S2L1CLayer, BBox, CRS_EPSG4326 } from '../../index';
 export function constructFixtureFindTilesSearchIndex({
   sensingTime = '2020-04-30T10:09:25Z',
   hasMore = true,
+  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+  maxCloudCoverPercent = 20,
 }): Record<any, any> {
-  const fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
-  const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
   const layer = new S2L1CLayer({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
-    maxCloudCoverPercent: 20,
+    maxCloudCoverPercent: maxCloudCoverPercent,
   });
 
   const expectedRequest = {
@@ -21,18 +22,18 @@ export function constructFixtureFindTilesSearchIndex({
       crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::4326' } },
       coordinates: [
         [
-          [19, 20],
-          [20, 20],
-          [20, 21],
-          [19, 21],
-          [19, 20],
+          [bbox.minX, bbox.minY],
+          [bbox.maxX, bbox.minY],
+          [bbox.maxX, bbox.maxY],
+          [bbox.minX, bbox.maxY],
+          [bbox.minX, bbox.minY],
         ],
       ],
     },
     maxcount: 5,
-    maxCloudCoverage: 0.2,
-    timeFrom: '2020-04-01T00:00:00.000Z',
-    timeTo: '2020-05-01T23:59:59.999Z',
+    maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
+    timeFrom: fromTime.toISOString(),
+    timeTo: toTime.toISOString(),
     offset: 0,
   };
 
@@ -143,23 +144,28 @@ export function constructFixtureFindTilesSearchIndex({
 export function constructFixtureFindTilesCatalog({
   sensingTime = '2020-08-23T10:09:17Z',
   hasMore = false,
+  fromTime = new Date(Date.UTC(2020, 8 - 1, 23, 0, 0, 0, 0)),
+  toTime = new Date(Date.UTC(2020, 8 - 1, 23, 23, 59, 59, 0)),
+  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+  maxCloudCoverPercent = 20,
 }): Record<any, any> {
-  const fromTime = new Date(Date.UTC(2020, 8 - 1, 23, 0, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 8 - 1, 23, 23, 59, 59, 999));
-  const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
   const layer = new S2L1CLayer({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
-    maxCloudCoverPercent: 20,
+    maxCloudCoverPercent: maxCloudCoverPercent,
   });
 
   const expectedRequest = {
-    bbox: [19, 20, 20, 21],
-    datetime: '2020-08-23T00:00:00.000Z/2020-08-23T23:59:59.999Z',
+    bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
+    datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-2-l1c'],
     limit: 5,
-    query: { 'eo:cloud_cover': { lte: 20 } },
+    query: { 'eo:cloud_cover': { lte: maxCloudCoverPercent } },
   };
+
+  if (maxCloudCoverPercent === null) {
+    delete expectedRequest['query'];
+  }
 
   /* eslint-disable */
   const mockedResponse = {

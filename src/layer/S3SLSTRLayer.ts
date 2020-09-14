@@ -1,7 +1,13 @@
 import moment from 'moment';
 
-import { BBox } from '../bbox';
-import { PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from './const';
+import {
+  PaginatedTiles,
+  OrbitDirection,
+  Link,
+  LinkType,
+  DataProductId,
+  FindTilesAdditionalParameters,
+} from './const';
 import { DATASET_S3SLSTR } from './dataset';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { ProcessingPayload } from './processing';
@@ -64,31 +70,17 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     };
   }
 
-  protected async fetchTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
     const findTilesDatasetParameters: S3SLSTRFindTilesDatasetParameters = {
       type: this.dataset.shProcessingApiDatasourceAbbreviation,
       orbitDirection: this.orbitDirection,
       view: this.view,
     };
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.maxCloudCoverPercent,
-      findTilesDatasetParameters,
-    );
 
-    return response;
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: findTilesDatasetParameters,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(

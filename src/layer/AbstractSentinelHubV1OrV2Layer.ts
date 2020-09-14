@@ -135,7 +135,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -182,21 +182,6 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       })),
       hasMore: response.data.hasMore,
     };
-  }
-
-  public async findTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(
-      async innerReqConfig => await this.fetchTiles(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
-      reqConfig,
-    );
-    return fetchTilesResponse;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
