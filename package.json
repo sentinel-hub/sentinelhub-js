@@ -69,7 +69,8 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/dist/",
-      "fixtures[.].*[.]ts"
+      "fixtures[.].*[.]ts",
+      "testUtils[.].*[.]ts"
     ]
   },
   "types": "dist/src/index.d.ts",

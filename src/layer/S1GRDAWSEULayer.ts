@@ -2,7 +2,15 @@ import moment from 'moment';
 
 import { BBox } from '../bbox';
 
-import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from './const';
+import {
+  BackscatterCoeff,
+  PaginatedTiles,
+  OrbitDirection,
+  Link,
+  LinkType,
+  DataProductId,
+  FindTilesAdditionalParameters,
+} from './const';
 import { ProcessingPayload } from './processing';
 import { DATASET_AWSEU_S1GRD } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -163,7 +171,22 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async fetchTiles(
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+      orbitDirection: this.orbitDirection,
+      resolution: this.resolution,
+    };
+
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: findTilesDatasetParameters,
+    };
+  }
+
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -172,27 +195,10 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
 
-    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-      type: this.dataset.datasetParametersType,
-      acquisitionMode: this.acquisitionMode,
-      polarization: this.polarization,
-      orbitDirection: this.orbitDirection,
-      resolution: this.resolution,
-    };
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      null,
-      findTilesDatasetParameters,
-    );
     return response;
   }
-
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {

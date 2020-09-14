@@ -14,6 +14,7 @@ import {
   Stats,
   DataProductId,
   BYOCBand,
+  FindTilesAdditionalParameters,
 } from './const';
 import { DATASET_BYOC } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -125,48 +126,19 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     };
   }
 
-  protected async fetchTilesFromSearchIndexOrCatalog(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig: RequestConfiguration,
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
-  ): Promise<PaginatedTiles> {
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-      const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-      return this.fetchTilesSearchIndex(
-        searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-        maxCloudCoverPercent,
-        datasetParameters,
-      );
-    }
-    return this.fetchTilesCatalog(
-      SHV3_LOCATIONS_ROOT_URL[this.locationId],
-      this.collectionId,
-      authToken,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      maxCloudCoverPercent,
-      datasetParameters,
-    );
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
+      type: 'BYOC',
+      collectionId: this.collectionId,
+    };
+
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: findTilesDatasetParameters,
+    };
   }
 
-  protected async fetchTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -175,23 +147,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-
-    const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
-      type: 'BYOC',
-      collectionId: this.collectionId,
-    };
-    // searchIndex URL depends on the locationId:
-
-    const response = await this.fetchTilesFromSearchIndexOrCatalog(
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      null,
-      findTilesDatasetParameters,
-    );
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
     return response;
   }
 
@@ -201,6 +157,16 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
     const shServiceHostname = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     return shServiceHostname;
+  }
+
+  protected getCatalogCollectionId(): string {
+    return this.collectionId;
+  }
+
+  protected getSearchIndexUrl(): string {
+    const rootUrl = this.getShServiceHostname();
+    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
+    return searchIndexUrl;
   }
 
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {
