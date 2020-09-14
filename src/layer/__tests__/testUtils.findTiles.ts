@@ -11,7 +11,7 @@ export async function checkRequestFindTiles(fixtures: Record<string, any>): Prom
   const { bbox, expectedRequest, fromTime, layer, toTime } = fixtures;
   mockNetwork.onAny().reply(200);
   try {
-    await layer.findTiles(bbox, fromTime, toTime, 5, 0);
+    await layer.findTiles(bbox, fromTime, toTime, 5, 0, { cache: { expiresIn: 0 } });
   } catch (err) {
     //we don't care about response here
   }
@@ -33,7 +33,7 @@ export async function checkResponseFindTiles(fixtures: Record<string, any>): Pro
 
   mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-  const { tiles, hasMore } = await layer.findTiles(bbox, fromTime, toTime, 5, 0);
+  const { tiles, hasMore } = await layer.findTiles(bbox, fromTime, toTime, 5, 0, { cache: { expiresIn: 0 } });
 
   expect(mockNetwork.history.post.length).toBe(1);
   const request = mockNetwork.history.post[0];
