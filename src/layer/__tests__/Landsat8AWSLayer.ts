@@ -1,5 +1,4 @@
-import { setAuthToken } from '../../index';
-import { ApiType, BBox, CRS_EPSG4326, S2L1CLayer } from '../../index';
+import { BBox, CRS_EPSG4326, setAuthToken } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
