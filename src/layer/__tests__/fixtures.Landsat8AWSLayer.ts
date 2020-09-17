@@ -119,6 +119,7 @@ export function constructFixtureFindTilesSearchIndex({
       sensingTime: moment.utc(sensingTime).toDate(),
       meta: {
         cloudCoverPercent: 36.66,
+        sunElevation: 60.455486,
       },
       links: [
         {
@@ -302,6 +303,7 @@ export function constructFixtureFindTilesCatalog({
       sensingTime: moment.utc(sensingTime).toDate(),
       meta: {
         cloudCoverPercent: 36.66,
+        sunElevation: 60.455486,
       },
       links: [
         {
