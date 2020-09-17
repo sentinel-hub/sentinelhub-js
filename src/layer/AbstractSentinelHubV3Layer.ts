@@ -503,7 +503,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
     const requestConfig: AxiosRequestConfig = {
       headers: headers,
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
 
     const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
