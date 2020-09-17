@@ -180,7 +180,7 @@ export function constructFixtureFindTilesSearchIndex({
         ],
       },
       sensingTime: moment.utc(sensingTime).toDate(),
-      meta: {},
+      meta: { MGRSLocation: '32TQL', cloudCoverPercent: 6.89, tileId: 9299470 },
       links: [
         {
           target: 's3://sentinel-s2-l2a/tiles/32/T/QL/2020/4/30/0',
