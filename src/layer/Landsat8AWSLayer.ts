@@ -24,4 +24,11 @@ export class Landsat8AWSLayer extends AbstractSentinelHubV3WithCCLayer {
       sunElevation: tile.sunElevation,
     };
   }
+
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    return {
+      ...super.extractFindTilesMetaFromCatalog(feature),
+      sunElevation: feature.properties['view:sun_elevation'],
+    };
+  }
 }
