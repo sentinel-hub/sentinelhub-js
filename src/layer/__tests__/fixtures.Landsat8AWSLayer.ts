@@ -311,6 +311,11 @@ export function constructFixtureFindTilesCatalog({
             'http://landsat-pds.s3.amazonaws.com/c1/L8/194/033/LC08_L1GT_194033_20200430_20200430_01_RT/index.html',
           type: LinkType.AWS,
         },
+        {
+          target:
+            'http://landsat-pds.s3.amazonaws.com/c1/L8/194/033/LC08_L1GT_194033_20200430_20200430_01_RT/LC08_L1GT_194033_20200430_20200430_01_RT_thumb_small.jpg',
+          type: LinkType.PREVIEW,
+        },
       ],
     },
   ];
