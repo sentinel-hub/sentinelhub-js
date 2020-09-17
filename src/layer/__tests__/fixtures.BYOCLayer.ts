@@ -267,6 +267,7 @@ export function constructFixtureFindTilesCatalog({
       },
       sensingTime: moment.utc(sensingTime).toDate(),
       meta: {},
+      links: [] as any,
     },
   ];
   return {

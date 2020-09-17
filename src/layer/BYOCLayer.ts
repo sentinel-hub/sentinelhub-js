@@ -117,9 +117,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         return {
           geometry: tile.dataGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: {
-            cloudCoverPercent: tile.cloudCoverPercentage,
-          },
+          meta: {},
         };
       }),
       hasMore: response.data.hasMore,
