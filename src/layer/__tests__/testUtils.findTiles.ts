@@ -39,7 +39,7 @@ export async function checkResponseFindTiles(fixtures: Record<string, any>): Pro
   const request = mockNetwork.history.post[0];
   expect(request.data).not.toBeNull();
   expect(JSON.parse(request.data)).toMatchObject(expectedRequest);
-  expect(tiles).toMatchObject(expectedResultTiles);
+  expect(tiles).toStrictEqual(expectedResultTiles);
   expect(hasMore).toEqual(expectedResultHasMore);
 }
 export async function checkIfCorrectEndpointIsUsed(
