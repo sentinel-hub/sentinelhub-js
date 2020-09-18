@@ -30,6 +30,11 @@ export function constructFixtureFindTilesSearchIndex({
         ],
       ],
     },
+    datasetParameters: {
+      orbitDirection: 'DESCENDING',
+      type: 'S3SLSTR',
+      view: 'NADIR',
+    },
     maxcount: 5,
     maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
     timeFrom: fromTime.toISOString(),
@@ -287,7 +292,7 @@ export function constructFixtureFindTilesCatalog({
   };
 
   if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query'];
+    delete expectedRequest['query']['eo:cloud_cover'];
   }
 
   /* eslint-disable */

@@ -32,6 +32,7 @@ export function constructFixtureFindTilesSearchIndex({
       ],
     },
     maxcount: 5,
+    maxCloudCoverage: 1,
     timeFrom: fromTime.toISOString(),
     timeTo: toTime.toISOString(),
     offset: 0,
