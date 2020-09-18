@@ -17,7 +17,7 @@ export async function checkRequestFindTiles(fixtures: Record<string, any>): Prom
   }
   const request = mockNetwork.history.post[0];
   expect(request.data).not.toBeNull();
-  expect(JSON.parse(request.data)).toMatchObject(expectedRequest);
+  expect(JSON.parse(request.data)).toStrictEqual(expectedRequest);
 }
 export async function checkResponseFindTiles(fixtures: Record<string, any>): Promise<void> {
   const {
@@ -38,7 +38,7 @@ export async function checkResponseFindTiles(fixtures: Record<string, any>): Pro
   expect(mockNetwork.history.post.length).toBe(1);
   const request = mockNetwork.history.post[0];
   expect(request.data).not.toBeNull();
-  expect(JSON.parse(request.data)).toMatchObject(expectedRequest);
+  expect(JSON.parse(request.data)).toStrictEqual(expectedRequest);
   expect(tiles).toStrictEqual(expectedResultTiles);
   expect(hasMore).toEqual(expectedResultHasMore);
 }
