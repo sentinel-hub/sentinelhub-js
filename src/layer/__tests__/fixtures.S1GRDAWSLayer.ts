@@ -45,11 +45,18 @@ export function constructFixtureFindTilesSearchIndex({
         ],
       ],
     },
+    maxCloudCoverage: null as any,
     maxcount: 5,
     timeFrom: fromTime.toISOString(),
     timeTo: toTime.toISOString(),
     offset: 0,
-    datasetParameters: {},
+    datasetParameters: {
+      acquisitionMode: acquisitionMode,
+      orbitDirection: orbitDirection,
+      polarization: polarization,
+      resolution: resolution,
+      type: 'S1GRD',
+    },
   };
 
   const mockedResponse = {
