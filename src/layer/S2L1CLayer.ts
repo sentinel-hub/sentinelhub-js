@@ -32,11 +32,7 @@ export class S2L1CLayer extends AbstractSentinelHubV3WithCCLayer {
   }
 
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
-    let result: Record<string, any> = {};
-
-    result = {
-      ...super.extractFindTilesMetaFromCatalog(feature),
-    };
+    let result: Record<string, any> = super.extractFindTilesMetaFromCatalog(feature);
 
     if (feature.assets && feature.assets.data && feature.assets.data.href) {
       result.MGRSLocation = feature.assets.data.href
