@@ -30,7 +30,7 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   }
 
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
-    let result: Link[] = [...super.getTileLinksFromCatalog(feature)];
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
 
     if (feature && feature.assets && feature.assets.data) {
       const dataUri = feature.assets.data.href.split('tiles')[1];
@@ -52,11 +52,7 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   }
 
   protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
-    let result: Record<string, any> = {};
-
-    result = {
-      ...super.extractFindTilesMetaFromCatalog(feature),
-    };
+    let result: Record<string, any> = super.extractFindTilesMetaFromCatalog(feature);
 
     if (feature.assets && feature.assets.data && feature.assets.data.href) {
       result.MGRSLocation = feature.assets.data.href
