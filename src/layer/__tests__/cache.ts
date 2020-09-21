@@ -18,6 +18,7 @@ describe('Testing caching', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
+    setAuthToken(undefined);
   });
 
   it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
@@ -178,6 +179,7 @@ describe('Testing cache targets', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
+    setAuthToken(undefined);
   });
 
   it('should cache to cache api', async () => {
@@ -345,6 +347,7 @@ describe('Testing cache targets when cache_api is not available', () => {
   beforeEach(async () => {
     Object.assign(global, { caches: undefined }, fetch); // adds these functions to the global object and removes caches from global object
     await invalidateCaches();
+    setAuthToken(undefined);
   });
 
   it('should default to memory if window.caches is undefined and no targets were defined', async () => {
@@ -418,6 +421,7 @@ describe('Reading from cache twice', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object and removes caches from global object
     await invalidateCaches();
+    setAuthToken(undefined);
   });
 
   it('should read from cache-api twice', async () => {

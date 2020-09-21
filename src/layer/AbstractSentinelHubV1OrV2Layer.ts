@@ -135,7 +135,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     return {};
   }
 
-  public async findTiles(
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -143,48 +143,45 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      if (!this.dataset.searchIndexUrl) {
-        throw new Error('This dataset does not support searching for tiles');
-      }
-      if (maxCount === null) {
-        maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
-      }
-      if (offset === null) {
-        offset = 0;
-      }
+    if (!this.dataset.searchIndexUrl) {
+      throw new Error('This dataset does not support searching for tiles');
+    }
+    if (maxCount === null) {
+      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
+    }
+    if (offset === null) {
+      offset = 0;
+    }
 
-      const payload = bbox.toGeoJSON();
-      const params = {
-        expand: 'true',
-        timefrom: fromTime.toISOString(),
-        timeto: toTime.toISOString(),
-        maxcount: maxCount,
-        offset: Number(offset),
-        ...this.getFindTilesAdditionalParameters(),
-      };
+    const payload = bbox.toGeoJSON();
+    const params = {
+      expand: 'true',
+      timefrom: fromTime.toISOString(),
+      timeto: toTime.toISOString(),
+      maxcount: maxCount,
+      offset: Number(offset),
+      ...this.getFindTilesAdditionalParameters(),
+    };
 
-      const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
-      const response = await axios.post(url, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept-CRS': 'EPSG:4326',
-        },
-        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
-      });
+    const url = `${this.dataset.searchIndexUrl}?${stringify(params, { sort: false })}`;
+    const response = await axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept-CRS': 'EPSG:4326',
+      },
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
+    });
 
-      const responseTiles: any[] = response.data.tiles;
-      return {
-        tiles: responseTiles.map(tile => ({
-          geometry: tile.tileDrawRegionGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: this.extractFindTilesMeta(tile),
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const responseTiles: any[] = response.data.tiles;
+    return {
+      tiles: responseTiles.map(tile => ({
+        geometry: tile.tileDrawRegionGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
   }
 
   protected async getFindDatesUTCAdditionalParameters(

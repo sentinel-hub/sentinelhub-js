@@ -1,4 +1,5 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
   S1GRDAWSEULayer,
@@ -216,8 +217,44 @@ export const getMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
-  const layer = new S1GRDAWSEULayer({ instanceId, layerId });
+export const findTilesSearchIndex = () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId,
+    layerId,
+    acquisitionMode: AcquisitionMode.EW,
+    polarization: Polarization.DH,
+    resolution: Resolution.MEDIUM,
+  });
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    setAuthToken(null);
+    const data = await layer.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
+      new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findTilesSearchCatalog = () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId,
+    layerId,
+    acquisitionMode: AcquisitionMode.EW,
+    polarization: Polarization.DH,
+    resolution: Resolution.MEDIUM,
+  });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -227,7 +264,7 @@ export const findTiles = () => {
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
     const data = await layer.findTiles(
-      bbox3857,
+      bbox4326,
       new Date(Date.UTC(2020, 2 - 1, 2, 0, 0, 0)),
       new Date(Date.UTC(2020, 2 - 1, 2, 23, 59, 59)),
       5,

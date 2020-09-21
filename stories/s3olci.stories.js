@@ -8,6 +8,7 @@ import {
   ApiType,
   DATASET_S3OLCI,
   LayersFactory,
+  setAuthToken,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -163,7 +164,7 @@ export const getMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
+export const findTilesSearchIndex = () => {
   const layer = new S3OLCILayer({ instanceId, layerId });
 
   const containerEl = document.createElement('pre');
@@ -173,12 +174,40 @@ export const findTiles = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
     const data = await layer.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
       0,
+      { cache: { expiresIn: 0 } },
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findTilesCatalog = () => {
+  const layer = new S3OLCILayer({ instanceId, layerId });
+
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>findTiles</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const data = await layer.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+      { cache: { expiresIn: 0 } },
     );
     renderTilesList(containerEl, data.tiles);
   };

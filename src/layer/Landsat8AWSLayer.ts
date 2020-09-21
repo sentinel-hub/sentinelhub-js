@@ -24,4 +24,24 @@ export class Landsat8AWSLayer extends AbstractSentinelHubV3WithCCLayer {
       sunElevation: tile.sunElevation,
     };
   }
+
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    return {
+      ...super.extractFindTilesMetaFromCatalog(feature),
+      sunElevation: feature.properties['view:sun_elevation'],
+    };
+  }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    if (assets.data && assets.data.href) {
+      result.push({
+        target: assets.data.href.replace('/index.html', `/${feature.id}_thumb_small.jpg`),
+        type: LinkType.PREVIEW,
+      });
+    }
+    return result;
+  }
 }

@@ -14,6 +14,7 @@ import {
   Stats,
   DataProductId,
   BYOCBand,
+  FindTilesAdditionalParameters,
 } from './const';
 import { DATASET_BYOC } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -108,7 +109,34 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => {
+        return {
+          geometry: tile.dataGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {},
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
+      type: 'BYOC',
+      collectionId: this.collectionId,
+    };
+
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: findTilesDatasetParameters,
+    };
+  }
+
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -116,41 +144,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
-
-      const findTilesDatasetParameters: BYOCFindTilesDatasetParameters = {
-        type: 'BYOC',
-        collectionId: this.collectionId,
-      };
-      // searchIndex URL depends on the locationId:
-      const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-      const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-      const response = await this.fetchTiles(
-        searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        null,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => {
-          return {
-            geometry: tile.dataGeometry,
-            sensingTime: moment.utc(tile.sensingTime).toDate(),
-            meta: {
-              cloudCoverPercent: tile.cloudCoverPercentage,
-            },
-          };
-        }),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    return response;
   }
 
   protected getShServiceHostname(): string {
@@ -159,6 +155,16 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
     const shServiceHostname = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     return shServiceHostname;
+  }
+
+  protected getCatalogCollectionId(): string {
+    return this.collectionId;
+  }
+
+  protected getSearchIndexUrl(): string {
+    const rootUrl = this.getShServiceHostname();
+    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
+    return searchIndexUrl;
   }
 
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {

@@ -1,20 +1,20 @@
 import { setAuthToken } from '../../index';
-import { ApiType, BBox, CRS_EPSG4326, S2L1CLayer } from '../../index';
+import { BBox, CRS_EPSG4326 } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
-} from './fixtures.S2L1CLayer';
+} from './fixtures.S3SLTRLayer';
 
 import {
   AUTH_TOKEN,
-  CATALOG_URL,
   checkIfCorrectEndpointIsUsed,
   checkRequestFindTiles,
   checkResponseFindTiles,
   mockNetwork,
 } from './testUtils.findTiles';
 
-const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
+const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/search';
+const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S3SLSTR/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -86,16 +86,3 @@ describe('Test findTiles using catalog', () => {
     await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
   });
 });
-
-test.each([
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/99999', false],
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643', true],
-])(
-  'AbstractSentinelHubV3Layer.supportsApiType correctly handles DataProducts supported by Processing API',
-  (dataProduct, expectedResult) => {
-    const layer = new S2L1CLayer({
-      dataProduct: dataProduct,
-    });
-    expect(layer.supportsApiType(ApiType.PROCESSING)).toBe(expectedResult);
-  },
-);

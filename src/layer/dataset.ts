@@ -10,6 +10,7 @@ export type Dataset = {
   orbitTimeMinutes: number;
   minDate: Date | null;
   maxDate: Date | null;
+  catalogCollectionId?: string | null;
 };
 
 export const DATASET_AWSEU_S1GRD: Dataset = {
@@ -24,6 +25,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   orbitTimeMinutes: 49.3,
   minDate: new Date(Date.UTC(2014, 12 - 1, 7, 4, 14, 15)), // 2014-12-07T04:14:15
   maxDate: null,
+  catalogCollectionId: 'sentinel-1-grd',
 };
 
 export const DATASET_EOCLOUD_S1GRD: Dataset = {
@@ -52,6 +54,7 @@ export const DATASET_S2L2A: Dataset = {
   orbitTimeMinutes: 50.3,
   minDate: new Date(Date.UTC(2016, 10 - 1, 20, 8, 9, 58)), // 2016-10-20T08:09:58
   maxDate: null,
+  catalogCollectionId: 'sentinel-2-l2a',
 };
 
 export const DATASET_S2L1C: Dataset = {
@@ -66,6 +69,7 @@ export const DATASET_S2L1C: Dataset = {
   orbitTimeMinutes: 50.3,
   minDate: new Date(Date.UTC(2015, 6 - 1, 27, 10, 25, 31)), // 2015-06-27T10:25:31
   maxDate: null,
+  catalogCollectionId: 'sentinel-2-l1c',
 };
 
 export const DATASET_S3SLSTR: Dataset = {
@@ -80,6 +84,7 @@ export const DATASET_S3SLSTR: Dataset = {
   orbitTimeMinutes: 50.495,
   minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
   maxDate: null,
+  catalogCollectionId: 'sentinel-3-slstr',
 };
 
 export const DATASET_S3OLCI: Dataset = {
@@ -94,6 +99,7 @@ export const DATASET_S3OLCI: Dataset = {
   orbitTimeMinutes: 50.495,
   minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
   maxDate: null,
+  catalogCollectionId: 'sentinel-3-olci',
 };
 
 export const DATASET_S5PL2: Dataset = {
@@ -108,6 +114,7 @@ export const DATASET_S5PL2: Dataset = {
   orbitTimeMinutes: 101,
   minDate: new Date(Date.UTC(2018, 4 - 1, 30, 0, 18, 51)), // 2018-04-30T00:18:51
   maxDate: null,
+  catalogCollectionId: 'sentinel-5p-l2',
 };
 
 export const DATASET_AWS_L8L1C: Dataset = {
@@ -122,6 +129,7 @@ export const DATASET_AWS_L8L1C: Dataset = {
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 59, 2)), // 2013-03-18T15:59:02.334
   maxDate: null,
+  catalogCollectionId: 'landsat-8-l1c',
 };
 
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
@@ -192,6 +200,7 @@ export const DATASET_MODIS: Dataset = {
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2000, 2 - 1, 24, 12, 0, 0)), // 2000-02-24T12:00:00
   maxDate: null,
+  catalogCollectionId: 'modis',
 };
 
 export const DATASET_AWS_DEM: Dataset = {
@@ -220,4 +229,5 @@ export const DATASET_BYOC: Dataset = {
   orbitTimeMinutes: null,
   minDate: null,
   maxDate: null,
+  catalogCollectionId: null,
 };

@@ -1,4 +1,5 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
   S2L1CLayer,
@@ -185,7 +186,7 @@ export const GetMapWMSMaxCC20vs60 = () => {
   return wrapperEl;
 };
 
-export const FindTiles = () => {
+export const FindTilesSearchIndex = () => {
   const maxCloudCoverPercent = 60;
   const layerS2L1C = new S2L1CLayer({
     instanceId,
@@ -195,15 +196,47 @@ export const FindTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L1C; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
+
     const data = await layerS2L1C.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
       new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
       5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const FindTilesCatalog = () => {
+  const maxCloudCoverPercent = 10;
+  const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent,
+  });
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L1C; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const data = await layerS2L1C.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      15,
       0,
     );
     renderTilesList(containerEl, data.tiles);
@@ -223,7 +256,7 @@ export const FindCachedToMemoryTiles = () => {
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.innerHTML = `<h2>findTiles for Sentinel-2 L1C; maxcc = ${maxCloudCoverPercent}</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
   const requestsConfig = {
     cache: {

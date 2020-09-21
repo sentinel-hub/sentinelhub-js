@@ -2,7 +2,15 @@ import moment from 'moment';
 
 import { BBox } from '../bbox';
 
-import { BackscatterCoeff, PaginatedTiles, OrbitDirection, Link, LinkType, DataProductId } from './const';
+import {
+  BackscatterCoeff,
+  PaginatedTiles,
+  OrbitDirection,
+  Link,
+  LinkType,
+  DataProductId,
+  FindTilesAdditionalParameters,
+} from './const';
 import { ProcessingPayload } from './processing';
 import { DATASET_AWSEU_S1GRD } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -131,7 +139,54 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: {
+          tileId: tile.id,
+          orbitDirection: tile.orbitDirection,
+          polarization: tile.polarization,
+          acquisitionMode: tile.acquisitionMode,
+          resolution: tile.resolution,
+        },
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    if (!feature) {
+      return {};
+    }
+    return {
+      orbitDirection: feature.properties['sat:orbit_state'].toUpperCase(),
+      polarization: feature.properties['polarization'],
+      acquisitionMode: feature.properties['sar:instrument_mode'],
+      resolution: feature.properties['resolution'],
+    };
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      acquisitionMode: this.acquisitionMode,
+      polarization: this.polarization,
+      orbitDirection: this.orbitDirection,
+      resolution: this.resolution,
+    };
+
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: findTilesDatasetParameters,
+    };
+  }
+
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -139,46 +194,11 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      await this.updateLayerFromServiceIfNeeded(innerReqConfig);
+    await this.updateLayerFromServiceIfNeeded(reqConfig);
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
 
-      const findTilesDatasetParameters: S1GRDFindTilesDatasetParameters = {
-        type: this.dataset.datasetParametersType,
-        acquisitionMode: this.acquisitionMode,
-        polarization: this.polarization,
-        orbitDirection: this.orbitDirection,
-        resolution: this.resolution,
-      };
-      const response = await this.fetchTiles(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        null,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: {
-            tileId: tile.id,
-            orbitDirection: tile.orbitDirection,
-            polarization: tile.polarization,
-            acquisitionMode: tile.acquisitionMode,
-            resolution: tile.resolution,
-          },
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    return response;
   }
-
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
@@ -203,5 +223,49 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
         type: LinkType.AWS,
       },
     ];
+  }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (datasetParameters && datasetParameters.acquisitionMode) {
+      result['sar:instrument_mode'] = {
+        eq: datasetParameters.acquisitionMode,
+      };
+    }
+
+    if (datasetParameters && datasetParameters.polarization) {
+      result['polarization'] = {
+        eq: datasetParameters.polarization,
+      };
+    }
+
+    if (datasetParameters && datasetParameters.resolution) {
+      result['resolution'] = {
+        eq: datasetParameters.resolution,
+      };
+    }
+
+    if (datasetParameters && datasetParameters.orbitDirection) {
+      result['sat:orbit_state'] = {
+        eq: datasetParameters.orbitDirection,
+      };
+    }
+
+    return result;
+  }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    // for some reason data link is stored differently as in other datasets (s3 instead of data)
+    if (assets.s3 && assets.s3.href) {
+      result.push({ target: assets.s3.href, type: LinkType.AWS });
+    }
+    return result;
   }
 }
