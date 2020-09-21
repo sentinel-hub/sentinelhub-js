@@ -1,16 +1,16 @@
-import { mapDataManipulation } from './mapDataManipulation';
+import { getImageProperties, getBlob } from '../utils/canvas';
 import { Effects } from './const';
+import { isAnyEffectSet, transformValueToRange } from './mapDataManipulationUtils';
 import {
-  isAnyEffectSet,
-  prepareRgbMappingArrays,
-  changeRgbMappingArraysRange,
-  prepareManipulatePixel,
-} from './mapDataManipulationUtils';
-import { runGainEffectFunction, runGammaEffectFunction, runColorEffectFunction } from './effectFunctions';
+  runGainEffectFunction,
+  runGammaEffectFunction,
+  runColorEffectFunction,
+  runCustomEffectFunction,
+} from './effectFunctions';
 
 // The algorithm works with numbers between 0 and 1, so we must:
 // - change the range of the values from [0, 255] to [0, 1]
-// - change the values according to the algorithms (gain; gamma; r,g,b effects)
+// - change the values according to the algorithms (gain; gamma; r,g,b effects; custom effect)
 // - change the range of the values from [0, 1] back to [0, 255]
 
 export async function runEffectFunctions(originalBlob: Blob, effects: Effects): Promise<Blob> {
@@ -18,25 +18,32 @@ export async function runEffectFunctions(originalBlob: Blob, effects: Effects): 
     return originalBlob;
   }
 
-  let rgbMappingArrays = prepareRgbMappingArrays();
+  const { rgba, width, height, format } = await getImageProperties(originalBlob);
 
   // change the range of the values from [0, 255] to [0, 1]
-  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 255, 0, 1);
+  let rgbaArray = new Array(rgba.length);
+  for (let i = 0; i < rgba.length; i++) {
+    rgbaArray[i] = transformValueToRange(rgba[i], 0, 255, 0, 1);
+  }
 
   // change the values according to the algorithm (gain)
-  rgbMappingArrays = runGainEffectFunction(rgbMappingArrays, effects);
+  rgbaArray = runGainEffectFunction(rgbaArray, effects);
 
   // change the values according to the algorithm (gamma)
-  rgbMappingArrays = runGammaEffectFunction(rgbMappingArrays, effects);
+  rgbaArray = runGammaEffectFunction(rgbaArray, effects);
 
   // change the values according to the algorithm (r,g,b effects)
-  rgbMappingArrays = runColorEffectFunction(rgbMappingArrays, effects);
+  rgbaArray = runColorEffectFunction(rgbaArray, effects);
+
+  // run custom effect function (with custom range of values)
+  rgbaArray = runCustomEffectFunction(rgbaArray, effects);
 
   // change the range of the values from [0, 1] back to [0, 255]
-  rgbMappingArrays = changeRgbMappingArraysRange(rgbMappingArrays, 0, 1, 0, 255);
+  const newImgData = new Uint8ClampedArray(rgbaArray.length);
+  for (let i = 0; i < rgbaArray.length; i++) {
+    newImgData[i] = transformValueToRange(rgbaArray[i], 0, 1, 0, 255);
+  }
 
-  // prepare manipulatePixel function for mapDataManipulation
-  const manipulatePixel = prepareManipulatePixel(rgbMappingArrays);
-
-  return await mapDataManipulation(originalBlob, manipulatePixel);
+  const newBlob = await getBlob({ rgba: newImgData, width, height, format });
+  return newBlob;
 }

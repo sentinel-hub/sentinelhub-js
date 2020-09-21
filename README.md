@@ -164,17 +164,17 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 When requesting an image, effects can be applied to visually improve the image.
 To apply the effects, the `effects` param in `getMapParams` should be present, containing the desired effects.
-Supported effects are `gain`, `gamma`, `redRange`, `greenRange` and `blueRange`.
+Supported effects are `gain`, `gamma`, `redRange`, `greenRange`, `blueRange` and `customEffect`.
+
 Effects `gain` and `gamma` accept values equal or greater than 0.
+
 Effects `redRange`, `greenRange` and `blueRange` accept the values between 0 and 1, including both 0 and 1.
 Setting values to `redRange`, `greenRange` and `blueRange` limits the values that pixels can have for red, green and blue color component respectively.
 
-Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
-
-When retrieving an image URL (via `getMapUrl()`) with effects applied, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
+Effect `customEffect` is a function that receives red, green and blue values and returns new red, green and blue values.
+It operates with values between 0 and 1, including both 0 and 1.
 
 ```javascript
-
   const getMapParamsWithEffects = {
     bbox: bbox,
     fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
@@ -188,12 +188,17 @@ When retrieving an image URL (via `getMapUrl()`) with effects applied, an error 
       redRange: {from: 0.2, to: 0.8},
       greenRange: {from: 0.2, to: 0.8},
       blueRange: {from: 0.2, to: 0.8},
+      customEffect: ({r,g,b,a}) => ({r,g,b,a})
+      }
     }
   };
 
   const imageBlob = await layer.getMap(getMapParamsWithEffects, ApiType.WMS);
   const imageBlob2 = await layer.getMap(getMapParamsWithEffects, ApiType.PROCESSING);
 ```
+
+**Note:** Effects are applied by the library (client-side) and are thus only available when the blob is retrieved (`getMap`) and not through the URL (`getMapUrl`).
+When retrieving an image URL (via `getMapUrl()`) with effects in the parameters, an error is thrown, because the retrieved URL points directly to the image on the services with no applied effects.
 
 ### Stitching images
 
