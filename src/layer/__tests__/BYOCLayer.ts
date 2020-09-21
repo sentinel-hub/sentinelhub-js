@@ -1,20 +1,19 @@
-import { setAuthToken } from '../../index';
-import { ApiType, BBox, CRS_EPSG4326, S2L1CLayer } from '../../index';
-import {
-  constructFixtureFindTilesSearchIndex,
-  constructFixtureFindTilesCatalog,
-} from './fixtures.S2L1CLayer';
+import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3 } from '../../index';
+import { SHV3_LOCATIONS_ROOT_URL } from '../const';
+import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
   AUTH_TOKEN,
-  CATALOG_URL,
   checkIfCorrectEndpointIsUsed,
   checkRequestFindTiles,
   checkResponseFindTiles,
   mockNetwork,
 } from './testUtils.findTiles';
 
-const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
+const SEARCH_INDEX_URL = `${
+  SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]
+}byoc/v3/collections/CUSTOM/searchIndex`;
+const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/search`;
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -26,24 +25,18 @@ const layerParamsArr: Record<string, any>[] = [
     toTime: toTime,
     bbox: bbox,
   },
-
   {
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
-    maxCloudCoverPercent: 20,
+    collectionId: 'mockCollectionId',
   },
   {
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
-    maxCloudCoverPercent: 0,
-  },
-  {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-    maxCloudCoverPercent: null,
+    collectionId: 'mockCollectionId',
+    locationId: 'mockLocationId',
   },
 ];
 
@@ -87,15 +80,4 @@ describe('Test findTiles using catalog', () => {
   });
 });
 
-test.each([
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/99999', false],
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643', true],
-])(
-  'AbstractSentinelHubV3Layer.supportsApiType correctly handles DataProducts supported by Processing API',
-  (dataProduct, expectedResult) => {
-    const layer = new S2L1CLayer({
-      dataProduct: dataProduct,
-    });
-    expect(layer.supportsApiType(ApiType.PROCESSING)).toBe(expectedResult);
-  },
-);
+test.todo('check if correct location is used');

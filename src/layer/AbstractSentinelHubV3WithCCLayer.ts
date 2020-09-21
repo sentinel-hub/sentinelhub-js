@@ -1,12 +1,7 @@
-import moment from 'moment';
-
-import { BBox } from '../bbox';
-
-import { PaginatedTiles, MosaickingOrder, DataProductId } from './const';
+import { MosaickingOrder, DataProductId, FindTilesAdditionalParameters } from './const';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -43,36 +38,19 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return payload;
   }
 
-  public async findTiles(
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig?: RequestConfiguration,
-  ): Promise<PaginatedTiles> {
-    const tilesResponse = await ensureTimeout(async innerReqConfig => {
-      const response = await this.fetchTiles(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        this.maxCloudCoverPercent,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: this.extractFindTilesMeta(tile),
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tilesResponse;
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    let result: Record<string, any> = {};
+
+    if (!feature) {
+      return result;
+    }
+
+    result = {
+      ...super.extractFindTilesMetaFromCatalog(feature),
+      cloudCoverPercent: feature.properties['eo:cloud_cover'],
+    };
+
+    return result;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -92,6 +70,27 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     return {
       ...super.extractFindTilesMeta(tile),
       cloudCoverPercent: tile.cloudCoverPercentage,
+    };
+  }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (maxCloudCoverPercent !== null && maxCloudCoverPercent !== undefined) {
+      result['eo:cloud_cover'] = {
+        lte: maxCloudCoverPercent,
+      };
+    }
+    return result;
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: null,
     };
   }
 }

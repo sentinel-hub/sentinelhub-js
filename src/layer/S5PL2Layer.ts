@@ -1,12 +1,11 @@
 import moment from 'moment';
 
 import { BBox } from '../bbox';
-import { PaginatedTiles, Link, LinkType, DataProductId } from './const';
+import { PaginatedTiles, Link, LinkType, DataProductId, FindTilesAdditionalParameters } from './const';
 import { DATASET_S5PL2 } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 /*
   S-5P is a bit special in that we need to supply productType when searching
@@ -80,7 +79,36 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  public async findTiles(
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => {
+        return {
+          geometry: tile.tileDrawRegionGeometry,
+          sensingTime: moment.utc(tile.sensingTime).toDate(),
+          meta: {},
+          links: this.getTileLinks(tile),
+        };
+      }),
+      hasMore: response.data.hasMore,
+    };
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
+      type: this.dataset.datasetParametersType,
+      productType: this.productType,
+      // minQa: this.minQa,
+    };
+
+    return {
+      maxCloudCoverPercent: this.maxCloudCoverPercent,
+      datasetParameters: findTilesDatasetParameters,
+    };
+  }
+
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -88,40 +116,12 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const tiles = await ensureTimeout(async innerReqConfig => {
-      if (this.productType === null) {
-        throw new Error('Parameter productType must be specified!');
-      }
+    if (this.productType === null) {
+      throw new Error('Parameter productType must be specified!');
+    }
 
-      const findTilesDatasetParameters: S5PL2FindTilesDatasetParameters = {
-        type: this.dataset.datasetParametersType,
-        productType: this.productType,
-        // minQa: this.minQa,
-      };
-      const response = await this.fetchTiles(
-        this.dataset.searchIndexUrl,
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        innerReqConfig,
-        this.maxCloudCoverPercent,
-        findTilesDatasetParameters,
-      );
-      return {
-        tiles: response.data.tiles.map(tile => {
-          return {
-            geometry: tile.tileDrawRegionGeometry,
-            sensingTime: moment.utc(tile.sensingTime).toDate(),
-            meta: {},
-            links: this.getTileLinks(tile),
-          };
-        }),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return tiles;
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    return response;
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -156,5 +156,30 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
         type: LinkType.CREODIAS,
       },
     ];
+  }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (datasetParameters && datasetParameters.productType) {
+      result['type'] = {
+        eq: datasetParameters.productType,
+      };
+    }
+
+    return result;
+  }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    if (assets.data) {
+      result.push({ target: assets.data.href.replace('s3://EODATA', '/eodata'), type: LinkType.CREODIAS });
+    }
+    return result;
   }
 }

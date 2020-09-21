@@ -15,9 +15,11 @@ import {
   Stats,
   Interpolator,
   Link,
+  LinkType,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
+  FindTilesAdditionalParameters,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
@@ -145,6 +147,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected getShServiceHostname(): string {
     return this.dataset.shServiceHostname;
+  }
+
+  protected getCatalogCollectionId(): string {
+    return this.dataset.catalogCollectionId;
+  }
+
+  protected getSearchIndexUrl(): string {
+    return this.dataset.searchIndexUrl;
   }
 
   protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
@@ -310,7 +320,65 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return requestConfig;
   }
 
-  public async findTiles(
+  protected convertResponseFromSearchIndex(response: {
+    data: { tiles: any[]; hasMore: boolean };
+  }): PaginatedTiles {
+    return {
+      tiles: response.data.tiles.map(tile => ({
+        geometry: tile.dataGeometry,
+        sensingTime: moment.utc(tile.sensingTime).toDate(),
+        meta: this.extractFindTilesMeta(tile),
+        links: this.getTileLinks(tile),
+      })),
+      hasMore: response.data.hasMore,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    return {};
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets, links } = feature;
+    let result: Link[] = [];
+    if (!assets && !links) {
+      return [];
+    }
+
+    if (assets && assets.data) {
+      result.push({ target: assets.data.href, type: LinkType.AWS });
+    }
+
+    if (assets && assets.thumbnail) {
+      result.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
+    }
+
+    const sciHubLink = links.find((l: Record<string, any>) => {
+      return l.title === 'scihub download';
+    });
+
+    if (sciHubLink) {
+      result.push({ target: sciHubLink.href, type: LinkType.SCIHUB });
+    }
+
+    return result;
+  }
+
+  protected convertResponseFromCatalog(response: any): PaginatedTiles {
+    return {
+      tiles: response.data.features.map((feature: Record<string, any>) => ({
+        geometry: feature.geometry,
+        sensingTime: moment.utc(feature.properties.datetime).toDate(),
+        meta: this.extractFindTilesMetaFromCatalog(feature),
+        links: this.getTileLinksFromCatalog(feature),
+      })),
+      hasMore: !!response.data.context.next,
+    };
+  }
+
+  protected async findTilesInner(
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
@@ -318,28 +386,36 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
-    const fetchTilesResponse = await ensureTimeout(async innerReqConfig => {
-      const response = await this.fetchTiles(
-        this.dataset.searchIndexUrl,
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    const canUseCatalog = authToken && !!this.getCatalogCollectionId();
+    let result: PaginatedTiles = null;
+
+    if (canUseCatalog) {
+      result = await this.findTilesUsingCatalog(
+        authToken,
         bbox,
         fromTime,
         toTime,
         maxCount,
         offset,
-        innerReqConfig,
+        reqConfig,
+        this.getFindTilesAdditionalParameters(),
       );
-      return {
-        tiles: response.data.tiles.map(tile => ({
-          geometry: tile.dataGeometry,
-          sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: this.extractFindTilesMeta(tile),
-          links: this.getTileLinks(tile),
-        })),
-        hasMore: response.data.hasMore,
-      };
-    }, reqConfig);
-    return fetchTilesResponse;
+    } else {
+      result = await this.findTilesUsingSearchIndex(
+        this.getSearchIndexUrl(),
+        bbox,
+        fromTime,
+        toTime,
+        maxCount,
+        offset,
+        reqConfig,
+        this.getFindTilesAdditionalParameters(),
+      );
+    }
+    return result;
   }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected extractFindTilesMeta(tile: any): Record<string, any> {
     return {};
@@ -349,7 +425,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return [];
   }
 
-  protected fetchTiles(
+  protected async findTilesUsingSearchIndex(
     searchIndexUrl: string,
     bbox: BBox,
     fromTime: Date,
@@ -357,9 +433,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig: RequestConfiguration,
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
-  ): Promise<{ data: { tiles: any[]; hasMore: boolean } }> {
+    findTilesAdditionalParameters: FindTilesAdditionalParameters,
+  ): Promise<PaginatedTiles> {
     if (maxCount === null) {
       maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
     }
@@ -369,13 +444,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!searchIndexUrl) {
       throw new Error('This dataset does not support searching for tiles');
     }
+
+    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
+
     const bboxPolygon = bbox.toGeoJSON();
     // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
     // the tiles we get cloudCoverPercentage (0..100).
     const payload: any = {
       clipping: bboxPolygon,
       maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverPercent ? maxCloudCoverPercent / 100 : null,
+      maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
       timeFrom: fromTime.toISOString(),
       timeTo: toTime.toISOString(),
       offset: offset,
@@ -385,7 +463,72 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.datasetParameters = datasetParameters;
     }
 
-    return axios.post(searchIndexUrl, payload, this.createSearchIndexRequestConfig(reqConfig));
+    const response = await axios.post(
+      searchIndexUrl,
+      payload,
+      this.createSearchIndexRequestConfig(reqConfig),
+    );
+    return this.convertResponseFromSearchIndex(response);
+  }
+
+  protected createCatalogPayloadQuery(
+    maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Record<string, any> {
+    return {};
+  }
+
+  protected async findTilesUsingCatalog(
+    authToken: string,
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+    maxCount: number | null = null,
+    offset: number | null = null,
+    reqConfig: RequestConfiguration,
+    findTilesAdditionalParameters: FindTilesAdditionalParameters,
+  ): Promise<PaginatedTiles> {
+    if (!authToken) {
+      throw new Error('Must be authenticated to use Catalog service');
+    }
+
+    const catalogCollectionId = this.getCatalogCollectionId();
+    if (!catalogCollectionId) {
+      throw new Error('Cannot use Catalog service without collection');
+    }
+
+    const headers = {
+      Authorization: `Bearer ${authToken}`,
+      'Content-Type': 'application/json',
+    };
+    const requestConfig: AxiosRequestConfig = {
+      headers: headers,
+      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+    };
+
+    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
+
+    const payload: any = {
+      bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
+      datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
+      collections: [catalogCollectionId],
+      limit: maxCount,
+    };
+    if (offset > 0) {
+      payload.next = offset;
+    }
+
+    let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
+
+    if (payloadQuery) {
+      payload.query = payloadQuery;
+    }
+
+    const shServiceHostname = this.getShServiceHostname();
+
+    const response = await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
+
+    return this.convertResponseFromCatalog(response);
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -536,5 +679,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected getConvertEvalscriptBaseUrl(): string {
     const shServiceHostname = this.getShServiceHostname();
     return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
+  }
+
+  protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
+    return {
+      maxCloudCoverPercent: null,
+      datasetParameters: null,
+    };
   }
 }
