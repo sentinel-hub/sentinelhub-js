@@ -117,9 +117,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         return {
           geometry: tile.dataGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),
-          meta: {
-            cloudCoverPercent: tile.cloudCoverPercentage,
-          },
+          meta: {},
         };
       }),
       hasMore: response.data.hasMore,
@@ -147,18 +145,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-    return this.findTilesUsingSearchIndex(
-      searchIndexUrl,
-      bbox,
-      fromTime,
-      toTime,
-      maxCount,
-      offset,
-      reqConfig,
-      this.getFindTilesAdditionalParameters(),
-    );
+    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    return response;
   }
 
   protected getShServiceHostname(): string {
@@ -167,6 +155,16 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
     const shServiceHostname = SHV3_LOCATIONS_ROOT_URL[this.locationId];
     return shServiceHostname;
+  }
+
+  protected getCatalogCollectionId(): string {
+    return this.collectionId;
+  }
+
+  protected getSearchIndexUrl(): string {
+    const rootUrl = this.getShServiceHostname();
+    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
+    return searchIndexUrl;
   }
 
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {

@@ -125,4 +125,29 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
       orbitDirection: tile.orbitDirection,
     };
   }
+
+  protected extractFindTilesMetaFromCatalog(feature: Record<string, any>): Record<string, any> {
+    let result: Record<string, any> = {};
+
+    if (!feature) {
+      return result;
+    }
+
+    result = {
+      ...super.extractFindTilesMetaFromCatalog(feature),
+      orbitDirection: feature.properties['sat:orbit_state'],
+    };
+
+    return result;
+  }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    if (assets.data && assets.data.href) {
+      result.push({ target: assets.data.href.replace('s3://EODATA', '/eodata'), type: LinkType.CREODIAS });
+    }
+    return result;
+  }
 }

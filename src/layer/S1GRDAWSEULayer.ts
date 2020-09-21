@@ -257,4 +257,15 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
 
     return result;
   }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    // for some reason data link is stored differently as in other datasets (s3 instead of data)
+    if (assets.s3 && assets.s3.href) {
+      result.push({ target: assets.s3.href, type: LinkType.AWS });
+    }
+    return result;
+  }
 }

@@ -1,6 +1,14 @@
 import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
-import { S3SLSTRLayer, CRS_EPSG4326, BBox, MimeTypes, ApiType, S3SLSTRView } from '../dist/sentinelHub.esm';
+import {
+  S3SLSTRLayer,
+  CRS_EPSG4326,
+  BBox,
+  MimeTypes,
+  ApiType,
+  setAuthToken,
+  S3SLSTRView,
+} from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
@@ -155,7 +163,7 @@ export const getMapProcessingFromLayer = () => {
   return wrapperEl;
 };
 
-export const findTiles = () => {
+export const findTilesSearchIndex = () => {
   const maxCloudCoverPercent = 60;
   const layer = new S3SLSTRLayer({
     instanceId,
@@ -171,6 +179,38 @@ export const findTiles = () => {
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const perform = async () => {
+    setAuthToken(null);
+    const data = await layer.findTiles(
+      bbox4326,
+      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+      5,
+      0,
+    );
+    renderTilesList(containerEl, data.tiles);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const findTilesCatalog = () => {
+  const maxCloudCoverPercent = 60;
+  const layer = new S3SLSTRLayer({
+    instanceId,
+    layerId,
+    maxCloudCoverPercent,
+    view: S3SLSTRView.NADIR,
+  });
+
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>findTiles; maxcc = ${maxCloudCoverPercent}</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
     const data = await layer.findTiles(
       bbox4326,
       new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
