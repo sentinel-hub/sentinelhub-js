@@ -36,4 +36,14 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
       },
     ];
   }
+
+  protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
+    const { assets } = feature;
+    let result: Link[] = super.getTileLinksFromCatalog(feature);
+
+    if (assets.data && assets.data.href) {
+      result.push({ target: assets.data.href.replace('s3://DIAS', '/dias'), type: LinkType.CREODIAS });
+    }
+    return result;
+  }
 }

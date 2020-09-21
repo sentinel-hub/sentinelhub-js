@@ -116,7 +116,7 @@ export function constructFixtureFindTilesSearchIndex({
         ],
       },
       sensingTime: moment.utc(sensingTime).toDate(),
-      meta: {},
+      meta: { MGRSLocation: '32TPL', cloudCoverPercent: 0.95, tileId: 12649990 },
       links: [
         {
           target: 's3://sentinel-s2-l1c/tiles/32/T/PL/2020/4/30/0',
@@ -164,7 +164,7 @@ export function constructFixtureFindTilesCatalog({
   };
 
   if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query'];
+    delete expectedRequest['query']['eo:cloud_cover'];
   }
 
   /* eslint-disable */

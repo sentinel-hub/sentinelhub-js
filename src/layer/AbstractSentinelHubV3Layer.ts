@@ -149,6 +149,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.shServiceHostname;
   }
 
+  protected getCatalogCollectionId(): string {
+    return this.dataset.catalogCollectionId;
+  }
+
+  protected getSearchIndexUrl(): string {
+    return this.dataset.searchIndexUrl;
+  }
+
   protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
       const response = await axios.get(this.evalscriptUrl, {
@@ -339,11 +347,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       return [];
     }
 
-    if (assets.data) {
+    if (assets && assets.data) {
       result.push({ target: assets.data.href, type: LinkType.AWS });
     }
 
-    if (assets.thumbnail) {
+    if (assets && assets.thumbnail) {
       result.push({ target: assets.thumbnail.href, type: LinkType.PREVIEW });
     }
 
@@ -379,8 +387,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig?: RequestConfiguration,
   ): Promise<PaginatedTiles> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    const canUseCatalog = authToken && !!this.dataset.catalogCollectionId;
-    //ait this.updateLayerFromServiceIfNeeded(reqConfig);
+    const canUseCatalog = authToken && !!this.getCatalogCollectionId();
     let result: PaginatedTiles = null;
 
     if (canUseCatalog) {
@@ -396,7 +403,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       );
     } else {
       result = await this.findTilesUsingSearchIndex(
-        this.dataset.searchIndexUrl,
+        this.getSearchIndexUrl(),
         bbox,
         fromTime,
         toTime,
@@ -485,7 +492,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('Must be authenticated to use Catalog service');
     }
 
-    if (!this.dataset.catalogCollectionId) {
+    const catalogCollectionId = this.getCatalogCollectionId();
+    if (!catalogCollectionId) {
       throw new Error('Cannot use Catalog service without collection');
     }
 
@@ -503,7 +511,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
-      collections: [this.dataset.catalogCollectionId],
+      collections: [catalogCollectionId],
       limit: maxCount,
     };
     if (offset > 0) {
@@ -516,11 +524,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.query = payloadQuery;
     }
 
-    const response = await axios.post(
-      `${this.dataset.shServiceHostname}api/v1/catalog/search`,
-      payload,
-      requestConfig,
-    );
+    const shServiceHostname = this.getShServiceHostname();
+
+    const response = await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
 
     return this.convertResponseFromCatalog(response);
   }
