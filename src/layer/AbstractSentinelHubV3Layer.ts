@@ -391,7 +391,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     let result: PaginatedTiles = null;
 
     if (canUseCatalog) {
-      result = await this.findTilesUsingCatalog(
+      const response: Record<string, any> = await this.findTilesUsingCatalog(
         authToken,
         bbox,
         fromTime,
@@ -401,6 +401,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         reqConfig,
         this.getFindTilesAdditionalParameters(),
       );
+      result = this.convertResponseFromCatalog(response);
     } else {
       result = await this.findTilesUsingSearchIndex(
         this.getSearchIndexUrl(),
@@ -478,7 +479,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async findTilesUsingCatalog<T>(
+  protected async findTilesUsingCatalog(
     authToken: string,
     bbox: BBox,
     fromTime: Date,
@@ -488,7 +489,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
     distinct: string | null = null,
-  ): Promise<T> {
+  ): Promise<Record<string, any>> {
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
     }
@@ -531,13 +532,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
     const shServiceHostname = this.getShServiceHostname();
 
-    const response = await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
-
-    return distinct
-      ? response.data.features
-          .map((date: Date) => new Date(date))
-          .sort((a: Date, b: Date) => b.getTime() - a.getTime())
-      : this.convertResponseFromCatalog(response);
+    return await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -613,7 +608,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
   ): Promise<Date[]> {
     const findDatesUTCAdditionalParameters = await this.getFindDatesUTCAdditionalParameters();
-    const response: Date[] = await this.findTilesUsingCatalog(
+    const response = await this.findTilesUsingCatalog(
       authToken,
       bbox,
       fromTime,
@@ -624,8 +619,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       findDatesUTCAdditionalParameters,
       'date',
     );
-
-    return response;
+    return response.data.features
+      .map((date: Date) => new Date(date))
+      .sort((a: Date, b: Date) => b.getTime() - a.getTime());
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
