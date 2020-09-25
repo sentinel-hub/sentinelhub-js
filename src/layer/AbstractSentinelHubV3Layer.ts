@@ -478,7 +478,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async findTilesUsingCatalog(
+  protected async findTilesUsingCatalog<T>(
     authToken: string,
     bbox: BBox,
     fromTime: Date,
@@ -487,7 +487,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
-  ): Promise<PaginatedTiles> {
+    distinct: string | null = null,
+  ): Promise<T> {
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
     }
@@ -524,11 +525,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.query = payloadQuery;
     }
 
+    if (distinct) {
+      payload['distinct'] = distinct;
+    }
+
     const shServiceHostname = this.getShServiceHostname();
 
     const response = await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
 
-    return this.convertResponseFromCatalog(response);
+    return distinct
+      ? response.data.features
+          .map((date: Date) => new Date(date))
+          .sort((a: Date, b: Date) => b.getTime() - a.getTime())
+      : this.convertResponseFromCatalog(response);
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -554,31 +563,69 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
     const findDatesUTCValue = await ensureTimeout(async innerReqConfig => {
-      const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerReqConfig);
-      if (!findDatesUTCUrl) {
-        throw new Error('This dataset does not support searching for dates');
+      const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+      const canUseCatalog = authToken && !!this.getCatalogCollectionId();
+      if (canUseCatalog) {
+        return await this.findDatesUTCCatalog(innerReqConfig, authToken, bbox, fromTime, toTime);
+      } else {
+        return await this.findDatesUTCSearchIndex(innerReqConfig, bbox, fromTime, toTime);
       }
-
-      const bboxPolygon = bbox.toGeoJSON();
-      const payload: any = {
-        queryArea: bboxPolygon,
-        from: fromTime.toISOString(),
-        to: toTime.toISOString(),
-        ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
-      };
-
-      const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-      };
-      const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
-      const found: Moment[] = response.data.map((date: string) => moment.utc(date));
-
-      // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
-      // Let's sort the data so that we always return most recent results first:
-      found.sort((a, b) => b.unix() - a.unix());
-      return found.map(m => m.toDate());
     }, reqConfig);
     return findDatesUTCValue;
+  }
+
+  private async findDatesUTCSearchIndex(
+    innerReqConfig: RequestConfiguration,
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+  ): Promise<Date[]> {
+    const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerReqConfig);
+    if (!findDatesUTCUrl) {
+      throw new Error('This dataset does not support searching for dates');
+    }
+
+    const bboxPolygon = bbox.toGeoJSON();
+    const payload: any = {
+      queryArea: bboxPolygon,
+      from: fromTime.toISOString(),
+      to: toTime.toISOString(),
+      ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
+    };
+
+    const axiosReqConfig: AxiosRequestConfig = {
+      ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
+    };
+    const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
+    const found: Moment[] = response.data.map((date: string) => moment.utc(date));
+
+    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
+    // Let's sort the data so that we always return most recent results first:
+    found.sort((a, b) => b.unix() - a.unix());
+    return found.map(m => m.toDate());
+  }
+
+  protected async findDatesUTCCatalog(
+    innerReqConfig: RequestConfiguration,
+    authToken: string,
+    bbox: BBox,
+    fromTime: Date,
+    toTime: Date,
+  ): Promise<Date[]> {
+    const findDatesUTCAdditionalParameters = await this.getFindDatesUTCAdditionalParameters();
+    const response: Date[] = await this.findTilesUsingCatalog(
+      authToken,
+      bbox,
+      fromTime,
+      toTime,
+      10000,
+      0,
+      innerReqConfig,
+      findDatesUTCAdditionalParameters,
+      'date',
+    );
+
+    return response;
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
