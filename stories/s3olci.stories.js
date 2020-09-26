@@ -1,4 +1,4 @@
-import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { createFindDatesUTCStory, renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
 import {
   S3OLCILayer,
@@ -259,54 +259,29 @@ export const findFlyoversLinearRingError = () => {
   return wrapperEl;
 };
 
-export const findDatesUTC = () => {
-  const layer = new S3OLCILayer({ instanceId, layerId });
+export const findDatesUTCSearchIndex = () =>
+  createFindDatesUTCStory(
+    new S3OLCILayer({
+      instanceId,
+      layerId,
+    }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    false,
+  );
 
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML =
-    '<h2>findDatesUTC</h2>' +
-    'from: ' +
-    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)) +
-    '<br />' +
-    'to: ' +
-    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59));
-
-  const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement('beforeend', containerEl);
-
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-
-  const perform = async () => {
-    const dates = await layer.findDatesUTC(
-      bbox4326,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-    );
-    containerEl.innerHTML = JSON.stringify(dates, null, true);
-
-    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
-
-    // prepare an image to show that the number makes sense:
-    const getMapParams = {
-      bbox: bbox4326,
-      fromTime: resDateStartOfDay,
-      toTime: resDateEndOfDay,
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    console.log('imgblob', imageBlob);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
+export const findDatesUTCCatalog = () =>
+  createFindDatesUTCStory(
+    new S3OLCILayer({
+      instanceId,
+      layerId,
+    }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    true,
+  );
 
 export const stats = () => {
   const wrapperEl = document.createElement('div');

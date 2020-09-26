@@ -1,4 +1,4 @@
-import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { createFindDatesUTCStory, renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
@@ -431,54 +431,34 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDatesUTCEPSG4326 = () => {
-  const layer = new S1GRDAWSEULayer({
-    instanceId,
-    layerId,
-    acquisitionMode: AcquisitionMode.IW,
-    polarization: Polarization.DV,
-    resolution: Resolution.HIGH,
-  });
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>findDatesUTC - BBox in EPSG:4326</h2>';
-
-  const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement('beforeend', containerEl);
-
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-
-  const perform = async () => {
-    const dates = await layer.findDatesUTC(
-      bbox4326,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-    );
-
-    containerEl.innerHTML = JSON.stringify(dates, null, true);
-
-    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
-
-    // prepare an image to show that the number makes sense:
-    const getMapParams = {
-      bbox: bbox4326,
-      fromTime: resDateStartOfDay,
-      toTime: resDateEndOfDay,
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
+export const findDatesUTCSearchIndex = () =>
+  createFindDatesUTCStory(
+    new S1GRDAWSEULayer({
+      instanceId,
+      layerId,
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    false,
+  );
+export const findDatesUTCCatalog = () =>
+  createFindDatesUTCStory(
+    new S1GRDAWSEULayer({
+      instanceId,
+      layerId,
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+    }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
+    true,
+  );
 
 export const supportsProcessingAPI = () => {
   const wrapperEl = document.createElement('div');
