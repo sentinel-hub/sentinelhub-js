@@ -1,4 +1,4 @@
-import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3 } from '../../index';
+import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer, DATASET_BYOC } from '../../index';
 import { SHV3_LOCATIONS_ROOT_URL } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
@@ -10,6 +10,17 @@ import {
   mockNetwork,
 } from './testUtils.findTiles';
 
+import {
+  checkIfCorrectEndpointIsUsedFindDatesUTC,
+  checkRequestFindDatesUTC,
+  checkResponseFindDatesUTC,
+} from './testUtils.findDatesUTC';
+
+import {
+  constructFixtureFindDatesUTCSearchIndex,
+  constructFixtureFindDatesUTCCatalog,
+} from './fixtures.findDatesUTC';
+
 const SEARCH_INDEX_URL = `${
   SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]
 }byoc/v3/collections/CUSTOM/searchIndex`;
@@ -20,17 +31,6 @@ const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
 const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
 
 const layerParamsArr: Record<string, any>[] = [
-  {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-  },
-  {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-    collectionId: 'mockCollectionId',
-  },
   {
     fromTime: fromTime,
     toTime: toTime,
@@ -77,6 +77,103 @@ describe('Test findTiles using catalog', () => {
 
   test('response from catalog', async () => {
     await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
+  });
+});
+
+describe('Test findDatesUTC using searchIndex', () => {
+  beforeEach(async () => {
+    setAuthToken(null);
+    mockNetwork.reset();
+  });
+
+  test('findAvailableData is used if token is not set', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      collectionId: 'mockCollectionId',
+      locationId: LocationIdSHv3.awsEuCentral1,
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      null,
+      constructFixtureFindDatesUTCSearchIndex(layer, {}),
+      'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+    if (layerParams && layerParams.collectionId) {
+      constructorParams.collectionId = layerParams.collectionId;
+    }
+
+    if (layerParams && layerParams.locationId) {
+      constructorParams.locationId = layerParams.locationId;
+    }
+
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      collectionId: 'mockCollectionId',
+      locationId: LocationIdSHv3.awsEuCentral1,
+    });
+    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCSearchIndex(layer, {}));
+  });
+});
+describe('Test findDatesUTC using catalog', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('catalog is used if token is set', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      collectionId: 'mockCollectionId',
+      locationId: LocationIdSHv3.awsEuCentral1,
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      AUTH_TOKEN,
+      constructFixtureFindDatesUTCCatalog(layer, {}),
+      CATALOG_URL,
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+    if (layerParams && layerParams.collectionId) {
+      constructorParams.collectionId = layerParams.collectionId;
+    }
+    if (layerParams && layerParams.locationId) {
+      constructorParams.locationId = layerParams.locationId;
+    }
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCCatalog(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      collectionId: 'mockCollectionId',
+      locationId: LocationIdSHv3.awsEuCentral1,
+    });
+    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
   });
 });
 
