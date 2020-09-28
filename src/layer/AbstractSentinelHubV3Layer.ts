@@ -607,7 +607,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     fromTime: Date,
     toTime: Date,
   ): Promise<Date[]> {
-    const findDatesUTCAdditionalParameters = await this.getFindDatesUTCAdditionalParameters();
+    const { maxCloudCoverage, datasetParameters } = await this.getFindDatesUTCAdditionalParameters();
+
+    let findTilesAdditionalParameters: Record<string, any> = { datasetParameters: datasetParameters };
+    if (maxCloudCoverage !== null && maxCloudCoverage !== undefined) {
+      findTilesAdditionalParameters.maxCloudCoverPercent = maxCloudCoverage * 100;
+    }
+
     const response = await this.findTilesUsingCatalog(
       authToken,
       bbox,
@@ -616,7 +622,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       10000,
       0,
       innerReqConfig,
-      findDatesUTCAdditionalParameters,
+      findTilesAdditionalParameters,
       'date',
     );
     return response.data.features
