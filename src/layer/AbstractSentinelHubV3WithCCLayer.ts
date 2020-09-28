@@ -56,9 +56,11 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Record<string, any>> {
-    return {
-      maxCloudCoverage: this.maxCloudCoverPercent / 100,
-    };
+    return this.maxCloudCoverPercent !== null && this.maxCloudCoverPercent !== undefined
+      ? {
+          maxCloudCoverage: this.maxCloudCoverPercent / 100,
+        }
+      : {};
   }
   protected getStatsAdditionalParameters(): Record<string, any> {
     return {
