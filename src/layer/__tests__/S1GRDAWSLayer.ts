@@ -23,6 +23,18 @@ import {
   mockNetwork,
 } from './testUtils.findTiles';
 
+import {
+  checkIfCorrectEndpointIsUsedFindDatesUTC,
+  checkRequestFindDatesUTC,
+  checkResponseFindDatesUTC,
+} from './testUtils.findDatesUTC';
+
+import {
+  constructFixtureFindDatesUTCSearchIndex,
+  constructFixtureFindDatesUTCCatalog,
+} from './fixtures.findDatesUTC';
+import { DATASET_AWSEU_S1GRD } from '../dataset';
+
 test('timezone should NOT be UTC', () => {
   // We are testing correctness in case of local timezones, so it doesn't make sense to
   // run these tests in UTC timezone. Env var in package.json should take care of that, but we
@@ -155,11 +167,6 @@ const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
 const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
 
 const layerParamsArr: Record<string, any>[] = [
-  {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-  },
   ...Object.keys(AcquisitionMode).map(acquisitionMode => ({
     fromTime: fromTime,
     toTime: toTime,
@@ -167,6 +174,7 @@ const layerParamsArr: Record<string, any>[] = [
     acquisitionMode: acquisitionMode,
     polarization: Polarization.DV,
     resolution: Resolution.HIGH,
+    orbitDirection: OrbitDirection.ASCENDING,
   })),
   ...Object.keys(Polarization).map(polarization => ({
     fromTime: fromTime,
@@ -175,6 +183,7 @@ const layerParamsArr: Record<string, any>[] = [
     acquisitionMode: AcquisitionMode.IW,
     polarization: polarization,
     resolution: Resolution.HIGH,
+    orbitDirection: OrbitDirection.ASCENDING,
   })),
   ...Object.keys(Resolution).map(resolution => ({
     fromTime: fromTime,
@@ -183,6 +192,7 @@ const layerParamsArr: Record<string, any>[] = [
     acquisitionMode: AcquisitionMode.IW,
     polarization: Polarization.DV,
     resolution: resolution,
+    orbitDirection: OrbitDirection.ASCENDING,
   })),
   ...Object.keys(OrbitDirection).map(orbitDirection => ({
     fromTime: fromTime,
@@ -232,5 +242,136 @@ describe('Test findTiles using catalog', () => {
 
   test('response from catalog', async () => {
     await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
+  });
+});
+
+describe('Test findDatesUTC using searchIndex', () => {
+  beforeEach(async () => {
+    setAuthToken(null);
+    mockNetwork.reset();
+  });
+
+  test('findAvailableData is used if token is not set', async () => {
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      null,
+      constructFixtureFindDatesUTCSearchIndex(layer, {}),
+      DATASET_AWSEU_S1GRD.findDatesUTCUrl,
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+
+    if (layerParams && layerParams.acquisitionMode) {
+      constructorParams.acquisitionMode = layerParams.acquisitionMode;
+    }
+
+    if (layerParams && layerParams.orbitDirection) {
+      constructorParams.orbitDirection = layerParams.orbitDirection;
+    }
+
+    if (layerParams && layerParams.polarization) {
+      constructorParams.polarization = layerParams.polarization;
+    }
+
+    if (layerParams && layerParams.resolution) {
+      constructorParams.resolution = layerParams.resolution;
+    }
+
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+      orbitDirection: OrbitDirection.ASCENDING,
+    });
+    await checkResponseFindDatesUTC(
+      constructFixtureFindDatesUTCSearchIndex(layer, {
+        acquisitionMode: AcquisitionMode.IW,
+        polarization: Polarization.DV,
+        resolution: Resolution.HIGH,
+        orbitDirection: OrbitDirection.ASCENDING,
+      }),
+    );
+  });
+});
+describe('Test findDatesUTC using catalog', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('catalog is used if token is set', async () => {
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      AUTH_TOKEN,
+      constructFixtureFindDatesUTCCatalog(layer, {}),
+      CATALOG_URL,
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+
+    if (layerParams && layerParams.acquisitionMode) {
+      constructorParams.acquisitionMode = layerParams.acquisitionMode;
+    }
+
+    if (layerParams && layerParams.orbitDirection) {
+      constructorParams.orbitDirection = layerParams.orbitDirection;
+    }
+
+    if (layerParams && layerParams.polarization) {
+      constructorParams.polarization = layerParams.polarization;
+    }
+
+    if (layerParams && layerParams.resolution) {
+      constructorParams.resolution = layerParams.resolution;
+    }
+
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCCatalog(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new S1GRDAWSEULayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+      orbitDirection: OrbitDirection.ASCENDING,
+    });
+    await checkResponseFindDatesUTC(
+      constructFixtureFindDatesUTCCatalog(layer, {
+        acquisitionMode: AcquisitionMode.IW,
+        polarization: Polarization.DV,
+        resolution: Resolution.HIGH,
+        orbitDirection: OrbitDirection.ASCENDING,
+      }),
+    );
   });
 });

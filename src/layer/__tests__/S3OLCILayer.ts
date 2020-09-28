@@ -1,4 +1,4 @@
-import { BBox, CRS_EPSG4326, setAuthToken } from '../../index';
+import { BBox, CRS_EPSG4326, S3OLCILayer, setAuthToken, DATASET_S3OLCI } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
@@ -11,6 +11,17 @@ import {
   checkResponseFindTiles,
   mockNetwork,
 } from './testUtils.findTiles';
+
+import {
+  checkIfCorrectEndpointIsUsedFindDatesUTC,
+  checkRequestFindDatesUTC,
+  checkResponseFindDatesUTC,
+} from './testUtils.findDatesUTC';
+
+import {
+  constructFixtureFindDatesUTCSearchIndex,
+  constructFixtureFindDatesUTCCatalog,
+} from './fixtures.findDatesUTC';
 
 const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/search';
 const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex';
@@ -64,5 +75,82 @@ describe('Test findTiles using catalog', () => {
 
   test('response from catalog', async () => {
     await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
+  });
+});
+
+describe('Test findDatesUTC using searchIndex', () => {
+  beforeEach(async () => {
+    setAuthToken(null);
+    mockNetwork.reset();
+  });
+
+  test('findAvailableData is used if token is not set', async () => {
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      null,
+      constructFixtureFindDatesUTCSearchIndex(layer, {}),
+      DATASET_S3OLCI.findDatesUTCUrl,
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCSearchIndex(layer, {}));
+  });
+});
+describe('Test findDatesUTC using catalog', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('catalog is used if token is set', async () => {
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkIfCorrectEndpointIsUsedFindDatesUTC(
+      AUTH_TOKEN,
+      constructFixtureFindDatesUTCCatalog(layer, {}),
+      CATALOG_URL,
+    );
+  });
+
+  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+    let constructorParams: Record<string, any> = {};
+
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      ...constructorParams,
+    });
+    const fixtures = constructFixtureFindDatesUTCCatalog(layer, layerParams);
+    await checkRequestFindDatesUTC(fixtures);
+  });
+
+  test('response from service', async () => {
+    const layer = new S3OLCILayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+    });
+    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
   });
 });
