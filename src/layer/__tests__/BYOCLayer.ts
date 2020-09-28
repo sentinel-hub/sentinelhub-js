@@ -1,4 +1,4 @@
-import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer, DATASET_BYOC } from '../../index';
+import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
 import { SHV3_LOCATIONS_ROOT_URL } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
