@@ -30,7 +30,7 @@ export async function getImageProperties(originalBlob: Blob): Promise<ImagePrope
   const imgCanvas = document.createElement('canvas');
   try {
     const imgCtx = imgCanvas.getContext('2d');
-    imgObjectUrl = window.URL.createObjectURL(originalBlob);
+    imgObjectUrl = URL.createObjectURL(originalBlob);
     const img: any = await new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
@@ -52,7 +52,7 @@ export async function getImageProperties(originalBlob: Blob): Promise<ImagePrope
   } finally {
     imgCanvas.remove();
     if (imgObjectUrl) {
-      window.URL.revokeObjectURL(imgObjectUrl);
+      URL.revokeObjectURL(imgObjectUrl);
     }
   }
 }
