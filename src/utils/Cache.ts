@@ -40,7 +40,7 @@ async function getFirstUseableTarget(targets: CacheTargets): Promise<CacheTarget
 }
 
 async function checkIfCacheApiAvailable(): Promise<boolean> {
-  if (!window.caches) {
+  if (typeof window === 'undefined' || !window.caches) {
     return false;
   }
   try {
