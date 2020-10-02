@@ -488,7 +488,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
-    distinct: string | null = null,
   ): Promise<Record<string, any>> {
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
@@ -508,7 +507,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
 
-    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
+    const { maxCloudCoverPercent, datasetParameters, distinct } = findTilesAdditionalParameters;
 
     const payload: any = {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
@@ -613,6 +612,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (maxCloudCoverage !== null && maxCloudCoverage !== undefined) {
       findTilesAdditionalParameters.maxCloudCoverPercent = maxCloudCoverage * 100;
     }
+    findTilesAdditionalParameters.distinct = 'date';
 
     const response = await this.findTilesUsingCatalog(
       authToken,
@@ -623,7 +623,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       0,
       innerReqConfig,
       findTilesAdditionalParameters,
-      'date',
     );
     return response.data.features
       .map((date: Date) => new Date(date))
