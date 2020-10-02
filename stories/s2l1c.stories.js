@@ -1,4 +1,4 @@
-import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { createFindDatesUTCStory, renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 import { setAuthToken } from '../dist/sentinelHub.esm';
 
 import {
@@ -319,53 +319,29 @@ export const findFlyovers = () => {
   return wrapperEl;
 };
 
-export const findDatesUTC = () => {
-  const maxCloudCoverPercent = 60;
-  const layerS2L1C = new S2L1CLayer({
-    instanceId,
-    layerId,
-    maxCloudCoverPercent,
-  });
+export const findDatesUTCSearchIndex = () =>
+  createFindDatesUTCStory(
+    new S2L1CLayer({
+      instanceId,
+      layerId,
+      maxCloudCoverPercent: 20,
+    }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
 
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>findDatesUTC for Sentinel-2 L2A; maxcc = ${maxCloudCoverPercent}</h2>`;
-
-  const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement('beforeend', containerEl);
-
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-
-  const perform = async () => {
-    const dates = await layerS2L1C.findDatesUTC(
-      bbox4326,
-      new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
-      new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
-    );
-
-    containerEl.innerHTML = JSON.stringify(dates, null, true);
-
-    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
-
-    // prepare an image to show that the number makes sense:
-    const getMapParams = {
-      bbox: bbox4326,
-      fromTime: resDateStartOfDay,
-      toTime: resDateEndOfDay,
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layerS2L1C.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
+    false,
+  );
+export const findDatesUTCCatalog = () =>
+  createFindDatesUTCStory(
+    new S2L1CLayer({
+      instanceId,
+      layerId,
+      maxCloudCoverPercent: 20,
+    }),
+    bbox4326,
+    true,
+  );
 
 export const stats = () => {
   const layerS2L1C = new S2L1CLayer({
