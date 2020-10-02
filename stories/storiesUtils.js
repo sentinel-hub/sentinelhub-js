@@ -1,4 +1,11 @@
-import { setAuthToken, isAuthTokenSet, requestAuthToken, setDebugEnabled } from '../dist/sentinelHub.esm';
+import {
+  setAuthToken,
+  isAuthTokenSet,
+  requestAuthToken,
+  setDebugEnabled,
+  MimeTypes,
+  ApiType,
+} from '../dist/sentinelHub.esm';
 
 // in storybooks, always display curl commands in console:
 setDebugEnabled(true);
@@ -38,3 +45,51 @@ export async function setAuthTokenWithOAuthCredentials() {
   setAuthToken(authToken);
   console.log('Auth token retrieved and set successfully');
 }
+
+export const createFindDatesUTCStory = (layer, bbox4326, fromTime, toTime, useAuth) => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML =
+    `<h2>findDatesUTC using ${useAuth ? 'catalog' : 'search index'}</h2>` +
+    'from: ' +
+    fromTime +
+    '<br />' +
+    'to: ' +
+    toTime;
+
+  const containerEl = document.createElement('pre');
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    if (useAuth) {
+      await setAuthTokenWithOAuthCredentials();
+    } else {
+      setAuthToken(null);
+    }
+    const dates = await layer.findDatesUTC(bbox4326, fromTime, toTime);
+
+    containerEl.innerHTML = JSON.stringify(dates, null, true);
+
+    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
+    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
+
+    // prepare an image to show that the number makes sense:
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: resDateStartOfDay,
+      toTime: resDateEndOfDay,
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

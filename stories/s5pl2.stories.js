@@ -1,4 +1,4 @@
-import { renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
+import { createFindDatesUTCStory, renderTilesList, setAuthTokenWithOAuthCredentials } from './storiesUtils';
 
 import {
   S5PL2Layer,
@@ -306,47 +306,23 @@ export const findTilesCatalog = () => {
   return wrapperEl;
 };
 
-export const findDatesUTC = () => {
-  const layer = new S5PL2Layer({ instanceId, layerId, productType: 'NO2', maxCloudCoverPercent: 60 });
+export const findDatesUTCSearchIndex = () =>
+  createFindDatesUTCStory(
+    new S5PL2Layer({ instanceId, layerId, productType: 'NO2' }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59)),
+    false,
+  );
 
-  const fromTime = new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0));
-  const toTime = new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59));
-
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML =
-    '<h2>findDatesUTC</h2>' + 'from: ' + fromTime.toISOString() + '<br />' + 'to: ' + toTime.toISOString();
-
-  const containerEl = document.createElement('pre');
-  wrapperEl.insertAdjacentElement('beforeend', containerEl);
-
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-
-  const perform = async () => {
-    const dates = await layer.findDatesUTC(bbox4326, fromTime, toTime);
-    containerEl.innerHTML = JSON.stringify(dates, null, true);
-
-    const resDateStartOfDay = new Date(new Date(dates[0]).setUTCHours(0, 0, 0, 0));
-    const resDateEndOfDay = new Date(new Date(dates[0]).setUTCHours(23, 59, 59, 999));
-
-    // prepare an image to show that the number makes sense:
-    const getMapParams = {
-      bbox: bbox4326,
-      fromTime: resDateStartOfDay,
-      toTime: resDateEndOfDay,
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
-    img.src = URL.createObjectURL(imageBlob);
-  };
-  perform().then(() => {});
-
-  return wrapperEl;
-};
+export const findDatesUTCCatalog = () =>
+  createFindDatesUTCStory(
+    new S5PL2Layer({ instanceId, layerId, productType: 'NO2' }),
+    bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 2 - 1, 1, 23, 59, 59)),
+    true,
+  );
 
 export const stats = () => {
   const wrapperEl = document.createElement('div');
