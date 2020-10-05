@@ -624,19 +624,35 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     findTilesAdditionalParameters.distinct = 'date';
 
-    const response = await this.findTilesUsingCatalog(
-      authToken,
-      bbox,
-      fromTime,
-      toTime,
-      10000,
-      0,
-      innerReqConfig,
-      findTilesAdditionalParameters,
-    );
-    return response.data.features
-      .map((date: Date) => new Date(date))
-      .sort((a: Date, b: Date) => b.getTime() - a.getTime());
+    let results: Date[] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await this.findTilesUsingCatalog(
+        authToken,
+        bbox,
+        fromTime,
+        toTime,
+        CATALOG_SEARCH_MAX_LIMIT,
+        offset,
+        innerReqConfig,
+        findTilesAdditionalParameters,
+      );
+
+      if (response && response.data && response.data.features) {
+        results = [...results, ...response.data.features.map((date: string) => new Date(date))];
+      }
+
+      if (response && response.data && response.data.context && !!response.data.context.next) {
+        hasMore = !!response.data.context.next;
+        offset = response.data.context.next;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return results.sort((a: Date, b: Date) => b.getTime() - a.getTime());
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
