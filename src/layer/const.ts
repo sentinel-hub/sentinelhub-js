@@ -216,3 +216,7 @@ export type BYOCBand = {
 };
 
 export type FindTilesAdditionalParameters = Record<string, any>;
+
+//catalog search uses optional `limit` parameter that limits the number of items that are presented in the response document
+//CATALOG_SEARCH_MAX_LIMIT represents maximum value for that parameter
+export const CATALOG_SEARCH_MAX_LIMIT = 100;
