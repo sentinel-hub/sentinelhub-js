@@ -20,6 +20,7 @@ import {
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
   FindTilesAdditionalParameters,
+  CATALOG_SEARCH_MAX_LIMIT,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
@@ -489,6 +490,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
   ): Promise<Record<string, any>> {
+    if (maxCount !== null && maxCount > CATALOG_SEARCH_MAX_LIMIT) {
+      throw new Error('Parameter maxCount must be less than or equal to 100');
+    }
+
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
     }
