@@ -12,6 +12,7 @@ import {
 } from '../../index';
 import { AbstractSentinelHubV3Layer } from '../AbstractSentinelHubV3Layer';
 import { AbstractSentinelHubV3WithCCLayer } from '../AbstractSentinelHubV3WithCCLayer';
+import { CATALOG_SEARCH_MAX_LIMIT } from '../const';
 
 export function constructFixtureFindDatesUTCSearchIndex(
   layer: AbstractSentinelHubV3Layer,
@@ -46,16 +47,7 @@ export function constructFixtureFindDatesUTCSearchIndex(
     from: fromTime.toISOString(),
     to: toTime.toISOString(),
   };
-  /*
-datasetParameters: {
-      acquisitionMode: acquisitionMode,
-      orbitDirection: orbitDirection,
-      polarization: polarization,
-      resolution: resolution,
-      type: 'S1GRD',
-    },
 
-*/
   if (layer instanceof S1GRDAWSEULayer) {
     expectedRequest.datasetParameters = { type: 'S1GRD' };
   }
@@ -177,7 +169,7 @@ export function constructFixtureFindDatesUTCCatalog(
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: [layer.dataset.catalogCollectionId],
-    limit: 10000,
+    limit: CATALOG_SEARCH_MAX_LIMIT,
     distinct: 'date',
     query: { 'eo:cloud_cover': { lte: maxCloudCoverPercent !== null ? maxCloudCoverPercent : 100 } },
   };
@@ -238,7 +230,7 @@ export function constructFixtureFindDatesUTCCatalog(
         type: 'application/json',
       },
     ],
-    context: { limit: 10000, returned: 13 },
+    context: { limit: CATALOG_SEARCH_MAX_LIMIT, returned: 13 },
   };
   /* eslint-enable */
 
