@@ -520,6 +520,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       collections: [catalogCollectionId],
       limit: maxCount,
     };
+
+    if (maxCount === null) {
+      delete payload.limit;
+    }
+
     if (offset > 0) {
       payload.next = offset;
     }
