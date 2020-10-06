@@ -491,7 +491,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
   ): Promise<Record<string, any>> {
     if (maxCount !== null && maxCount > CATALOG_SEARCH_MAX_LIMIT) {
-      throw new Error('Parameter maxCount must be less than or equal to 100');
+      throw new Error(`Parameter maxCount must be less than or equal to ${CATALOG_SEARCH_MAX_LIMIT}`);
     }
 
     if (!authToken) {
