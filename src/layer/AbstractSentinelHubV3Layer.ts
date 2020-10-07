@@ -518,11 +518,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
       collections: [catalogCollectionId],
-      limit: maxCount,
     };
 
-    if (maxCount === null) {
-      delete payload.limit;
+    if (maxCount > 0) {
+      payload.limit = maxCount;
     }
 
     if (offset > 0) {
