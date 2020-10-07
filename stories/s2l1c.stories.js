@@ -340,6 +340,8 @@ export const findDatesUTCCatalog = () =>
       maxCloudCoverPercent: 20,
     }),
     bbox4326,
+    new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     true,
   );
 

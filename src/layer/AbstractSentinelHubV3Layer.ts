@@ -20,6 +20,7 @@ import {
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
   DataProductId,
   FindTilesAdditionalParameters,
+  CATALOG_SEARCH_MAX_LIMIT,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
@@ -489,6 +490,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
   ): Promise<Record<string, any>> {
+    if (maxCount !== null && maxCount > CATALOG_SEARCH_MAX_LIMIT) {
+      throw new Error(`Parameter maxCount must be less than or equal to ${CATALOG_SEARCH_MAX_LIMIT}`);
+    }
+
     if (!authToken) {
       throw new Error('Must be authenticated to use Catalog service');
     }
@@ -513,8 +518,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
       datetime: `${moment.utc(fromTime).toISOString()}/${moment.utc(toTime).toISOString()}`,
       collections: [catalogCollectionId],
-      limit: maxCount,
     };
+
+    if (maxCount > 0) {
+      payload.limit = maxCount;
+    }
+
     if (offset > 0) {
       payload.next = offset;
     }
@@ -614,19 +623,35 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     findTilesAdditionalParameters.distinct = 'date';
 
-    const response = await this.findTilesUsingCatalog(
-      authToken,
-      bbox,
-      fromTime,
-      toTime,
-      10000,
-      0,
-      innerReqConfig,
-      findTilesAdditionalParameters,
-    );
-    return response.data.features
-      .map((date: Date) => new Date(date))
-      .sort((a: Date, b: Date) => b.getTime() - a.getTime());
+    let results: Date[] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    while (hasMore) {
+      const response = await this.findTilesUsingCatalog(
+        authToken,
+        bbox,
+        fromTime,
+        toTime,
+        CATALOG_SEARCH_MAX_LIMIT,
+        offset,
+        innerReqConfig,
+        findTilesAdditionalParameters,
+      );
+
+      if (response && response.data && response.data.features) {
+        results = [...results, ...response.data.features.map((date: string) => new Date(date))];
+      }
+
+      if (response && response.data && response.data.context && !!response.data.context.next) {
+        hasMore = !!response.data.context.next;
+        offset = response.data.context.next;
+      } else {
+        hasMore = false;
+      }
+    }
+
+    return results.sort((a: Date, b: Date) => b.getTime() - a.getTime());
   }
 
   public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
