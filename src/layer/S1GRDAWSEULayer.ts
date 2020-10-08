@@ -117,6 +117,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.orthorectify = layerParams['orthorectify'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+      this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
       // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);

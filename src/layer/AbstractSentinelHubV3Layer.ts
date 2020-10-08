@@ -744,6 +744,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     await ensureTimeout(async innerReqConfig => {
       const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
+      this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
       // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
