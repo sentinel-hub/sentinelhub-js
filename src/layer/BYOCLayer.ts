@@ -76,7 +76,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       if (this.collectionId === null || this.evalscript === null) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
         this.collectionId = layerParams['collectionId'];
-        this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
+        if (!this.evalscript) {
+          this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
+        }
       }
 
       if (this.locationId === null) {
