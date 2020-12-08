@@ -8,6 +8,7 @@ import {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  DEMInstanceType,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -122,6 +123,7 @@ export {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  DEMInstanceType,
   S3SLSTRView,
   BBox,
   LocationIdSHv3,
