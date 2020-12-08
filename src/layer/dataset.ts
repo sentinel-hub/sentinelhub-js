@@ -209,7 +209,7 @@ export const DATASET_AWS_DEM: Dataset = {
   shWmsEvalsource: 'DEM',
   shProcessingApiDatasourceAbbreviation: 'DEM',
   datasetParametersType: null,
-  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  shServiceHostname: 'https://services.sentinel-hub.com/',
   searchIndexUrl: null,
   findDatesUTCUrl: null,
   orbitTimeMinutes: null,
