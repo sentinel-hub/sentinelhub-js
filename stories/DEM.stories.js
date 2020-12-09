@@ -5,6 +5,7 @@ import {
   BBox,
   MimeTypes,
   ApiType,
+  DEMAWSUSLayer,
   DEMLayer,
   DEMInstanceType,
   setAuthToken,
@@ -156,6 +157,37 @@ export const GetMapProcessing = () => {
       const imageBlob = await demLayer.layer.getMap(getMapParams, ApiType.PROCESSING);
       demLayer.img.src = URL.createObjectURL(imageBlob);
     });
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapProcessingAWSUS = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for DEM_AWS_US</h2>';
+  const img = document.createElement('img');
+  img.width = '256';
+  img.height = '256';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+  const demAWSUSLayer = new DEMAWSUSLayer({ evalscript: defaultDEMEvalscript });
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await demAWSUSLayer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 
