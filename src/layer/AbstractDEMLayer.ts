@@ -15,7 +15,7 @@ import { BBox } from '../bbox';
 import { Polygon } from '@turf/helpers';
 import moment from 'moment';
 
-interface ConstructorParameters {
+export interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
   evalscript?: string | null;
@@ -33,7 +33,7 @@ interface ConstructorParameters {
 }
 
 export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
-  private demInstance: DEMInstanceType;
+  protected demInstance: DEMInstanceType;
 
   public constructor({ demInstance, ...rest }: ConstructorParameters) {
     super(rest);
@@ -42,12 +42,6 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
-      if (this.instanceId === null || this.layerId === null) {
-        throw new Error(
-          "Some of layer parameters (collectionId, locationId) are not set and can't be fetched from service because instanceId and layerId are not available",
-        );
-      }
-
       if (!this.demInstance) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
         this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
