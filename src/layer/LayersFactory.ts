@@ -12,7 +12,7 @@ import {
   DATASET_S2L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
-  DATASET_AWS_US_DEM,
+  DATASET_AWSUS_DEM,
   DATASET_AWSEU_S1GRD,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
@@ -34,8 +34,8 @@ import { S3SLSTRLayer } from './S3SLSTRLayer';
 import { S3OLCILayer } from './S3OLCILayer';
 import { S5PL2Layer } from './S5PL2Layer';
 import { MODISLayer } from './MODISLayer';
+import { DEMAWSUSLayer } from './DEMAWSUSLayer';
 import { DEMLayer } from './DEMLayer';
-import { DEMLayerAWSUS } from './DEMLayerAWSUS';
 import { Landsat8AWSLayer } from './Landsat8AWSLayer';
 import { BYOCLayer } from './BYOCLayer';
 import { S1GRDEOCloudLayer } from './S1GRDEOCloudLayer';
@@ -63,7 +63,7 @@ export class LayersFactory {
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
-    [DATASET_AWS_US_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_US_DEM,
+    [DATASET_AWSUS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWSUS_DEM,
     [DATASET_BYOC.shJsonGetCapabilitiesDataset]: DATASET_BYOC,
   };
 
@@ -87,7 +87,7 @@ export class LayersFactory {
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
-    [DATASET_AWS_US_DEM.id]: DEMLayerAWSUS,
+    [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
     [DATASET_BYOC.id]: BYOCLayer,
   };
 
