@@ -217,8 +217,8 @@ export const DATASET_AWS_DEM: Dataset = {
   maxDate: null,
 };
 
-export const DATASET_AWS_US_DEM: Dataset = {
-  id: 'AWS_US_DEM',
+export const DATASET_AWSUS_DEM: Dataset = {
+  id: 'AWSUS_DEM',
   shJsonGetCapabilitiesDataset: 'DEM',
   shWmsEvalsource: 'DEM',
   shProcessingApiDatasourceAbbreviation: 'DEM',
