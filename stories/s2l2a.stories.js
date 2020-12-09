@@ -469,16 +469,16 @@ export const getMapURLGainGamma = () => {
     const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
-      const imageBlobNoGainGamma = await layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
+      const imageBlobNoGainGamma = layerS2L2A.getMapUrl(getMapParams, ApiType.WMS);
       imgNoGainGamma.src = imageBlobNoGainGamma;
 
-      const imageBlobGainIs2 = await layerS2L2A.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
+      const imageBlobGainIs2 = layerS2L2A.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
       imgGainIs2.src = imageBlobGainIs2;
 
-      const imageBlobGammaIs2 = await layerS2L2A.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
+      const imageBlobGammaIs2 = layerS2L2A.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
       imgGammaIs2.src = imageBlobGammaIs2;
 
-      const imageBlobGainGamaAre2 = await layerS2L2A.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
+      const imageBlobGainGamaAre2 = layerS2L2A.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
       imgGainGammaAre2.src = imageBlobGainGamaAre2;
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
