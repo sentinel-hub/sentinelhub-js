@@ -168,12 +168,14 @@ export const GetMapProcessingAWSUS = () => {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with Processing for DEM_AWS_US</h2>';
-  const img = document.createElement('img');
-  img.width = '256';
-  img.height = '256';
-  wrapperEl.insertAdjacentElement('beforeend', img);
-  const demAWSUSLayer = new DEMAWSUSLayer({ evalscript: defaultDEMEvalscript });
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for DEM_AWSUS</h2>';
+  wrapperEl.innerHTML += `<h4> MAPZEN</h4>`;
+
+  const imgMapzen = document.createElement('img');
+  imgMapzen.width = '256';
+  imgMapzen.height = '256';
+  wrapperEl.insertAdjacentElement('beforeend', imgMapzen);
+  const demAWSUSLayerMapzen = new DEMAWSUSLayer({ evalscript: defaultDEMEvalscript });
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -186,8 +188,27 @@ export const GetMapProcessingAWSUS = () => {
       height: 256,
       format: MimeTypes.JPEG,
     };
-    const imageBlob = await demAWSUSLayer.getMap(getMapParams, ApiType.PROCESSING);
-    img.src = URL.createObjectURL(imageBlob);
+    const imageBlob = await demAWSUSLayerMapzen.getMap(getMapParams, ApiType.PROCESSING);
+    imgMapzen.src = URL.createObjectURL(imageBlob);
+
+    try {
+      const demAWSUSLayerCopernicus = new DEMAWSUSLayer({
+        evalscript: defaultDEMEvalscript,
+        demInstance: DEMInstanceType.COPERNICUS_30,
+      });
+
+      const imgCopernicus = document.createElement('img');
+      imgCopernicus.width = '256';
+      imgCopernicus.height = '256';
+      wrapperEl.insertAdjacentElement('beforeend', imgCopernicus);
+      const imageBlob = await demAWSUSLayerCopernicus.getMap(getMapParams, ApiType.PROCESSING);
+      imgCopernicus.src = URL.createObjectURL(imageBlob);
+    } catch (e) {
+      const error = document.createElement('div');
+      error.innerHTML = e.message;
+      wrapperEl.innerHTML += `<h4> COPERNICUS_30</h4>`;
+      wrapperEl.insertAdjacentElement('beforeend', error);
+    }
   };
   perform().then(() => {});
 
