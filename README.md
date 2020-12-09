@@ -147,16 +147,16 @@ Note that both of the images above should be _exactly_ the same.
 In some cases we can retrieve just the image URL instead of a blob:
 
 ```javascript
-  const imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
-  const imageUrl2 = await layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
+  const imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
+  const imageUrl2 = layer.getMapUrl(getMapParams, ApiType.PROCESSING); // exception thrown - Processing API does not support HTTP GET method
 ```
 
 It is also possible to determine whether a layer supports a specific ApiType:
 ```javascript
   if (layer.supportsApiType(ApiType.PROCESSING)) {
-    imageUrl = await layer.getMapUrl(getMapParams, ApiType.PROCESSING);
+    imageUrl = layer.getMapUrl(getMapParams, ApiType.PROCESSING);
   } else {
-    imageUrl = await layer.getMapUrl(getMapParams, ApiType.WMS);
+    imageUrl = layer.getMapUrl(getMapParams, ApiType.WMS);
   };
 ```
 
@@ -388,15 +388,15 @@ If we already have a WMS GetMap URL, we can use it directly:
 Example params: `gain`, `gamma`, `upsampling`, `downsampling`, etc.
 
 `legacyGetMapFromParams` and `legacyGetMapFromUrl` also accept the parameters that are used for creating a dataset-specific layer object or for getting the data with `getMap()` function but are not supported in [OGC WMS GetMap standard](https://www.sentinel-hub.com/develop/api/ogc/standard-parameters/wms/) and [Sentinel hub OGC API](https://www.sentinel-hub.com/develop/api/ogc/custom-parameters/).
-- Parameters which would be used for creating a `Layer` can be passed inside of `overrideLayerConstructorParams`. 
+- Parameters which would be used for creating a `Layer` can be passed inside of `overrideLayerConstructorParams`.
 Example params: dataset-specific params for creating [layers](#layers)
-- Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`. 
+- Parameters which would be passed to `getMap` can be passed inside the `overrideGetMapParams`.
 Example params: [effects](#effects)
 
 ```javascript
   const imageBlob5 = await legacyGetMapFromParams(
-    rootUrl, 
-    wmsParams, 
+    rootUrl,
+    wmsParams,
     ApiType.PROCESSING
     fallbackToWmsApi,
     overrideLayerConstructorParams,

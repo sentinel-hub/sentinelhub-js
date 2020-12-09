@@ -225,16 +225,16 @@ export const getMapURLGainGamma = () => {
     const getMapParamsGainGammaAre2 = { ...getMapParams, effects: { gain: gain, gamma: gamma } };
 
     try {
-      const imageBlobNoGainGamma = await layer.getMapUrl(getMapParams, ApiType.WMS);
+      const imageBlobNoGainGamma = layer.getMapUrl(getMapParams, ApiType.WMS);
       imgNoGainGamma.src = imageBlobNoGainGamma;
 
-      const imageBlobGainIs2 = await layer.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
+      const imageBlobGainIs2 = layer.getMapUrl(getMapParamsGainIs2, ApiType.WMS);
       imgGainIs2.src = imageBlobGainIs2;
 
-      const imageBlobGammaIs2 = await layer.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
+      const imageBlobGammaIs2 = layer.getMapUrl(getMapParamsGammaIs2, ApiType.WMS);
       imgGammaIs2.src = imageBlobGammaIs2;
 
-      const imageBlobGainGamaAre2 = await layer.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
+      const imageBlobGainGamaAre2 = layer.getMapUrl(getMapParamsGainGammaAre2, ApiType.WMS);
       imgGainGammaAre2.src = imageBlobGainGamaAre2;
     } catch (err) {
       wrapperEl.innerHTML += '<pre>ERROR OCCURED: ' + err + '</pre>';
