@@ -33,6 +33,10 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
+      if (!(this.instanceId && this.layerId)) {
+        return;
+      }
+
       if (!this.demInstance) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
         this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
