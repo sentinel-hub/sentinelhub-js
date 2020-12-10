@@ -81,26 +81,23 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   public async findTiles(
     bbox: BBox,
-    fromTime: Date,
+    fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
     toTime: Date,
-    maxCount: number | null = null,
+    maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     const tiles = [];
     let hasMore = false;
 
-    const intervalStart = fromTime ? moment.utc(fromTime) : moment.utc(toTime);
-    const dateIterator = moment.utc(toTime);
-
-    while (dateIterator.isAfter(intervalStart)) {
-      if (maxCount && tiles.length >= maxCount) {
-        hasMore = true;
-        break;
-      }
-      tiles.push({ geometry: this.bboxToPolygon(bbox), sensingTime: dateIterator.toDate(), meta: {} });
-      dateIterator.subtract(1, 'days');
-    }
+    tiles.push({
+      geometry: this.bboxToPolygon(bbox),
+      sensingTime: moment
+        .utc(toTime)
+        .startOf('day')
+        .toDate(),
+      meta: {},
+    });
 
     return { tiles: tiles, hasMore: hasMore };
   }
