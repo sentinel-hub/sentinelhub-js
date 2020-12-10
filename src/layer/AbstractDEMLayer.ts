@@ -1,13 +1,5 @@
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
-import {
-  ApiType,
-  DataProductId,
-  DEMInstanceType,
-  GetMapParams,
-  Interpolator,
-  MosaickingOrder,
-  PaginatedTiles,
-} from './const';
+import { ApiType, DataProductId, DEMInstanceType, GetMapParams, Interpolator, PaginatedTiles } from './const';
 import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
@@ -21,7 +13,6 @@ export interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: DataProductId | null;
-  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
   upsampling?: Interpolator | null;
@@ -62,6 +53,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload = await super.updateProcessingGetMapPayload(payload);
     payload.input.data[0].dataFilter.demInstance = this.demInstance;
+    delete payload.input.data[0].dataFilter.mosaickingOrder;
     return payload;
   }
 
