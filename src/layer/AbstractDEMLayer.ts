@@ -90,16 +90,16 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     const tiles = [];
     let hasMore = false;
 
-    const stopDate = fromTime ? moment.utc(fromTime) : moment.utc(toTime);
-    const iterDate = moment.utc(toTime);
+    const intervalStart = fromTime ? moment.utc(fromTime) : moment.utc(toTime);
+    const dateIterator = moment.utc(toTime);
 
-    while (iterDate.diff(stopDate) > 0) {
+    while (dateIterator.isAfter(intervalStart)) {
       if (maxCount && tiles.length >= maxCount) {
         hasMore = true;
         break;
       }
-      tiles.push({ geometry: this.bboxToPolygon(bbox), sensingTime: iterDate.toDate(), meta: {} });
-      iterDate.subtract(1, 'days');
+      tiles.push({ geometry: this.bboxToPolygon(bbox), sensingTime: dateIterator.toDate(), meta: {} });
+      dateIterator.subtract(1, 'days');
     }
 
     return { tiles: tiles, hasMore: hasMore };
