@@ -55,7 +55,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscriptUrl: string | null;
   protected dataProduct: DataProductId | null;
   public legend?: any[] | null;
-  protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
   public upsampling: Interpolator | null;
   public downsampling: Interpolator | null;
@@ -89,7 +88,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
-    this.evalscriptWasConvertedToV3 = false;
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
