@@ -200,10 +200,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return super.getStats(params);
   }
 
-  protected getConvertEvalscriptBaseUrl(): string {
-    return `${super.getConvertEvalscriptBaseUrl()}&byocCollectionId=${this.collectionId}`;
-  }
-
   public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       if (this.collectionId === null) {

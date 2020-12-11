@@ -55,7 +55,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   protected evalscriptUrl: string | null;
   protected dataProduct: DataProductId | null;
   public legend?: any[] | null;
-  protected evalscriptWasConvertedToV3: boolean | null;
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
   public upsampling: Interpolator | null;
   public downsampling: Interpolator | null;
@@ -89,7 +88,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.evalscript = evalscript;
     this.evalscriptUrl = evalscriptUrl;
     this.dataProduct = dataProduct;
-    this.evalscriptWasConvertedToV3 = false;
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
@@ -168,18 +166,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
   }
 
-  protected async convertEvalscriptToV3IfNeeded(reqConfig: RequestConfiguration): Promise<void> {
-    // Convert internal evalscript to V3 if it's not in that version.
-    if (this.evalscriptWasConvertedToV3 || !this.evalscript) {
-      return;
-    }
-    if (!this.evalscript.startsWith('//VERSION=3')) {
-      const evalscript = await this.convertEvalscriptToV3(this.evalscript, reqConfig);
-      this.evalscript = evalscript;
-    }
-    this.evalscriptWasConvertedToV3 = true;
-  }
-
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
     const getMapValue = await ensureTimeout(async innerReqConfig => {
       // SHv3 services support Processing API:
@@ -221,8 +207,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
             this.downsampling = layerParams.downsampling;
           }
         }
-
-        await this.convertEvalscriptToV3IfNeeded(innerReqConfig);
 
         const payload = createProcessingPayload(
           this.dataset,
@@ -719,27 +703,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return stats;
   }
 
-  protected async convertEvalscriptToV3(
-    evalscript: string,
-    reqConfig: RequestConfiguration,
-  ): Promise<string> {
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      throw new Error('Must be authenticated to convert evalscript to V3');
-    }
-    const url = this.getConvertEvalscriptBaseUrl();
-    const requestConfig: AxiosRequestConfig = {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Content-Type': 'application/ecmascript',
-      },
-      responseType: 'text',
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
-    };
-    const res = await axios.post(url, evalscript, requestConfig);
-    return res.data;
-  }
-
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
       const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
@@ -751,11 +714,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
-  }
-
-  protected getConvertEvalscriptBaseUrl(): string {
-    const shServiceHostname = this.getShServiceHostname();
-    return `${shServiceHostname}api/v1/process/convertscript?datasetType=${this.dataset.shProcessingApiDatasourceAbbreviation}`;
   }
 
   protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {
