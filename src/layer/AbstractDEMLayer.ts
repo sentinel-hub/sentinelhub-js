@@ -83,6 +83,9 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     };
   }
 
+  // Since DEM dataset doesn't have dates/tiles we mock tiles by always returning
+  //one "tile" which is covering input bounding box on the date of intervals end.
+
   public async findTiles(
     bbox: BBox,
     fromTime: Date, // eslint-disable-line @typescript-eslint/no-unused-vars
