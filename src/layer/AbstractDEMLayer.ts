@@ -96,10 +96,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
     tiles.push({
       geometry: this.bboxToPolygon(bbox),
-      sensingTime: moment
-        .utc(toTime)
-        .startOf('day')
-        .toDate(),
+      sensingTime: moment.utc(toTime).toDate(),
       meta: {},
     });
 
