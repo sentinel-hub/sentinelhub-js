@@ -37,6 +37,11 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
+      if (!(this.instanceId && this.layerId)) {
+        return;
+      }
+      //update properties defined on parent layer
+      await super.updateLayerFromServiceIfNeeded(innerReqConfig);
       //update DEM specific properties if they're not set
       if (!this.demInstance || isBooleanNull(this.egm) || isBooleanNull(this.clampNegative)) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
