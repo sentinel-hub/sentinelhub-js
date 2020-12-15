@@ -77,7 +77,10 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
       payload.input.data[0].processing.egm = this.egm;
     }
 
-    if (this.demInstance === DEMInstanceType.MAPZEN && !isBooleanNull(this.clampNegative)) {
+    if (
+      (!this.demInstance || this.demInstance === DEMInstanceType.MAPZEN) &&
+      !isBooleanNull(this.clampNegative)
+    ) {
       payload.input.data[0].processing.clampNegative = this.clampNegative;
     }
 
