@@ -12,6 +12,7 @@ import {
   DATASET_S2L1C,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  DATASET_AWSUS_DEM,
   DATASET_AWSEU_S1GRD,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
@@ -33,6 +34,7 @@ import { S3SLSTRLayer } from './S3SLSTRLayer';
 import { S3OLCILayer } from './S3OLCILayer';
 import { S5PL2Layer } from './S5PL2Layer';
 import { MODISLayer } from './MODISLayer';
+import { DEMAWSUSLayer } from './DEMAWSUSLayer';
 import { DEMLayer } from './DEMLayer';
 import { Landsat8AWSLayer } from './Landsat8AWSLayer';
 import { BYOCLayer } from './BYOCLayer';
@@ -84,6 +86,7 @@ export class LayersFactory {
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
+    [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
     [DATASET_BYOC.id]: BYOCLayer,
   };
 

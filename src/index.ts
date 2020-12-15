@@ -8,6 +8,7 @@ import {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  DEMInstanceType,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -28,6 +29,7 @@ import {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  DATASET_AWSUS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
@@ -39,6 +41,7 @@ import { S3OLCILayer } from './layer/S3OLCILayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
 import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from './layer/MODISLayer';
+import { DEMAWSUSLayer } from './layer/DEMAWSUSLayer';
 import { DEMLayer } from './layer/DEMLayer';
 import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
@@ -83,6 +86,7 @@ export {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
+  DATASET_AWSUS_DEM,
   // layers:
   WmsLayer,
   S1GRDAWSEULayer,
@@ -94,6 +98,7 @@ export {
   S5PL2Layer,
   EnvisatMerisEOCloudLayer,
   MODISLayer,
+  DEMAWSUSLayer,
   DEMLayer,
   Landsat5EOCloudLayer,
   Landsat7EOCloudLayer,
@@ -122,6 +127,7 @@ export {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  DEMInstanceType,
   S3SLSTRView,
   BBox,
   LocationIdSHv3,
