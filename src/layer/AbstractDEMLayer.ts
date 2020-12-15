@@ -25,21 +25,31 @@ export interface ConstructorParameters {
 
 export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   protected demInstance: DEMInstanceType;
+  protected egm: boolean = null;
+  protected clampNegative: boolean = null;
 
-  public constructor({ demInstance, ...rest }: ConstructorParameters) {
+  public constructor({ demInstance, egm, clampNegative, ...rest }: ConstructorParameters) {
     super(rest);
     this.demInstance = demInstance;
+    this.egm = egm;
+    this.clampNegative = clampNegative;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
-      if (!(this.instanceId && this.layerId)) {
-        return;
-      }
-
-      if (!this.demInstance) {
+      //update DEM specific properties if they're not set
+      if (!this.demInstance || isBooleanNull(this.egm) || isBooleanNull(this.clampNegative)) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
-        this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
+        if (!this.demInstance) {
+          this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
+        }
+        if (isBooleanNull(this.clampNegative)) {
+          this.clampNegative = layerParams['clampNegative'] ? layerParams['clampNegative'] : false;
+        }
+        if (isBooleanNull(this.egm)) {
+          //this in not a typo. Configuration service returns `EGM`, process api accepts `egm`
+          this.egm = layerParams['EGM'] ? layerParams['EGM'] : false;
+        }
       }
     }, reqConfig);
   }
@@ -57,7 +67,19 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload = await super.updateProcessingGetMapPayload(payload);
     payload.input.data[0].dataFilter.demInstance = this.demInstance;
+
+    if (!isBooleanNull(this.egm)) {
+      payload.input.data[0].processing.egm = this.egm;
+    }
+
+    if (this.demInstance === DEMInstanceType.MAPZEN && !isBooleanNull(this.clampNegative)) {
+      payload.input.data[0].processing.clampNegative = this.clampNegative;
+    }
+
+    //DEM doesn't support dates and mosaickingOrder so they can be removed from payload
     delete payload.input.data[0].dataFilter.mosaickingOrder;
+    delete payload.input.data[0].dataFilter.timeRange;
+
     return payload;
   }
 
@@ -116,3 +138,5 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     return tiles.map(tile => moment.utc(tile.sensingTime).toDate());
   }
 }
+
+const isBooleanNull = (value: boolean): boolean => value === null || value == undefined;
