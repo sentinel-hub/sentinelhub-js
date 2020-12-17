@@ -48,10 +48,10 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
         if (!this.demInstance) {
           this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
         }
-        if (isBooleanNull(this.clampNegative)) {
-          this.clampNegative = layerParams['clampNegative'] ? layerParams['clampNegative'] : false;
+        if (!isDefined(this.clampNegative)) {
+          this.clampNegative = layerParams['clampNegative'] ? layerParams['clampNegative'] : null;
         }
-        if (isBooleanNull(this.egm)) {
+        if (!isDefined(this.egm)) {
           //this in not a typo. Configuration service returns `EGM`, process api accepts `egm`
           this.egm = layerParams['EGM'] ? layerParams['EGM'] : false;
         }
@@ -73,14 +73,11 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     payload = await super.updateProcessingGetMapPayload(payload);
     payload.input.data[0].dataFilter.demInstance = this.demInstance;
 
-    if (!isBooleanNull(this.egm)) {
+    if (isDefined(this.egm)) {
       payload.input.data[0].processing.egm = this.egm;
     }
 
-    if (
-      (!this.demInstance || this.demInstance === DEMInstanceType.MAPZEN) &&
-      !isBooleanNull(this.clampNegative)
-    ) {
+    if ((!this.demInstance || this.demInstance === DEMInstanceType.MAPZEN) && isDefined(this.clampNegative)) {
       payload.input.data[0].processing.clampNegative = this.clampNegative;
     }
 
@@ -147,4 +144,4 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   }
 }
 
-const isBooleanNull = (value: boolean): boolean => value === null || value == undefined;
+const isDefined = (value: any): boolean => value !== null && value !== undefined;
