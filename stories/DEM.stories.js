@@ -52,6 +52,32 @@ return colorBlend(DEM, [-12000,-9000,-5000,-1000,-500,-200,-50,-20,-10,0,10,30,5
 [0.980, 0.576, 0.173],
 [1.000, 0.588, 0.176]])`;
 
+const colorDEMEvalscript = `
+//VERSION=3
+return colorBlend(DEM, [-12000,-9000,-6000,-1000,-500,-200,-50,-20,-10,0,10,30,50,200,300,400,500,1000,3000,5000,7000,9000],
+[[0.000, 0.000, 0.157],
+[0.118, 0.000, 0.353],
+[0.118, 0.118, 0.471],
+[0.157, 0.196, 0.706],
+[0.235, 0.235, 0.902],
+[0.235, 0.314, 0.961],
+[0.353, 0.333, 0.980],
+[0.471, 0.471, 0.922],
+[0.627, 0.627, 1.000],
+[0.784, 0.784, 0.784],
+[0.392, 0.220, 0.235],
+[0.471, 0.180, 0.157],
+[0.549, 0.298, 0.157],
+[0.667, 0.376, 0.000],
+[0.471, 0.220, 0.353],
+[0.824, 0.573, 0.706],
+[0.549, 0.431, 0.000],
+[0.471, 0.549, 0.706],
+[0.627, 0.667, 0.941],
+[0.745, 0.784, 0.980],
+[0.863, 0.941, 1.000],
+[1.000, 1.000, 1.000]])`;
+
 const createDEMLayers = (
   wrapperEl,
   createImgPlaceholder = true,
@@ -320,3 +346,55 @@ export const findDatesUTCCatalog = () =>
     new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     true,
   );
+
+export const ClampNegativeValues = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const bbox4326 = new BBox(
+    CRS_EPSG4326,
+    7.646484375000001,
+    39.54641191968671,
+    18.094482421875004,
+    47.31648293428335,
+  );
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Clamp negative values MAPZEN</h2>';
+  wrapperEl.innerHTML += `<h4>false|true</h4>`;
+
+  const img = document.createElement('img');
+  img.width = '256';
+  img.height = '256';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const imgClampNegative = document.createElement('img');
+  imgClampNegative.width = '256';
+  imgClampNegative.height = '256';
+  wrapperEl.insertAdjacentElement('beforeend', imgClampNegative);
+
+  const demLayer = new DEMLayer({ evalscript: colorDEMEvalscript });
+  const demLayerClampNegative = new DEMLayer({ evalscript: colorDEMEvalscript, clampNegative: true });
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await demLayer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
+
+    const imageBlobClampNegative = await demLayerClampNegative.getMap(getMapParams, ApiType.PROCESSING);
+    imgClampNegative.src = URL.createObjectURL(imageBlobClampNegative);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};

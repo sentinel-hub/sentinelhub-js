@@ -25,10 +25,24 @@ export interface ConstructorParameters {
 
 export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   protected demInstance: DEMInstanceType;
+  protected egm: boolean = null;
+  protected clampNegative: boolean = null;
+  private layerUpdatedFromService: boolean = false;
 
-  public constructor({ demInstance, ...rest }: ConstructorParameters) {
+  public constructor({ demInstance, egm, clampNegative, ...rest }: ConstructorParameters) {
     super(rest);
     this.demInstance = demInstance;
+    this.egm = egm;
+    this.clampNegative = clampNegative;
+  }
+
+  private shouldUpdateLayerFromService(): boolean {
+    //don't update layer info if layer has already been updated
+    if (this.layerUpdatedFromService) {
+      return false;
+    }
+    //update from service if any of DEM parameters is not set
+    return !(this.demInstance && isDefined(this.egm) && isDefined(this.clampNegative));
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
@@ -36,10 +50,22 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
       if (!(this.instanceId && this.layerId)) {
         return;
       }
-
-      if (!this.demInstance) {
+      //update properties defined on parent layer
+      await super.updateLayerFromServiceIfNeeded(innerReqConfig);
+      //update DEM specific properties if they're not set
+      if (this.shouldUpdateLayerFromService()) {
         const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
-        this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : DEMInstanceType.MAPZEN;
+        if (!this.demInstance) {
+          this.demInstance = layerParams['demInstance'] ? layerParams['demInstance'] : null;
+        }
+        if (!isDefined(this.clampNegative)) {
+          this.clampNegative = layerParams['clampNegative'] ? layerParams['clampNegative'] : null;
+        }
+        if (!isDefined(this.egm)) {
+          //this in not a typo. Configuration service returns `EGM`, process api accepts `egm`
+          this.egm = layerParams['EGM'] ? layerParams['EGM'] : null;
+        }
+        this.layerUpdatedFromService = true;
       }
     }, reqConfig);
   }
@@ -56,8 +82,23 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload = await super.updateProcessingGetMapPayload(payload);
-    payload.input.data[0].dataFilter.demInstance = this.demInstance;
+    if (!this.demInstance) {
+      payload.input.data[0].dataFilter.demInstance = this.demInstance;
+    }
+
+    if (isDefined(this.egm)) {
+      payload.input.data[0].processing.egm = this.egm;
+    }
+
+    //clampNegative is MAPZEN specific option
+    if ((!this.demInstance || this.demInstance === DEMInstanceType.MAPZEN) && isDefined(this.clampNegative)) {
+      payload.input.data[0].processing.clampNegative = this.clampNegative;
+    }
+
+    //DEM doesn't support dates and mosaickingOrder so they can be removed from payload
     delete payload.input.data[0].dataFilter.mosaickingOrder;
+    delete payload.input.data[0].dataFilter.timeRange;
+
     return payload;
   }
 
@@ -116,3 +157,5 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     return tiles.map(tile => moment.utc(tile.sensingTime).toDate());
   }
 }
+
+const isDefined = (value: any): boolean => value !== null && value !== undefined;
