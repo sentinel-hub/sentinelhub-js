@@ -82,7 +82,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
 
   protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload = await super.updateProcessingGetMapPayload(payload);
-    if (!this.demInstance) {
+    if (this.demInstance) {
       payload.input.data[0].dataFilter.demInstance = this.demInstance;
     }
 
