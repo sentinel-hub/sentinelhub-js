@@ -22,11 +22,14 @@ declare module 'axios' {
   }
 }
 
-export const registerAxiosCacheRetryInterceptors = (): any => {
+export const registerInitialAxiosInterceptors = (): any => {
   findAndDeleteExpiredCachedItems();
+  // note that the interceptors are called in reverse order in which they are registered - last
+  // defined interceptor is called first:
   axios.interceptors.request.use(logCurl, error => Promise.reject(error));
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
   axios.interceptors.response.use(saveCacheResponse, error => retryRequests(error));
+  // additionally, `registerHostnameReplacing()` registers another request interceptor (if/when called)
 };
 
 const logCurl = async (config: any): Promise<any> => {
