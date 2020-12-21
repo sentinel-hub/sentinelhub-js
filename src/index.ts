@@ -59,7 +59,8 @@ import {
 
 import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
 import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from './layer/const';
-import { registerAxiosCacheRetryInterceptors } from './utils/axiosInterceptors';
+import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
+import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { CacheTarget, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
@@ -67,7 +68,7 @@ import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
 
-registerAxiosCacheRetryInterceptors();
+registerInitialAxiosInterceptors();
 
 export {
   LayersFactory,
@@ -136,6 +137,7 @@ export {
   isCancelled,
   CacheTarget,
   invalidateCaches,
+  registerHostnameReplacing,
   RequestConfiguration,
   drawBlobOnCanvas,
   canvasToBlob,
