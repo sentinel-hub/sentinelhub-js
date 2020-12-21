@@ -387,9 +387,9 @@ export const GetMapProcessingAlternativeHostname = () => {
     } finally {
       // reset auth token back, so that we don't break other stories:
       registerHostnameReplacing('services.sentinel-hub.com', 'services.sentinel-hub.com');
-      const authTokenServices = await requestAuthToken(clientId, clientSecret);
+      const authTokenServices = await requestAuthToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
       setAuthToken(authTokenServices);
-      printOut('Auth token reset.');
+      console.log('Auth token reset.');
     }
   };
   perform().then(() => {});
