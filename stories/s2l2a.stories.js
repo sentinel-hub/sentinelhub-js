@@ -9,6 +9,7 @@ import {
   ApiType,
   CRS_EPSG3857,
   registerHostnameReplacing,
+  requestAuthToken,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -361,31 +362,35 @@ export const GetMapProcessingAlternativeHostname = () => {
   const perform = async () => {
     registerHostnameReplacing('services.sentinel-hub.com', process.env.ALTERNATIVE_HOSTNAME);
 
-    // await setAuthTokenWithOAuthCredentials();
-    const authToken = await requestAuthToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
-    setAuthToken(authToken);
-    console.log('Auth token retrieved and set successfully');
+    try {
+      // await setAuthTokenWithOAuthCredentials();
+      const authToken = await requestAuthToken(process.env.CLIENT_ID, process.env.CLIENT_SECRET);
+      setAuthToken(authToken);
+      console.log('Auth token retrieved and set successfully');
 
-    const layerS2L2A = new S2L2ALayer({
-      instanceId,
-      layerId,
-      evalscript: 'return [2.5 * B04, 2.5 * B03, 2.5 * B02];',
-    });
+      const layerS2L2A = new S2L2ALayer({
+        instanceId,
+        layerId,
+        evalscript: 'return [2.5 * B04, 2.5 * B03, 2.5 * B02];',
+      });
 
-    const getMapParams = {
-      bbox: bbox4326,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
-    img.src = URL.createObjectURL(imageBlob);
-
-    // reset auth token back, so that we don't break other stories:
-    registerHostnameReplacing('services.sentinel-hub.com', 'services.sentinel-hub.com');
-    await setAuthTokenWithOAuthCredentials();
+      const getMapParams = {
+        bbox: bbox4326,
+        fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+        width: 512,
+        height: 512,
+        format: MimeTypes.JPEG,
+      };
+      const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+      img.src = URL.createObjectURL(imageBlob);
+    } finally {
+      // reset auth token back, so that we don't break other stories:
+      registerHostnameReplacing('services.sentinel-hub.com', 'services.sentinel-hub.com');
+      const authTokenServices = await requestAuthToken(clientId, clientSecret);
+      setAuthToken(authTokenServices);
+      printOut('Auth token reset.');
+    }
   };
   perform().then(() => {});
   return wrapperEl;
