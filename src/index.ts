@@ -1,6 +1,6 @@
 import { BBox } from './bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs';
-import { setAuthToken, isAuthTokenSet, requestAuthToken } from './auth';
+import { setAuthToken, isAuthTokenSet, requestAuthToken, getAuthToken } from './auth';
 import {
   ApiType,
   MimeTypes,
@@ -111,6 +111,7 @@ export {
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
+  getAuthToken,
   // other:
   GetMapParams,
   OverrideGetMapParams,
