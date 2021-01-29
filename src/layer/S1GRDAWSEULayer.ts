@@ -4,6 +4,7 @@ import { BBox } from '../bbox';
 
 import {
   BackscatterCoeff,
+  DEMInstanceType,
   PaginatedTiles,
   OrbitDirection,
   Link,
@@ -50,6 +51,7 @@ interface ConstructorParameters {
   polarization?: Polarization | null;
   resolution?: Resolution | null;
   orthorectify?: boolean | null;
+  demInstanceType?: DEMInstanceType | null;
   backscatterCoeff?: BackscatterCoeff | null;
   orbitDirection?: OrbitDirection | null;
 }
@@ -70,6 +72,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public resolution: Resolution | null = null;
   public orbitDirection: OrbitDirection | null = null;
   public orthorectify: boolean | null = false;
+  public demInstanceType: DEMInstanceType | null = DEMInstanceType.MAPZEN;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
   public constructor({
@@ -85,6 +88,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     polarization = null,
     resolution = null,
     orthorectify = false,
+    demInstanceType = DEMInstanceType.MAPZEN,
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
   }: ConstructorParameters) {
@@ -93,6 +97,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.polarization = polarization;
     this.resolution = resolution;
     this.orthorectify = orthorectify;
+    this.demInstanceType = demInstanceType;
     this.backscatterCoeff = backscatterCoeff;
     this.orbitDirection = orbitDirection;
   }
@@ -115,6 +120,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.resolution = layerParams['resolution'];
       this.backscatterCoeff = layerParams['backCoeff'];
       this.orthorectify = layerParams['orthorectify'];
+      this.demInstanceType = layerParams['demInstance'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
       if (!this.evalscript) {
@@ -139,6 +145,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     }
     payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
     payload.input.data[0].processing.orthorectify = this.orthorectify;
+    payload.input.data[0].processing.demInstance = this.demInstanceType;
     return payload;
   }
 
