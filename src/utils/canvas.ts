@@ -75,3 +75,12 @@ export async function getBlob(imageProperties: ImageProperties): Promise<Blob> {
     imgCanvas.remove();
   }
 }
+
+export async function validateCanvasDimensions(canvas: HTMLCanvasElement): Promise<boolean> {
+  // If the canvas exceeds the size limit for the browser, canvas.toBlob returns null.
+  const blob = await new Promise(resolve => canvas.toBlob(resolve));
+  if (blob === null) {
+    return false;
+  }
+  return true;
+}
