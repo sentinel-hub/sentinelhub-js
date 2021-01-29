@@ -13,7 +13,7 @@ import {
   Resolution,
   OrbitDirection,
   BackscatterCoeff,
-  demInstanceType,
+  DEMInstanceType,
   DATASET_AWSEU_S1GRD,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
@@ -258,7 +258,7 @@ export const getMapProcessingWithoutInstanceRTC = () => {
       resolution: Resolution.HIGH,
       backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
       orthorectify: true,
-      demInstanceType: demInstanceType.MAPZEN,
+      demInstanceType: DEMInstanceType.MAPZEN,
     });
 
     const getMapParams = {
