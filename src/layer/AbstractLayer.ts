@@ -12,7 +12,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
-import { drawBlobOnCanvas, canvasToBlob } from '../utils/canvas';
+import { drawBlobOnCanvas, canvasToBlob, validateCanvasDimensions } from '../utils/canvas';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
 interface ConstructorParameters {
@@ -110,6 +110,13 @@ export class AbstractLayer {
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
+
+      const isCanvasValid = await validateCanvasDimensions(canvas);
+      if (!isCanvasValid) {
+        throw new Error(
+          `Image dimensions (${width}x${height}) exceed the canvas size limit for this browser.`,
+        );
+      }
 
       const xSplitBy = Math.ceil(width / LIMIT_DIM);
       const chunkWidth = Math.ceil(width / xSplitBy);
