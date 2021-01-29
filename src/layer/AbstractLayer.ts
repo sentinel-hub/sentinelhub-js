@@ -114,7 +114,7 @@ export class AbstractLayer {
       const isCanvasValid = await validateCanvasDimensions(canvas);
       if (!isCanvasValid) {
         throw new Error(
-          `Image dimensions (${width}x${height}) exceeds the canvas size limit for this browser.`,
+          `Image dimensions (${width}x${height}) exceed the canvas size limit for this browser.`,
         );
       }
 
