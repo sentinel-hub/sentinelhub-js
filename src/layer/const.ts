@@ -224,6 +224,12 @@ export const CATALOG_SEARCH_MAX_LIMIT = 100;
 
 export enum DEMInstanceType {
   MAPZEN = 'MAPZEN',
+  COPERNICUS_30 = 'COPERNICUS_30',
+  COPERNICUS_90 = 'COPERNICUS_90',
+}
+
+export enum DEMInstanceTypeOrthorectification {
+  MAPZEN = 'MAPZEN',
   COPERNICUS = 'COPERNICUS',
   COPERNICUS_30 = 'COPERNICUS_30',
   COPERNICUS_90 = 'COPERNICUS_90',

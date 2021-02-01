@@ -4,7 +4,7 @@ import { BBox } from '../bbox';
 
 import {
   BackscatterCoeff,
-  DEMInstanceType,
+  DEMInstanceTypeOrthorectification,
   PaginatedTiles,
   OrbitDirection,
   Link,
@@ -51,7 +51,7 @@ interface ConstructorParameters {
   polarization?: Polarization | null;
   resolution?: Resolution | null;
   orthorectify?: boolean | null;
-  demInstanceType?: DEMInstanceType | null;
+  demInstanceType?: DEMInstanceTypeOrthorectification | null;
   backscatterCoeff?: BackscatterCoeff | null;
   orbitDirection?: OrbitDirection | null;
 }
@@ -72,7 +72,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public resolution: Resolution | null = null;
   public orbitDirection: OrbitDirection | null = null;
   public orthorectify: boolean | null = false;
-  public demInstanceType: DEMInstanceType | null = DEMInstanceType.MAPZEN;
+  public demInstanceType: DEMInstanceTypeOrthorectification | null = DEMInstanceTypeOrthorectification.MAPZEN;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
 
   public constructor({
@@ -88,7 +88,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     polarization = null,
     resolution = null,
     orthorectify = false,
-    demInstanceType = DEMInstanceType.MAPZEN,
+    demInstanceType = DEMInstanceTypeOrthorectification.MAPZEN,
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
   }: ConstructorParameters) {
