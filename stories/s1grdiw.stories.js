@@ -228,49 +228,56 @@ export const getMapProcessingWithoutInstanceRTC = () => {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
 
-  const img = document.createElement('img');
-  img.width = '512';
-  img.height = '512';
+  const images = document.createElement('div');
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>GetMap with Processing Radiometric Terrain Correction</h2>';
-  wrapperEl.insertAdjacentElement('beforeend', img);
+  wrapperEl.innerHTML += `<h4> ${Object.keys(DEMInstanceTypeOrthorectification).join('|')} </h4>`;
+  wrapperEl.insertAdjacentElement('beforeend', images);
+
+  const bbox = new BBox(CRS_EPSG4326, -98.74, 26.62, -98.71, 26.65);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    const layer = new S1GRDAWSEULayer({
-      evalscript: `
-      //VERSION=3
-      function setup() {
-        return {
-          input: ["VV"],
-          output: { bands: 3 }
-        };
-      }
+    for (let dem in DEMInstanceTypeOrthorectification) {
+      const img = document.createElement('img');
+      img.width = '256';
+      img.height = '256';
 
-      function evaluatePixel(sample) {
-        return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
-      }
-    `,
-      acquisitionMode: AcquisitionMode.IW,
-      polarization: Polarization.DV,
-      resolution: Resolution.HIGH,
-      backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
-      orthorectify: true,
-      demInstanceType: DEMInstanceTypeOrthorectification.COPERNICUS,
-    });
+      const layer = new S1GRDAWSEULayer({
+        evalscript: `
+        //VERSION=3
+        function setup() {
+          return {
+            input: ["VV"],
+            output: { bands: 3 }
+          };
+        }
 
-    const getMapParams = {
-      bbox: bbox3857,
-      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
-      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
-      width: 512,
-      height: 512,
-      format: MimeTypes.JPEG,
-    };
-    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
-    img.src = URL.createObjectURL(imageBlob);
+        function evaluatePixel(sample) {
+          return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
+        }
+      `,
+        acquisitionMode: AcquisitionMode.IW,
+        polarization: Polarization.DV,
+        resolution: Resolution.HIGH,
+        backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
+        orthorectify: true,
+        demInstanceType: dem,
+      });
+      const getMapParams = {
+        bbox: bbox,
+        fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+        width: 256,
+        height: 256,
+        format: MimeTypes.JPEG,
+      };
+      const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+      img.src = URL.createObjectURL(imageBlob);
+      images.insertAdjacentElement('beforeend', img);
+    }
   };
   perform().then(() => {});
 
