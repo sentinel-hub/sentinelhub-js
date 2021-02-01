@@ -8,6 +8,7 @@ import {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  BackscatterCoeff,
   DEMInstanceType,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
@@ -128,6 +129,7 @@ export {
   PreviewMode,
   MosaickingOrder,
   Interpolator,
+  BackscatterCoeff,
   DEMInstanceType,
   S3SLSTRView,
   BBox,
