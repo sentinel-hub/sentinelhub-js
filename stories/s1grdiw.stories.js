@@ -235,7 +235,7 @@ export const getMapProcessingWithoutInstanceRTC = () => {
   wrapperEl.innerHTML += `<h4> ${Object.keys(DEMInstanceTypeOrthorectification).join('|')} </h4>`;
   wrapperEl.insertAdjacentElement('beforeend', images);
 
-  const bbox = new BBox(CRS_EPSG4326, -98.74, 26.62, -98.71, 26.65);
+  const bbox = new BBox(CRS_EPSG4326, 10.780525, 46.909749, 11.145704, 47.182899);
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
@@ -262,7 +262,7 @@ export const getMapProcessingWithoutInstanceRTC = () => {
         acquisitionMode: AcquisitionMode.IW,
         polarization: Polarization.DV,
         resolution: Resolution.HIGH,
-        backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
+        backscatterCoeff: BackscatterCoeff.GAMMA0_TERRAIN,
         orthorectify: true,
         demInstanceType: dem,
       });
