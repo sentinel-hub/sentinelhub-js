@@ -145,7 +145,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     }
     payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
     payload.input.data[0].processing.orthorectify = this.orthorectify;
-    payload.input.data[0].processing.demInstance = this.demInstanceType;
+    if (this.orthorectify === true) {
+      payload.input.data[0].processing.demInstance = this.demInstanceType;
+    }
     return payload;
   }
 
