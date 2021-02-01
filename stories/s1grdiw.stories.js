@@ -258,7 +258,7 @@ export const getMapProcessingWithoutInstanceRTC = () => {
       resolution: Resolution.HIGH,
       backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
       orthorectify: true,
-      demInstanceType: DEMInstanceType.MAPZEN,
+      demInstanceType: DEMInstanceType.COPERNICUS,
     });
 
     const getMapParams = {
