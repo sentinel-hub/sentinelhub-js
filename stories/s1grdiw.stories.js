@@ -12,6 +12,8 @@ import {
   Polarization,
   Resolution,
   OrbitDirection,
+  BackscatterCoeff,
+  DEMInstanceTypeOrthorectification,
   DATASET_AWSEU_S1GRD,
   LayersFactory,
 } from '../dist/sentinelHub.esm';
@@ -215,6 +217,67 @@ export const getMapProcessingWithoutInstance = () => {
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
     img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingWithoutInstanceRTC = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const images = document.createElement('div');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing Radiometric Terrain Correction</h2>';
+  wrapperEl.innerHTML += `<h4> ${Object.keys(DEMInstanceTypeOrthorectification).join('|')} </h4>`;
+  wrapperEl.insertAdjacentElement('beforeend', images);
+
+  const bbox = new BBox(CRS_EPSG4326, 10.780525, 46.909749, 11.145704, 47.182899);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    for (let dem in DEMInstanceTypeOrthorectification) {
+      const img = document.createElement('img');
+      img.width = '256';
+      img.height = '256';
+
+      const layer = new S1GRDAWSEULayer({
+        evalscript: `
+        //VERSION=3
+        function setup() {
+          return {
+            input: ["VV"],
+            output: { bands: 3 }
+          };
+        }
+
+        function evaluatePixel(sample) {
+          return [2.5 * sample.VV, 2.5 * sample.VV, 2.5 * sample.VV];
+        }
+      `,
+        acquisitionMode: AcquisitionMode.IW,
+        polarization: Polarization.DV,
+        resolution: Resolution.HIGH,
+        backscatterCoeff: BackscatterCoeff.GAMMA0_TERRAIN,
+        orthorectify: true,
+        demInstanceType: dem,
+      });
+      const getMapParams = {
+        bbox: bbox,
+        fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+        width: 256,
+        height: 256,
+        format: MimeTypes.JPEG,
+      };
+      const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+      img.src = URL.createObjectURL(imageBlob);
+      images.insertAdjacentElement('beforeend', img);
+    }
   };
   perform().then(() => {});
 
