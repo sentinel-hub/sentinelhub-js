@@ -74,6 +74,7 @@ export enum BackscatterCoeff {
   BETA0 = 'BETA0',
   GAMMA0_ELLIPSOID = 'GAMMA0_ELLIPSOID',
   SIGMA0_ELLIPSOID = 'SIGMA0_ELLIPSOID',
+  GAMMA0_TERRAIN = 'GAMMA0_TERRAIN',
 }
 
 export enum LinkType {
@@ -223,6 +224,13 @@ export const CATALOG_SEARCH_MAX_LIMIT = 100;
 
 export enum DEMInstanceType {
   MAPZEN = 'MAPZEN',
+  COPERNICUS_30 = 'COPERNICUS_30',
+  COPERNICUS_90 = 'COPERNICUS_90',
+}
+
+export enum DEMInstanceTypeOrthorectification {
+  MAPZEN = 'MAPZEN',
+  COPERNICUS = 'COPERNICUS',
   COPERNICUS_30 = 'COPERNICUS_30',
   COPERNICUS_90 = 'COPERNICUS_90',
 }
