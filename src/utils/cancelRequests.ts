@@ -7,6 +7,7 @@ export type RequestConfiguration = {
   timeout?: number | null;
   cancelToken?: CancelToken;
   cache?: CacheConfig;
+  rewriteUrlFunc?: (url: string) => string;
 };
 
 export class CancelToken {
@@ -48,6 +49,9 @@ export const getAxiosReqParams = (
   axiosReqConfig.retries = reqConfig.retries;
   if (reqConfig.cache) {
     axiosReqConfig.cache = reqConfig.cache;
+  }
+  if (reqConfig.rewriteUrlFunc) {
+    axiosReqConfig.rewriteUrlFunc = reqConfig.rewriteUrlFunc;
   }
   return axiosReqConfig;
 };
