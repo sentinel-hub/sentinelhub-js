@@ -82,7 +82,17 @@ export const getMapWmsLayersFactory = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = (await LayersFactory.makeLayers(baseUrl, (lId, datasetId) => layerId === lId))[0];
+    const layer = await LayersFactory.makeLayer(baseUrl, layerId, null, {
+      rewriteUrlFunc: url => {
+        if (
+          url.startsWith('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?') &&
+          url.includes('request=GetCapabilities')
+        ) {
+          return 'https://eob-getcapabilities-cache.s3.eu-central-1.amazonaws.com/gibs.xml';
+        }
+        return url;
+      },
+    });
 
     const getMapParams = {
       bbox: bbox,
