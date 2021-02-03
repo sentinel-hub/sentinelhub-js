@@ -19,6 +19,7 @@ declare module 'axios' {
     cancelToken?: CancelToken;
     cacheKey?: string;
     cache?: CacheConfig;
+    rewriteUrlFunc?: (url: string) => string;
   }
 }
 
@@ -29,7 +30,15 @@ export const registerInitialAxiosInterceptors = (): any => {
   // - some interceptors might also be added in other places (`registerHostnameReplacing()`)
   axios.interceptors.request.use(logCurl, error => Promise.reject(error));
   axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
+  axios.interceptors.request.use(rewriteUrl, error => Promise.reject(error));
   axios.interceptors.response.use(saveCacheResponse, error => retryRequests(error));
+};
+
+const rewriteUrl = async (config: any): Promise<any> => {
+  if (config.rewriteUrlFunc) {
+    config.url = config.rewriteUrlFunc(config.url);
+  }
+  return config;
 };
 
 const logCurl = async (config: any): Promise<any> => {
