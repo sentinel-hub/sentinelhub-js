@@ -64,6 +64,7 @@ import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from './
 import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
+import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
 import { CacheTarget, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
@@ -143,6 +144,7 @@ export {
   invalidateCaches,
   registerHostnameReplacing,
   RequestConfiguration,
+  setDefaultRequestsConfig,
   drawBlobOnCanvas,
   canvasToBlob,
   // legacy:
