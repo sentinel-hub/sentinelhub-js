@@ -628,7 +628,7 @@ export const CachedParallelRequests = () => {
     const promises = layers.map(l =>
       l.updateLayerFromServiceIfNeeded({
         cache: {
-          expiresIn: 10,
+          expiresIn: 1000,
           targets: [CacheTarget.MEMORY],
         },
       }),
