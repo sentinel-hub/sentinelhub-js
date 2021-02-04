@@ -207,7 +207,7 @@ Services limit the size of the output image per request (2500px in each directio
 IMPORTANT: be careful with the image sizes as a big image could consume a lot of processing units. There is no limit imposed by this method.
 
 ```javascript
-  const imageBlob = await layer.getHugeMap(getMapParams, ApiType.PROCESSING, reqConfig);
+  const imageBlob = await layer.getHugeMap(getMapParams, ApiType.PROCESSING, requestsConfig);
 ```
 
 ## Searching for data
@@ -306,9 +306,9 @@ try {
 }
 ```
 
-To enable caching for the requests, one can add `expiresIn` to the requests configuration object. The values are in seconds.
-```
-// cache is valid for 30 minutes
+To enable caching for the requests, one can add `expiresIn` to the requests configuration object. The values are in seconds. Value `0` disables caching.
+```javascript
+// cache is valid for 30 minutes:
 const requestsConfig = {
   cache: {
     expiresIn: 1800,
@@ -316,17 +316,8 @@ const requestsConfig = {
 };
 ```
 
-To disable caching for the requests that are enabled by default, you can assign 0 to `expiresIn`.
-```
-const requestsConfig = {
-  cache: {
-    expiresIn: 1800,
-  }
-};
-```
-
-Requests can be cached to [CACHE_API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) or to memory, where the target can be specified with.
-```
+Requests can be cached to [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) or to memory:
+```javascript
   const requestsConfig = {
     cache: {
       expiresIn: 5000,
@@ -334,7 +325,8 @@ Requests can be cached to [CACHE_API](https://developer.mozilla.org/en-US/docs/W
     },
   };
 ```
-```
+
+```javascript
   const requestsConfig = {
     cache: {
       expiresIn: 5000,
@@ -342,9 +334,10 @@ Requests can be cached to [CACHE_API](https://developer.mozilla.org/en-US/docs/W
     },
   };
 ```
+
 A list of targets can be provided which is ordered by priority, and the first available target in the list will be used. This example will fallback to caching to memory if [CACHE_API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) is not available:
 
-```
+```javascript
   const requestsConfig = {
     cache: {
       expiresIn: 5000,
