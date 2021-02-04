@@ -99,7 +99,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     shCache.set(response.config.cacheKey, response);
     return response;
   } finally {
-    // if response.confic.cacheKey was there, we *must* remove it from the list
+    // if response.config.cacheKey was there, we *must* remove it from the list
     // of requests in progress, otherwise all other requests with the same cacheKey
     // will wait indefinitely:
     cacheableRequestsInProgress.delete(response.config.cacheKey);
