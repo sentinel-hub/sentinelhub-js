@@ -13,6 +13,7 @@ import {
   MosaickingOrder,
   Interpolator,
   _wmsGetMapUrl,
+  CacheTarget,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -612,6 +613,48 @@ export const wmsGetMapUrl = () => {
   img1.height = '256';
   img1.src = url;
   wrapperEl.insertAdjacentElement('beforeend', img1);
+
+  return wrapperEl;
+};
+
+export const CachedParallelRequests = () => {
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Initialize 5 layers and make sure only 1 request to /layers is made</h2>';
+
+  const layers = [...Array(5).keys()].map(i => new S1GRDAWSEULayer({ instanceId, layerId: s1grdLayerId }));
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const promises = layers.map(l =>
+      l.updateLayerFromServiceIfNeeded({
+        cache: {
+          expiresIn: 10,
+          targets: [CacheTarget.MEMORY],
+        },
+      }),
+    );
+    await Promise.all(promises);
+
+    for (let i = 0; i < layers.length; i++) {
+      const getMapParams = {
+        bbox: bbox4326,
+        fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+        toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+        width: 256,
+        height: 256,
+        format: MimeTypes.JPEG,
+      };
+      const imageUrl = layers[i].getMapUrl(getMapParams, ApiType.WMS);
+
+      const img = document.createElement('img');
+      img.width = '256';
+      img.height = '256';
+      img.src = imageUrl;
+
+      wrapperEl.insertAdjacentElement('beforeend', img);
+    }
+  };
+  perform().then(() => {});
 
   return wrapperEl;
 };
