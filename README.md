@@ -345,6 +345,15 @@ A list of targets can be provided which is ordered by priority, and the first av
     },
   };
 ```
+
+If a default requests configuration object is specified, it will be used for any key which is not set explicitly:
+
+```javascript
+  setDefaultRequestsConfig({
+    retries: 2,
+  });
+```
+
 ## Getting basic statistics and histogram
 
 Getting basic statistics (mean, min, max, standard deviation) and a histogram for a geometry (Polygon or MultiPolygon).

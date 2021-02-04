@@ -1,5 +1,6 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
 import { CacheConfig } from './cacheHandlers';
+import { getDefaultRequestsConfig } from './defaultReqsConfig';
 
 export type RequestConfiguration = {
   authToken?: string | null;
@@ -37,6 +38,7 @@ export const getAxiosReqParams = (
 ): AxiosRequestConfig => {
   let axiosReqConfig: AxiosRequestConfig = {
     cache: defaultCache,
+    ...getDefaultRequestsConfig(),
   };
 
   if (!reqConfig) {
