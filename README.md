@@ -316,7 +316,7 @@ const requestsConfig = {
 };
 ```
 
-Requests can be cached to [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache) or to memory:
+Responses can be cached to [Cache API](https://developer.mozilla.org/en-US/docs/Web/API/Cache):
 ```javascript
   const requestsConfig = {
     cache: {
@@ -326,6 +326,7 @@ Requests can be cached to [Cache API](https://developer.mozilla.org/en-US/docs/W
   };
 ```
 
+They can also be cached to memory:
 ```javascript
   const requestsConfig = {
     cache: {
