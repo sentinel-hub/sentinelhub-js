@@ -1,5 +1,6 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
 import { CacheConfig } from './cacheHandlers';
+import { getDefaultRequestsConfig } from './defaultReqsConfig';
 
 export type RequestConfiguration = {
   authToken?: string | null;
@@ -13,6 +14,7 @@ export type RequestConfiguration = {
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;
   protected source: CancelTokenSource | null = null;
+
   public constructor() {
     this.source = axios.CancelToken.source();
     this.token = this.source.token;
@@ -39,19 +41,22 @@ export const getAxiosReqParams = (
     cache: defaultCache,
   };
 
-  if (!reqConfig) {
-    return axiosReqConfig;
-  }
+  const reqConfigWithDefault = {
+    ...getDefaultRequestsConfig(),
+    ...reqConfig,
+  };
 
-  if (reqConfig.cancelToken) {
-    axiosReqConfig.cancelToken = reqConfig.cancelToken.getToken();
+  if (reqConfigWithDefault.cancelToken) {
+    axiosReqConfig.cancelToken = reqConfigWithDefault.cancelToken.getToken();
   }
-  axiosReqConfig.retries = reqConfig.retries;
-  if (reqConfig.cache) {
-    axiosReqConfig.cache = reqConfig.cache;
+  if (reqConfigWithDefault.retries !== null && reqConfigWithDefault.retries !== undefined) {
+    axiosReqConfig.retries = reqConfigWithDefault.retries;
   }
-  if (reqConfig.rewriteUrlFunc) {
-    axiosReqConfig.rewriteUrlFunc = reqConfig.rewriteUrlFunc;
+  if (reqConfigWithDefault.cache) {
+    axiosReqConfig.cache = reqConfigWithDefault.cache;
+  }
+  if (reqConfigWithDefault.rewriteUrlFunc) {
+    axiosReqConfig.rewriteUrlFunc = reqConfigWithDefault.rewriteUrlFunc;
   }
   return axiosReqConfig;
 };
