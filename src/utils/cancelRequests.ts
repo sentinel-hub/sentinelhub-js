@@ -53,7 +53,9 @@ export const getAxiosReqParams = (
   if (reqConfigWithDefault.cancelToken) {
     axiosReqConfig.cancelToken = reqConfigWithDefault.cancelToken.getToken();
   }
-  axiosReqConfig.retries = reqConfigWithDefault.retries;
+  if (reqConfigWithDefault.retries !== null && reqConfigWithDefault.retries !== undefined) {
+    axiosReqConfig.retries = reqConfigWithDefault.retries;
+  }
   if (reqConfigWithDefault.cache) {
     axiosReqConfig.cache = reqConfigWithDefault.cache;
   }
