@@ -46,7 +46,7 @@ export const getAxiosReqParams = (
     ...reqConfig,
   };
 
-  if (!reqConfigWithDefault) {
+  if (Object.keys(reqConfigWithDefault).length === 0) {
     return axiosReqConfig;
   }
 
