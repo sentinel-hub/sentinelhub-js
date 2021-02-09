@@ -46,10 +46,6 @@ export const getAxiosReqParams = (
     ...reqConfig,
   };
 
-  if (Object.keys(reqConfigWithDefault).length === 0) {
-    return axiosReqConfig;
-  }
-
   if (reqConfigWithDefault.cancelToken) {
     axiosReqConfig.cancelToken = reqConfigWithDefault.cancelToken.getToken();
   }
