@@ -4,7 +4,7 @@ import { BBox } from '../bbox';
 import { GetMapParams, ApiType } from './const';
 import { wmsGetMapUrl } from './wms';
 import { AbstractLayer } from './AbstractLayer';
-import { fetchGetCapabilitiesXml } from './utils';
+import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 
@@ -57,10 +57,8 @@ export class WmsLayer extends AbstractLayer {
   ): Promise<Date[]> {
     const dates = await ensureTimeout(async innerReqConfig => {
       // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
-      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerReqConfig);
-      const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
-        layerInfo => this.layerId === layerInfo.Name[0],
-      );
+      const parsedLayers = await fetchLayersFromGetCapabilitiesXml(this.baseUrl, innerReqConfig);
+      const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }
@@ -121,10 +119,8 @@ export class WmsLayer extends AbstractLayer {
           "Additional data can't be fetched from service because baseUrl and layerId are not defined",
         );
       }
-      const capabilities = await fetchGetCapabilitiesXml(this.baseUrl, innerReqConfig);
-      const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
-        layer => this.layerId === layer.Name[0],
-      );
+      const parsedLayers = await fetchLayersFromGetCapabilitiesXml(this.baseUrl, innerReqConfig);
+      const layer = parsedLayers.find(layer => this.layerId === layer.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }
