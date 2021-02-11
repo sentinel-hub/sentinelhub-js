@@ -245,7 +245,9 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
+    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.filter(
+      layerInfo => layerInfo.Name,
+    ).map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
