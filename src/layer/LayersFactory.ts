@@ -1,5 +1,5 @@
 import {
-  fetchGetCapabilitiesXml,
+  fetchLayersFromGetCapabilitiesXml,
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
@@ -244,8 +244,8 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.map(layerInfo => ({
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, reqConfig);
+    const layersInfos = parsedLayers.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,

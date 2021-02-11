@@ -20,7 +20,7 @@ import {
 import { wmsGetMapUrl } from './wms';
 import { AbstractLayer } from './AbstractLayer';
 import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
-import { fetchGetCapabilitiesXml } from './utils';
+import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
@@ -297,10 +297,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       }
 
       const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-      const capabilities = await fetchGetCapabilitiesXml(baseUrl, innerReqConfig);
-      const layer = capabilities.WMS_Capabilities.Capability[0].Layer[0].Layer.find(
-        layerInfo => this.layerId === layerInfo.Name[0],
-      );
+      const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, innerReqConfig);
+      const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }

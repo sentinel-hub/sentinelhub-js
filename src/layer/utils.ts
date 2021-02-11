@@ -11,26 +11,22 @@ export type GetCapabilitiesXml = {
     Service: [];
     Capability: [
       {
-        Layer: [
-          {
-            Layer: [
-              {
-                Name: string[];
-                Title: string[];
-                Abstract: string[];
-                Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
-                Dimension?: any[];
-                Layer?: any[];
-              },
-            ];
-          },
-        ];
+        Layer: [GetCapabilitiesXmlLayer];
       },
     ];
   };
 };
 
-export async function fetchGetCapabilitiesXml(
+export type GetCapabilitiesXmlLayer = {
+  Name?: string[];
+  Title: string[];
+  Abstract: string[];
+  Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
+  Dimension?: any[];
+  Layer?: GetCapabilitiesXmlLayer[];
+};
+
+async function fetchGetCapabilitiesXml(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXml> {
@@ -48,6 +44,31 @@ export async function fetchGetCapabilitiesXml(
   const res = await axios.get(url, axiosReqConfig);
   const parsedXml = await parseStringPromise(res.data);
   return parsedXml;
+}
+
+function _flattenLayers(
+  layers: GetCapabilitiesXmlLayer[],
+  result: GetCapabilitiesXmlLayer[] = [],
+): GetCapabilitiesXmlLayer[] {
+  layers.forEach(l => {
+    result.push(l);
+    if (l.Layer) {
+      _flattenLayers(l.Layer, result);
+    }
+  });
+  return result;
+}
+
+export async function fetchLayersFromGetCapabilitiesXml(
+  baseUrl: string,
+  reqConfig: RequestConfiguration,
+): Promise<GetCapabilitiesXmlLayer[]> {
+  const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
+  // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
+  const layersInfos = _flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer).filter(
+    layerInfo => layerInfo.Name,
+  );
+  return layersInfos;
 }
 
 export async function fetchGetCapabilitiesJson(
