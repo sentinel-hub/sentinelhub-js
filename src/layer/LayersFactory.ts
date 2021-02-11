@@ -1,5 +1,5 @@
 import {
-  fetchGetCapabilitiesXml,
+  fetchLayersFromGetCapabilitiesXml,
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
@@ -237,17 +237,6 @@ export class LayersFactory {
     return result;
   }
 
-  // GetCapabilities might use recursion to group layers, this function allows us to flatten them:
-  private static _flattenLayers(layers: any, result: any[] = []): any[] {
-    layers.forEach((l: any) => {
-      result.push(l);
-      if (l.Layer) {
-        LayersFactory._flattenLayers(l.Layer, result);
-      }
-    });
-    return result;
-  }
-
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
@@ -255,8 +244,8 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = LayersFactory._flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer)
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, reqConfig);
+    const layersInfos = parsedLayers
       .filter(layerInfo => layerInfo.Name)
       .map(layerInfo => ({
         layerId: layerInfo.Name[0],
