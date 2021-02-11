@@ -237,6 +237,17 @@ export class LayersFactory {
     return result;
   }
 
+  // GetCapabilities might use recursion to group layers, this function allows us to flatten them:
+  private static _flattenLayers(layers: any, result: any[] = []): any[] {
+    layers.forEach((l: any) => {
+      result.push(l);
+      if (l.Layer) {
+        LayersFactory._flattenLayers(l.Layer, result);
+      }
+    });
+    return result;
+  }
+
   private static async makeLayersWms(
     baseUrl: string,
     filterLayers: Function | null,
@@ -245,20 +256,20 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = parsedXml.WMS_Capabilities.Capability[0].Layer[0].Layer.filter(
-      layerInfo => layerInfo.Name,
-    ).map(layerInfo => ({
-      layerId: layerInfo.Name[0],
-      title: layerInfo.Title[0],
-      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
-      dataset: null,
-      legendUrl:
-        layerInfo.Style && layerInfo.Style[0].LegendURL
-          ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
-          ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : null,
-    }));
+    const layersInfos = LayersFactory._flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer)
+      .filter(layerInfo => layerInfo.Name)
+      .map(layerInfo => ({
+        layerId: layerInfo.Name[0],
+        title: layerInfo.Title[0],
+        description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+        dataset: null,
+        legendUrl:
+          layerInfo.Style && layerInfo.Style[0].LegendURL
+            ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
+            ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : null,
+      }));
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
