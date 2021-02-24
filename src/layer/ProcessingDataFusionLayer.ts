@@ -95,15 +95,16 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
           datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
         }
 
-        if (layerInfo.layer.upsampling) {
-          datasource.processing.upsampling = layerInfo.layer.upsampling;
-        }
-
-        if (layerInfo.layer.downsampling) {
-          datasource.processing.downsampling = layerInfo.layer.downsampling;
-        }
-
-        payload.input.data.push(datasource);
+        // HACK: we want to use layer's updateProcessingGetMapPayload(), but it assumes that there is only
+        // a single datasource, so we must create a temporary payload, fix it, and then push the result to
+        // the real payload:
+        const temporaryPayload = {
+          input: {
+            data: [datasource],
+          },
+        };
+        layerInfo.layer.updateProcessingGetMapPayload(temporaryPayload, reqConfig);
+        payload.input.data.push(temporaryPayload.input.data[0]);
       }
 
       // If all layers share the common endpoint, it is used for the request.
