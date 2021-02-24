@@ -69,7 +69,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     this.minQa = minQa;
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
+  public async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
     payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     if (this.minQa !== null) {
       payload.input.data[0].processing.minQa = this.minQa;

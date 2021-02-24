@@ -103,7 +103,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return getMapValue;
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {

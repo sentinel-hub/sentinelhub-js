@@ -131,7 +131,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     }, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async updateProcessingGetMapPayload(
     payload: ProcessingPayload,
     reqConfig: RequestConfiguration,
   ): Promise<ProcessingPayload> {

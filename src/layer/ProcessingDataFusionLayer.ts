@@ -5,6 +5,7 @@ import {
   convertPreviewToString,
   processingGetMap,
   ProcessingPayloadDatasource,
+  ProcessingPayload,
 } from './processing';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from '../utils/cancelRequests';
@@ -12,6 +13,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { CRS_EPSG4326 } from '../crs';
 
 /*
   This layer allows using Processing API "data fusion". It takes a list of layers and
@@ -98,9 +100,26 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         // HACK: we want to use layer's updateProcessingGetMapPayload(), but it assumes that there is only
         // a single datasource, so we must create a temporary payload, fix it, and then push the result to
         // the real payload:
-        const temporaryPayload = {
+        const temporaryPayload: ProcessingPayload = {
           input: {
+            bounds: {
+              properties: {
+                crs: CRS_EPSG4326.authId,
+              },
+            },
             data: [datasource],
+          },
+          output: {
+            width: 1,
+            height: 1,
+            responses: [
+              {
+                identifier: 'default',
+                format: {
+                  type: 'image/jpeg',
+                },
+              },
+            ],
           },
         };
         layerInfo.layer.updateProcessingGetMapPayload(temporaryPayload, reqConfig);
