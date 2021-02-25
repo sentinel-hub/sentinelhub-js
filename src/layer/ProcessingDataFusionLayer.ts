@@ -94,26 +94,21 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         if (layerInfo.layer.mosaickingOrder) {
           datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
         }
-
-        // note that we should be using _updateProcessingGetMapPayload or sth. similar here, this is just a
-        // temporary band-aid which lets us quickly use datafusion:
         if (layerInfo.layer.upsampling) {
           datasource.processing.upsampling = layerInfo.layer.upsampling;
         }
         if (layerInfo.layer.downsampling) {
           datasource.processing.downsampling = layerInfo.layer.downsampling;
         }
-        if (
-          (layerInfo.layer as any).orthorectify !== undefined &&
-          (layerInfo.layer as any).orthorectify !== null
-        ) {
-          datasource.processing.orthorectify = (layerInfo.layer as any).orthorectify;
-          if ((layerInfo.layer as any).orthorectify) {
-            datasource.processing.demInstanceType = (layerInfo.layer as any).demInstanceType;
-          }
-        }
 
         payload.input.data.push(datasource);
+
+        // the layer should set its parameters for Process API:
+        await layerInfo.layer._updateProcessingGetMapPayload(
+          payload,
+          payload.input.data.length - 1,
+          reqConfig,
+        );
       }
 
       // If all layers share the common endpoint, it is used for the request.
