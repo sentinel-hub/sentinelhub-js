@@ -20,7 +20,7 @@ import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 */
 interface ConstructorParameters {
   evalscript: string | null;
-  evalscriptUrl: string | null;
+  evalscriptUrl?: string | null;
   layers: DataFusionLayerInfo[];
   title?: string | null;
   description?: string | null;
