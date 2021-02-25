@@ -49,10 +49,13 @@ export class S3SLSTRLayer extends AbstractSentinelHubV3WithCCLayer {
     this.view = view;
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload = await super.updateProcessingGetMapPayload(payload);
-    payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
-    payload.input.data[0].processing.view = this.view;
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload = await super._updateProcessingGetMapPayload(payload);
+    payload.input.data[datasetSeqNo].dataFilter.orbitDirection = this.orbitDirection;
+    payload.input.data[datasetSeqNo].processing.view = this.view;
     return payload;
   }
 
