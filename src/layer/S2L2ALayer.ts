@@ -6,8 +6,11 @@ import { Link, LinkType } from './const';
 export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_S2L2A;
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload.input.data[datasetSeqNo].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     return payload;
   }
 

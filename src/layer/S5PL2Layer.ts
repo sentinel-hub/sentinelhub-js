@@ -69,10 +69,13 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     this.minQa = minQa;
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload.input.data[datasetSeqNo].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     if (this.minQa !== null) {
-      payload.input.data[0].processing.minQa = this.minQa;
+      payload.input.data[datasetSeqNo].processing.minQa = this.minQa;
     }
     // note that productType is not present among the parameters:
     // https://docs.sentinel-hub.com/api/latest/reference/#operation/process

@@ -95,7 +95,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
           datasource.dataFilter.mosaickingOrder = layerInfo.layer.mosaickingOrder;
         }
 
-        // note that we should be using updateProcessingGetMapPayload or sth. similar here, this is just a
+        // note that we should be using _updateProcessingGetMapPayload or sth. similar here, this is just a
         // temporary band-aid which lets us quickly use datafusion:
         if (layerInfo.layer.upsampling) {
           datasource.processing.upsampling = layerInfo.layer.upsampling;
