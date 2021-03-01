@@ -1,7 +1,7 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
-import { ApiType, setAuthToken, invalidateCaches } from '../../index';
+import { ApiType, setAuthToken, invalidateCaches, S2L2ALayer } from '../../index';
 
 import '../../../jest-setup';
 import { constructFixtureGetMapOutputResponses } from './fixtures.outputResponses';
@@ -21,6 +21,28 @@ test('Error if outputResponseId is empty string in getMapParams', async () => {
     await layer.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
   } catch (e) {
     expect(e.message).toBe('outputResponseId most not be empty');
+  }
+});
+
+test('Error if outputResponseId is used with WMS', async () => {
+  const { getMapParamsDefaultResponseId } = constructFixtureGetMapOutputResponses();
+  setAuthToken(EXAMPLE_TOKEN);
+  try {
+    const layer = new S2L2ALayer({ instanceId: 'INSTANCE_ID', layerId: 'LAYER_ID' });
+    await layer.getMap(getMapParamsDefaultResponseId, ApiType.WMS);
+  } catch (e) {
+    expect(e.message).toBe('outputResponseId is only available with Processing API');
+  }
+});
+
+test('Error if outputResponseId is empty and used with WMS', async () => {
+  const { getMapParamsEmptyOutputResponseId } = constructFixtureGetMapOutputResponses();
+  setAuthToken(EXAMPLE_TOKEN);
+  try {
+    const layer = new S2L2ALayer({ instanceId: 'INSTANCE_ID', layerId: 'LAYER_ID' });
+    await layer.getMap(getMapParamsEmptyOutputResponseId, ApiType.WMS);
+  } catch (e) {
+    expect(e.message).toBe('outputResponseId is only available with Processing API');
   }
 });
 

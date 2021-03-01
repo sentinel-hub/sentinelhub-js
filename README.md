@@ -162,6 +162,8 @@ It is also possible to determine whether a layer supports a specific ApiType:
 
 If your evalscript contains multiple [output response objects](https://docs.sentinel-hub.com/api/latest/evalscript/v3/#output-object-properties), you can set the `outputResponseId` to set which output should be returned.
 
+**Note:** This feature is only available with Processing API.
+
 ```javascript
   const getMapParams = {
     bbox: bbox,
@@ -173,7 +175,7 @@ If your evalscript contains multiple [output response objects](https://docs.sent
     outputResponseId: 'default',
   };
 
-  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+  const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
 ```
 
 ### Effects
