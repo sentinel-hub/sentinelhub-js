@@ -100,8 +100,8 @@ export function createProcessingPayload(
 
   // If there are more than 1 output responses, the response from the services is in TAR format.
   // Sentinelhub-js can't deal with manipulating files inside the tar yet.
-  if (params.outputResponses && params.outputResponses.length !== 1) {
-    throw new Error('outputResponses can only have 1 element');
+  if (params.outputResponseId === '') {
+    throw new Error('outputResponseId most not be empty');
   }
 
   const payload: ProcessingPayload = {
@@ -129,20 +129,19 @@ export function createProcessingPayload(
     output: {
       width: params.width,
       height: params.height,
-      responses:
-        params.outputResponses && params.outputResponses.length > 0
-          ? params.outputResponses.map(outputRes => {
-              return {
-                identifier: outputRes.id,
-                format: { type: outputRes.format },
-              };
-            })
-          : [
-              {
-                identifier: 'default',
-                format: { type: params.format },
-              },
-            ],
+      responses: params.outputResponseId
+        ? [
+            {
+              identifier: params.outputResponseId,
+              format: { type: params.format },
+            },
+          ]
+        : [
+            {
+              identifier: 'default',
+              format: { type: params.format },
+            },
+          ],
     },
   };
 
