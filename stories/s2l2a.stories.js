@@ -1067,18 +1067,24 @@ export const GetMapProcessingResponse = () => {
   img3.width = '256';
   img3.height = '256';
 
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A, response set to index</h2>';
   wrapperEl.innerHTML += `<h4>
     outputResponseId not set <br />
     outputResponseId = "default" <br /> 
     outputResponseId = "index" <br /> 
-    outputResponseId = "" (ERROR)
+    outputResponseId = "" (ERROR) <br />
+    outputResponseId used with WMS (ERROR)
   </h4>`;
   wrapperEl.insertAdjacentElement('beforeend', img0);
   wrapperEl.insertAdjacentElement('beforeend', img1);
   wrapperEl.insertAdjacentElement('beforeend', img2);
   wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
 
   // getMap is async:
   const perform = async () => {
@@ -1126,8 +1132,25 @@ export const GetMapProcessingResponse = () => {
     const imageBlob2 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.PROCESSING);
     img2.src = URL.createObjectURL(imageBlob2);
 
-    const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
-    img3.src = URL.createObjectURL(imageBlob3);
+    try {
+      const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
+      img3.src = URL.createObjectURL(imageBlob3);
+    } catch (e) {
+      console.error(e);
+      const p = document.createElement('p');
+      p.innerHTML = '<b>error for empty outputResponseId:</b> ' + e;
+      wrapperEl.insertAdjacentElement('beforeend', p);
+    }
+
+    try {
+      const imageBlob4 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.WMS);
+      img4.src = URL.createObjectURL(imageBlob4);
+    } catch (e) {
+      console.error(e);
+      const p = document.createElement('p');
+      p.innerHTML = '<b>error for using outputResponseId with WMS:</b> ' + e;
+      wrapperEl.insertAdjacentElement('beforeend', p);
+    }
   };
   perform().then(() => {});
 
