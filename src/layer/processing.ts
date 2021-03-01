@@ -32,17 +32,17 @@ export type ProcessingPayload = {
   output: {
     width: number;
     height: number;
-    responses: ProcessingOutputResponse[];
+    responses: [
+      {
+        identifier: string;
+        format: {
+          type: MimeType;
+        };
+      },
+    ];
   };
   evalscript?: string;
   dataProduct?: DataProduct;
-};
-
-export type ProcessingOutputResponse = {
-  identifier: string;
-  format: {
-    type: MimeType;
-  };
 };
 
 export type ProcessingPayloadDatasource = {
