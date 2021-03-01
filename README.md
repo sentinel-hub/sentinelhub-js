@@ -160,8 +160,7 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
-It is also possible to set the **output response**, if your evalscript contains multiple [output response objects](https://docs.sentinel-hub.com/api/latest/evalscript/v3/#output-object-properties).
-In this case, the `format` parameter in the `getMapParams` is ignored.
+If your evalscript contains multiple [output response objects](https://docs.sentinel-hub.com/api/latest/evalscript/v3/#output-object-properties), you can set the `outputResponseId` to set which output should be returned.
 
 ```javascript
   const getMapParams = {
@@ -171,7 +170,7 @@ In this case, the `format` parameter in the `getMapParams` is ignored.
     width: 512,
     height: 512,
     format: MimeTypes.JPEG,
-    outputResponses: [{ id: 'default', format: MimeTypes.JPEG }],
+    outputResponseId: 'default',
   };
 
   const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);

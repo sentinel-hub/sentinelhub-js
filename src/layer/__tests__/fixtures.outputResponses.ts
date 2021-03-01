@@ -1,4 +1,4 @@
-import { S2L2ALayer, BBox, CRS_EPSG4326, MimeTypes, OutputResponse } from '../../index';
+import { S2L2ALayer, BBox, CRS_EPSG4326, MimeTypes } from '../../index';
 
 export function constructFixtureGetMapOutputResponses(): Record<any, any> {
   const layer = new S2L2ALayer({
@@ -28,25 +28,8 @@ export function constructFixtureGetMapOutputResponses(): Record<any, any> {
     format: MimeTypes.JPEG,
   };
 
-  const getMapParamsDefaultResponse = {
-    ...getMapParams,
-    outputResponses: [{ id: 'default', format: MimeTypes.JPEG }],
-  };
-
-  const getMapParamsMultipleOutputResponses = {
-    ...getMapParams,
-    outputResponses: [
-      { id: 'default', format: MimeTypes.JPEG },
-      { id: 'index', format: MimeTypes.JPEG },
-    ],
-  };
-
-  const emptyOutputResponsesArray: OutputResponse[] = [];
-
-  const getMapParamsEmptyOutputResponses = {
-    ...getMapParams,
-    outputResponses: emptyOutputResponsesArray,
-  };
+  const getMapParamsDefaultResponseId = { ...getMapParams, outputResponseId: 'default' };
+  const getMapParamsEmptyOutputResponseId = { ...getMapParams, outputResponseId: '' };
 
   const buffer = new ArrayBuffer(8);
   const mockedResponse = (config: any): any => {
@@ -58,9 +41,8 @@ export function constructFixtureGetMapOutputResponses(): Record<any, any> {
   return {
     layer: layer,
     getMapParams: getMapParams,
-    getMapParamsDefaultResponse: getMapParamsDefaultResponse,
-    getMapParamsMultipleOutputResponses: getMapParamsMultipleOutputResponses,
-    getMapParamsEmptyOutputResponses: getMapParamsEmptyOutputResponses,
+    getMapParamsDefaultResponseId: getMapParamsDefaultResponseId,
+    getMapParamsEmptyOutputResponseId: getMapParamsEmptyOutputResponseId,
     mockedResponse: mockedResponse,
   };
 }

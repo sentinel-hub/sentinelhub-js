@@ -32,7 +32,7 @@ export type GetMapParams = {
   temporal?: boolean;
   upsampling?: Interpolator;
   downsampling?: Interpolator;
-  outputResponses?: OutputResponse[];
+  outputResponseId?: string;
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
     [key: string]: string;
@@ -129,11 +129,6 @@ export type ImageProperties = {
   rgba: Uint8ClampedArray;
   width: number;
   height: number;
-  format: MimeType;
-};
-
-export type OutputResponse = {
-  id: string;
   format: MimeType;
 };
 

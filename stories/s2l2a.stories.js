@@ -6,7 +6,6 @@ import {
   CRS_EPSG4326,
   BBox,
   MimeTypes,
-  OutputResponse,
   ApiType,
   CRS_EPSG3857,
   registerHostnameReplacing,
@@ -1071,10 +1070,10 @@ export const GetMapProcessingResponse = () => {
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A, response set to index</h2>';
   wrapperEl.innerHTML += `<h4>
-    no output responses set <br />
-    output responses = default <br /> 
-    output responses = index <br /> 
-    output responses = default and index (ERROR)
+    outputResponseId not set <br />
+    outputResponseId = "default" <br /> 
+    outputResponseId = "index" <br /> 
+    outputResponseId = "" (ERROR)
   </h4>`;
   wrapperEl.insertAdjacentElement('beforeend', img0);
   wrapperEl.insertAdjacentElement('beforeend', img1);
@@ -1113,26 +1112,10 @@ export const GetMapProcessingResponse = () => {
       width: 512,
       height: 512,
       format: MimeTypes.JPEG,
-      outputResponses: [{ id: 'default', format: MimeTypes.JPEG }],
     };
-
-    const getMapParamsDefault = {
-      ...getMapParams,
-      outputResponses: [{ id: 'default', format: MimeTypes.JPEG }],
-    };
-
-    const getMapParamsIndex = {
-      ...getMapParams,
-      outputResponses: [{ id: 'index', format: MimeTypes.JPEG }],
-    };
-
-    const getMapParamsMultipleOutputResponses = {
-      ...getMapParams,
-      outputResponses: [
-        { id: 'default', format: MimeTypes.JPEG },
-        { id: 'index', format: MimeTypes.JPEG },
-      ],
-    };
+    const getMapParamsDefault = { ...getMapParams, outputResponseId: 'default' };
+    const getMapParamsIndex = { ...getMapParams, outputResponseId: 'index' };
+    const getMapParamsEmptyOutputResponseId = { ...getMapParams, outputResponseId: '' };
 
     const imageBlob0 = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
     img0.src = URL.createObjectURL(imageBlob0);
@@ -1143,7 +1126,7 @@ export const GetMapProcessingResponse = () => {
     const imageBlob2 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.PROCESSING);
     img2.src = URL.createObjectURL(imageBlob2);
 
-    const imageBlob3 = await layerS2L2A.getMap(getMapParamsMultipleOutputResponses, ApiType.PROCESSING);
+    const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
     img3.src = URL.createObjectURL(imageBlob3);
   };
   perform().then(() => {});
