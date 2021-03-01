@@ -32,17 +32,17 @@ export type ProcessingPayload = {
   output: {
     width: number;
     height: number;
-    responses: [
-      {
-        identifier: string;
-        format: {
-          type: MimeType;
-        };
-      },
-    ];
+    responses: ProcessingOutputResponse[];
   };
   evalscript?: string;
   dataProduct?: DataProduct;
+};
+
+export type ProcessingOutputResponse = {
+  identifier: string;
+  format: {
+    type: MimeType;
+  };
 };
 
 export type ProcessingPayloadDatasource = {
@@ -98,6 +98,12 @@ export function createProcessingPayload(
 ): ProcessingPayload {
   const { bbox } = params;
 
+  // If there are more than 1 output responses, the response from the services is in TAR format.
+  // Sentinelhub-js can't deal with manipulating files inside the tar yet.
+  if (params.outputResponses && params.outputResponses.length !== 1) {
+    throw new Error('outputResponses can only have 1 element');
+  }
+
   const payload: ProcessingPayload = {
     input: {
       bounds: {
@@ -123,14 +129,20 @@ export function createProcessingPayload(
     output: {
       width: params.width,
       height: params.height,
-      responses: [
-        {
-          identifier: 'default',
-          format: {
-            type: params.format,
-          },
-        },
-      ],
+      responses:
+        params.outputResponses && params.outputResponses.length > 0
+          ? params.outputResponses.map(outputRes => {
+              return {
+                identifier: outputRes.id,
+                format: { type: outputRes.format },
+              };
+            })
+          : [
+              {
+                identifier: 'default',
+                format: { type: params.format },
+              },
+            ],
     },
   };
 

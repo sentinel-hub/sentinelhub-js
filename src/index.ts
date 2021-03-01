@@ -4,6 +4,7 @@ import { setAuthToken, isAuthTokenSet, requestAuthToken } from './auth';
 import {
   ApiType,
   MimeTypes,
+  OutputResponse,
   OrbitDirection,
   PreviewMode,
   MosaickingOrder,
@@ -124,6 +125,7 @@ export {
   CRS_EPSG3857,
   CRS_WGS84,
   MimeTypes,
+  OutputResponse,
   AcquisitionMode,
   Polarization,
   Resolution,

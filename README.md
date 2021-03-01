@@ -160,6 +160,23 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
+It is also possible to set the **output response**, if your evalscript contains multiple [output response objects](https://docs.sentinel-hub.com/api/latest/evalscript/v3/#output-object-properties).
+In this case, the `format` parameter in the `getMapParams` is ignored.
+
+```javascript
+  const getMapParams = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    outputResponses: [{ id: 'default', format: MimeTypes.JPEG }],
+  };
+
+  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+```
+
 ### Effects
 
 When requesting an image, effects can be applied to visually improve the image.
