@@ -42,16 +42,9 @@ const getMapParams = {
   height: 512,
   format: MimeTypes.JPEG,
 };
+const getMapParamsEmptyOutputResponseId = { ...getMapParams, outputResponseId: '' };
 const getMapParamsDefaultResponseId = { ...getMapParams, outputResponseId: 'default' };
 const getMapParamsIndexResponseId = { ...getMapParams, format: MimeTypes.PNG, outputResponseId: 'index' };
-const getMapParamsEmptyOutputResponseId = { ...getMapParams, outputResponseId: '' };
-
-const buffer = new ArrayBuffer(8);
-const mockedResponse = (config: any): any => {
-  if (config.responseType === 'arraybuffer') {
-    return [200, buffer];
-  }
-};
 
 beforeEach(async () => {
   await invalidateCaches();
@@ -81,7 +74,7 @@ it('NO output response id, JPEG format', async () => {
 
   setAuthToken(EXAMPLE_TOKEN);
   mockNetwork.reset();
-  mockNetwork.onPost().replyOnce(200, mockedResponse);
+  mockNetwork.onPost().replyOnce(200, '');
 
   await layerProcessing.getMap(getMapParams, ApiType.PROCESSING);
 
@@ -95,7 +88,7 @@ it('EMPTY output response id, JPEG format', async () => {
   window.Blob = undefined;
   setAuthToken(EXAMPLE_TOKEN);
   mockNetwork.reset();
-  mockNetwork.onPost().replyOnce(200, mockedResponse);
+  mockNetwork.onPost().replyOnce(200, '');
 
   await layerProcessing.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
 
@@ -109,7 +102,7 @@ it('DEFAULT output response, JPEG format', async () => {
   window.Blob = undefined;
   setAuthToken(EXAMPLE_TOKEN);
   mockNetwork.reset();
-  mockNetwork.onPost().replyOnce(200, mockedResponse);
+  mockNetwork.onPost().replyOnce(200, '');
 
   await layerProcessing.getMap(getMapParamsDefaultResponseId, ApiType.PROCESSING);
 
@@ -123,7 +116,7 @@ it('INDEX output response, PNG format', async () => {
   window.Blob = undefined;
   setAuthToken(EXAMPLE_TOKEN);
   mockNetwork.reset();
-  mockNetwork.onPost().replyOnce(200, mockedResponse);
+  mockNetwork.onPost().replyOnce(200, '');
 
   await layerProcessing.getMap(getMapParamsIndexResponseId, ApiType.PROCESSING);
 
