@@ -98,13 +98,6 @@ export function createProcessingPayload(
 ): ProcessingPayload {
   const { bbox } = params;
 
-  // Processing API supports setting multiple output responses, which are then returned as TAR archive.
-  // Sentinelhub-js can't deal with manipulating files inside the tar yet,
-  // so we only allow setting one output response id.
-  if (params.outputResponseId === '') {
-    throw new Error('outputResponseId most not be empty');
-  }
-
   const payload: ProcessingPayload = {
     input: {
       bounds: {
@@ -130,19 +123,12 @@ export function createProcessingPayload(
     output: {
       width: params.width,
       height: params.height,
-      responses: params.outputResponseId
-        ? [
-            {
-              identifier: params.outputResponseId,
-              format: { type: params.format },
-            },
-          ]
-        : [
-            {
-              identifier: 'default',
-              format: { type: params.format },
-            },
-          ],
+      responses: [
+        {
+          identifier: params.outputResponseId ? params.outputResponseId : 'default',
+          format: { type: params.format },
+        },
+      ],
     },
   };
 

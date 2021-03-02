@@ -32,6 +32,9 @@ export type GetMapParams = {
   temporal?: boolean;
   upsampling?: Interpolator;
   downsampling?: Interpolator;
+  // Processing API supports setting multiple output responses, which are then returned as TAR archive.
+  // Sentinelhub-js can't deal with manipulating files inside the tar yet,
+  // so we only allow setting one output response id.
   outputResponseId?: string;
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
