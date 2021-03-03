@@ -13,7 +13,7 @@ export type GetMapParams = {
   fromTime: Date | null;
   /** End of the time interval for which the images are fetched. If `fromTime` is null, only this parameter will be used to set time. */
   toTime: Date;
-  format: MimeType;
+  format: MimeType | FormatJpegOrPng;
   resx?: string; // either resx + resy or width + height must be specified
   resy?: string;
   width?: number;
@@ -123,9 +123,12 @@ export type MimeType =
   | 'image/tiff;depth=16'
   | 'image/tiff;depth=32f';
 
-export const MimeTypes: Record<string, MimeType> = {
+export type FormatJpegOrPng = 'JPEG_OR_PNG';
+
+export const MimeTypes: Record<string, MimeType | FormatJpegOrPng> = {
   JPEG: 'image/jpeg',
   PNG: 'image/png',
+  JPEG_OR_PNG: 'JPEG_OR_PNG',
 };
 
 export type ImageProperties = {

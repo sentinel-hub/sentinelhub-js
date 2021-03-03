@@ -54,7 +54,8 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    const getMapValue = await ensureTimeout(async innerReqConfig => {
+    params = await this.decideJpegOrPng(params);
+    return await ensureTimeout(async innerReqConfig => {
       if (api !== ApiType.PROCESSING) {
         throw new Error(`Only API type "PROCESSING" is supported`);
       }
@@ -139,7 +140,6 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
 
       return blob;
     }, reqConfig);
-    return getMapValue;
   }
 
   public supportsApiType(api: ApiType): boolean {
