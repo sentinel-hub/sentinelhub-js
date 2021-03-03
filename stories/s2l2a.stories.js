@@ -1046,7 +1046,7 @@ export const GetHugeMap = () => {
   return wrapperEl;
 };
 
-export const GetMapProcessingResponse = () => {
+export const GetMapProcessingOutputResponse = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
@@ -1072,12 +1072,12 @@ export const GetMapProcessingResponse = () => {
   img4.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A, response set to index</h2>';
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A, output response set to:</h2>';
   wrapperEl.innerHTML += `<h4>
     outputResponseId not set <br />
     outputResponseId = "default" <br /> 
     outputResponseId = "index" <br /> 
-    outputResponseId = "" (ERROR) <br />
+    outputResponseId = "" (defaults to "default") <br />
     outputResponseId used with WMS (ERROR)
   </h4>`;
   wrapperEl.insertAdjacentElement('beforeend', img0);
@@ -1132,15 +1132,8 @@ export const GetMapProcessingResponse = () => {
     const imageBlob2 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.PROCESSING);
     img2.src = URL.createObjectURL(imageBlob2);
 
-    try {
-      const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
-      img3.src = URL.createObjectURL(imageBlob3);
-    } catch (e) {
-      console.error(e);
-      const p = document.createElement('p');
-      p.innerHTML = '<b>error for empty outputResponseId:</b> ' + e;
-      wrapperEl.insertAdjacentElement('beforeend', p);
-    }
+    const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
+    img3.src = URL.createObjectURL(imageBlob3);
 
     try {
       const imageBlob4 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.WMS);
