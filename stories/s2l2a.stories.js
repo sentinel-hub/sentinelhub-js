@@ -1046,6 +1046,110 @@ export const GetHugeMap = () => {
   return wrapperEl;
 };
 
+export const GetMapProcessingOutputResponse = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img0 = document.createElement('img');
+  img0.width = '256';
+  img0.height = '256';
+
+  const img1 = document.createElement('img');
+  img1.width = '256';
+  img1.height = '256';
+
+  const img2 = document.createElement('img');
+  img2.width = '256';
+  img2.height = '256';
+
+  const img3 = document.createElement('img');
+  img3.width = '256';
+  img3.height = '256';
+
+  const img4 = document.createElement('img');
+  img4.width = '256';
+  img4.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing for Sentinel-2 L2A, output response set to:</h2>';
+  wrapperEl.innerHTML += `<h4>
+    outputResponseId not set <br />
+    outputResponseId = "default" <br /> 
+    outputResponseId = "index" <br /> 
+    outputResponseId = "" (defaults to "default") <br />
+    outputResponseId used with WMS (ERROR)
+  </h4>`;
+  wrapperEl.insertAdjacentElement('beforeend', img0);
+  wrapperEl.insertAdjacentElement('beforeend', img1);
+  wrapperEl.insertAdjacentElement('beforeend', img2);
+  wrapperEl.insertAdjacentElement('beforeend', img3);
+  wrapperEl.insertAdjacentElement('beforeend', img4);
+
+  // getMap is async:
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      evalscript: `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: [{ id: "default", bands: 4 }, { id: "index", bands: 2 }]
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return {
+            default: [4 * sample.B04, 4 * sample.B03, 4 * sample.B02, sample.dataMask],
+            index: [sample.B04, sample.dataMask] 
+          };
+      }
+    `,
+    });
+
+    const getMapParams = {
+      bbox: bbox4326,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const getMapParamsDefault = { ...getMapParams, outputResponseId: 'default' };
+    const getMapParamsIndex = { ...getMapParams, outputResponseId: 'index' };
+    const getMapParamsEmptyOutputResponseId = { ...getMapParams, outputResponseId: '' };
+
+    const imageBlob0 = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+    img0.src = URL.createObjectURL(imageBlob0);
+
+    const imageBlob1 = await layerS2L2A.getMap(getMapParamsDefault, ApiType.PROCESSING);
+    img1.src = URL.createObjectURL(imageBlob1);
+
+    const imageBlob2 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.PROCESSING);
+    img2.src = URL.createObjectURL(imageBlob2);
+
+    const imageBlob3 = await layerS2L2A.getMap(getMapParamsEmptyOutputResponseId, ApiType.PROCESSING);
+    img3.src = URL.createObjectURL(imageBlob3);
+
+    try {
+      const imageBlob4 = await layerS2L2A.getMap(getMapParamsIndex, ApiType.WMS);
+      img4.src = URL.createObjectURL(imageBlob4);
+    } catch (e) {
+      console.error(e);
+      const p = document.createElement('p');
+      p.innerHTML = '<b>error for using outputResponseId with WMS:</b> ' + e;
+      wrapperEl.insertAdjacentElement('beforeend', p);
+    }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
 export const FindTilesSearchIndex = () => {
   const maxCloudCoverPercent = 60;
   const layerS2L2A = new S2L2ALayer({

@@ -125,10 +125,8 @@ export function createProcessingPayload(
       height: params.height,
       responses: [
         {
-          identifier: 'default',
-          format: {
-            type: params.format,
-          },
+          identifier: params.outputResponseId ? params.outputResponseId : 'default',
+          format: { type: params.format },
         },
       ],
     },
