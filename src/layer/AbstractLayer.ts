@@ -37,6 +37,10 @@ export class AbstractLayer {
     const blob = await ensureTimeout(async innerReqConfig => {
       switch (api) {
         case ApiType.WMS:
+          if (params.outputResponseId || params.outputResponseId === '') {
+            throw new Error('outputResponseId is only available with Processing API');
+          }
+
           // When API type is set to WMS, getMap() uses getMapUrl() with the same provided parameters for
           //   getting the url of the image.
           // getMap() changes the received image according to provided gain and gamma after it is received.

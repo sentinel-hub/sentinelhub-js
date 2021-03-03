@@ -160,6 +160,24 @@ It is also possible to determine whether a layer supports a specific ApiType:
   };
 ```
 
+If your evalscript contains multiple [output response objects](https://docs.sentinel-hub.com/api/latest/evalscript/v3/#output-object-properties), you can set the `outputResponseId` to set which output should be returned.
+
+**Note:** This feature is only available with Processing API.
+
+```javascript
+  const getMapParams = {
+    bbox: bbox,
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG,
+    outputResponseId: 'default',
+  };
+
+  const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+```
+
 ### Effects
 
 When requesting an image, effects can be applied to visually improve the image.
