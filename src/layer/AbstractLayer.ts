@@ -5,7 +5,15 @@ import { union, intersection, Geom } from 'polygon-clipping';
 
 import { BBox } from '../bbox';
 import { CRS_EPSG4326 } from '../crs';
-import { GetMapParams, ApiType, PaginatedTiles, FlyoverInterval, PreviewMode, MimeTypes } from './const';
+import {
+  GetMapParams,
+  ApiType,
+  PaginatedTiles,
+  FlyoverInterval,
+  PreviewMode,
+  MimeType,
+  MimeTypes,
+} from './const';
 import { Dataset } from './dataset';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
@@ -81,6 +89,32 @@ export class AbstractLayer {
     return blob;
   }
 
+  protected async decideJpegOrPng(params: GetMapParams): Promise<GetMapParams> {
+    // If using JPEG_OR_PNG format, this function changes params so that format is set to either JPEG or PNG.
+
+    if (params.format !== MimeTypes.JPEG_OR_PNG) {
+      return params;
+    }
+
+    const res = await this.findFlyovers(
+      params.bbox,
+      params.fromTime,
+      params.toTime,
+      null,
+      null,
+      null,
+      Number.POSITIVE_INFINITY,
+    );
+    if (res.length === 0) {
+      // no data - transparent image needed, use PNG:
+      return { ...params, format: MimeTypes.PNG };
+    }
+
+    const { coveragePercent } = res[0];
+    const format = coveragePercent === 100 ? MimeTypes.JPEG : MimeTypes.PNG;
+    return { ...params, format: format };
+  }
+
   public async getHugeMap(
     params: GetMapParams,
     api: ApiType,
@@ -93,7 +127,11 @@ export class AbstractLayer {
           'Method getHugeMap() requests that width and height of resulting image are specified',
         );
       }
-      if (params.format !== MimeTypes.JPEG && params.format !== MimeTypes.PNG) {
+      if (
+        params.format !== MimeTypes.JPEG &&
+        params.format !== MimeTypes.PNG &&
+        params.format !== MimeTypes.JPEG_OR_PNG
+      ) {
         throw new Error(
           'Format ' +
             params.format +
@@ -147,7 +185,11 @@ export class AbstractLayer {
         }
       }
 
-      return await canvasToBlob(canvas, params.format);
+      // JPEG_OR_PNG is not a real format - use PNG instead:
+      const outputFormat = (params.format === MimeTypes.JPEG_OR_PNG
+        ? MimeTypes.PNG
+        : params.format) as MimeType;
+      return await canvasToBlob(canvas, outputFormat);
     }, reqConfig);
   }
 
@@ -201,19 +243,29 @@ export class AbstractLayer {
     bbox: BBox,
     fromTime: Date,
     toTime: Date,
-    maxFindTilesRequests: number = 50,
-    tilesPerRequest: number = 50,
+    maxFindTilesRequests: number | null = 50,
+    tilesPerRequest: number | null = 50,
     reqConfig?: RequestConfiguration,
+    overrideOrbitTimeMinutes: number | null = null,
   ): Promise<FlyoverInterval[]> {
     const flyOvers = await ensureTimeout(async innerReqConfig => {
-      if (!this.dataset || !this.dataset.orbitTimeMinutes) {
+      if (overrideOrbitTimeMinutes === null && (!this.dataset || !this.dataset.orbitTimeMinutes)) {
         throw new Error('Orbit time is needed for grouping tiles into flyovers.');
       }
       if (bbox.crs !== CRS_EPSG4326) {
         throw new Error('Currently, only EPSG:4326 in findFlyovers');
       }
+      if (maxFindTilesRequests === null) {
+        maxFindTilesRequests = 50;
+      }
+      if (tilesPerRequest === null) {
+        tilesPerRequest = 50;
+      }
 
-      const orbitTimeS = this.dataset.orbitTimeMinutes * 60;
+      const orbitTimeS =
+        overrideOrbitTimeMinutes === null
+          ? this.dataset.orbitTimeMinutes * 60
+          : overrideOrbitTimeMinutes * 60;
       const bboxGeometry: Geom = this.roundCoordinates([
         [
           [bbox.minX, bbox.minY],

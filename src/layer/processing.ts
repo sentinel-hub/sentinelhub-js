@@ -126,7 +126,9 @@ export function createProcessingPayload(
       responses: [
         {
           identifier: params.outputResponseId ? params.outputResponseId : 'default',
-          format: { type: params.format },
+          format: {
+            type: params.format as MimeType,
+          },
         },
       ],
     },
