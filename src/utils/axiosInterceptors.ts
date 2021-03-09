@@ -129,5 +129,5 @@ const shouldRetry = (error: AxiosError): boolean => {
   if (!error.response || !error.response.status) {
     return false;
   }
-  return error.response.status >= 500 && error.response.status <= 599;
+  return error.response.status == 429 || (error.response.status >= 500 && error.response.status <= 599);
 };
