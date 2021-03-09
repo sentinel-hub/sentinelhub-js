@@ -96,8 +96,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    params = await this.decideJpegOrPng(params);
     return await ensureTimeout(async innerReqConfig => {
+      params = await this.decideJpegOrPng(params, innerReqConfig);
       await this.updateLayerFromServiceIfNeeded(innerReqConfig);
       return await super.getMap(params, api, innerReqConfig);
     }, reqConfig);

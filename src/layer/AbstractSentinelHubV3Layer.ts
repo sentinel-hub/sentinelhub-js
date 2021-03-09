@@ -167,8 +167,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    params = await this.decideJpegOrPng(params);
     return await ensureTimeout(async innerReqConfig => {
+      params = await this.decideJpegOrPng(params, innerReqConfig);
       // SHv3 services support Processing API:
       if (api === ApiType.PROCESSING) {
         if (!this.dataset) {
