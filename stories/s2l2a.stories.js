@@ -62,6 +62,30 @@ const gamma = 2;
 const redRange = { from: 0.2, to: 0.8 };
 const greenRange = { from: 0.2, to: 0.8 };
 const blueRange = { from: 0.2, to: 0.8 };
+const TRUE_COLOR_EVALSCRIPT = `//VERSION=3
+  function setup() {
+    return {
+      input: ["B02", "B03", "B04"],
+      output: { bands: 3 }
+    };
+  }
+
+  function evaluatePixel(sample) {
+    return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+  }
+`;
+const TRUE_COLOR_TRANSPARENT_EVALSCRIPT = `//VERSION=3
+  function setup() {
+    return {
+      input: ["B02", "B03", "B04", "dataMask"],
+      output: { bands: 4 }
+    };
+  }
+
+  function evaluatePixel(sample) {
+    return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02, sample.dataMask];
+  }
+`;
 
 export default {
   title: 'Sentinel 2 L2A',
@@ -171,19 +195,7 @@ export const GetMapProcessing = () => {
     const layerS2L2A = new S2L2ALayer({
       instanceId,
       layerId,
-      evalscript: `
-      //VERSION=3
-      function setup() {
-        return {
-          input: ["B02", "B03", "B04"],
-          output: { bands: 3 }
-        };
-      }
-
-      function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
-      }
-    `,
+      evalscript: TRUE_COLOR_EVALSCRIPT,
     });
 
     const getMapParams = {
@@ -222,19 +234,7 @@ export const GetMapProcessingWithGeometryPolygon = () => {
     const layerS2L2A = new S2L2ALayer({
       instanceId,
       layerId,
-      evalscript: `
-      //VERSION=3
-      function setup() {
-        return {
-          input: ["B02", "B03", "B04"],
-          output: { bands: 3 }
-        };
-      }
-
-      function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
-      }
-    `,
+      evalscript: TRUE_COLOR_EVALSCRIPT,
     });
 
     const getMapParams = {
@@ -769,19 +769,7 @@ export const getMapProcessingGainGamma = () => {
       instanceId,
       layerId,
       maxCloudCoverPercent: 0,
-      evalscript: `
-      //VERSION=3
-      function setup() {
-        return {
-          input: ["B02", "B03", "B04"],
-          output: { bands: 3 }
-        };
-      }
-
-      function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
-      }
-    `,
+      evalscript: TRUE_COLOR_EVALSCRIPT,
     });
 
     const getMapParams = {
@@ -933,19 +921,7 @@ export const getMapProcessingAdvancedRGB = () => {
       instanceId,
       layerId,
       maxCloudCoverPercent: 0,
-      evalscript: `
-      //VERSION=3
-      function setup() {
-        return {
-          input: ["B02", "B03", "B04"],
-          output: { bands: 3 }
-        };
-      }
-
-      function evaluatePixel(sample) {
-        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
-      }
-    `,
+      evalscript: TRUE_COLOR_EVALSCRIPT,
     });
 
     const getMapParams = {
@@ -1014,19 +990,7 @@ export const GetHugeMap = () => {
     const layerS2L2A = new S2L2ALayer({
       instanceId,
       layerId,
-      evalscript: `
-        //VERSION=3
-        function setup() {
-          return {
-            input: ["B02", "B03", "B04"],
-            output: { bands: 3 }
-          };
-        }
-
-        function evaluatePixel(sample) {
-          return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
-        }
-      `,
+      evalscript: TRUE_COLOR_EVALSCRIPT,
       maxCloudCoverPercent: 100,
     });
 
@@ -1377,6 +1341,68 @@ export const statsWithEvalscript = () => {
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const GetMapJPEGOrPNG = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const formats = [MimeTypes.PNG, MimeTypes.JPEG, MimeTypes.JPEG_OR_PNG];
+  const bboxes = [
+    new BBox(CRS_EPSG4326, 11.0, 41.98, 12.4, 43.03), // partial coverage
+    new BBox(CRS_EPSG4326, 13.0, 41.98, 14.4, 43.03), // full coverage
+  ];
+  const fromTime = new Date(Date.UTC(2021, 3 - 1, 1, 0, 0, 0));
+  const toTime = new Date(Date.UTC(2021, 3 - 1, 1, 23, 59, 59));
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with either JPEG or PNG (depending on data coverage)</h2>';
+  wrapperEl.style.backgroundImage =
+    'linear-gradient(0deg, transparent 50%, #aaa 50%), linear-gradient(90deg, #aaa 50%, #ccc 50%)';
+  wrapperEl.style.backgroundSize = '50px 50px,50px 50px';
+  wrapperEl.style.backgroundPosition = '0 0, 0 25px';
+
+  const imgs = [];
+  for (let b = 0; b < bboxes.length; b++) {
+    const divEl = document.createElement('div');
+    wrapperEl.insertAdjacentElement('beforeend', divEl);
+    for (let f = 0; f < formats.length; f++) {
+      const img = document.createElement('img');
+      img.width = '256';
+      img.height = '256';
+      imgs.push(img);
+      divEl.insertAdjacentElement('beforeend', img);
+    }
+  }
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layerS2L2A = new S2L2ALayer({
+      instanceId,
+      layerId,
+      evalscript: TRUE_COLOR_TRANSPARENT_EVALSCRIPT,
+    });
+
+    for (let b = 0; b < bboxes.length; b++) {
+      for (let f = 0; f < formats.length; f++) {
+        const getMapParams = {
+          bbox: bboxes[b],
+          fromTime: fromTime,
+          toTime: toTime,
+          width: 256,
+          height: 256,
+          format: formats[f],
+        };
+        const imageBlob = await layerS2L2A.getMap(getMapParams, ApiType.PROCESSING);
+        imgs[b * formats.length + f].src = URL.createObjectURL(imageBlob);
+      }
+    }
   };
   perform().then(() => {});
 
