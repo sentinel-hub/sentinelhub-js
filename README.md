@@ -178,6 +178,27 @@ If your evalscript contains multiple [output response objects](https://docs.sent
   const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
 ```
 
+### Optimizing the data retrieval
+
+This library is often used to display satellite imagery on the map. Data in this case is requested in "tiles" (typically of 256x256 or 512x512 pixels) and is often overlaid over some background map, which shows land cover, borders, roads, places,... Thus, when making `getMap` requests, it is usually desirable to get images which are transparent in places where the satellite data is not available. The easiest solution is to use `PNG` format instead of `JPEG` (because `JPEG` does not support transparency), however this makes the size of the images much bigger, leading to longer load times on slow connections.
+
+To solve this issue, there is a special format available (`MimeTypes.JPEG_OR_PNG`). If specified, `getMap` call will try to determine if it should use `JPEG` or `PNG` based on the data available. If requested bounding box is fully covered with data, it will use JPEG (for performance reasons), otherwise it will use PNG and will return an image with transparent channel.
+
+CAREFUL: this setting should only be used if the retrieved data is not transparent (within the tiles). In other words: if `evalscript` returns a transparent image channel, using `PNG` is probably the only viable option.
+
+```javascript
+  const getMapParams = {
+    bbox: new BBox(CRS_EPSG4326, 18.3, 20.1, 18.7, 20.4),
+    fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+    width: 512,
+    height: 512,
+    format: MimeTypes.JPEG_OR_PNG,
+  };
+  const imageBlob = await layer.getMap(getMapParams, ApiType.WMS);
+  const imageBlob2 = await layer.getMap(getMapParams, ApiType.PROCESSING);
+```
+
 ### Effects
 
 When requesting an image, effects can be applied to visually improve the image.

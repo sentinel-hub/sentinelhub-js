@@ -61,7 +61,7 @@ export function wmsGetMapUrl(
     version: OGC_SERVICES_IMPLEMENTED_VERSIONS[ServiceType.WMS],
     service: ServiceType.WMS,
     request: 'GetMap',
-    format: MimeTypes.JPEG,
+    format: MimeTypes.JPEG as MimeType,
     srs: CRS_EPSG4326.authId,
     layers: undefined,
     bbox: undefined,
@@ -85,7 +85,7 @@ export function wmsGetMapUrl(
   queryParams.srs = params.bbox.crs.authId;
 
   if (params.format) {
-    queryParams.format = params.format;
+    queryParams.format = params.format as MimeType;
   }
 
   if (!params.fromTime) {
