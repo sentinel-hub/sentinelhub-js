@@ -89,7 +89,10 @@ export class AbstractLayer {
     return blob;
   }
 
-  protected async decideJpegOrPng(params: GetMapParams): Promise<GetMapParams> {
+  protected async decideJpegOrPng(
+    params: GetMapParams,
+    reqConfig: RequestConfiguration,
+  ): Promise<GetMapParams> {
     // If using JPEG_OR_PNG format, this function changes params so that format is set to either JPEG or PNG.
 
     if (params.format !== MimeTypes.JPEG_OR_PNG) {
@@ -102,7 +105,7 @@ export class AbstractLayer {
       params.toTime,
       null,
       null,
-      null,
+      reqConfig,
       Number.POSITIVE_INFINITY,
     );
     if (res.length === 0) {

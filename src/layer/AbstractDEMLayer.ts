@@ -71,8 +71,8 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    params = await this.decideJpegOrPng(params);
     return await ensureTimeout(async innerReqConfig => {
+      params = await this.decideJpegOrPng(params, innerReqConfig);
       if (api === ApiType.PROCESSING) {
         await this.updateLayerFromServiceIfNeeded(innerReqConfig);
       }
