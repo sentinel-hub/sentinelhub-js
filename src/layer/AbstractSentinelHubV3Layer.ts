@@ -133,8 +133,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return layerParams;
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async _updateProcessingGetMapPayload(
     payload: ProcessingPayload,
+    datasetSeqNo: number = 0, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<ProcessingPayload> {
     // Subclasses should override this method if they wish to supply additional
@@ -219,7 +220,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
           this.downsampling,
         );
         // allow subclasses to update payload with their own parameters:
-        const updatedPayload = await this.updateProcessingGetMapPayload(payload, innerReqConfig);
+        const updatedPayload = await this._updateProcessingGetMapPayload(payload, 0, innerReqConfig);
         const shServiceHostname = this.getShServiceHostname();
 
         let blob = await processingGetMap(shServiceHostname, updatedPayload, innerReqConfig);

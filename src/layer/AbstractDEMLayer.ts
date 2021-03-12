@@ -80,24 +80,27 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     }, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload = await super.updateProcessingGetMapPayload(payload);
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload = await super._updateProcessingGetMapPayload(payload);
     if (this.demInstance) {
-      payload.input.data[0].dataFilter.demInstance = this.demInstance;
+      payload.input.data[datasetSeqNo].dataFilter.demInstance = this.demInstance;
     }
 
     if (isDefined(this.egm)) {
-      payload.input.data[0].processing.egm = this.egm;
+      payload.input.data[datasetSeqNo].processing.egm = this.egm;
     }
 
     //clampNegative is MAPZEN specific option
     if ((!this.demInstance || this.demInstance === DEMInstanceType.MAPZEN) && isDefined(this.clampNegative)) {
-      payload.input.data[0].processing.clampNegative = this.clampNegative;
+      payload.input.data[datasetSeqNo].processing.clampNegative = this.clampNegative;
     }
 
     //DEM doesn't support dates and mosaickingOrder so they can be removed from payload
-    delete payload.input.data[0].dataFilter.mosaickingOrder;
-    delete payload.input.data[0].dataFilter.timeRange;
+    delete payload.input.data[datasetSeqNo].dataFilter.mosaickingOrder;
+    delete payload.input.data[datasetSeqNo].dataFilter.timeRange;
 
     return payload;
   }
