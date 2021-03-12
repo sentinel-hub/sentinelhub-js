@@ -32,9 +32,12 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
   }
 
-  protected async updateProcessingGetMapPayload(payload: ProcessingPayload): Promise<ProcessingPayload> {
-    payload = await super.updateProcessingGetMapPayload(payload);
-    payload.input.data[0].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload = await super._updateProcessingGetMapPayload(payload);
+    payload.input.data[datasetSeqNo].dataFilter.maxCloudCoverage = this.maxCloudCoverPercent;
     return payload;
   }
 

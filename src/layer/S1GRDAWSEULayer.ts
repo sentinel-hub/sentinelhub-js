@@ -131,22 +131,23 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     }, reqConfig);
   }
 
-  protected async updateProcessingGetMapPayload(
+  public async _updateProcessingGetMapPayload(
     payload: ProcessingPayload,
-    reqConfig: RequestConfiguration,
+    datasetSeqNo: number = 0,
+    reqConfig?: RequestConfiguration,
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-    payload.input.data[0].dataFilter.acquisitionMode = this.acquisitionMode;
-    payload.input.data[0].dataFilter.polarization = this.polarization;
-    payload.input.data[0].dataFilter.resolution = this.resolution;
+    payload.input.data[datasetSeqNo].dataFilter.acquisitionMode = this.acquisitionMode;
+    payload.input.data[datasetSeqNo].dataFilter.polarization = this.polarization;
+    payload.input.data[datasetSeqNo].dataFilter.resolution = this.resolution;
     if (this.orbitDirection !== null) {
-      payload.input.data[0].dataFilter.orbitDirection = this.orbitDirection;
+      payload.input.data[datasetSeqNo].dataFilter.orbitDirection = this.orbitDirection;
     }
-    payload.input.data[0].processing.backCoeff = this.backscatterCoeff;
-    payload.input.data[0].processing.orthorectify = this.orthorectify;
+    payload.input.data[datasetSeqNo].processing.backCoeff = this.backscatterCoeff;
+    payload.input.data[datasetSeqNo].processing.orthorectify = this.orthorectify;
     if (this.orthorectify === true) {
-      payload.input.data[0].processing.demInstance = this.demInstanceType;
+      payload.input.data[datasetSeqNo].processing.demInstance = this.demInstanceType;
     }
     return payload;
   }
