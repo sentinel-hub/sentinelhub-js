@@ -167,6 +167,7 @@ export type GetStatsParams = {
   resolution: number;
   geometry: Polygon;
   bins?: number;
+  type?: HistogramType;
 };
 
 export type FisPayload = {
@@ -183,7 +184,7 @@ export type FisPayload = {
 
 export enum HistogramType {
   EQUALFREQUENCY = 'EQUALFREQUENCY',
-  // EQUIDISTANT = 'EQUIDISTANT',
+  EQUIDISTANT = 'EQUIDISTANT',
   // STREAMING = 'STREAMING',
 }
 
