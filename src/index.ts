@@ -52,6 +52,8 @@ import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
 import { Landsat8AWSLayer } from './layer/Landsat8AWSLayer';
 import { Landsat8LOTL1Layer } from './layer/Landsat8LOTL1Layer';
+import { Landsat8LOTL2Layer } from './layer/Landsat8LOTL2Layer';
+
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
@@ -114,6 +116,7 @@ export {
   Landsat8EOCloudLayer,
   Landsat8AWSLayer,
   Landsat8LOTL1Layer,
+  Landsat8LOTL2Layer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   // auth:

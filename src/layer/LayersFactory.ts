@@ -25,6 +25,7 @@ import {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   Dataset,
   DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -46,6 +47,7 @@ import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
 import { EnvisatMerisEOCloudLayer } from './EnvisatMerisEOCloudLayer';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { Landsat8LOTL1Layer } from './Landsat8LOTL1Layer';
+import { Landsat8LOTL2Layer } from './Landsat8LOTL2Layer';
 
 export class LayersFactory {
   /*
@@ -87,6 +89,7 @@ export class LayersFactory {
     [DATASET_S5PL2.id]: S5PL2Layer,
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_AWS_LOTL1.id]: Landsat8LOTL1Layer,
+    [DATASET_AWS_LOTL2.id]: Landsat8LOTL2Layer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
     [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
