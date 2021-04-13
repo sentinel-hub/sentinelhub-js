@@ -33,7 +33,7 @@ const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
-  title: 'Landsat 8 - AWS',
+  title: 'Landsat 8 - AWS L8L1C',
 };
 
 export const getMapURL = () => {
