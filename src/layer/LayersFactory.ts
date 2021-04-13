@@ -64,6 +64,8 @@ export class LayersFactory {
     [DATASET_S3OLCI.shJsonGetCapabilitiesDataset]: DATASET_S3OLCI,
     [DATASET_S5PL2.shJsonGetCapabilitiesDataset]: DATASET_S5PL2,
     [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
+    [DATASET_AWS_LOTL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL1,
+    [DATASET_AWS_LOTL2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL2,
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
