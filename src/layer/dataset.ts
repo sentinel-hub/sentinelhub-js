@@ -147,6 +147,21 @@ export const DATASET_AWS_LOTL1: Dataset = {
   catalogCollectionId: 'landsat-ot-l1',
 };
 
+export const DATASET_AWS_LOTL2: Dataset = {
+  id: 'AWS_LOTL2',
+  shJsonGetCapabilitiesDataset: 'LOTL2',
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: 'LOTL2',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL2/searchIndex',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL2/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 59, 2)), // 2013-03-18T15:59:02.334
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l2',
+};
+
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   id: 'EOC_L5',
   shJsonGetCapabilitiesDataset: null,
