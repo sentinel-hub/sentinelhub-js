@@ -1,9 +1,9 @@
-import { DATASET_AWS_LOTL2 } from './dataset';
+import { DATASET_AWS_LOTL1 } from './dataset';
 import { AbstractLandsat8Layer } from './AbstractLandsat8Layer';
 import { Link, LinkType } from './const';
 
-export class Landsat8LOTL2Layer extends AbstractLandsat8Layer {
-  public readonly dataset = DATASET_AWS_LOTL2;
+export class Landsat8AWSLOTL1Layer extends AbstractLandsat8Layer {
+  public readonly dataset = DATASET_AWS_LOTL1;
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [

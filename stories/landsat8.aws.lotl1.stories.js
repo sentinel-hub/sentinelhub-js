@@ -1,7 +1,7 @@
 import { createFindDatesUTCStory, renderTilesList } from './storiesUtils';
 
 import {
-  Landsat8LOTL1Layer,
+  Landsat8AWSLOTL1Layer,
   CRS_EPSG3857,
   CRS_EPSG4326,
   BBox,
@@ -45,7 +45,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox,
@@ -71,7 +71,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat8LOTL1Layer({ instanceId, layerId });
+    const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -132,7 +132,7 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat8LOTL1Layer({
+    const layer = new Landsat8AWSLOTL1Layer({
       instanceId,
       layerId,
       evalscript: `
@@ -157,7 +157,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTilesSearchIndex = () => {
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -182,7 +182,7 @@ export const findTilesSearchIndex = () => {
 };
 
 export const findTilesCatalog = () => {
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -207,7 +207,7 @@ export const findTilesCatalog = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -246,7 +246,7 @@ export const findFlyovers = () => {
 
 export const findDatesUTCSearchIndex = () =>
   createFindDatesUTCStory(
-    new Landsat8LOTL1Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
+    new Landsat8AWSLOTL1Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
     bbox4326,
     new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
@@ -254,7 +254,7 @@ export const findDatesUTCSearchIndex = () =>
   );
 export const findDatesUTCCatalog = () =>
   createFindDatesUTCStory(
-    new Landsat8LOTL1Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
+    new Landsat8AWSLOTL1Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
     bbox4326,
     new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
@@ -267,7 +267,7 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -291,7 +291,7 @@ export const statsBBOX3857 = () => {
   wrapperEl.innerHTML = '<h2>getStats for EPSG:3857</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8LOTL1Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLOTL1Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
