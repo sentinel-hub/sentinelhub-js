@@ -1,14 +1,14 @@
 import { createFindDatesUTCStory, renderTilesList } from './storiesUtils';
 
 import {
-  Landsat8AWSLayer,
+  Landsat8AWSLOTL2Layer,
   CRS_EPSG3857,
   CRS_EPSG4326,
   BBox,
   MimeTypes,
   ApiType,
   LayersFactory,
-  DATASET_AWS_L8L1C,
+  DATASET_AWS_LOTL1,
   setAuthToken,
 } from '../dist/sentinelHub.esm';
 
@@ -18,22 +18,22 @@ if (!process.env.INSTANCE_ID) {
   throw new Error('INSTANCE_ID environment variable is not defined!');
 }
 
-if (!process.env.LANDSAT8_LAYER_ID) {
-  throw new Error('LANDSAT8_LAYER_ID environment variable is not defined!');
+if (!process.env.LANDSAT8_LOTL2_LAYER_ID) {
+  throw new Error('LANDSAT8_LOTL2_LAYER_ID environment variable is not defined!');
 }
 
-if (!process.env.LANDSAT8_NDVI_LAYER_ID) {
-  throw new Error('LANDSAT8_NDVI_LAYER_ID environment variable is not defined!');
+if (!process.env.LANDSAT8_LOTL2_NDVI_LAYER_ID) {
+  throw new Error('LANDSAT8_LOTL2_NDVI_LAYER_ID environment variable is not defined!');
 }
 
 const instanceId = process.env.INSTANCE_ID;
-const layerId = process.env.LANDSAT8_LAYER_ID;
-const layerIdNdvi = process.env.LANDSAT8_NDVI_LAYER_ID;
+const layerId = process.env.LANDSAT8_LOTL2_LAYER_ID;
+const layerIdNdvi = process.env.LANDSAT8_LOTL2_NDVI_LAYER_ID;
 const bbox = new BBox(CRS_EPSG3857, 1487158.82, 5322463.15, 1565430.34, 5400734.67);
 const bbox4326 = new BBox(CRS_EPSG4326, 11.9, 42.05, 12.95, 43.09);
 
 export default {
-  title: 'Landsat 8 - AWS',
+  title: 'Landsat 8 - AWS LOTL2',
 };
 
 export const getMapURL = () => {
@@ -45,7 +45,7 @@ export const getMapURL = () => {
   wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId });
 
   const getMapParams = {
     bbox: bbox,
@@ -71,7 +71,7 @@ export const getMapWMS = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat8AWSLayer({ instanceId, layerId });
+    const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -101,7 +101,7 @@ export const getMapWMSLayersFactory = () => {
   const perform = async () => {
     const layer = (
       await LayersFactory.makeLayers(
-        `${DATASET_AWS_L8L1C.shServiceHostname}ogc/wms/${instanceId}`,
+        `${DATASET_AWS_LOTL1.shServiceHostname}ogc/wms/${instanceId}`,
         (lId, datasetId) => layerId === lId,
       )
     )[0];
@@ -132,7 +132,7 @@ export const getMapWMSEvalscript = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
 
   const perform = async () => {
-    const layer = new Landsat8AWSLayer({
+    const layer = new Landsat8AWSLOTL2Layer({
       instanceId,
       layerId,
       evalscript: `
@@ -157,7 +157,7 @@ export const getMapWMSEvalscript = () => {
 };
 
 export const findTilesSearchIndex = () => {
-  const layer = new Landsat8AWSLayer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -182,7 +182,7 @@ export const findTilesSearchIndex = () => {
 };
 
 export const findTilesCatalog = () => {
-  const layer = new Landsat8AWSLayer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId });
   const containerEl = document.createElement('pre');
 
   const wrapperEl = document.createElement('div');
@@ -207,7 +207,7 @@ export const findTilesCatalog = () => {
 };
 
 export const findFlyovers = () => {
-  const layer = new Landsat8AWSLayer({ instanceId, layerId });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId });
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>findFlyovers</h2>';
@@ -246,7 +246,7 @@ export const findFlyovers = () => {
 
 export const findDatesUTCSearchIndex = () =>
   createFindDatesUTCStory(
-    new Landsat8AWSLayer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
+    new Landsat8AWSLOTL2Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
     bbox4326,
     new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
@@ -254,7 +254,7 @@ export const findDatesUTCSearchIndex = () =>
   );
 export const findDatesUTCCatalog = () =>
   createFindDatesUTCStory(
-    new Landsat8AWSLayer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
+    new Landsat8AWSLOTL2Layer({ instanceId, layerId, maxCloudCoverPercent: 40 }),
     bbox4326,
     new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
     new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
@@ -267,7 +267,7 @@ export const stats = () => {
   wrapperEl.innerHTML = '<h2>getStats</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
@@ -291,7 +291,7 @@ export const statsBBOX3857 = () => {
   wrapperEl.innerHTML = '<h2>getStats for EPSG:3857</h2>';
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
-  const layer = new Landsat8AWSLayer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
+  const layer = new Landsat8AWSLOTL2Layer({ instanceId, layerId: layerIdNdvi, maxCloudCoverPercent: 100 });
 
   const params = {
     fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),

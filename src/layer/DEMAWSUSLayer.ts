@@ -1,6 +1,6 @@
 import { DATASET_AWSUS_DEM } from './dataset';
 import { AbstractDEMLayer, ConstructorParameters } from './AbstractDEMLayer';
-import { DEMInstanceType } from '..';
+import { DEMInstanceType } from './const';
 
 export class DEMAWSUSLayer extends AbstractDEMLayer {
   public readonly dataset = DATASET_AWSUS_DEM;
