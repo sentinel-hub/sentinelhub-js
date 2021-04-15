@@ -25,6 +25,8 @@ import {
   DATASET_S3OLCI,
   DATASET_S5PL2,
   DATASET_AWS_L8L1C,
+  DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -49,6 +51,9 @@ import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
 import { Landsat8AWSLayer } from './layer/Landsat8AWSLayer';
+import { Landsat8AWSLOTL1Layer } from './layer/Landsat8AWSLOTL1Layer';
+import { Landsat8AWSLOTL2Layer } from './layer/Landsat8AWSLOTL2Layer';
+
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
@@ -84,6 +89,8 @@ export {
   DATASET_S3OLCI,
   DATASET_S5PL2,
   DATASET_AWS_L8L1C,
+  DATASET_AWS_LOTL1,
+  DATASET_AWS_LOTL2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -108,6 +115,8 @@ export {
   Landsat7EOCloudLayer,
   Landsat8EOCloudLayer,
   Landsat8AWSLayer,
+  Landsat8AWSLOTL1Layer,
+  Landsat8AWSLOTL2Layer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   // auth:
