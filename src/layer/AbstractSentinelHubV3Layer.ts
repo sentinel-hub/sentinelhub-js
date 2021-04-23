@@ -90,6 +90,18 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.downsampling = downsampling;
   }
 
+  public getLayerId(): string {
+    return this.layerId;
+  }
+
+  public getEvalscript(): string {
+    return this.evalscript;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
+  }
+
   protected async fetchLayerParamsFromSHServiceV3(reqConfig: RequestConfiguration): Promise<any> {
     if (this.instanceId === null || this.layerId === null) {
       throw new Error('Could not fetch layer params - instanceId and layerId must be set on Layer');

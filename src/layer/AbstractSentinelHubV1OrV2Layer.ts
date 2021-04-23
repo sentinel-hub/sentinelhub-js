@@ -70,10 +70,22 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     this.downsampling = downsampling;
   }
 
-  protected getEvalsource(): string {
+  public getEvalsource(): string {
     // some subclasses (Sentinel 1 at EO Cloud) might want to return a different
     // evalsource depending on their parameters
     return this.dataset.shWmsEvalsource;
+  }
+
+  public getLayerId(): string {
+    return this.layerId;
+  }
+
+  public getEvalscript(): string {
+    return this.evalscript;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
