@@ -154,7 +154,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
-  protected getShServiceHostname(): string {
+  public getShServiceHostname(): string {
     return this.dataset.shServiceHostname;
   }
 
@@ -543,7 +543,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected getStatsAdditionalParameters(): Record<string, any> {
+  public getStatsAdditionalParameters(): Record<string, any> {
     return {};
   }
 

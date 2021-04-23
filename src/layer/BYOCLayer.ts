@@ -154,7 +154,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return response;
   }
 
-  protected getShServiceHostname(): string {
+  public getShServiceHostname(): string {
     if (this.locationId === null) {
       throw new Error('Parameter locationId must be specified');
     }
