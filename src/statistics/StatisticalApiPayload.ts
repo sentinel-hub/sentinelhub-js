@@ -4,6 +4,7 @@ import { MosaickingOrder } from '../layer/const';
 import { ProcessingPayloadDatasource } from '../layer/processing';
 import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
 import { CRS_EPSG4326 } from '../crs';
+import { RequestConfiguration } from '../utils/cancelRequests';
 
 type StatisticalApiInputPayload = {
   bounds: {
@@ -19,7 +20,7 @@ type StatisticalApiInputPayload = {
 export async function createInputPayload(
   layer: AbstractSentinelHubV3Layer,
   params: any,
-  reqConfig: {},
+  reqConfig: RequestConfiguration,
 ): Promise<StatisticalApiInputPayload> {
   const payload: StatisticalApiInputPayload = {
     bounds: {
@@ -83,7 +84,6 @@ type StatisticalApiAggregationPayload = {
 export function createAggregationPayload(
   layer: AbstractSentinelHubV3Layer,
   params: any,
-  reqConfig: {},
 ): StatisticalApiAggregationPayload {
   if (!params.fromTime) {
     throw new Error('fromTime must be defined');
@@ -133,7 +133,6 @@ type StatisticalApiPayload = {
 export function createCalculationsPayload(
   layer: AbstractSentinelHubV3Layer,
   params: any,
-  reqConfig: {},
   output?: string,
 ): StatisticalApiCalculationsPayload {
   const outputId = output ? output : 'default';

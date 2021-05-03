@@ -75,8 +75,8 @@ export class StatisticalApi implements StatisticsProvider {
     await layer.updateLayerFromServiceIfNeeded(reqConfig);
 
     const input = await createInputPayload(layer, params, reqConfig);
-    const aggregation = createAggregationPayload(layer, { ...params, aggregationInterval: 'P1D' }, reqConfig);
-    const calculations = createCalculationsPayload(layer, params, reqConfig, STATS_MAGIC_STRING);
+    const aggregation = createAggregationPayload(layer, { ...params, aggregationInterval: 'P1D' });
+    const calculations = createCalculationsPayload(layer, params, STATS_MAGIC_STRING);
 
     const requestConfig: AxiosRequestConfig = {
       headers: {
