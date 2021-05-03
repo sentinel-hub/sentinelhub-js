@@ -1274,7 +1274,7 @@ export const stats = () => {
 
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats for S2L2A;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const params = {
@@ -1328,7 +1328,7 @@ export const statsWithEvalscript = () => {
 
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = `<h2>getStats for S2L1C;</h2>`;
+  wrapperEl.innerHTML = `<h2>getStats for S2L2A;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const params = {
