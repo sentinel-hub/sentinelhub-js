@@ -10,6 +10,7 @@ import {
   CRS_EPSG3857,
   registerHostnameReplacing,
   requestAuthToken,
+  StatsProvider,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -1340,6 +1341,70 @@ export const statsWithEvalscript = () => {
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
+    containerEl.innerHTML = JSON.stringify(stats, null, true);
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const statsWithStatisticalApi = () => {
+  const statsEvalScript = `
+//VERSION=3
+function setup() {
+  return {
+    input: [{
+      bands: [
+        "B04",
+        "B08",
+        "dataMask"
+      ]
+    }],
+    output: [
+      {
+        id: "stats",
+        bands: 1
+      },
+  
+      {
+        id: "dataMask",
+        bands: 1
+      }]
+  };
+};
+
+  function evaluatePixel(samples) {
+    let index = (samples.B08 - samples.B04) / (samples.B08 + samples.B04);
+    return {
+      stats: [index],
+      dataMask: [samples.dataMask],
+    };
+  }
+`;
+  const layerS2L2A = new S2L2ALayer({
+    instanceId,
+    layerId,
+    evalscript: statsEvalScript,
+  });
+
+  const bbox = new BBox(CRS_EPSG4326, 14.524829, 46.014936, 14.543764, 46.026975);
+
+  const containerEl = document.createElement('pre');
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStats for S2L2A with Statistical Api;</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const params = {
+    fromTime: new Date(Date.UTC(2021, 4 - 1, 3, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2021, 5 - 1, 3, 23, 59, 59)),
+    resolution: 10,
+    bins: 10,
+    bbox: bbox,
+    crs: CRS_EPSG4326,
+  };
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+    const stats = await layerS2L2A.getStats(params, {}, StatsProvider.STAPI);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});
