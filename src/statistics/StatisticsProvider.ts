@@ -2,6 +2,7 @@ import { AbstractLayer } from '../layer/AbstractLayer';
 import { GetStatsParams, Stats } from '../layer/const';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { Fis } from './Fis';
+import { StatisticalApi } from './StatisticalApi';
 
 export enum StatsProvider {
   FIS = 'FIS',
@@ -15,7 +16,7 @@ export interface StatisticsProvider {
 export function getStatisticsProvider(statsProvider: StatsProvider): StatisticsProvider {
   switch (statsProvider) {
     case StatsProvider.STAPI:
-      throw new Error(`Not supported yet `);
+      return new StatisticalApi();
     case StatsProvider.FIS:
       return new Fis();
     default:
