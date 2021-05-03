@@ -22,7 +22,7 @@ export class StatisticalApi implements StatisticsProvider {
     const statisticsPerBand = new Map<string, DailyChannelStats[]>();
 
     for (let statObject of data) {
-      const date = statObject.interval.from;
+      const date = new Date(statObject.interval.from);
       const { outputs } = statObject;
       const outputId = Object.keys(outputs).find(output => output === defaultOutput) || outputs[0];
       const outputData = outputs[outputId];
@@ -48,8 +48,11 @@ export class StatisticalApi implements StatisticsProvider {
     const result: Stats = {};
 
     for (let band of statisticsPerBand.keys()) {
-      //bands in FIS response are prefixed with C
-      result[band.replace('B', 'C')] = statisticsPerBand.get(band);
+      const bandStats = statisticsPerBand.get(band);
+      //bands in FIS response are
+      // - prefixed with C
+      // - sorted descending
+      result[band.replace('B', 'C')] = bandStats.sort((a, b) => b.date.valueOf() - a.date.valueOf());
     }
 
     return result;
