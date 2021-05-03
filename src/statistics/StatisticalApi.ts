@@ -15,7 +15,7 @@ import {
 export class StatisticalApi implements StatisticsProvider {
   private convertToFISResponse(response: any, defaultOutput: string): Stats {
     if (response && response.status !== 'OK') {
-      throw new Error('Unabled to get statistics');
+      throw new Error('Unable to get statistics');
     }
     //array of stats objects (interval+outputs)
     const { data } = response;
@@ -48,7 +48,8 @@ export class StatisticalApi implements StatisticsProvider {
     const result: Stats = {};
 
     for (let band of statisticsPerBand.keys()) {
-      result[band] = statisticsPerBand.get(band);
+      //bands in FIS response are prefixed with C
+      result[band.replace('B', 'C')] = statisticsPerBand.get(band);
     }
 
     return result;
