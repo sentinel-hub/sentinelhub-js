@@ -197,14 +197,12 @@ export type DailyChannelStats = {
     mean: number;
     stDev: number;
   };
-  histogram: {
-    bins: [
-      {
-        lowEdge: number;
-        mean: number;
-        count: number;
-      },
-    ];
+  histogram?: {
+    bins: {
+      lowEdge: number;
+      mean: number;
+      count: number;
+    }[];
   };
 };
 
