@@ -96,8 +96,9 @@ export function createAggregationPayload(
   if (!params.aggregationInterval) {
     throw new Error('aggregationInterval must be defined');
   }
-  const resX = params.resolution;
-  const resY = params.resolution;
+  //TODO: properly handle resolution
+  const resX = params.resolution * 0.00001;
+  const resY = params.resolution * 0.00001;
 
   const payload: StatisticalApiAggregationPayload = {
     timeRange: {
@@ -137,9 +138,11 @@ export function createCalculationsPayload(
 ): StatisticalApiCalculationsPayload {
   const outputId = output ? output : 'default';
   const defaultOutput: StatisticalApiOutput = {
-    histograms: {
+    statistics: {
       default: {
-        nBins: params.bins,
+        percentiles: {
+          k: Array.from({ length: params.bins - 1 }, (_, i) => ((i + 1) * 100) / params.bins),
+        },
       },
     },
   };

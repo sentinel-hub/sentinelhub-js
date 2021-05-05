@@ -29,12 +29,30 @@ export class StatisticalApi implements StatisticsProvider {
       const { bands } = outputData;
 
       Object.keys(bands).forEach(band => {
-        const { stats, histogram } = bands[band];
+        const { stats } = bands[band];
+
         const dailyStats: DailyChannelStats = {
           date: date,
           basicStats: stats,
-          histogram: histogram,
         };
+        // bring your own histogram
+        // statistical api doesn't support equal frequency histograms so we try to
+        // create them from percentiles
+
+        if (!!stats.percentiles) {
+          const lowEdges = Object.keys(stats.percentiles).sort((a, b) => parseFloat(a) - parseFloat(b));
+          const bins = [
+            parseFloat(stats.min),
+            ...lowEdges.map(lowEdge => parseFloat(stats.percentiles[lowEdge])),
+          ].map(value => ({ lowEdge: value, mean: null, count: null }));
+
+          dailyStats.histogram = {
+            bins: bins,
+          };
+        }
+
+        //remove percentiles from basic stats
+        delete stats.percentiles;
 
         let dcs: DailyChannelStats[] = [];
         if (statisticsPerBand.has(band)) {
