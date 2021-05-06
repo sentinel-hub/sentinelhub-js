@@ -120,7 +120,8 @@ const generateCacheKey = (request: AxiosRequestConfig): string | null => {
     // post requests are not supported, so we mimic a get request, by formatting the body/params to sha256, and constructing a key/url
     // idea taken from https://blog.cloudflare.com/introducing-the-workers-cache-api-giving-you-control-over-how-your-content-is-cached/
     case 'post':
-      const body = JSON.stringify(request.data);
+      // don't serialize strings or already serialized objects as this will result in escaping some chars and different hash
+      const body = typeof request.data === 'string' ? request.data : JSON.stringify(request.data);
       const hash = stringToHash(body);
       return `${request.url}?${hash}`;
     case 'get':
