@@ -110,7 +110,7 @@ test('Uses default number of retries (2) if null is set', async () => {
   expect(mockNetwork.history.post.length).toBe(3);
 });
 
-test.only('Retries correctly when caching is enabled', async () => {
+test('Retries correctly when caching is enabled', async () => {
   jest.setTimeout(10 * 3000 + 1000);
   const {
     fromTime,
