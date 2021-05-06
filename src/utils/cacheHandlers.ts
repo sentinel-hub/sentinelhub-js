@@ -17,11 +17,14 @@ export type CacheConfig = {
 // simply delay new requests with the same cacheKey.
 const cacheableRequestsInProgress = new Set();
 
+export const removeCacheableRequestsInProgress = (cacheKey: string): void => {
+  cacheableRequestsInProgress.delete(cacheKey);
+};
+
 export const fetchCachedResponse = async (request: any): Promise<any> => {
   if (!isRequestCachable(request)) {
     return request;
   }
-
   const cacheKey = generateCacheKey(request);
   // resource not cacheable? It couldn't have been saved to cache:
   if (cacheKey === null) {
@@ -63,7 +66,7 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     // if we have blocked other requests by mistake (we will not be creating a new cache
     // entry from this request), we should fix this now:
     if (!request.cacheKey) {
-      cacheableRequestsInProgress.delete(cacheKey);
+      removeCacheableRequestsInProgress(cacheKey);
     }
   }
 };
@@ -102,7 +105,7 @@ export const saveCacheResponse = async (response: AxiosResponse): Promise<any> =
     // if response.config.cacheKey was there, we *must* remove it from the list
     // of requests in progress, otherwise all other requests with the same cacheKey
     // will wait indefinitely:
-    cacheableRequestsInProgress.delete(response.config.cacheKey);
+    removeCacheableRequestsInProgress(response.config.cacheKey);
   }
 };
 
