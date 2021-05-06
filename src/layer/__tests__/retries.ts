@@ -5,6 +5,7 @@ import { invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
 import { constructFixtureFindTiles } from './fixtures.findTiles';
+import { CACHE_CONFIG_30MIN } from '../../utils/cacheHandlers';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -107,4 +108,40 @@ test('Uses default number of retries (2) if null is set', async () => {
 
   await expect(layer.findTiles(bbox, fromTime, toTime, null, null, { retries: null })).rejects.toThrow();
   expect(mockNetwork.history.post.length).toBe(3);
+});
+
+test.only('Retries correctly when caching is enabled', async () => {
+  jest.setTimeout(10 * 3000 + 1000);
+  const {
+    fromTime,
+    toTime,
+    bbox,
+    layer,
+    mockedResponse,
+    expectedResultTiles,
+    expectedResultHasMore,
+  } = constructFixtureFindTiles({});
+
+  mockNetwork.reset();
+  mockNetwork.onPost().replyOnce(500);
+  mockNetwork.onPost().replyOnce(500);
+  mockNetwork.onPost().replyOnce(200, mockedResponse);
+  mockNetwork.onPost().replyOnce(200, mockedResponse);
+
+  const { tiles, hasMore } = await layer.findTiles(bbox, fromTime, toTime, null, null, {
+    retries: 3,
+    cache: CACHE_CONFIG_30MIN,
+  });
+
+  expect(mockNetwork.history.post.length).toBe(3);
+  expect(tiles).toStrictEqual(expectedResultTiles);
+  expect(hasMore).toBe(expectedResultHasMore);
+
+  const cachedResult = await layer.findTiles(bbox, fromTime, toTime, null, null, {
+    retries: 2,
+    cache: CACHE_CONFIG_30MIN,
+  });
+  //check if any new network request was made
+  expect(mockNetwork.history.post.length).toBe(3);
+  expect(cachedResult.tiles).toStrictEqual(expectedResultTiles);
 });
