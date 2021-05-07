@@ -26,7 +26,8 @@ export class StatisticalApi implements StatisticsProvider {
     for (let statObject of data) {
       const date = new Date(statObject.interval.from);
       const { outputs } = statObject;
-      const outputId = Object.keys(outputs).find(output => output === defaultOutput) || outputs[0];
+      const outputId =
+        Object.keys(outputs).find(output => output === defaultOutput) || Object.keys(outputs)[0];
       const outputData = outputs[outputId];
       const { bands } = outputData;
 
