@@ -12,6 +12,8 @@ import {
   createInputPayload,
 } from './StatisticalApiPayload';
 
+const STATS_DEFAULT_OUTPUT = 'default';
+
 export class StatisticalApi implements StatisticsProvider {
   private convertToFISResponse(response: any, defaultOutput: string): Stats {
     if (response && response.status !== 'OK') {
@@ -81,15 +83,15 @@ export class StatisticalApi implements StatisticsProvider {
     params: GetStatsParams,
     reqConfig?: RequestConfiguration,
   ): Promise<Stats> {
-    return this.getBasicStats(layer, params, reqConfig);
+    return this.getBasicStats(layer, params, STATS_DEFAULT_OUTPUT, reqConfig);
   }
 
   public async getBasicStats(
     layer: AbstractSentinelHubV3Layer,
     params: GetStatsParams,
+    output: string,
     reqConfig?: RequestConfiguration,
   ): Promise<Stats> {
-    const STATS_MAGIC_STRING = 'stats';
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     if (!authToken) {
       throw new Error('Must be authenticated to use Statistical API');
@@ -98,7 +100,7 @@ export class StatisticalApi implements StatisticsProvider {
 
     const input = await createInputPayload(layer, params, reqConfig);
     const aggregation = createAggregationPayload(layer, { ...params, aggregationInterval: 'P1D' });
-    const calculations = createCalculationsPayload(layer, params, STATS_MAGIC_STRING);
+    const calculations = createCalculationsPayload(layer, params, output);
 
     const requestConfig: AxiosRequestConfig = {
       headers: {
@@ -118,6 +120,6 @@ export class StatisticalApi implements StatisticsProvider {
       requestConfig,
     );
 
-    return this.convertToFISResponse(response.data, STATS_MAGIC_STRING);
+    return this.convertToFISResponse(response.data, STATS_DEFAULT_OUTPUT);
   }
 }
