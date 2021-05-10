@@ -6,6 +6,7 @@ import {
   saveCacheResponse,
   findAndDeleteExpiredCachedItems,
   CacheConfig,
+  removeCacheableRequestsInProgress,
 } from './cacheHandlers';
 
 const DEFAULT_RETRY_DELAY = 3000;
@@ -116,6 +117,9 @@ const retryRequests = (err: any): any => {
     const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
+      if (err.config.cacheKey) {
+        removeCacheableRequestsInProgress(err.config.cacheKey);
+      }
       return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
     }
   }
