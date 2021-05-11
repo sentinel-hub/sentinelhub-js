@@ -65,7 +65,7 @@ import {
 } from './legacyCompat';
 
 import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
-import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams } from './layer/const';
+import { LocationIdSHv3, GetMapParams, LinkType, OverrideGetMapParams, SHV3_LOCATIONS_ROOT_URL } from './layer/const';
 import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
@@ -156,6 +156,7 @@ export {
   setDefaultRequestsConfig,
   drawBlobOnCanvas,
   canvasToBlob,
+  SHV3_LOCATIONS_ROOT_URL,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
