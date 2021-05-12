@@ -162,6 +162,36 @@ export const DATASET_AWS_LOTL2: Dataset = {
   catalogCollectionId: 'landsat-ot-l2',
 };
 
+export const DATASET_AWS_LTML1: Dataset = {
+  id: 'AWS_LTML1',
+  shJsonGetCapabilitiesDataset: 'LTML1',
+  shWmsEvalsource: 'LTML1',
+  shProcessingApiDatasourceAbbreviation: 'LTML1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML1/searchIndex',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(1982, 7 - 1, 1, 0, 0, 0)), // July 1982
+  maxDate: new Date(Date.UTC(2012, 6 - 1, 1, 0, 0, 0)), // May 2012
+  catalogCollectionId: 'landsat-tm-l1',
+};
+
+export const DATASET_AWS_LTML2: Dataset = {
+  id: 'AWS_LTML2',
+  shJsonGetCapabilitiesDataset: 'LTML2',
+  shWmsEvalsource: 'LTML2',
+  shProcessingApiDatasourceAbbreviation: 'LTML2',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/searchIndex',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(1982, 7 - 1, 1, 0, 0, 0)), // July 1982
+  maxDate: new Date(Date.UTC(2012, 6 - 1, 1, 0, 0, 0)), // May 2012
+  catalogCollectionId: 'landsat-tm-l2',
+};
+
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   id: 'EOC_L5',
   shJsonGetCapabilitiesDataset: null,
