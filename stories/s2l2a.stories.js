@@ -1397,7 +1397,7 @@ function setup() {
   const params = {
     fromTime: new Date(Date.UTC(2021, 4 - 1, 3, 0, 0, 0)),
     toTime: new Date(Date.UTC(2021, 5 - 1, 3, 23, 59, 59)),
-    resolution: 10,
+    resolution: 10 / 111111,
     bins: 10,
     bbox: bbox,
     crs: CRS_EPSG4326,

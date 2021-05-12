@@ -97,8 +97,8 @@ export function createAggregationPayload(
     throw new Error('aggregationInterval must be defined');
   }
   //TODO: properly handle resolution
-  const resX = params.resolution * 0.00001;
-  const resY = params.resolution * 0.00001;
+  const resX = params.resolution;
+  const resY = params.resolution;
 
   const payload: StatisticalApiAggregationPayload = {
     timeRange: {
