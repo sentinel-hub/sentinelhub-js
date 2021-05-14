@@ -172,8 +172,8 @@ export const DATASET_AWS_LTML1: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML1/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML1/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(1982, 7 - 1, 1, 0, 0, 0)), // July 1982
-  maxDate: new Date(Date.UTC(2012, 6 - 1, 1, 0, 0, 0)), // May 2012
+  minDate: new Date(Date.UTC(1982, 8 - 1, 22, 14, 18, 20)), // 1982-08-22 14:18:20 UTC
+  maxDate: new Date(Date.UTC(2012, 5 - 1, 5, 17, 54, 6)), // 2012-05-05  17:54:06 UTC
   catalogCollectionId: 'landsat-tm-l1',
 };
 
@@ -187,8 +187,8 @@ export const DATASET_AWS_LTML2: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(1982, 7 - 1, 1, 0, 0, 0)), // July 1982
-  maxDate: new Date(Date.UTC(2012, 6 - 1, 1, 0, 0, 0)), // May 2012
+  minDate: new Date(Date.UTC(1984, 7 - 1, 16, 1, 23, 2)), // 1984-07-16  01:23:02 UTC
+  maxDate: new Date(Date.UTC(2012, 5 - 1, 5, 17, 54, 6)), // 2012-05-05  17:54:06 UTC
   catalogCollectionId: 'landsat-tm-l2',
 };
 
