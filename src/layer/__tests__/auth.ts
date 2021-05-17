@@ -98,4 +98,6 @@ test('getMap with different authToken following an identical failed getMap makes
   await layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig);
 
   expect(mockNetwork.history.post.length).toBe(4);
+  expect(mockNetwork.history.post[2].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN1}`);
+  expect(mockNetwork.history.post[3].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN2}`);
 });
