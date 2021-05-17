@@ -108,6 +108,11 @@ const retryRequests = (err: any): any => {
   if (!err.config) {
     return Promise.reject(err);
   }
+
+  if (err.config.cacheKey) {
+    removeCacheableRequestsInProgress(err.config.cacheKey);
+  }
+
   if (shouldRetry(err)) {
     err.config.retriesCount = err.config.retriesCount | 0;
     const maxRetries =
@@ -117,9 +122,6 @@ const retryRequests = (err: any): any => {
     const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
-      if (err.config.cacheKey) {
-        removeCacheableRequestsInProgress(err.config.cacheKey);
-      }
       return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
     }
   }
