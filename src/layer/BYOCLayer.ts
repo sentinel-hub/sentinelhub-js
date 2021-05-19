@@ -22,7 +22,7 @@ import { ProcessingPayload } from './processing';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
-import { StatsProvider } from '../statistics/StatisticsProvider';
+import { StatisticsProviderType } from '../statistics/StatisticsProvider';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -200,7 +200,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public async getStats(
     params: GetStatsParams,
     reqConfig: RequestConfiguration = {},
-    statsProvider: StatsProvider = StatsProvider.STAPI,
+    statsProvider: StatisticsProviderType = StatisticsProviderType.STAPI,
   ): Promise<Stats> {
     await this.updateLayerFromServiceIfNeeded();
     return super.getStats(params, reqConfig, statsProvider);

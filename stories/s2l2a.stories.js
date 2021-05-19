@@ -10,7 +10,7 @@ import {
   CRS_EPSG3857,
   registerHostnameReplacing,
   requestAuthToken,
-  StatsProvider,
+  StatisticsProviderType,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -1404,7 +1404,7 @@ function setup() {
   };
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
-    const stats = await layerS2L2A.getStats(params, {}, StatsProvider.STAPI);
+    const stats = await layerS2L2A.getStats(params, {}, StatisticsProviderType.STAPI);
     containerEl.innerHTML = JSON.stringify(stats, null, true);
   };
   perform().then(() => {});

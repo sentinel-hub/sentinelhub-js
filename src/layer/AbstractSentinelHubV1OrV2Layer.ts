@@ -20,7 +20,7 @@ import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { getStatisticsProvider, StatsProvider } from '../statistics/StatisticsProvider';
+import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -240,7 +240,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   public async getStats(
     params: GetStatsParams,
     reqConfig: RequestConfiguration = {},
-    statsProvider: StatsProvider = StatsProvider.FIS,
+    statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
     const stats = await ensureTimeout(async innerReqConfig => {
       const sp = getStatisticsProvider(statsProvider);

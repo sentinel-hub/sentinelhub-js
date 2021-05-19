@@ -82,7 +82,7 @@ import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
 
-import { StatsProvider } from './statistics/StatisticsProvider';
+import { StatisticsProviderType } from './statistics/StatisticsProvider';
 
 registerInitialAxiosInterceptors();
 
@@ -176,5 +176,5 @@ export {
   Effects,
   ColorRange,
   //StatisticalApi
-  StatsProvider,
+  StatisticsProviderType,
 };

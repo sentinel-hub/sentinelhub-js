@@ -28,7 +28,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { getStatisticsProvider, StatsProvider } from '../statistics/StatisticsProvider';
+import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -651,7 +651,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public async getStats(
     params: GetStatsParams,
     reqConfig: RequestConfiguration = {},
-    statsProvider: StatsProvider = StatsProvider.FIS,
+    statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
     const stats = await ensureTimeout(async innerReqConfig => {
       const sp = getStatisticsProvider(statsProvider);

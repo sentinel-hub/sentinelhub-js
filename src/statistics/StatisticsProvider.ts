@@ -4,7 +4,7 @@ import { RequestConfiguration } from '../utils/cancelRequests';
 import { Fis } from './Fis';
 import { StatisticalApi } from './StatisticalApi';
 
-export enum StatsProvider {
+export enum StatisticsProviderType {
   FIS = 'FIS',
   STAPI = 'STAPI',
 }
@@ -13,11 +13,11 @@ export interface StatisticsProvider {
   getStats(layer: AbstractLayer, params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats>;
 }
 
-export function getStatisticsProvider(statsProvider: StatsProvider): StatisticsProvider {
+export function getStatisticsProvider(statsProvider: StatisticsProviderType): StatisticsProvider {
   switch (statsProvider) {
-    case StatsProvider.STAPI:
+    case StatisticsProviderType.STAPI:
       return new StatisticalApi();
-    case StatsProvider.FIS:
+    case StatisticsProviderType.FIS:
       return new Fis();
     default:
       throw new Error(`Unknows statistics provider ${statsProvider}`);
