@@ -58,6 +58,34 @@ const geometryMultiPolygon = {
   ],
 };
 
+const geometryStats = {
+  type: 'Polygon',
+  coordinates: [
+    [
+      [38.443522453308105, 29.97140509632656],
+      [38.44244956970215, 29.96954625480396],
+      [38.44292163848877, 29.967538666899472],
+      [38.44480991363525, 29.965865645995088],
+      [38.44686985015869, 29.96541950233024],
+      [38.44910144805908, 29.96564257441305],
+      [38.45056056976318, 29.966720749087546],
+      [38.451247215270996, 29.96861682100166],
+      [38.450989723205566, 29.97006673393574],
+      [38.450260162353516, 29.971330743333375],
+      [38.4486722946167, 29.97229732790467],
+      [38.44622611999512, 29.972446032388678],
+      [38.444252014160156, 29.971888389426],
+      [38.443522453308105, 29.97140509632656],
+    ],
+  ],
+  crs: {
+    type: 'name',
+    properties: {
+      name: 'urn:ogc:def:crs:EPSG::4326',
+    },
+  },
+};
+
 const gain = 2;
 const gamma = 2;
 const redRange = { from: 0.2, to: 0.8 };
@@ -1245,34 +1273,6 @@ export const stats = () => {
     maxCloudCoverPercent: 20,
   });
 
-  const geometry = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [38.443522453308105, 29.97140509632656],
-        [38.44244956970215, 29.96954625480396],
-        [38.44292163848877, 29.967538666899472],
-        [38.44480991363525, 29.965865645995088],
-        [38.44686985015869, 29.96541950233024],
-        [38.44910144805908, 29.96564257441305],
-        [38.45056056976318, 29.966720749087546],
-        [38.451247215270996, 29.96861682100166],
-        [38.450989723205566, 29.97006673393574],
-        [38.450260162353516, 29.971330743333375],
-        [38.4486722946167, 29.97229732790467],
-        [38.44622611999512, 29.972446032388678],
-        [38.444252014160156, 29.971888389426],
-        [38.443522453308105, 29.97140509632656],
-      ],
-    ],
-    crs: {
-      type: 'name',
-      properties: {
-        name: 'urn:ogc:def:crs:EPSG::4326',
-      },
-    },
-  };
-
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>getStats for S2L2A;</h2>`;
@@ -1283,7 +1283,7 @@ export const stats = () => {
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
     bins: 10,
-    geometry: geometry,
+    geometry: geometryStats,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
@@ -1305,28 +1305,6 @@ export const statsWithEvalscript = () => {
   `,
   });
 
-  const geometry = {
-    type: 'Polygon',
-    coordinates: [
-      [
-        [38.443522453308105, 29.97140509632656],
-        [38.44244956970215, 29.96954625480396],
-        [38.44292163848877, 29.967538666899472],
-        [38.44480991363525, 29.965865645995088],
-        [38.44686985015869, 29.96541950233024],
-        [38.44910144805908, 29.96564257441305],
-        [38.45056056976318, 29.966720749087546],
-        [38.451247215270996, 29.96861682100166],
-        [38.450989723205566, 29.97006673393574],
-        [38.450260162353516, 29.971330743333375],
-        [38.4486722946167, 29.97229732790467],
-        [38.44622611999512, 29.972446032388678],
-        [38.444252014160156, 29.971888389426],
-        [38.443522453308105, 29.97140509632656],
-      ],
-    ],
-  };
-
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>getStats for S2L2A;</h2>`;
@@ -1337,7 +1315,7 @@ export const statsWithEvalscript = () => {
     toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10,
     bins: 10,
-    geometry: geometry,
+    geometry: geometryStats,
   };
   const perform = async () => {
     const stats = await layerS2L2A.getStats(params);
@@ -1387,19 +1365,17 @@ function setup() {
     evalscript: statsEvalScript,
   });
 
-  const bbox = new BBox(CRS_EPSG4326, 14.524829, 46.014936, 14.543764, 46.026975);
-
   const containerEl = document.createElement('pre');
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = `<h2>getStats for S2L2A with Statistical Api;</h2>`;
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
 
   const params = {
-    fromTime: new Date(Date.UTC(2021, 4 - 1, 3, 0, 0, 0)),
-    toTime: new Date(Date.UTC(2021, 5 - 1, 3, 23, 59, 59)),
+    fromTime: new Date(Date.UTC(2020, 1 - 1, 1, 0, 0, 0)),
+    toTime: new Date(Date.UTC(2020, 1 - 1, 15, 23, 59, 59)),
     resolution: 10 / 111111,
     bins: 10,
-    bbox: bbox,
+    geometry: geometryStats,
     crs: CRS_EPSG4326,
   };
   const perform = async () => {
