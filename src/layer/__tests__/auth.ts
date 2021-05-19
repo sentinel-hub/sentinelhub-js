@@ -75,3 +75,29 @@ test('requestAuthToken correctly encodes URI parameters', async () => {
   const req = mockNetwork.history.post[0];
   expect(req.data).toBe('grant_type=client_credentials&client_id=asd%2C321&client_secret=.%2F*%26');
 });
+
+test('getMap with different authToken following an identical failed getMap makes a request', async () => {
+  const { layer, getMapParams } = constructFixtureGetMap();
+
+  jest.setTimeout(30000);
+
+  mockNetwork.reset();
+  mockNetwork.onPost().replyOnce(429, '');
+  mockNetwork.onPost().replyOnce(429, '');
+  mockNetwork.onPost().replyOnce(429, '');
+  mockNetwork.onPost().replyOnce(200, '');
+
+  const reqConfig = { authToken: EXAMPLE_TOKEN1, retries: 2 };
+  try {
+    await layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig);
+  } catch (err) {
+    expect(err.response.status).toBe(429);
+  }
+
+  reqConfig.authToken = EXAMPLE_TOKEN2;
+  await layer.getMap(getMapParams, ApiType.PROCESSING, reqConfig);
+
+  expect(mockNetwork.history.post.length).toBe(4);
+  expect(mockNetwork.history.post[2].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN1}`);
+  expect(mockNetwork.history.post[3].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN2}`);
+});
