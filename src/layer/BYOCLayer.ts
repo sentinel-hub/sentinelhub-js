@@ -200,7 +200,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public async getStats(
     params: GetStatsParams,
     reqConfig: RequestConfiguration = {},
-    statsProvider: StatisticsProviderType = StatisticsProviderType.STAPI,
+    statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
     await this.updateLayerFromServiceIfNeeded();
     return super.getStats(params, reqConfig, statsProvider);
