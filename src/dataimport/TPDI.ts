@@ -77,5 +77,20 @@ export class TPDI {
       return await axios.post(`${TPDI_SERVICE_URL}/search`, payload, requestConfig);
     }, reqConfig);
   }
+
+  public static async createOrder(
+    provider: TPDProvider,
+    name: string,
+    collectionId: string,
+    items: string[],
+    params: TPDISearchParams,
+    reqConfig?: RequestConfiguration,
+  ): Promise<any> {
+    return await ensureTimeout(async innerReqConfig => {
+      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+      const tpdp = getThirdPartyDataProvider(provider);
+      const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+      return await axios.post(`${TPDI_SERVICE_URL}/order`, payload, requestConfig);
+    }, reqConfig);
   }
 }

@@ -2,6 +2,7 @@ import { TPDProvider, TPDISearchParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
+  getOrderPayload(name: string, collectionId: string, items: string[], params: TPDISearchParams): any;
 }
 
 export abstract class AbstractTPDProvider implements TPDProviderInterface {
@@ -56,6 +57,26 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     const commonParams = this.getCommonSearchParams(params);
     const additionalParams = this.getAdditionalSearchParams(params);
     const payload = { ...commonParams, ...additionalParams };
+    return payload;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
+    return {};
+  }
+
+  public getOrderPayload(name: string, collectionId: string, items: string[], params: TPDISearchParams): any {
+    const payload: any = {};
+
+    if (!!name) {
+      payload.name = name;
+    }
+
+    if (!!collectionId) {
+      payload.collectionId = collectionId;
+    }
+    payload.input = this.getAdditionalOrderParams(items, params);
+
     return payload;
   }
 }
