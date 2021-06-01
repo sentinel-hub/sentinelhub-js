@@ -9,6 +9,7 @@ import { TPDI } from '../TPDI';
 import '../../../jest-setup';
 import { PlanetProductBundle, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
+import { checkSearchPayload } from './testUtils.PlanetDataProvider';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -107,41 +108,6 @@ describe('Test search', () => {
     const { data } = mockNetwork.history.post[0];
     const requestData = JSON.parse(data);
 
-    expect(requestData.provider).toStrictEqual(TPDProvider.PLANET);
-    expect(requestData.planetApiKey).toStrictEqual(params.planetApiKey);
-
-    if (!!params.bbox) {
-      expect(requestData.bounds.bbox).toStrictEqual([
-        params.bbox.minX,
-        params.bbox.minY,
-        params.bbox.maxX,
-        params.bbox.maxY,
-      ]);
-    }
-    if (!!params.geometry) {
-      expect(requestData.bounds.geometry).toStrictEqual(params.geometry);
-    }
-    expect(requestData.bounds.properties.crs).toStrictEqual(params.bbox.crs.opengisUrl);
-    const dataObject = requestData.data[0];
-
-    expect(dataObject.itemType).toStrictEqual('PSScene4Band');
-
-    const { dataFilter } = dataObject;
-    expect(dataFilter.timeRange.from).toStrictEqual(params.fromTime.toISOString());
-    expect(dataFilter.timeRange.to).toStrictEqual(params.toTime.toISOString());
-
-    if (!isNaN(params.maxCloudCoverage)) {
-      expect(dataFilter.maxCloudCoverage).toBeDefined();
-      expect(dataFilter.maxCloudCoverage).toStrictEqual(params.maxCloudCoverage);
-    } else {
-      expect(dataFilter.maxCloudCoverage).toBeUndefined();
-    }
-
-    if (!!params.nativeFilter) {
-      expect(dataFilter.nativeFilter).toBeDefined();
-      expect(dataFilter.nativeFilter).toStrictEqual(params.nativeFilter);
-    } else {
-      expect(dataFilter.nativeFilter).toBeUndefined();
-    }
+    checkSearchPayload(requestData, params);
   });
 });
