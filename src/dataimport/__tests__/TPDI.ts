@@ -48,7 +48,7 @@ describe('Test getQuota', () => {
   it('requires authenthication', async () => {
     setAuthToken(undefined);
     try {
-      TPDI.getQuota(TPDICollections.AIRBUS_PLEIADES, { cache: CACHE_CONFIG_NOCACHE });
+      await TPDI.getQuota(TPDICollections.AIRBUS_PLEIADES, { cache: CACHE_CONFIG_NOCACHE });
     } catch (e) {
       expect(e.message).toEqual('Must be authenticated to fetch quotas');
     }
