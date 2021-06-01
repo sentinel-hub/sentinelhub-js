@@ -10,6 +10,7 @@ import '../../../jest-setup';
 import { PlanetProductBundle, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
 import { checkSearchPayload } from './testUtils.PlanetDataProvider';
+import { PlanetDataProvider } from '../PlanetDataProvider';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -109,5 +110,61 @@ describe('Test search', () => {
     const requestData = JSON.parse(data);
 
     checkSearchPayload(requestData, params);
+  });
+});
+
+describe('Test create order payload', () => {
+  it.each([
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    [
+      'name',
+      'collectionId',
+      ['id'],
+      {
+        ...defaultSearchParams,
+        maxCloudCoverage: 10,
+        productBundle: PlanetProductBundle.ANALYTIC,
+        nativeFilter: { id: 1 },
+      },
+    ],
+
+    ['name', 'collectionId', null, { ...defaultSearchParams }],
+    ['name', 'collectionId', [], { ...defaultSearchParams }],
+    ['name', null, null, { ...defaultSearchParams }],
+    [null, null, null, { ...defaultSearchParams }],
+  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
+    const tpdp = new PlanetDataProvider();
+    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+
+    if (!!name) {
+      expect(payload.name).toBeDefined();
+      expect(payload.name).toStrictEqual(name);
+    } else {
+      expect(payload.name).toBeUndefined();
+    }
+
+    if (!!collectionId) {
+      expect(payload.collectionId).toBeDefined();
+      expect(payload.collectionId).toStrictEqual(collectionId);
+    } else {
+      expect(payload.collectionId).toBeUndefined();
+    }
+
+    const { input } = payload;
+
+    checkSearchPayload(input, params);
+
+    const dataObject = input.data[0];
+    const { itemIds } = dataObject;
+
+    if (!!items && items.length) {
+      expect(itemIds).toBeDefined();
+      expect(itemIds.length).toStrictEqual(items.length);
+      expect(itemIds).toStrictEqual(items);
+
+      //check each item
+    } else {
+      expect(itemIds).toBeUndefined();
+    }
   });
 });

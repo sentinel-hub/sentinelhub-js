@@ -10,6 +10,7 @@ import '../../../jest-setup';
 import { MaxarSensor, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
 import { checkSearchPayload } from './testUtils.MaxarDataProvider';
+import { MaxarDataProvider } from '../MaxarDataProvider';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -117,5 +118,63 @@ describe('Test search', () => {
     const requestData = JSON.parse(data);
 
     checkSearchPayload(requestData, params);
+  });
+});
+
+describe('Test create order payload', () => {
+  it.each([
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    [
+      'name',
+      'collectionId',
+      ['id'],
+      {
+        ...defaultSearchParams,
+        maxCloudCoverage: 10,
+        minOffNadir: 15,
+        maxOffNadir: 20,
+        minSunElevation: 30,
+        maxSunElevation: 30,
+        sensor: MaxarSensor.GE01,
+      },
+    ],
+    ['name', 'collectionId', null, { ...defaultSearchParams }],
+    ['name', 'collectionId', [], { ...defaultSearchParams }],
+    ['name', null, null, { ...defaultSearchParams }],
+    [null, null, null, { ...defaultSearchParams }],
+  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
+    const tpdp = new MaxarDataProvider();
+    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+
+    if (!!name) {
+      expect(payload.name).toBeDefined();
+      expect(payload.name).toStrictEqual(name);
+    } else {
+      expect(payload.name).toBeUndefined();
+    }
+
+    if (!!collectionId) {
+      expect(payload.collectionId).toBeDefined();
+      expect(payload.collectionId).toStrictEqual(collectionId);
+    } else {
+      expect(payload.collectionId).toBeUndefined();
+    }
+
+    const { input } = payload;
+
+    checkSearchPayload(input, params);
+
+    const dataObject = input.data[0];
+    const { selectedImages } = dataObject;
+
+    if (!!items && items.length) {
+      expect(selectedImages).toBeDefined();
+      expect(selectedImages.length).toStrictEqual(items.length);
+      expect(selectedImages).toStrictEqual(items);
+
+      //check each item
+    } else {
+      expect(selectedImages).toBeUndefined();
+    }
   });
 });
