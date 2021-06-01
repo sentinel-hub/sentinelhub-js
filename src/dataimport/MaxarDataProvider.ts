@@ -57,4 +57,13 @@ export class MaxarDataProvider extends AbstractTPDProvider {
 
     return { data: [data] };
   }
+
+  protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
+    const input = this.getSearchPayload(params);
+    if (!!items && items.length) {
+      const dataObject = input.data[0];
+      dataObject.selectedImages = items;
+    }
+    return input;
+  }
 }

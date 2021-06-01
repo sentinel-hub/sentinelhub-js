@@ -5,6 +5,7 @@ import fetch from 'node-fetch';
 
 import { setAuthToken, invalidateCaches, BBox, CRS_EPSG4326 } from '../../index';
 import { TPDI } from '../TPDI';
+import { AirbusDataProvider } from '../AirbusDataProvider';
 
 import '../../../jest-setup';
 import { AirbusConstellation, AirbusProcessingLevel, TPDISearchParams, TPDProvider } from '../const';
@@ -122,59 +123,44 @@ describe('Test search', () => {
   });
 });
 
-    expect(requestData.provider).toStrictEqual(TPDProvider.AIRBUS);
-    if (!!params.bbox) {
-      expect(requestData.bounds.bbox).toStrictEqual([
-        params.bbox.minX,
-        params.bbox.minY,
-        params.bbox.maxX,
-        params.bbox.maxY,
-      ]);
-    }
-    if (!!params.geometry) {
-      expect(requestData.bounds.geometry).toStrictEqual(params.geometry);
-    }
-    expect(requestData.bounds.properties.crs).toStrictEqual(params.bbox.crs.opengisUrl);
-    const dataObject = requestData.data[0];
-    const { dataFilter } = dataObject;
-    expect(dataObject.constellation).toStrictEqual(params.constellation);
-    expect(dataFilter.timeRange.from).toStrictEqual(params.fromTime.toISOString());
-    expect(dataFilter.timeRange.to).toStrictEqual(params.toTime.toISOString());
+describe('Test create order payload', () => {
+  it.each([
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    ['name', 'collectionId', null, { ...defaultSearchParams }],
+    ['name', 'collectionId', [], { ...defaultSearchParams }],
+    ['name', null, null, { ...defaultSearchParams }],
+    [null, null, null, { ...defaultSearchParams }],
+  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
+    const tpdp = new AirbusDataProvider();
+    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
 
-    if (!isNaN(params.maxCloudCoverage)) {
-      expect(dataFilter.maxCloudCoverage).toBeDefined();
-      expect(dataFilter.maxCloudCoverage).toStrictEqual(params.maxCloudCoverage);
+    if (!!name) {
+      expect(payload.name).toBeDefined();
+      expect(payload.name).toStrictEqual(name);
     } else {
-      expect(dataFilter.maxCloudCoverage).toBeUndefined();
+      expect(payload.name).toBeUndefined();
     }
 
-    if (!!params.processingLevel) {
-      expect(dataFilter.processingLevel).toBeDefined();
-      expect(dataFilter.processingLevel).toStrictEqual(params.processingLevel);
+    if (!!collectionId) {
+      expect(payload.collectionId).toBeDefined();
+      expect(payload.collectionId).toStrictEqual(collectionId);
     } else {
-      expect(dataFilter.processingLevel).toBeUndefined();
+      expect(payload.collectionId).toBeUndefined();
     }
 
-    if (!isNaN(params.maxSnowCoverage)) {
-      expect(dataFilter.maxSnowCoverage).toBeDefined();
-      expect(dataFilter.maxSnowCoverage).toStrictEqual(params.maxSnowCoverage);
-    } else {
-      expect(dataFilter.maxSnowCoverage).toBeUndefined();
-    }
+    const { input } = payload;
 
-    if (!isNaN(params.maxIncidenceAngle)) {
-      expect(dataFilter.maxIncidenceAngle).toBeDefined();
-      expect(dataFilter.maxIncidenceAngle).toStrictEqual(params.maxIncidenceAngle);
-    } else {
-      expect(dataFilter.maxIncidenceAngle).toBeUndefined();
-    }
+    checkSearchPayload(input, params);
 
-    if (!!params.expiredFromTime && !!params.expiredToTime) {
-      expect(dataFilter.expirationDate).toBeDefined();
-      expect(dataFilter.expirationDate.from).toStrictEqual(params.expiredFromTime.toISOString());
-      expect(dataFilter.expirationDate.to).toStrictEqual(params.expiredToTime.toISOString());
+    const dataObject = input.data[0];
+    const { products } = dataObject;
+
+    if (!!items && items.length) {
+      expect(products).toBeDefined();
+      expect(dataObject.products.length).toStrictEqual(items.length);
+      //check each item
     } else {
-      expect(dataFilter.expirationDate).toBeUndefined();
+      expect(products).toBeUndefined();
     }
   });
 });
