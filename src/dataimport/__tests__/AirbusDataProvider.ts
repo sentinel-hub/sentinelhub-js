@@ -126,6 +126,19 @@ describe('Test search', () => {
 describe('Test create order payload', () => {
   it.each([
     ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    [
+      'name',
+      'collectionId',
+      ['id'],
+      {
+        ...defaultSearchParams,
+        maxCloudCoverage: 10,
+        processingLevel: AirbusProcessingLevel.ALBUM,
+        maxSnowCoverage: 20,
+        maxIncidenceAngle: 30,
+      },
+    ],
+
     ['name', 'collectionId', null, { ...defaultSearchParams }],
     ['name', 'collectionId', [], { ...defaultSearchParams }],
     ['name', null, null, { ...defaultSearchParams }],
