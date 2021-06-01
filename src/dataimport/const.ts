@@ -1,4 +1,4 @@
-import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
+import { Polygon, MultiPolygon } from '@turf/helpers';
 import { CRS } from '../crs';
 import { BBox } from '../bbox';
 
