@@ -2,6 +2,8 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 import { CRS } from '../crs';
 import { BBox } from '../bbox';
 
+export const TPDI_SERVICE_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
+
 export enum TPDICollections {
   AIRBUS_PLEIADES = 'AIRBUS_PLEIADES',
   AIRBUS_SPOT = 'AIRBUS_SPOT',
@@ -73,4 +75,21 @@ export type Quota = {
   quotaUsed: number;
 };
 
-export const TPDI_SERVICE_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
+export enum OrderStatus {
+  CREATED = 'CREATED',
+  CANCELLED = 'CANCELLED',
+  RUNNING = 'RUNNING',
+  DONE = 'DONE',
+  PARTIAL = 'PARTIAL',
+  FAILED = 'FAILED',
+}
+
+export type Order = {
+  id: string;
+  name: string;
+  userId: string;
+  collectionId: string;
+  status: OrderStatus;
+  sqkm: number;
+  input: any;
+};

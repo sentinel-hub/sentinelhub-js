@@ -48,7 +48,7 @@ describe('Test search', () => {
     try {
       await TPDI.search(TPDProvider.PLANET, defaultSearchParams);
     } catch (e) {
-      expect(e.message).toEqual('Must be authenticated to search for data');
+      expect(e.message).toEqual('Must be authenticated to perform request');
     }
 
     setAuthToken(EXAMPLE_TOKEN);

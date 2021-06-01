@@ -24,25 +24,30 @@ async function getQuotasInner(
   reqConfig?: RequestConfiguration,
 ): Promise<any> {
   return await ensureTimeout(async innerReqConfig => {
-    const authToken = innerReqConfig && innerReqConfig.authToken ? innerReqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      throw new Error('Must be authenticated to fetch quotas');
-    }
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-    };
-
-    const requestConfig: AxiosRequestConfig = {
-      responseType: 'json',
-      headers: headers,
-      ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
-    };
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     if (!!TDPICollectionId) {
       requestConfig.params = { collectionId: TDPICollectionId };
     }
     const res = await axios.get(`${TPDI_SERVICE_URL}/quotas`, requestConfig);
     return res.data;
   }, reqConfig);
+}
+
+function createRequestConfig(innerReqConfig: RequestConfiguration): AxiosRequestConfig {
+  const authToken = innerReqConfig && innerReqConfig.authToken ? innerReqConfig.authToken : getAuthToken();
+  if (!authToken) {
+    throw new Error('Must be authenticated to perform request');
+  }
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  const requestConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    headers: headers,
+    ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
+  };
+  return requestConfig;
 }
 
 export class TPDI {
@@ -65,7 +70,12 @@ export class TPDI {
     params: TPDISearchParams,
     reqConfig?: RequestConfiguration,
   ): Promise<any> {
-    const tpdp = getThirdPartyDataProvider(provider);
-    return await tpdp.search(params, reqConfig);
+    return await ensureTimeout(async innerReqConfig => {
+      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+      const tpdp = getThirdPartyDataProvider(provider);
+      const payload = tpdp.getSearchPayload(params);
+      return await axios.post(`${TPDI_SERVICE_URL}/search`, payload, requestConfig);
+    }, reqConfig);
+  }
   }
 }

@@ -26,7 +26,7 @@ describe('Test getQuotas', () => {
     try {
       await TPDI.getQuotas({});
     } catch (e) {
-      expect(e.message).toEqual('Must be authenticated to fetch quotas');
+      expect(e.message).toEqual('Must be authenticated to perform request');
     }
 
     setAuthToken(EXAMPLE_TOKEN);
@@ -50,7 +50,7 @@ describe('Test getQuota', () => {
     try {
       await TPDI.getQuota(TPDICollections.AIRBUS_PLEIADES, { cache: CACHE_CONFIG_NOCACHE });
     } catch (e) {
-      expect(e.message).toEqual('Must be authenticated to fetch quotas');
+      expect(e.message).toEqual('Must be authenticated to perform request');
     }
 
     setAuthToken(EXAMPLE_TOKEN);
