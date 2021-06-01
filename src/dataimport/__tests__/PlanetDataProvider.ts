@@ -7,7 +7,7 @@ import { setAuthToken, invalidateCaches, BBox, CRS_EPSG4326 } from '../../index'
 import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
-import { MaxarSensor, PlanetProductBundle, TPDISearchParams, TPDProvider } from '../const';
+import { PlanetProductBundle, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
 
 const mockNetwork = new MockAdapter(axios);
