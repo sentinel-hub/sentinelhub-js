@@ -9,6 +9,7 @@ import { TPDI } from '../TPDI';
 import '../../../jest-setup';
 import { AirbusConstellation, AirbusProcessingLevel, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
+import { checkSearchPayload } from './testUtils.AirbusDataProvider';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -117,6 +118,9 @@ describe('Test search', () => {
     expect(mockNetwork.history.post.length).toBe(1);
     const { data } = mockNetwork.history.post[0];
     const requestData = JSON.parse(data);
+    checkSearchPayload(requestData, params);
+  });
+});
 
     expect(requestData.provider).toStrictEqual(TPDProvider.AIRBUS);
     if (!!params.bbox) {
