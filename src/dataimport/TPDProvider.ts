@@ -1,17 +1,11 @@
-import axios, { AxiosRequestConfig } from 'axios';
-import { getAuthToken } from '../auth';
-import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
-import { TPDProvider, TPDISearchParams, TPDI_SERVICE_URL } from './const';
+import { TPDProvider, TPDISearchParams } from './const';
 
 export interface TPDProviderInterface {
-  search(params: TPDISearchParams, reqConfig?: RequestConfiguration): Promise<void>;
-  getProvider(): TPDProvider;
+  getSearchPayload(params: TPDISearchParams): any;
 }
 
 export abstract class AbstractTPDProvider implements TPDProviderInterface {
   protected provider: TPDProvider;
-  protected serviceUrl = `${TPDI_SERVICE_URL}/search`;
 
   public getProvider(): TPDProvider {
     return this.provider;
@@ -58,33 +52,10 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     return {};
   }
 
-  public async search(params: TPDISearchParams, reqConfig?: RequestConfiguration): Promise<any> {
-    return await ensureTimeout(async innerReqConfig => this._search(params, innerReqConfig), reqConfig);
-  }
-
-  protected getSearchPayload(params: TPDISearchParams): any {
+  public getSearchPayload(params: TPDISearchParams): any {
     const commonParams = this.getCommonSearchParams(params);
     const additionalParams = this.getAdditionalSearchParams(params);
     const payload = { ...commonParams, ...additionalParams };
     return payload;
-  }
-
-  protected async _search(params: TPDISearchParams, reqConfig?: RequestConfiguration): Promise<any> {
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      throw new Error('Must be authenticated to search for data');
-    }
-
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-      'Content-Type': 'application/json',
-    };
-    const requestConfig: AxiosRequestConfig = {
-      headers: headers,
-      ...getAxiosReqParams(reqConfig, null),
-    };
-
-    const payload = this.getSearchPayload(params);
-    return await axios.post(this.serviceUrl, payload, requestConfig);
   }
 }
