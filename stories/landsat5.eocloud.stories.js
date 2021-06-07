@@ -359,7 +359,7 @@ export const stats = () => {
 
 
 export const getStatsGeoJSONDifferentCRS = () => {
-  // GeoJSON is in CRS:84. Use geometry with longitude > 90, so switched coordinates aren't valid
+  // GeoJSON is in CRS:84. Use geometry with longitude near 0, so switched coordinates outside of data availability
 const geometry = {
         "type": "Polygon",
         "coordinates": [
