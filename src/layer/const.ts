@@ -1,7 +1,7 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from '../bbox';
-import { CRS_IDS } from '../crs';
+import { CRS_IDS, CRS } from '../crs';
 import { Effects } from '../mapDataManipulation/const';
 
 /**
@@ -167,6 +167,7 @@ export type GetStatsParams = {
   resolution: number;
   geometry: Polygon;
   bins?: number;
+  crs?: CRS;
 };
 
 export type FisPayload = {

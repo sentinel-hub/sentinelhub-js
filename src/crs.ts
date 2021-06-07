@@ -35,7 +35,16 @@ export const CRS_EPSG4326: CRS = {
   opengisUrl: 'http://www.opengis.net/def/crs/EPSG/0/4326',
 };
 
-export const CRS_WGS84: CRS = CRS_EPSG4326;
+/**
+ * Same as EPSG:4326, but with a switched coordinate order.
+ */
+export const CRS_WGS84: CRS = {
+  authId: 'CRS:84',
+  auth: 'CRS',
+  srid: 84,
+  urn: 'urn:ogc:def:crs:OGC:1.3:CRS84',
+  opengisUrl: 'http://www.opengis.net/def/crs/OGC/1.3/CRS84',
+};
 
 export const SUPPORTED_CRS_OBJ = {
   [CRS_EPSG3857.authId]: CRS_EPSG3857,
