@@ -58,10 +58,11 @@ export class TPDI {
     if (!TDPICollectionId) {
       throw new Error('TDPICollectionId must be provided');
     }
-    return await getQuotasInner(TDPICollectionId, reqConfig);
+    const quotas = await getQuotasInner(TDPICollectionId, reqConfig);
+    return quotas.length ? quotas[0] : null;
   }
 
-  public static async getQuotas(reqConfig?: RequestConfiguration): Promise<Quota> {
+  public static async getQuotas(reqConfig?: RequestConfiguration): Promise<Quota[]> {
     return await getQuotasInner(null, reqConfig);
   }
 
