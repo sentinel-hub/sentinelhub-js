@@ -85,6 +85,8 @@ import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
+import { TPDI } from './dataimport/TPDI';
+import { AirbusConstellation, TPDICollections, TPDISearchParams, TPDProvider } from './dataimport/const';
 
 registerInitialAxiosInterceptors();
 
@@ -181,4 +183,10 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
+  //TPDI
+  TPDI,
+  TPDICollections,
+  TPDProvider,
+  TPDISearchParams,
+  AirbusConstellation,
 };
