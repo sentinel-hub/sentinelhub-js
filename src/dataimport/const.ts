@@ -69,6 +69,19 @@ export type TPDISearchParams = {
   productBundle?: PlanetProductBundle;
 };
 
+export type TPDSearchResult = {
+  features: any[];
+  links?: {
+    currentToken: string;
+    nextToken: string;
+    previousToken: string;
+    '@id': string;
+    next: string;
+    previous: string;
+  };
+  totalResults?: number;
+};
+
 export type Quota = {
   collectionId: TPDICollections;
   quotaSqkm: number;

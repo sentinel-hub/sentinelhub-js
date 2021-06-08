@@ -69,12 +69,46 @@ export class TPDI {
     provider: TPDProvider,
     params: TPDISearchParams,
     reqConfig?: RequestConfiguration,
-  ): Promise<any> {
+    count: number = 10,
+    viewtoken: string = null,
+  ): Promise<TPDSearchResult> {
     return await ensureTimeout(async innerReqConfig => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const tpdp = getThirdPartyDataProvider(provider);
+      tpdp.addSearchPagination(requestConfig, count, viewtoken);
       const payload = tpdp.getSearchPayload(params);
-      return await axios.post(`${TPDI_SERVICE_URL}/search`, payload, requestConfig);
+      const response = await axios.post<TPDSearchResult>(
+        `${TPDI_SERVICE_URL}/search`,
+        payload,
+        requestConfig,
+      );
+      return response.data;
+    }, reqConfig);
+  }
+
+  public static async getThumbnail(
+    collectionId: TPDICollections,
+    productId: string,
+    reqConfig?: RequestConfiguration,
+  ): Promise<Blob> {
+    if (!collectionId) {
+      throw new Error('collectionId must be provided');
+    }
+
+    if (!productId) {
+      throw new Error('productId must be provided');
+    }
+
+    return await ensureTimeout(async innerReqConfig => {
+      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+      requestConfig.responseType = 'blob';
+
+      const response = await axios.get<Blob>(
+        `${TPDI_SERVICE_URL}/collections/${collectionId}/products/${productId}/thumbnail`,
+        requestConfig,
+      );
+      const thumbnail = response.data;
+      return thumbnail;
     }, reqConfig);
   }
 

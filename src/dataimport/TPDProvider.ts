@@ -1,8 +1,10 @@
+import { AxiosRequestConfig } from 'axios';
 import { TPDProvider, TPDISearchParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
   getOrderPayload(name: string, collectionId: string, items: string[], params: TPDISearchParams): any;
+  addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
 }
 
 export abstract class AbstractTPDProvider implements TPDProviderInterface {
@@ -10,6 +12,20 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
 
   public getProvider(): TPDProvider {
     return this.provider;
+  }
+
+  public addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void {
+    let queryParams: Record<string, any> = {};
+    //set page size
+    if (!isNaN(count)) {
+      queryParams.count = count;
+    }
+
+    //set offset
+    if (viewtoken) {
+      queryParams.viewtoken = viewtoken;
+    }
+    requestConfig.params = queryParams;
   }
 
   protected getCommonSearchParams(params: TPDISearchParams): any {

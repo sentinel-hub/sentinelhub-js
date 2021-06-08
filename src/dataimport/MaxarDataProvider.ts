@@ -7,6 +7,8 @@ export class MaxarDataProvider extends AbstractTPDProvider {
     this.provider = TPDProvider.MAXAR;
   }
 
+  public addSearchPagination(): void {}
+
   protected getAdditionalSearchParams(params: TPDISearchParams): any {
     const data: any = {};
 
