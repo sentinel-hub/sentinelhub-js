@@ -37,7 +37,7 @@ describe('Test getQuotas', () => {
 
     setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200, []);
+    mockNetwork.onGet().replyOnce(200, { data: [] });
     const res = await TPDI.getQuotas({});
     expect(mockNetwork.history.get.length).toBe(1);
     expect(res).toStrictEqual([]);
@@ -61,7 +61,7 @@ describe('Test getQuota', () => {
 
     setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200);
+    mockNetwork.onGet().replyOnce(200, { data: [] });
     await TPDI.getQuota(TPDICollections.AIRBUS_PLEIADES, { cache: CACHE_CONFIG_NOCACHE });
     expect(mockNetwork.history.get.length).toBe(1);
   });
@@ -74,7 +74,7 @@ describe('Test getQuota', () => {
       expect(e.message).toEqual('TDPICollectionId must be provided');
     }
     mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200, {});
+    mockNetwork.onGet().replyOnce(200, { data: [] });
     await TPDI.getQuota(TPDICollections.AIRBUS_PLEIADES);
     expect(mockNetwork.history.get.length).toBe(1);
     const { params } = mockNetwork.history.get[0];
