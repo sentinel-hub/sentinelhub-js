@@ -19,7 +19,7 @@ import {
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { AbstractLayer } from './AbstractLayer';
-import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
+import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
 import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
@@ -242,7 +242,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
       const payload: FisPayload = {
         layer: this.layerId,
-        crs: CRS_EPSG4326.authId,
+        crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
         geometry: WKT.convert(params.geometry),
         time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
           .utc(params.toTime)
@@ -257,8 +257,8 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
         payload.crs = selectedCrs.authId;
       }
-      // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
-      if (payload.crs === CRS_EPSG4326.authId) {
+      // When using CRS=EPSG:4326 or CRS_WGS84 one has to add the "m" suffix to enforce resolution in meters per pixel
+      if (payload.crs === CRS_EPSG4326.authId || payload.crs === CRS_WGS84.authId) {
         payload.resolution = params.resolution + 'm';
       } else {
         payload.resolution = params.resolution;
