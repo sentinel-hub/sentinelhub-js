@@ -186,26 +186,40 @@ export const GetOrders = () => {
       {
         id: 'All',
         params: {},
+        count: 10,
       },
       {
         id: 'Status created',
         params: {
           status: 'CREATED',
         },
+        count: 10,
       },
       {
         id: 'BYOC CollectionId',
         params: {
           collectionId: 'b40a6d43-d753-4b91-8996-47c032671919',
         },
+        count: 10,
+      },
+      {
+        id: 'PageSize=1',
+        params: {},
+        count: 1,
       },
     ];
     orderQueries.forEach(async query => {
-      const orders = await TPDI.getOrders(query.params);
-      const title = document.createElement('div');
+      const orders = await TPDI.getOrders(query.params, {}, query.count, '');
+      const title = document.createElement('h2');
       title.innerHTML = query.id;
       containerEl.appendChild(title);
+
       renderListOfItems(containerEl, orders.data);
+      if (orders.links.nextToken) {
+        const more = document.createElement('div');
+        more.innerHTML = 'has more results';
+        containerEl.appendChild(more);
+      }
     });
   };
   perform().then(() => {});
