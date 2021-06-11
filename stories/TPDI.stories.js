@@ -10,21 +10,21 @@ import {
 } from '../dist/sentinelHub.esm';
 
 export default {
-  title: 'TPDI search',
+  title: 'TPDI',
 };
 
-const renderSearchResults = (containerEl, features) =>
-  features.forEach(product => {
+const renderListOfItems = (containerEl, items) =>
+  items.forEach(item => {
     const ul = document.createElement('ul');
     containerEl.appendChild(ul);
-    for (let key in product) {
+    for (let key in item) {
       const li = document.createElement('li');
       ul.appendChild(li);
       let text;
-      if (product[key] instanceof Object) {
-        text = JSON.stringify(product[key]);
+      if (item[key] instanceof Object) {
+        text = JSON.stringify(item[key]);
       } else {
-        text = product[key];
+        text = item[key];
       }
       li.innerHTML = `${key} : ${text}`;
     }
@@ -50,22 +50,7 @@ export const GetQuotas = () => {
     await setAuthTokenWithOAuthCredentials();
 
     const quotas = await TPDI.getQuotas();
-
-    quotas.forEach(quota => {
-      const ul = document.createElement('ul');
-      containerEl.appendChild(ul);
-      for (let key in quota) {
-        const li = document.createElement('li');
-        ul.appendChild(li);
-        let text;
-        if (quota[key] instanceof Object) {
-          text = JSON.stringify(quota[key]);
-        } else {
-          text = quota[key];
-        }
-        li.innerHTML = `${key} : ${text}`;
-      }
-    });
+    renderListOfItems(containerEl, quotas);
   };
   perform().then(() => {});
 
@@ -87,12 +72,12 @@ export const SearchAirbusSpot = () => {
 
     defaultSearchParams.constellation = AirbusConstellation.SPOT;
     const { features, links } = await TPDI.search(TPDProvider.AIRBUS, defaultSearchParams, {}, 5);
-    renderSearchResults(containerEl, features);
+    renderListOfItems(containerEl, features);
     const nextPage = document.createElement('div');
     nextPage.innerHTML = '<p>next page</p>';
     containerEl.appendChild(nextPage);
     const response = await TPDI.search(TPDProvider.AIRBUS, defaultSearchParams, {}, 5, links.nextToken);
-    renderSearchResults(containerEl, response.features);
+    renderListOfItems(containerEl, response.features);
   };
   perform().then(() => {});
 
@@ -113,12 +98,12 @@ export const SearchAirbusPleiades = () => {
     await setAuthTokenWithOAuthCredentials();
     defaultSearchParams.constellation = AirbusConstellation.PHR;
     const { features, links } = await TPDI.search(TPDProvider.AIRBUS, defaultSearchParams, {}, 5);
-    renderSearchResults(containerEl, features);
+    renderListOfItems(containerEl, features);
     const nextPage = document.createElement('div');
     nextPage.innerHTML = '<p>next page</p>';
     containerEl.appendChild(nextPage);
     const response = await TPDI.search(TPDProvider.AIRBUS, defaultSearchParams, {}, 5, links.nextToken);
-    renderSearchResults(containerEl, response.features);
+    renderListOfItems(containerEl, response.features);
   };
   perform().then(() => {});
 
@@ -139,7 +124,7 @@ export const SearchMAXAR = () => {
     await setAuthTokenWithOAuthCredentials();
     defaultSearchParams.constellation = AirbusConstellation.PHR;
     const { features } = await TPDI.search(TPDProvider.MAXAR, defaultSearchParams, {}, 5);
-    renderSearchResults(containerEl, features);
+    renderListOfItems(containerEl, features);
   };
   perform().then(() => {});
 
@@ -154,6 +139,8 @@ export const GetThumbnails = () => {
 
   const wrapperEl = document.createElement('div');
   wrapperEl.innerHTML = '<h2>get thumbnails</h2>';
+  wrapperEl.innerHTML += `<h4> ${Object.keys(TPDProvider).join('|')} </h4>`;
+
   wrapperEl.insertAdjacentElement('beforeend', containerEl);
   const imgs = [];
   const products = [
