@@ -168,3 +168,47 @@ export const GetThumbnails = () => {
 
   return wrapperEl;
 };
+
+export const GetOrders = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for TPDI API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>Get orders</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const orderQueries = [
+      {
+        id: 'All',
+        params: {},
+      },
+      {
+        id: 'Status created',
+        params: {
+          status: 'CREATED',
+        },
+      },
+      {
+        id: 'BYOC CollectionId',
+        params: {
+          collectionId: 'b40a6d43-d753-4b91-8996-47c032671919',
+        },
+      },
+    ];
+    orderQueries.forEach(async query => {
+      const orders = await TPDI.getOrders(query.params);
+      const title = document.createElement('div');
+      title.innerHTML = query.id;
+      containerEl.appendChild(title);
+      renderListOfItems(containerEl, orders.data);
+    });
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
