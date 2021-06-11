@@ -7,6 +7,8 @@ import {
   TPDI_SERVICE_URL,
   Order,
   TPDSearchResult,
+  OrderSearchParams,
+  OrderSearchResult,
 } from './const';
 import { AirbusDataProvider } from './AirbusDataProvider';
 import { PlanetDataProvider } from './PlanetDataProvider';
@@ -139,10 +141,39 @@ export class TPDI {
     }, reqConfig);
   }
 
+  public static async getOrders(
+    params?: OrderSearchParams,
+    reqConfig?: RequestConfiguration,
+    count?: number,
+    viewtoken?: string,
+  ): Promise<OrderSearchResult> {
+    return await ensureTimeout(async innerReqConfig => {
+      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+
+      let queryParams: Record<string, any> = {};
+      if (params) {
+        queryParams = { ...params };
+      }
+      if (!isNaN(count)) {
+        //set page size
+        queryParams.count = count;
+      }
+
+      //set offset
+      if (viewtoken) {
+        queryParams.viewtoken = viewtoken;
+      }
+      requestConfig.params = queryParams;
+
+      const { data } = await axios.get<OrderSearchResult>(`${TPDI_SERVICE_URL}/orders/`, requestConfig);
+      return data;
+    }, reqConfig);
+  }
+
   public static async getOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<Order> {
     return await ensureTimeout(async innerReqConfig => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      const response = await axios.get<Order>(`${TPDI_SERVICE_URL}/order/${orderId}`, requestConfig);
+      const response = await axios.get<Order>(`${TPDI_SERVICE_URL}/orders/${orderId}`, requestConfig);
       const order: Order = response.data;
       return order;
     }, reqConfig);
@@ -151,14 +182,17 @@ export class TPDI {
   public static async deleteOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<void> {
     return await ensureTimeout(async innerReqConfig => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      await axios.delete(`${TPDI_SERVICE_URL}/order/${orderId}`, requestConfig);
+      await axios.delete(`${TPDI_SERVICE_URL}/orders/${orderId}`, requestConfig);
     }, reqConfig);
   }
 
   public static async confirmOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<Order> {
     return await ensureTimeout(async innerReqConfig => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      const response = await axios.post<Order>(`${TPDI_SERVICE_URL}/order/${orderId}/confirm`, requestConfig);
+      const response = await axios.post<Order>(
+        `${TPDI_SERVICE_URL}/orders/${orderId}/confirm`,
+        requestConfig,
+      );
       const order: Order = response.data;
       return order;
     }, reqConfig);

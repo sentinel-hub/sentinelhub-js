@@ -69,16 +69,18 @@ export type TPDISearchParams = {
   productBundle?: PlanetProductBundle;
 };
 
+type LinksType = {
+  currentToken: string;
+  nextToken: string;
+  previousToken: string;
+  '@id': string;
+  next: string;
+  previous: string;
+};
+
 export type TPDSearchResult = {
   features: any[];
-  links?: {
-    currentToken: string;
-    nextToken: string;
-    previousToken: string;
-    '@id': string;
-    next: string;
-    previous: string;
-  };
+  links?: LinksType;
   totalResults?: number;
 };
 
@@ -104,5 +106,16 @@ export type Order = {
   collectionId: string;
   status: OrderStatus;
   sqkm: number;
-  input: any;
+  input: Record<string, any>;
+};
+
+export type OrderSearchParams = {
+  status?: OrderStatus;
+  collectionId?: string;
+  search?: string;
+};
+
+export type OrderSearchResult = {
+  data: Order[];
+  links?: LinksType;
 };
