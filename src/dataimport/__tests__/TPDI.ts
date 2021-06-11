@@ -107,3 +107,58 @@ describe('Test createOrder', () => {
     expect(mockNetwork.history.post.length).toBe(1);
   });
 });
+
+describe('Test getOrders', () => {
+  beforeEach(async () => {
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
+    await invalidateCaches();
+    setAuthToken(EXAMPLE_TOKEN);
+  });
+
+  it('requires authenthication', async () => {
+    setAuthToken(undefined);
+    await expect(TPDI.getOrders()).rejects.toThrow(new Error('Must be authenticated to perform request'));
+
+    setAuthToken(EXAMPLE_TOKEN);
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200);
+    await TPDI.getOrders();
+    expect(mockNetwork.history.get.length).toBe(1);
+  });
+
+  it.each([
+    [null, null, null, {}],
+    [{ status: 'CREATED' }, null, null, { status: 'CREATED' }],
+    [{ collectionId: 'collectionId' }, null, null, { collectionId: 'collectionId' }],
+    [{ search: 'search' }, null, null, { search: 'search' }],
+    [
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search' },
+      null,
+      null,
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search' },
+    ],
+    [
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search' },
+      5,
+      null,
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search', count: 5 },
+    ],
+    [
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search' },
+      5,
+      'viewtoken',
+      { status: 'CREATED', collectionId: 'collectionId', search: 'search', count: 5, viewtoken: 'viewtoken' },
+    ],
+    [undefined, undefined, undefined, {}],
+    [{}, undefined, undefined, {}],
+    [null, 0, null, { count: 0 }],
+    [null, null, '', {}],
+  ])('sets search params correctly', async (searchParams, count, token, expectedParams) => {
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200);
+    await TPDI.getOrders(searchParams, null, count, token);
+    expect(mockNetwork.history.get.length).toBe(1);
+    const getParams = mockNetwork.history.get[0].params;
+    expect(getParams).toStrictEqual(expectedParams);
+  });
+});

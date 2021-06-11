@@ -154,7 +154,7 @@ export class TPDI {
       if (params) {
         queryParams = { ...params };
       }
-      if (!isNaN(count)) {
+      if (!isNaN(count) && count !== null) {
         //set page size
         queryParams.count = count;
       }
@@ -164,7 +164,6 @@ export class TPDI {
         queryParams.viewtoken = viewtoken;
       }
       requestConfig.params = queryParams;
-
       const { data } = await axios.get<OrderSearchResult>(`${TPDI_SERVICE_URL}/orders/`, requestConfig);
       return data;
     }, reqConfig);
