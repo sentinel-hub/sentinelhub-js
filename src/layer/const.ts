@@ -242,3 +242,8 @@ export enum DEMInstanceTypeOrthorectification {
   COPERNICUS_30 = 'COPERNICUS_30',
   COPERNICUS_90 = 'COPERNICUS_90',
 }
+
+export enum BYOCSubTypes {
+  BATCH = 'BATCH',
+  BYOC = 'BYOC',
+}
