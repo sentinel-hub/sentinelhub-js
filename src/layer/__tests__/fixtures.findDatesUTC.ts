@@ -12,7 +12,7 @@ import {
 } from '../../index';
 import { AbstractSentinelHubV3Layer } from '../AbstractSentinelHubV3Layer';
 import { AbstractSentinelHubV3WithCCLayer } from '../AbstractSentinelHubV3WithCCLayer';
-import { CATALOG_SEARCH_MAX_LIMIT } from '../const';
+import { CATALOG_SEARCH_MAX_LIMIT, BYOCSubTypes } from '../const';
 
 export function constructFixtureFindDatesUTCSearchIndex(
   layer: AbstractSentinelHubV3Layer,
@@ -163,6 +163,7 @@ export function constructFixtureFindDatesUTCCatalog(
     polarization = Polarization.DV,
     resolution = Resolution.HIGH,
     orbitDirection = OrbitDirection.ASCENDING,
+    subType = BYOCSubTypes.BYOC,
   },
 ): Record<any, any> {
   const expectedRequest: Record<string, any> = {
@@ -195,7 +196,7 @@ export function constructFixtureFindDatesUTCCatalog(
   }
 
   if (layer instanceof BYOCLayer && collectionId) {
-    expectedRequest['collections'] = [collectionId];
+    expectedRequest['collections'] = [`${subType === BYOCSubTypes.BATCH ? 'batch' : 'byoc'}-${collectionId}`];
   }
 
   if (

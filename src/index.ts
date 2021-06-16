@@ -11,6 +11,7 @@ import {
   BackscatterCoeff,
   DEMInstanceType,
   DEMInstanceTypeOrthorectification,
+  BYOCSubTypes,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -180,6 +181,7 @@ export {
   drawBlobOnCanvas,
   canvasToBlob,
   SHV3_LOCATIONS_ROOT_URL,
+  BYOCSubTypes,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,

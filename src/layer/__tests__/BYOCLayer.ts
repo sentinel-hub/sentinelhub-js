@@ -1,5 +1,5 @@
 import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
-import { SHV3_LOCATIONS_ROOT_URL } from '../const';
+import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
@@ -37,6 +37,15 @@ const layerParamsArr: Record<string, any>[] = [
     bbox: bbox,
     collectionId: 'mockCollectionId',
     locationId: 'mockLocationId',
+    subType: null,
+  },
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    collectionId: 'mockCollectionId',
+    locationId: 'mockLocationId',
+    subType: BYOCSubTypes.BATCH,
   },
 ];
 
@@ -156,6 +165,9 @@ describe('Test findDatesUTC using catalog', () => {
     }
     if (layerParams && layerParams.locationId) {
       constructorParams.locationId = layerParams.locationId;
+    }
+    if (layerParams && layerParams.subType !== undefined) {
+      constructorParams.subType = layerParams.subType;
     }
     const layer = new BYOCLayer({
       instanceId: 'INSTANCE_ID',
