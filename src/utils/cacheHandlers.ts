@@ -31,6 +31,10 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
     return request;
   }
 
+  if (request.cancelToken && request.setCancelTokenCacheKey) {
+    request.setCancelTokenCacheKey(cacheKey);
+  }
+
   // there is a request with the same cacheKey in progress - wait until it
   // finishes (we might be able to use its response from cache)
   while (cacheableRequestsInProgress.has(cacheKey)) {
