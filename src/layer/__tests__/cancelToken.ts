@@ -11,7 +11,7 @@ import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { RequestConfiguration } from '../../utils/cancelRequests';
 import { constructFixtureGetMap } from './fixtures.getMap';
 
-const createRequestPromise = (useCache = true, setRequestError: (err: any) => {}): any => {
+const createRequestPromise = (useCache = true, setRequestError: (err: any) => void): any => {
   const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
   let cancelToken = new CancelToken();
   const requestsConfig: RequestConfiguration = {
@@ -122,11 +122,7 @@ describe('Handling cancelled requests', () => {
   });
 
   it('handles multiple requests with the same cancel token', async () => {
-    let requestError = null;
-    const { requestPromise, cancelToken, mockedResponse } = createRequestPromise(
-      true,
-      err => (requestError = err),
-    );
+    const { requestPromise, cancelToken, mockedResponse } = createRequestPromise(true, () => {});
 
     const { layer, getMapParams, mockedResponse: mockedResponse2 } = constructFixtureGetMap();
 
