@@ -14,21 +14,24 @@ export type RequestConfiguration = {
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;
   protected source: CancelTokenSource | null = null;
-  protected cacheKey: string | null = null;
+  //list of all request that can be cancelled by token instance
+  protected cacheKeys: Set<string> = new Set();
 
   public constructor() {
     this.source = axios.CancelToken.source();
     this.token = this.source.token;
   }
 
-  public setCancelTokenCacheKey(cacheKey: string | null): void {
-    this.cacheKey = cacheKey;
+  public setCancelTokenCacheKey(cacheKey: string): void {
+    this.cacheKeys.add(cacheKey);
   }
 
   public cancel(): void {
-    if (!!this.cacheKey) {
-      removeCacheableRequestsInProgress(this.cacheKey);
-      this.cacheKey = null;
+    if (this.cacheKeys.size > 0) {
+      for (let cacheKey of this.cacheKeys) {
+        removeCacheableRequestsInProgress(cacheKey);
+      }
+      this.cacheKeys.clear();
     }
     this.source.cancel();
   }
