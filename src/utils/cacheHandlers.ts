@@ -30,6 +30,9 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   if (cacheKey === null) {
     return request;
   }
+
+  // When request is cancelled, it must also be removed from list of cacheableRequestsInProgress.
+  // In order to remove requests from cacheableRequestsInProgress, cancelToken must be aware of requests(cacheKeys) it is responsible for.
   if (request.cancelToken && request.setCancelTokenCacheKey) {
     request.setCancelTokenCacheKey(cacheKey);
   }
