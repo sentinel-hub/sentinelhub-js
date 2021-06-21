@@ -15,7 +15,7 @@ export type CacheConfig = {
 // still all be executed - because by the time first response is saved in cache, the other 9
 // requests are already made too. To combat this, we save cacheKeys of ongoing requests and
 // simply delay new requests with the same cacheKey.
-const cacheableRequestsInProgress = new Set();
+export const cacheableRequestsInProgress = new Set();
 
 export const removeCacheableRequestsInProgress = (cacheKey: string): void => {
   cacheableRequestsInProgress.delete(cacheKey);
@@ -30,7 +30,6 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   if (cacheKey === null) {
     return request;
   }
-
   if (request.cancelToken && request.setCancelTokenCacheKey) {
     request.setCancelTokenCacheKey(cacheKey);
   }
