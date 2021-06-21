@@ -3,12 +3,13 @@ import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
 import fetch from 'node-fetch';
 
-import { setAuthToken, invalidateCaches, CacheTarget, CancelToken, isCancelled } from '../../index';
+import { setAuthToken, invalidateCaches, CacheTarget, CancelToken, isCancelled, ApiType } from '../../index';
 import { cacheableRequestsInProgress } from '../../utils/cacheHandlers';
 
 import '../../../jest-setup';
 import { constructFixtureFindTiles } from './fixtures.findTiles';
 import { RequestConfiguration } from '../../utils/cancelRequests';
+import { constructFixtureGetMap } from './fixtures.getMap';
 
 const createRequestPromise = (useCache = true, setRequestError: (err: any) => {}): any => {
   const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
@@ -117,6 +118,37 @@ describe('Handling cancelled requests', () => {
     expect(catchFn2).not.toHaveBeenCalled();
     expect(requestError).toBeNull();
     expect(isCancelled(requestError)).toBeFalsy();
+    expect(cacheableRequestsInProgress.size).toBe(0);
+  });
+
+  it('handles multiple requests with the same cancel token', async () => {
+    let requestError = null;
+    const { requestPromise, cancelToken, mockedResponse } = createRequestPromise(
+      true,
+      err => (requestError = err),
+    );
+
+    const { layer, getMapParams, mockedResponse: mockedResponse2 } = constructFixtureGetMap();
+
+    mockNetwork.onPost().replyOnce(200, mockedResponse);
+    mockNetwork.onPost().replyOnce(200, mockedResponse2);
+
+    setAuthToken('EXAMPLE_TOKEN');
+
+    await Promise.all([
+      requestPromise,
+      layer
+        .getMap(getMapParams, ApiType.PROCESSING, {
+          cancelToken: cancelToken,
+          cache: {
+            expiresIn: 60,
+            targets: [CacheTarget.MEMORY],
+          },
+        })
+        .catch((err: any) => console.log(err)),
+      setTimeout(() => cancelToken.cancel(), 10),
+    ]);
+
     expect(cacheableRequestsInProgress.size).toBe(0);
   });
 });
