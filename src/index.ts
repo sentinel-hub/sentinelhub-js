@@ -89,6 +89,8 @@ import { Effects, ColorRange } from './mapDataManipulation/const';
 import { TPDI } from './dataimport/TPDI';
 import {
   AirbusConstellation,
+  AirbusProcessingLevel,
+  MaxarSensor,
   OrderSearchParams,
   OrderSearchResult,
   PlanetProductBundle,
@@ -199,7 +201,9 @@ export {
   TPDProvider,
   TPDISearchParams,
   AirbusConstellation,
+  AirbusProcessingLevel,
   OrderSearchParams,
   OrderSearchResult,
   PlanetProductBundle,
+  MaxarSensor,
 };
