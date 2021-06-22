@@ -91,6 +91,7 @@ import {
   AirbusConstellation,
   OrderSearchParams,
   OrderSearchResult,
+  PlanetProductBundle,
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
@@ -200,4 +201,5 @@ export {
   AirbusConstellation,
   OrderSearchParams,
   OrderSearchResult,
+  PlanetProductBundle,
 };
