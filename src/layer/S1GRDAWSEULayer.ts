@@ -126,6 +126,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       if (!this.evalscript) {
         this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
       }
+      if (!this.mosaickingOrder && layerParams.mosaickingOrder) {
+        this.mosaickingOrder = layerParams.mosaickingOrder;
+      }
       // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
