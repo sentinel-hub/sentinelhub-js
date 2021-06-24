@@ -87,6 +87,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         if (!this.subType) {
           this.subType = layerParams['subType'] ? layerParams['subType'] : null;
         }
+        if (!this.mosaickingOrder && layerParams.mosaickingOrder) {
+          this.mosaickingOrder = layerParams.mosaickingOrder;
+        }
       }
 
       if (this.locationId === null) {
