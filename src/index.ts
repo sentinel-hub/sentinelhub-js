@@ -93,6 +93,7 @@ import {
   MaxarSensor,
   OrderSearchParams,
   OrderSearchResult,
+  OrderStatus,
   PlanetProductBundle,
   TPDICollections,
   TPDISearchParams,
@@ -204,6 +205,7 @@ export {
   AirbusProcessingLevel,
   OrderSearchParams,
   OrderSearchResult,
+  OrderStatus,
   PlanetProductBundle,
   MaxarSensor,
 };
