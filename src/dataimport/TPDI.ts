@@ -190,6 +190,7 @@ export class TPDI {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const response = await axios.post<Order>(
         `${TPDI_SERVICE_URL}/orders/${orderId}/confirm`,
+        {},
         requestConfig,
       );
       const order: Order = response.data;
