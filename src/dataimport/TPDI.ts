@@ -135,7 +135,7 @@ export class TPDI {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const tpdp = getThirdPartyDataProvider(provider);
       const payload = tpdp.getOrderPayload(name, collectionId, items, params);
-      const response = await axios.post<Order>(`${TPDI_SERVICE_URL}/order`, payload, requestConfig);
+      const response = await axios.post<Order>(`${TPDI_SERVICE_URL}/orders`, payload, requestConfig);
       const order: Order = response.data;
       return order;
     }, reqConfig);
