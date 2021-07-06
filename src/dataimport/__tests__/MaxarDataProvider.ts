@@ -162,8 +162,6 @@ describe('Test create order payload', () => {
 
     const { input } = payload;
 
-    checkSearchPayload(input, params);
-
     const dataObject = input.data[0];
     const { selectedImages } = dataObject;
 
@@ -171,10 +169,10 @@ describe('Test create order payload', () => {
       expect(selectedImages).toBeDefined();
       expect(selectedImages.length).toStrictEqual(items.length);
       expect(selectedImages).toStrictEqual(items);
-
-      //check each item
+      expect(dataObject.dataFilter).toBeUndefined();
     } else {
       expect(selectedImages).toBeUndefined();
+      checkSearchPayload(input, params);
     }
   });
 });

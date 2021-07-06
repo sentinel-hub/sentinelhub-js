@@ -65,6 +65,7 @@ export class MaxarDataProvider extends AbstractTPDProvider {
     if (!!items && items.length) {
       const dataObject = input.data[0];
       dataObject.selectedImages = items;
+      delete dataObject.dataFilter;
     }
     return input;
   }
