@@ -152,8 +152,6 @@ describe('Test create order payload', () => {
 
     const { input } = payload;
 
-    checkSearchPayload(input, params);
-
     const dataObject = input.data[0];
     const { itemIds } = dataObject;
 
@@ -161,10 +159,10 @@ describe('Test create order payload', () => {
       expect(itemIds).toBeDefined();
       expect(itemIds.length).toStrictEqual(items.length);
       expect(itemIds).toStrictEqual(items);
-
-      //check each item
+      expect(dataObject.dataFilter).toBeUndefined();
     } else {
       expect(itemIds).toBeUndefined();
+      checkSearchPayload(input, params);
     }
   });
 });

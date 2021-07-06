@@ -62,6 +62,7 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     if (!!items && items.length) {
       const dataObject = input.data[0];
       dataObject.itemIds = items;
+      delete dataObject.dataFilter;
     }
     return input;
   }

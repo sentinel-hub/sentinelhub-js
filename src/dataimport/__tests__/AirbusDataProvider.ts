@@ -163,17 +163,16 @@ describe('Test create order payload', () => {
 
     const { input } = payload;
 
-    checkSearchPayload(input, params);
-
     const dataObject = input.data[0];
     const { products } = dataObject;
 
     if (!!items && items.length) {
       expect(products).toBeDefined();
       expect(dataObject.products.length).toStrictEqual(items.length);
-      //check each item
+      expect(dataObject.dataFilter).toBeUndefined();
     } else {
       expect(products).toBeUndefined();
+      checkSearchPayload(input, params);
     }
   });
 });
