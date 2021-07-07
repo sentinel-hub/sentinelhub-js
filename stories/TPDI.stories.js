@@ -135,33 +135,38 @@ export const GetThumbnails = () => {
   if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
     return "<div>Please set OAuth Client's id and secret for TPDI API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
   }
-  const containerEl = document.createElement('pre');
 
-  const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>get thumbnails</h2>';
-  wrapperEl.innerHTML += `<h4> ${Object.keys(TPDProvider).join('|')} </h4>`;
-
-  wrapperEl.insertAdjacentElement('beforeend', containerEl);
-  const imgs = [];
+  const imgs = {};
   const products = [
     { collectionId: TPDICollections.AIRBUS_SPOT, productId: '1e2d3f96-5afc-4050-8e74-98e1eb159cd1' },
     { collectionId: TPDICollections.AIRBUS_PLEIADES, productId: 'ec30b314-e423-4780-a3a9-44b03c964d96' },
     { collectionId: TPDICollections.MAXAR_WORLDVIEW, productId: '10300100638BEC00' },
   ];
-  for (let i = 0; i < products.length; i++) {
+
+  const containerEl = document.createElement('pre');
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>get thumbnails</h2>';
+
+  wrapperEl.insertAdjacentElement('beforeend', containerEl);
+
+  for (let product of products) {
+    const imgWrapper = document.createElement('div');
+    imgWrapper.innerHTML = `${product.collectionId}<br/>`;
     const img = document.createElement('img');
     img.width = '256';
     img.height = '256';
-    imgs.push(img);
-    containerEl.insertAdjacentElement('beforeend', img);
+    imgs[product.collectionId] = img;
+    imgWrapper.insertAdjacentElement('beforeend', img);
+    containerEl.insertAdjacentElement('beforeend', imgWrapper);
   }
 
   const perform = async () => {
     await setAuthTokenWithOAuthCredentials();
 
-    for (let i = 0; i < products.length; i++) {
-      const imageBlob = await TPDI.getThumbnail(products[i].collectionId, products[i].productId);
-      imgs[i].src = URL.createObjectURL(imageBlob);
+    for (let product of products) {
+      const imageBlob = await TPDI.getThumbnail(product.collectionId, product.productId);
+      imgs[product.collectionId].src = URL.createObjectURL(imageBlob);
     }
   };
   perform().then(() => {});
