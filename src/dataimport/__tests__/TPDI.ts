@@ -7,7 +7,13 @@ import { setAuthToken, invalidateCaches, CRS_EPSG4326, BBox } from '../../index'
 import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
-import { AirbusConstellation, TPDICollections, TPDISearchParams, TPDProvider } from '../const';
+import {
+  AirbusConstellation,
+  TPDICollections,
+  TPDISearchParams,
+  TPDProvider,
+  TPDI_SERVICE_URL,
+} from '../const';
 import { CACHE_CONFIG_NOCACHE } from '../../utils/cacheHandlers';
 
 const mockNetwork = new MockAdapter(axios);
@@ -19,6 +25,76 @@ const defaultSearchParams: TPDISearchParams = {
   toTime: new Date(2021, 6 - 1, 31, 23, 59, 59, 999),
   bbox: new BBox(CRS_EPSG4326, 18, 20, 20, 22),
 };
+
+describe('Test TPDI service enpoints', () => {
+  beforeEach(async () => {
+    Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
+    await invalidateCaches();
+    setAuthToken(EXAMPLE_TOKEN);
+  });
+
+  it('uses correct endpoint to get quotas', async () => {
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200, []);
+    await TPDI.getQuotas({});
+    expect(mockNetwork.history.get.length).toBe(1);
+    const request = mockNetwork.history.get[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/quotas`);
+  });
+
+  it('uses correct endpoint to get orders', async () => {
+    mockNetwork.reset();
+    mockNetwork.onGet().replyOnce(200);
+    await TPDI.getOrders();
+    expect(mockNetwork.history.get.length).toBe(1);
+    const request = mockNetwork.history.get[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders`);
+  });
+
+  it('uses correct endpoint to create an order', async () => {
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    await TPDI.createOrder(TPDProvider.AIRBUS, 'name', 'collectionId', null, {
+      ...defaultSearchParams,
+      constellation: AirbusConstellation.SPOT,
+    });
+    expect(mockNetwork.history.post.length).toBe(1);
+    const request = mockNetwork.history.post[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders`);
+  });
+
+  it('uses correct endpoint to confirm an order', async () => {
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    const orderId = 'orderId';
+    await TPDI.confirmOrder(orderId);
+    expect(mockNetwork.history.post.length).toBe(1);
+    const request = mockNetwork.history.post[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders/${orderId}/confirm`);
+  });
+
+  it('uses correct endpoint to delete an order', async () => {
+    mockNetwork.reset();
+    mockNetwork.onDelete().replyOnce(200);
+    const orderId = 'orderId';
+    await TPDI.deleteOrder(orderId);
+    expect(mockNetwork.history.delete.length).toBe(1);
+    const request = mockNetwork.history.delete[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders/${orderId}`);
+  });
+
+  it('uses correct endpoint for search', async () => {
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    await TPDI.search(TPDProvider.AIRBUS, {
+      ...defaultSearchParams,
+      constellation: AirbusConstellation.SPOT,
+    });
+    expect(mockNetwork.history.post.length).toBe(1);
+    const request = mockNetwork.history.post[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/search`);
+  });
+});
 
 describe('Test getQuotas', () => {
   beforeEach(async () => {

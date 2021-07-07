@@ -164,7 +164,7 @@ export class TPDI {
         queryParams.viewtoken = viewtoken;
       }
       requestConfig.params = queryParams;
-      const { data } = await axios.get<OrderSearchResult>(`${TPDI_SERVICE_URL}/orders/`, requestConfig);
+      const { data } = await axios.get<OrderSearchResult>(`${TPDI_SERVICE_URL}/orders`, requestConfig);
       return data;
     }, reqConfig);
   }
