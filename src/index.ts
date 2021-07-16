@@ -95,6 +95,7 @@ import {
   OrderSearchResult,
   OrderStatus,
   PlanetProductBundle,
+  PlanetScopeHarmonization,
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
@@ -207,5 +208,6 @@ export {
   OrderSearchResult,
   OrderStatus,
   PlanetProductBundle,
+  PlanetScopeHarmonization,
   MaxarSensor,
 };
