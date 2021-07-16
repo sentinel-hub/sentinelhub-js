@@ -38,7 +38,7 @@ export enum MaxarSensor {
 export enum PlanetProductBundle {
   ANALYTIC = 'analytic',
   ANALYTIC_UDM2 = 'analytic_udm2',
-  ANALYTIC_ST = 'analytic_sr',
+  ANALYTIC_SR = 'analytic_sr',
   ANALYTIC_SR_UDM2 = 'analytic_sr_udm2',
 }
 
