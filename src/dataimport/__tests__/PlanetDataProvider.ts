@@ -64,7 +64,6 @@ describe('Test search', () => {
     ['bbox', 'Parameter bbox and/or geometry must be specified'],
     ['fromTime', 'Parameter fromTime must be specified'],
     ['toTime', 'Parameter toTime must be specified'],
-    ['planetApiKey', 'Parameter planetApiKey must be specified'],
   ])('throws an error when required parameter is missing', async (property, errorMessage) => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, defaultSearchParams);
