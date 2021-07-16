@@ -10,11 +10,6 @@ export class PlanetDataProvider extends AbstractTPDProvider {
   protected getAdditionalSearchParams(params: TPDISearchParams): any {
     const data: any = {};
 
-    //planetApiKey is a required parameter
-    if (!params.planetApiKey) {
-      throw new Error('Parameter planetApiKey must be specified');
-    }
-
     //itemType is a required parameter witl value of PlanetItemType
 
     data.itemType = PlanetItemType;
@@ -59,8 +54,13 @@ export class PlanetDataProvider extends AbstractTPDProvider {
 
   protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
     const input = this.getSearchPayload(params);
+    const dataObject = input.data[0];
+
+    if (!!params.harmonizeTo) {
+      dataObject.harmonizeTo = params.harmonizeTo;
+    }
+
     if (!!items && items.length) {
-      const dataObject = input.data[0];
       dataObject.itemIds = items;
       delete dataObject.dataFilter;
     }
