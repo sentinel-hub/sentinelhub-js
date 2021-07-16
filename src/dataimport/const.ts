@@ -67,6 +67,7 @@ export type TPDISearchParams = {
   nativeFilter?: any;
   sensor?: MaxarSensor;
   productBundle?: PlanetProductBundle;
+  harmonizeTo?: PlanetScopeHarmonization;
 };
 
 type LinksType = {
@@ -119,3 +120,8 @@ export type OrderSearchResult = {
   data: Order[];
   links?: LinksType;
 };
+
+export enum PlanetScopeHarmonization {
+  PS2 = 'PS2',
+  NONE = 'NONE',
+}
