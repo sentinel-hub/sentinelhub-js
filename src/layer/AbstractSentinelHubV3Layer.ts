@@ -715,6 +715,12 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (!this.mosaickingOrder && layerParams.mosaickingOrder) {
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
+      if (!this.upsampling && layerParams.upsampling) {
+        this.upsampling = layerParams.upsampling;
+      }
+      if (!this.downsampling && layerParams.downsampling) {
+        this.downsampling = layerParams.downsampling;
+      }
       // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
