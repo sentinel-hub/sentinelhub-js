@@ -29,6 +29,8 @@ import {
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
   DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -54,6 +56,8 @@ import { Landsat8AWSLOTL2Layer } from './Landsat8AWSLOTL2Layer';
 import { Landsat45AWSLTML1Layer } from './Landsat45AWSLTML1Layer';
 import { Landsat45AWSLTML2Layer } from './Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
+import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
+import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -72,8 +76,10 @@ export class LayersFactory {
     [DATASET_AWS_LOTL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL1,
     [DATASET_AWS_LOTL2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL2,
     [DATASET_AWS_LTML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML1,
-    [DATASET_AWS_LMSSL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LMSSL1,
     [DATASET_AWS_LTML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML2,
+    [DATASET_AWS_LMSSL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LMSSL1,
+    [DATASET_AWS_LETML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML1,
+    [DATASET_AWS_LETML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML2,
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
@@ -103,6 +109,8 @@ export class LayersFactory {
     [DATASET_AWS_LTML1.id]: Landsat45AWSLTML1Layer,
     [DATASET_AWS_LTML2.id]: Landsat45AWSLTML2Layer,
     [DATASET_AWS_LMSSL1.id]: Landsat15AWSLMSSL1Layer,
+    [DATASET_AWS_LETML1.id]: Landsat7AWSLETML1Layer,
+    [DATASET_AWS_LETML2.id]: Landsat7AWSLETML2Layer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
     [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
