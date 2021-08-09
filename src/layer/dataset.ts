@@ -192,6 +192,21 @@ export const DATASET_AWS_LTML2: Dataset = {
   catalogCollectionId: 'landsat-tm-l2',
 };
 
+export const DATASET_AWS_LMSSL1: Dataset = {
+  id: 'AWS_LMSSL1',
+  shJsonGetCapabilitiesDataset: 'LMSSL1',
+  shWmsEvalsource: 'LMSSL1',
+  shProcessingApiDatasourceAbbreviation: 'LMSSL1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LMSSL1/searchIndex',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LMSSL1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(1972, 7 - 1, 1, 0, 0, 0)),
+  maxDate: new Date(Date.UTC(2013, 1 - 1, 31, 23, 59, 59)),
+  catalogCollectionId: 'landsat-mss-l1',
+};
+
 export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
   id: 'EOC_L5',
   shJsonGetCapabilitiesDataset: null,
