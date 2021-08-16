@@ -30,6 +30,9 @@ import {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -58,7 +61,9 @@ import { Landsat8AWSLOTL1Layer } from './layer/Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './layer/Landsat8AWSLOTL2Layer';
 import { Landsat45AWSLTML1Layer } from './layer/Landsat45AWSLTML1Layer';
 import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
-
+import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
+import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
+import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
@@ -86,6 +91,20 @@ import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
+import { TPDI } from './dataimport/TPDI';
+import {
+  AirbusConstellation,
+  AirbusProcessingLevel,
+  MaxarSensor,
+  OrderSearchParams,
+  OrderSearchResult,
+  OrderStatus,
+  PlanetProductBundle,
+  PlanetScopeHarmonization,
+  TPDICollections,
+  TPDISearchParams,
+  TPDProvider,
+} from './dataimport/const';
 
 registerInitialAxiosInterceptors();
 
@@ -104,6 +123,9 @@ export {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -132,6 +154,9 @@ export {
   Landsat8AWSLOTL2Layer,
   Landsat45AWSLTML1Layer,
   Landsat45AWSLTML2Layer,
+  Landsat15AWSLMSSL1Layer,
+  Landsat7AWSLETML1Layer,
+  Landsat7AWSLETML2Layer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   // auth:
@@ -183,4 +208,17 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
+  //TPDI
+  TPDI,
+  TPDICollections,
+  TPDProvider,
+  TPDISearchParams,
+  AirbusConstellation,
+  AirbusProcessingLevel,
+  OrderSearchParams,
+  OrderSearchResult,
+  OrderStatus,
+  PlanetProductBundle,
+  PlanetScopeHarmonization,
+  MaxarSensor,
 };
