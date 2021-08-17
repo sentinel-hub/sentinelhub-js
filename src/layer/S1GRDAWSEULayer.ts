@@ -38,6 +38,17 @@ export enum Resolution {
   MEDIUM = 'MEDIUM',
 }
 
+export enum SpeckleFilterType {
+  NONE = 'NONE',
+  LEE = 'LEE',
+}
+
+export type SpeckleFilter = {
+  type: SpeckleFilterType;
+  windowSizeX: number;
+  windowSizeY: number;
+};
+
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -54,6 +65,7 @@ interface ConstructorParameters {
   demInstanceType?: DEMInstanceTypeOrthorectification | null;
   backscatterCoeff?: BackscatterCoeff | null;
   orbitDirection?: OrbitDirection | null;
+  speckleFilter?: SpeckleFilter | null;
 }
 
 type S1GRDFindTilesDatasetParameters = {
@@ -74,6 +86,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public orthorectify: boolean | null = false;
   public demInstanceType: DEMInstanceTypeOrthorectification | null = DEMInstanceTypeOrthorectification.MAPZEN;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
+  public speckleFilter: SpeckleFilter | null;
 
   public constructor({
     instanceId = null,
@@ -91,6 +104,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     demInstanceType = DEMInstanceTypeOrthorectification.MAPZEN,
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
+    speckleFilter = null,
   }: ConstructorParameters) {
     super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
     this.acquisitionMode = acquisitionMode;
@@ -100,6 +114,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.demInstanceType = demInstanceType;
     this.backscatterCoeff = backscatterCoeff;
     this.orbitDirection = orbitDirection;
+    this.speckleFilter = speckleFilter;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
@@ -122,6 +137,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.orthorectify = layerParams['orthorectify'];
       this.demInstanceType = layerParams['demInstance'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
+      this.speckleFilter = layerParams['speckleFilter'];
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
       if (!this.evalscript) {
         this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
@@ -158,6 +174,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     if (this.orthorectify === true) {
       payload.input.data[datasetSeqNo].processing.demInstance = this.demInstanceType;
     }
+    payload.input.data[datasetSeqNo].processing.speckleFilter = this.speckleFilter;
     return payload;
   }
 
