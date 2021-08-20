@@ -39,6 +39,7 @@ export enum Resolution {
 }
 
 export enum SpeckleFilterType {
+  DEFAULT = 'DEFAULT',
   NONE = 'NONE',
   LEE = 'LEE',
 }
