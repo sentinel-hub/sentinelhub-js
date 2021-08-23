@@ -138,7 +138,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.orthorectify = layerParams['orthorectify'];
       this.demInstanceType = layerParams['demInstance'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
-      this.speckleFilter = layerParams['speckleFilter'];
+      if (!this.speckleFilter) {
+        this.speckleFilter = layerParams['speckleFilter'];
+      }
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
       if (!this.evalscript) {
         this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
