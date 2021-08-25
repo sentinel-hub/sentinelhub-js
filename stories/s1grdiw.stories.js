@@ -16,6 +16,7 @@ import {
   DEMInstanceTypeOrthorectification,
   DATASET_AWSEU_S1GRD,
   LayersFactory,
+  SpeckleFilterType,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.INSTANCE_ID) {
@@ -278,6 +279,50 @@ export const getMapProcessingWithoutInstanceRTC = () => {
       img.src = URL.createObjectURL(imageBlob);
       images.insertAdjacentElement('beforeend', img);
     }
+  };
+  perform().then(() => {});
+
+  return wrapperEl;
+};
+
+export const getMapProcessingWithSpeckleFilter = () => {
+  if (!process.env.CLIENT_ID || !process.env.CLIENT_SECRET) {
+    return "<div>Please set OAuth Client's id and secret for Processing API (CLIENT_ID, CLIENT_SECRET env vars)</div>";
+  }
+
+  const img = document.createElement('img');
+  img.width = '512';
+  img.height = '512';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with Processing Speckle Filter</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    await setAuthTokenWithOAuthCredentials();
+
+    const layer = new S1GRDAWSEULayer({
+      instanceId,
+      layerId,
+      acquisitionMode: AcquisitionMode.IW,
+      polarization: Polarization.DV,
+      resolution: Resolution.HIGH,
+      speckleFilter: {
+        type: SpeckleFilterType.LEE,
+        windowSizeX: 5,
+        windowSizeY: 5,
+      },
+    });
+    const getMapParams = {
+      bbox: bbox3857,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 512,
+      height: 512,
+      format: MimeTypes.JPEG,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.PROCESSING);
+    img.src = URL.createObjectURL(imageBlob);
   };
   perform().then(() => {});
 

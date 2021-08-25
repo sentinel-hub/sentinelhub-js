@@ -107,6 +107,7 @@ describe('Test data fusion passes layer parameters correctly', () => {
             backCoeff: 'GAMMA0_ELLIPSOID',
             orthorectify: true,
             demInstance: 'COPERNICUS_90',
+            speckleFilter: null,
           },
           type: 'S1GRD',
         },

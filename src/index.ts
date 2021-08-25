@@ -74,7 +74,7 @@ import {
   parseLegacyWmsGetMapParams,
 } from './legacyCompat';
 
-import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization, Resolution, SpeckleFilterType } from './layer/S1GRDAWSEULayer';
 import {
   LocationIdSHv3,
   GetMapParams,
@@ -176,6 +176,7 @@ export {
   AcquisitionMode,
   Polarization,
   Resolution,
+  SpeckleFilterType,
   OrbitDirection,
   PreviewMode,
   MosaickingOrder,
