@@ -182,7 +182,18 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   protected getTypeId(): string {
-    return `${this.subType === BYOCSubTypes.BATCH ? 'batch' : 'byoc'}-${this.collectionId}`;
+    return `${this.getTypePrefix()}-${this.collectionId}`;
+  }
+
+  protected getTypePrefix(): string {
+    switch (this.subType) {
+      case BYOCSubTypes.BATCH:
+        return 'batch';
+      case BYOCSubTypes.ZARR:
+        return 'zarr';
+      default:
+        return 'byoc';
+    }
   }
 
   protected getCatalogCollectionId(): string {
