@@ -136,7 +136,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.backscatterCoeff = layerParams['backCoeff'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
       if (!this.orthorectify) {
-        this.orthorectify = layerParams['orthorectify']
+        this.orthorectify = layerParams['orthorectify'];
       }
       if (!this.demInstanceType) {
         this.demInstanceType = layerParams['demInstance'];
