@@ -83,8 +83,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public polarization: Polarization;
   public resolution: Resolution | null = null;
   public orbitDirection: OrbitDirection | null = null;
-  public orthorectify: boolean | null = false;
-  public demInstanceType: DEMInstanceTypeOrthorectification | null = DEMInstanceTypeOrthorectification.MAPZEN;
+  public orthorectify: boolean | null = null;
+  public demInstanceType: DEMInstanceTypeOrthorectification | null = null;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
   public speckleFilter: SpeckleFilter | null;
 
@@ -100,8 +100,8 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     acquisitionMode = null,
     polarization = null,
     resolution = null,
-    orthorectify = false,
-    demInstanceType = DEMInstanceTypeOrthorectification.MAPZEN,
+    orthorectify = null,
+    demInstanceType = null,
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
     speckleFilter = null,
@@ -135,7 +135,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       this.resolution = layerParams['resolution'];
       this.backscatterCoeff = layerParams['backCoeff'];
       this.orbitDirection = layerParams['orbitDirection'] ? layerParams['orbitDirection'] : null;
-      if (!this.orthorectify) {
+      if (this.orthorectify === null) {
         this.orthorectify = layerParams['orthorectify'];
       }
       if (!this.demInstanceType) {
@@ -176,9 +176,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       payload.input.data[datasetSeqNo].dataFilter.orbitDirection = this.orbitDirection;
     }
     payload.input.data[datasetSeqNo].processing.backCoeff = this.backscatterCoeff;
-    payload.input.data[datasetSeqNo].processing.orthorectify = this.orthorectify;
     if (this.orthorectify === true) {
       payload.input.data[datasetSeqNo].processing.demInstance = this.demInstanceType;
+      payload.input.data[datasetSeqNo].processing.orthorectify = this.orthorectify;
     }
     payload.input.data[datasetSeqNo].processing.speckleFilter = this.speckleFilter;
     return payload;
