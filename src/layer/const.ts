@@ -248,4 +248,5 @@ export enum DEMInstanceTypeOrthorectification {
 export enum BYOCSubTypes {
   BATCH = 'BATCH',
   BYOC = 'BYOC',
+  ZARR = 'ZARR',
 }
