@@ -31,8 +31,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
-import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -110,10 +109,17 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
     };
+
+    // reqConfig might include the cache config from getMap, which could cache instances/${this.instanceId}/layers
+    // we do not want this as layer updates will not invalidate this cache, so we rathger cache to memory
+    const reqConfigWithMemoryCache = {
+      ...reqConfig,
+      cache: CACHE_CONFIG_30MIN_MEMORY,
+    };
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
       headers: headers,
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
+      ...getAxiosReqParams(reqConfigWithMemoryCache, null),
     };
     const res = await axios.get(url, requestConfig);
     const layersParams = res.data.map((l: any) => ({
@@ -222,7 +228,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         // allow subclasses to update payload with their own parameters:
         const updatedPayload = await this._updateProcessingGetMapPayload(payload, 0, innerReqConfig);
         const shServiceHostname = this.getShServiceHostname();
-
         let blob = await processingGetMap(shServiceHostname, updatedPayload, innerReqConfig);
 
         // apply effects:
