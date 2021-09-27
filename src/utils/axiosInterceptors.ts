@@ -21,6 +21,7 @@ declare module 'axios' {
     cacheKey?: string;
     cache?: CacheConfig;
     rewriteUrlFunc?: (url: string) => string;
+    setCancelTokenCacheKey?: (cacheKey: string) => void;
   }
 }
 

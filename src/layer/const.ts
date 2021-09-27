@@ -153,12 +153,14 @@ export enum LocationIdSHv3 {
   awsUsWest2 = 'aws-us-west-2',
   creo = 'creo',
   mundi = 'mundi',
+  gcpUsCentral1 = 'gcp-us-central1',
 }
 export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
   [LocationIdSHv3.awsUsWest2]: 'https://services-uswest2.sentinel-hub.com/',
   [LocationIdSHv3.creo]: 'https://creodias.sentinel-hub.com/',
   [LocationIdSHv3.mundi]: 'https://shservices.mundiwebservices.com/',
+  [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
 };
 
 export type GetStatsParams = {
@@ -240,4 +242,10 @@ export enum DEMInstanceTypeOrthorectification {
   COPERNICUS = 'COPERNICUS',
   COPERNICUS_30 = 'COPERNICUS_30',
   COPERNICUS_90 = 'COPERNICUS_90',
+}
+
+export enum BYOCSubTypes {
+  BATCH = 'BATCH',
+  BYOC = 'BYOC',
+  ZARR = 'ZARR',
 }

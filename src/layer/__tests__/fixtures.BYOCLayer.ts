@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { BYOCLayer, BBox, CRS_EPSG4326, LocationIdSHv3 } from '../../index';
+import { BYOCLayer, BBox, CRS_EPSG4326, LocationIdSHv3, BYOCSubTypes } from '../../index';
 
 export function constructFixtureFindTilesSearchIndex({
   sensingTime = '2020-04-04T10:19:39.900Z',
@@ -140,18 +140,20 @@ export function constructFixtureFindTilesCatalog({
   bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
   collectionId = 'fafb9454-80ea-431d-b36f-a127faa929c7',
   locationId = LocationIdSHv3.awsEuCentral1,
+  subType = BYOCSubTypes.BYOC,
 }): Record<any, any> {
   const layer = new BYOCLayer({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     collectionId: collectionId,
     locationId: locationId,
+    subType: subType,
   });
 
   const expectedRequest = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
-    collections: [collectionId],
+    collections: [`${subType === BYOCSubTypes.BATCH ? 'batch' : 'byoc'}-${collectionId}`],
     limit: 5,
     query: {},
   };
