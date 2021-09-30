@@ -284,3 +284,121 @@ export function constructFixtureFindTilesCatalog({
     expectedResultHasMore: hasMore,
   };
 }
+
+export function constructFixtureUpdateLayerFromServiceIfNeeded({
+  collectionId = '0ed669e7-0f09-4909-9b9b-ffff1c9eaca5',
+  locationId = LocationIdSHv3.awsEuCentral1,
+}): Record<any, any> {
+  const layer = new BYOCLayer({
+    instanceId: 'cc6082af-2788-4b20-b0fe-54e13454bc66',
+    layerId: 'BYOC3',
+    collectionId: collectionId,
+    locationId: locationId,
+  });
+
+  const mockedResponse = [
+    {
+      '@id':
+        'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC3',
+      id: 'BYOC3',
+      title: 'byoc3',
+      description: '',
+      styles: [
+        {
+          name: 'default',
+          description: 'Default layer style',
+          evalScript:
+            '//VERSION=3\nfunction setup() {\nreturn {\n         input: ["IR", "G", "B"],\n          output: { bands: 3 }\n        };\n}\n\nfunction evaluatePixel(sample) {\n    return [sample.IR/255, sample.G/255, sample.B/255];\n}',
+        },
+      ],
+      orderHint: 0,
+      instance: {
+        '@id':
+          'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
+      },
+      dataset: {
+        '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM',
+      },
+      datasetSource: {
+        '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10',
+      },
+      defaultStyleName: 'default',
+      datasourceDefaults: {
+        timeRange: {
+          startTime: {
+            type: 'ABSOLUTE',
+          },
+          endTime: {
+            type: 'ABSOLUTE',
+          },
+        },
+        mosaickingOrder: 'mostRecent',
+        temporal: false,
+        collectionId: '0ed669e7-0f09-4909-9b9b-ffff1c9eaca5',
+        type: 'CUSTOM',
+      },
+    },
+    {
+      '@id':
+        'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC_AZER_SKY_TRUE_COLOR',
+      id: 'BYOC_AZER_SKY_TRUE_COLOR',
+      title: 'BYOC_AZER_SKY_TRUE_COLOR',
+      description: '',
+      styles: [
+        {
+          name: 'default',
+          description: 'Default layer style',
+          evalScript:
+            '//VERSION=3\n//This script was converted from v1 to v3 using the converter API\n\nfunction evaluatePixel(samples) {\n  let r = Math.cbrt(samples.R * 0.000375);\n  let g = Math.cbrt(samples.G * 0.000375);\n  let b = Math.cbrt(samples.B * 0.000375);\n  return [r*r,g*g,b*b];\n}\n\nfunction setup() {\n  return {\n    input: [{\n      bands: [\n        "R",\n        "G",\n        "B"\n      ]\n    }],\n    output: {\n      bands: 3\n    }\n  }\n}\n',
+        },
+      ],
+      orderHint: 0,
+      instance: {
+        '@id':
+          'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
+      },
+      dataset: {
+        '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM',
+      },
+      datasetSource: {
+        '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM/sources/10',
+      },
+      defaultStyleName: 'default',
+      datasourceDefaults: {
+        mosaickingOrder: 'mostRecent',
+        temporal: false,
+        collectionId: '70874d64-7ef0-4ec4-a302-b1f00649c78d',
+        type: 'CUSTOM',
+      },
+    },
+  ];
+
+  const expectedLayerParams = {
+    layerId: 'BYOC3',
+    timeRange: { startTime: { type: 'ABSOLUTE' }, endTime: { type: 'ABSOLUTE' } },
+    mosaickingOrder: 'mostRecent',
+    temporal: false,
+    collectionId: '0ed669e7-0f09-4909-9b9b-ffff1c9eaca5',
+    type: 'CUSTOM',
+    evalscript:
+      '//VERSION=3\n' +
+      'function setup() {\n' +
+      'return {\n' +
+      '         input: ["IR", "G", "B"],\n' +
+      '          output: { bands: 3 }\n' +
+      '        };\n' +
+      '}\n' +
+      '\n' +
+      'function evaluatePixel(sample) {\n' +
+      '    return [sample.IR/255, sample.G/255, sample.B/255];\n' +
+      '}',
+    dataProduct: undefined as any,
+    legend: undefined as any,
+  };
+
+  return {
+    layer: layer,
+    mockedResponse: mockedResponse,
+    expectedLayerParams: expectedLayerParams,
+  };
+}
