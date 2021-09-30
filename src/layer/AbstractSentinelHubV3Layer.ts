@@ -114,7 +114,8 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     // we do not want this as layer updates will not invalidate this cache, so we rathger cache to memory
     const reqConfigWithMemoryCache = {
       ...reqConfig,
-      cache: CACHE_CONFIG_30MIN_MEMORY,
+      // Do not override cache if cache is disabled with `expiresIn: 0`
+      cache: reqConfig.cache.expiresIn === 0 ? reqConfig.cache : CACHE_CONFIG_30MIN_MEMORY,
     };
     const requestConfig: AxiosRequestConfig = {
       responseType: 'json',
