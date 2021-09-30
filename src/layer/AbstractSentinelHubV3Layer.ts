@@ -111,7 +111,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
 
     // reqConfig might include the cache config from getMap, which could cache instances/${this.instanceId}/layers
-    // we do not want this as layer updates will not invalidate this cache, so we rathger cache to memory
+    // we do not want this as layer updates will not invalidate this cache, so we rather cache to memory
     const reqConfigWithMemoryCache = {
       ...reqConfig,
       // Do not override cache if cache is disabled with `expiresIn: 0`
