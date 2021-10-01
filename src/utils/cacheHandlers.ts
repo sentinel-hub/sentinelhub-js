@@ -1,9 +1,13 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
-import { CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
+import { CacheTarget, CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
+export const CACHE_CONFIG_30MIN_MEMORY = {
+  targets: [CacheTarget.MEMORY],
+  expiresIn: CACHE_CONFIG_30MIN.expiresIn,
+};
 export const EXPIRY_HEADER_KEY = 'cache_expires';
 
 export type CacheConfig = {
