@@ -504,32 +504,67 @@ describe('Unit test for aux request caching', () => {
     await invalidateCaches();
     setAuthToken(undefined);
   });
-  it('It should be cache aux request to memory by default', async () => {
-    setAuthToken(EXAMPLE_TOKEN);
-    const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded({});
-    const requestsConfig = {
+
+  const listOfRequstConfigs = [
+    {},
+    null,
+    undefined,
+    { retries: 1 },
+    {
       cache: {
         expiresIn: 60,
       },
-    };
+    },
+    {
+      cache: {
+        targets: [CacheTarget.CACHE_API],
+        expiresIn: 60,
+      },
+    },
+    {
+      cache: {
+        targets: null,
+        expiresIn: 60,
+      },
+    },
+    {
+      cache: {
+        targets: [],
+        expiresIn: 60,
+      },
+    },
+    {
+      cache: {
+        targets: [],
+        expiresIn: null,
+      },
+    },
+  ];
+  it.each([...listOfRequstConfigs])(
+    'It should be cache aux request to memory by default',
+    async requestConfig => {
+      setAuthToken(EXAMPLE_TOKEN);
+      const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded(
+        {},
+      );
+      mockNetwork.reset();
+      mockNetwork.onGet().replyOnce(200, mockedResponse);
+      mockNetwork.onGet().replyOnce(200, mockedResponse);
+      mockNetwork.onGet().replyOnce(200, mockedResponse);
 
-    mockNetwork.reset();
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
-    mockNetwork.onGet().replyOnce(200, mockedResponse);
+      const responseFromMockNetwork = await layer.fetchLayerParamsFromSHServiceV3(requestConfig);
+      const fromCacheResponse = await layer.fetchLayerParamsFromSHServiceV3(requestConfig);
+      expect(mockNetwork.history.get.length).toBe(1);
+      expect(responseFromMockNetwork).toStrictEqual(expectedLayerParams);
+      expect(fromCacheResponse).toStrictEqual(expectedLayerParams);
 
-    const responseFromMockNetwork = await layer.fetchLayerParamsFromSHServiceV3(requestsConfig);
-    const fromCacheResponse = await layer.fetchLayerParamsFromSHServiceV3(requestsConfig);
-    expect(mockNetwork.history.get.length).toBe(1);
-    expect(responseFromMockNetwork).toStrictEqual(expectedLayerParams);
-    expect(fromCacheResponse).toStrictEqual(expectedLayerParams);
+      invalidateCaches([CacheTarget.MEMORY]);
 
-    invalidateCaches([CacheTarget.MEMORY]);
-
-    const afterMemCacheInvalidated = await layer.fetchLayerParamsFromSHServiceV3(requestsConfig);
-    expect(mockNetwork.history.get.length).toBe(2);
-    expect(afterMemCacheInvalidated).toStrictEqual(expectedLayerParams);
-  });
+      const afterMemCacheInvalidated = await layer.fetchLayerParamsFromSHServiceV3(requestConfig);
+      expect(mockNetwork.history.get.length).toBe(2);
+      expect(afterMemCacheInvalidated).toStrictEqual(expectedLayerParams);
+    },
+  );
   it('It should not cache aux request when cache is disabled', async () => {
     setAuthToken(EXAMPLE_TOKEN);
     const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded({});
