@@ -1,6 +1,6 @@
 import { stringify } from 'query-string';
 import moment from 'moment';
-import WKT from 'terraformer-wkt-parser';
+import { geojsonToWKT } from '@terraformer/wkt';
 
 import { CRS_EPSG4326, CRS_IDS } from '../crs';
 import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
@@ -129,7 +129,7 @@ export function wmsGetMapUrl(
     queryParams.preview = params.preview;
   }
   if (params.geometry) {
-    queryParams.geometry = WKT.convert(params.geometry);
+    queryParams.geometry = geojsonToWKT(params.geometry);
   }
   if (params.quality) {
     queryParams.quality = params.quality;

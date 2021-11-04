@@ -1,4 +1,4 @@
-import WKT from 'terraformer-wkt-parser';
+import { wktToGeoJSON } from '@terraformer/wkt';
 import { Polygon } from '@turf/helpers';
 
 import { BBox } from './bbox';
@@ -196,7 +196,7 @@ export function parseLegacyWmsGetMapParams(wmsParams: Record<string, any>): Pars
     getMapParams.preview = previewFromParams(params);
   }
   if (params.geometry) {
-    getMapParams.geometry = WKT.parse(params.geometry) as Polygon;
+    getMapParams.geometry = wktToGeoJSON(params.geometry) as Polygon;
   }
   if (params.quality) {
     getMapParams.quality = parseInt(params.quality);

@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
-import WKT from 'terraformer-wkt-parser';
+import { geojsonToWKT } from '@terraformer/wkt';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
@@ -654,7 +654,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       const payload: FisPayload = {
         layer: this.layerId,
         crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
-        geometry: WKT.convert(params.geometry),
+        geometry: geojsonToWKT(params.geometry),
         time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
           .utc(params.toTime)
           .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,

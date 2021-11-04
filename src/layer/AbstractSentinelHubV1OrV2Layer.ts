@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import { stringify } from 'query-string';
-import WKT from 'terraformer-wkt-parser';
+import { geojsonToWKT } from '@terraformer/wkt';
 
 import { BBox } from '../bbox';
 import {
@@ -243,7 +243,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       const payload: FisPayload = {
         layer: this.layerId,
         crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
-        geometry: WKT.convert(params.geometry),
+        geometry: geojsonToWKT(params.geometry),
         time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
           .utc(params.toTime)
           .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,

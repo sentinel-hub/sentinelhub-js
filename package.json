@@ -5,6 +5,7 @@
   "module": "dist/sentinelHub.esm.js",
   "browser": "dist/sentinelHub.umd.js",
   "dependencies": {
+    "@terraformer/wkt": "^2.0.7",
     "@turf/area": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@types/xml2js": "^0.4.4",
@@ -12,7 +13,6 @@
     "moment": "^2.24.0",
     "polygon-clipping": "^0.14.3",
     "query-string": "^6.4.2",
-    "terraformer-wkt-parser": "^1.2.1",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
