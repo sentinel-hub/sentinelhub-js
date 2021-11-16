@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { stringify } from 'query-string';
+import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 
@@ -26,21 +26,27 @@ export type GetCapabilitiesXmlLayer = {
   Layer?: GetCapabilitiesXmlLayer[];
 };
 
-async function fetchGetCapabilitiesXml(
-  baseUrl: string,
-  reqConfig: RequestConfiguration,
-): Promise<GetCapabilitiesXml> {
-  const query = {
-    service: 'wms',
+export function createGetCapabilitiesXmlUrl(baseUrl: string, ogcServiceType: OgcServiceTypes): string {
+  const defaultQueryParams = {
+    service: ogcServiceType,
     request: 'GetCapabilities',
     format: 'text/xml',
   };
+
+  const { url, query } = parseUrl(baseUrl);
+  return stringifyUrl({ url: url, query: { ...defaultQueryParams, ...query } }, { sort: false });
+}
+
+async function fetchGetCapabilitiesXml(
+  baseUrl: string,
+  ogcServiceType: OgcServiceTypes,
+  reqConfig: RequestConfiguration,
+): Promise<GetCapabilitiesXml> {
   const axiosReqConfig: AxiosRequestConfig = {
     responseType: 'text',
     ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
   };
-  const queryString = stringify(query, { sort: false });
-  const url = `${baseUrl}?${queryString}`;
+  const url = createGetCapabilitiesXmlUrl(baseUrl, ogcServiceType);
   const res = await axios.get(url, axiosReqConfig);
   const parsedXml = await parseStringPromise(res.data);
   return parsedXml;
@@ -61,9 +67,10 @@ function _flattenLayers(
 
 export async function fetchLayersFromGetCapabilitiesXml(
   baseUrl: string,
+  ogcServiceType: OgcServiceTypes,
   reqConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXmlLayer[]> {
-  const parsedXml = await fetchGetCapabilitiesXml(baseUrl, reqConfig);
+  const parsedXml = await fetchGetCapabilitiesXml(baseUrl, ogcServiceType, reqConfig);
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
   const layersInfos = _flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer).filter(
     layerInfo => layerInfo.Name,

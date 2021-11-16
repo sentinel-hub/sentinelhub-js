@@ -250,3 +250,8 @@ export enum BYOCSubTypes {
   BYOC = 'BYOC',
   ZARR = 'ZARR',
 }
+
+export enum OgcServiceTypes {
+  WMS = 'wms',
+  WMTS = 'wmts',
+}
