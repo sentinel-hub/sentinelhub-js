@@ -5,7 +5,7 @@ import {
   parseSHInstanceId,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -271,7 +271,7 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, reqConfig);
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMS, reqConfig);
     const layersInfos = parsedLayers.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
