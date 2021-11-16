@@ -1,4 +1,4 @@
-export const getCapabilitiesXmlResponse = `<?xml version="1.0" encoding="UTF-8"?><WMS_Capabilities version="1.3.0" updateSequence="4853" xmlns="http://www.opengis.net/wms" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/schemas/wms/1.3.0/capabilities_1_3_0.xsd">
+export const getCapabilitiesWmsXmlResponse = `<?xml version="1.0" encoding="UTF-8"?><WMS_Capabilities version="1.3.0" updateSequence="4853" xmlns="http://www.opengis.net/wms" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/wms https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/schemas/wms/1.3.0/capabilities_1_3_0.xsd">
 <Service>
   <Name>WMS</Name>
   <Title/>

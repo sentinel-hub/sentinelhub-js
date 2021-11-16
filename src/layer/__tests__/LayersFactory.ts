@@ -5,7 +5,7 @@ import { LayersFactory } from '../LayersFactory';
 import { WmsLayer, setAuthToken } from '../../index';
 import { S2L1CLayer } from '../S2L1CLayer';
 import { S5PL2Layer } from '../S5PL2Layer';
-import { getCapabilitiesXmlResponse } from './fixtures.wmsGetCapabilities';
+import { getCapabilitiesWmsXmlResponse } from './fixtures.getCapabilitiesWMS';
 
 const mockNetwork = new MockAdapter(axios);
 type CASE = [string, any, any];
@@ -43,7 +43,7 @@ const cases: CASE[] = [
   ],
   [
     'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
-    getCapabilitiesXmlResponse,
+    getCapabilitiesWmsXmlResponse,
     WmsLayer,
   ],
 ];
