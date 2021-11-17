@@ -58,6 +58,7 @@ import { Landsat45AWSLTML2Layer } from './Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
+import { WmtsLayer } from './WmtsLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -164,8 +165,11 @@ export class LayersFactory {
           return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
         }
       }
-
-      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      if (baseUrl.includes('/wmts')) {
+        return await this.makeLayersWmts(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      } else {
+        return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      }
     }, reqConfig);
     return returnValue;
   }
@@ -291,6 +295,31 @@ export class LayersFactory {
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl }) =>
         new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
+    );
+  }
+
+  private static async makeLayersWmts(
+    baseUrl: string,
+    filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    overrideConstructorParams: Record<string, any> | null,
+    reqConfig: RequestConfiguration,
+  ): Promise<AbstractLayer[]> {
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMTS, reqConfig);
+    const layersInfos = parsedLayers.map(layerInfo => ({
+      layerId: layerInfo.Name[0],
+      title: layerInfo.Title[0],
+      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+      dataset: null,
+      legendUrl: layerInfo.Style[0].LegendURL,
+    }));
+
+    const filteredLayersInfos =
+      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description, legendUrl }) =>
+        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl }),
     );
   }
 }
