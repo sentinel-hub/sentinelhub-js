@@ -13,41 +13,41 @@ const mockNetwork = new MockAdapter(axios);
 type CASE = [string, any, any];
 
 const cases: CASE[] = [
-  // [
-  //   `${DATASET_S2L2A.shServiceHostname}ogc/wms/instanceID`,
-  //   {
-  //     layers: [
-  //       {
-  //         id: 'S2L1C',
-  //         name: 's2l1c',
-  //         description: '',
-  //         dataset: 'S2L1C',
-  //         legendUrl: '',
-  //       },
-  //     ],
-  //   },
-  //   S2L1CLayer,
-  // ],
-  // [
-  //   `${DATASET_S5PL2.shServiceHostname}ogc/wms/`,
-  //   {
-  //     layers: [
-  //       {
-  //         dataset: 'S5PL2',
-  //         description: '',
-  //         id: 'S5TMP',
-  //         legendUrl: null,
-  //         name: 's5tmp',
-  //       },
-  //     ],
-  //   },
-  //   S5PL2Layer,
-  // ],
-  // [
-  //   'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
-  //   getCapabilitiesWmsXmlResponse,
-  //   WmsLayer,
-  // ],
+  [
+    `${DATASET_S2L2A.shServiceHostname}ogc/wms/instanceID`,
+    {
+      layers: [
+        {
+          id: 'S2L1C',
+          name: 's2l1c',
+          description: '',
+          dataset: 'S2L1C',
+          legendUrl: '',
+        },
+      ],
+    },
+    S2L1CLayer,
+  ],
+  [
+    `${DATASET_S5PL2.shServiceHostname}ogc/wms/`,
+    {
+      layers: [
+        {
+          dataset: 'S5PL2',
+          description: '',
+          id: 'S5TMP',
+          legendUrl: null,
+          name: 's5tmp',
+        },
+      ],
+    },
+    S5PL2Layer,
+  ],
+  [
+    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+    getCapabilitiesWmsXmlResponse,
+    WmsLayer,
+  ],
   ['https://api.planet.com/basemaps/v1/mosaics/wmts', getCapabilitiesWmtsXMLResponse, WmtsLayer],
 ];
 
