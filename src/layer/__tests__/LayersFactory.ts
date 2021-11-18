@@ -10,12 +10,11 @@ import { getCapabilitiesWmtsXMLResponse } from './fixtures.getCapabilitiesWMTS';
 import { WmtsLayer } from '../WmtsLayer';
 
 const mockNetwork = new MockAdapter(axios);
-type CASE = [string, any, any];
 
-const cases: CASE[] = [
-  [
-    `${DATASET_S2L2A.shServiceHostname}ogc/wms/instanceID`,
-    {
+const cases = [
+  {
+    url: `${DATASET_S2L2A.shServiceHostname}ogc/wms/instanceID`,
+    response: {
       layers: [
         {
           id: 'S2L1C',
@@ -26,38 +25,46 @@ const cases: CASE[] = [
         },
       ],
     },
-    S2L1CLayer,
-  ],
-  [
-    `${DATASET_S5PL2.shServiceHostname}ogc/wms/`,
-    {
+    expectedInstanceType: S2L1CLayer,
+  },
+
+  {
+    url: `${DATASET_S5PL2.shServiceHostname}ogc/wms/`,
+    response: {
       layers: [
         {
           dataset: 'S5PL2',
           description: '',
           id: 'S5TMP',
-          legendUrl: null,
           name: 's5tmp',
         },
       ],
     },
-    S5PL2Layer,
-  ],
-  [
-    'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
-    getCapabilitiesWmsXmlResponse,
-    WmsLayer,
-  ],
-  ['https://api.planet.com/basemaps/v1/mosaics/wmts', getCapabilitiesWmtsXMLResponse, WmtsLayer],
+    expectedInstanceType: S5PL2Layer,
+  },
+
+  {
+    url: 'https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows',
+    response: getCapabilitiesWmsXmlResponse,
+    expectedInstanceType: WmsLayer,
+  },
+  {
+    url: 'https://api.planet.com/basemaps/v1/mosaics/wmts',
+    response: getCapabilitiesWmtsXMLResponse,
+    expectedInstanceType: WmtsLayer,
+  },
 ];
 
 describe('Test LayersFactory', () => {
-  test.each(cases)('Given url returns correct Layer type', async (url, response, expectedResult) => {
-    setAuthToken('a123');
-    mockNetwork.reset();
-    mockNetwork.onAny().replyOnce(200, response); // we don't care about the response, we will just inspect the request params
-    const layer = (await LayersFactory.makeLayers(url, null))[0];
+  test.each(cases)(
+    'Given url returns correct Layer type',
+    async ({ url, response, expectedInstanceType }) => {
+      setAuthToken('a123');
+      mockNetwork.reset();
+      mockNetwork.onAny().replyOnce(200, response); // we don't care about the response, we will just inspect the request params
+      const layer = (await LayersFactory.makeLayers(url, null))[0];
 
-    expect(layer).toBeInstanceOf(expectedResult);
-  });
+      expect(layer).toBeInstanceOf(expectedInstanceType);
+    },
+  );
 });
