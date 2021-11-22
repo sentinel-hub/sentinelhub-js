@@ -15,7 +15,9 @@ interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
+  resourceURL?: string | null;
 }
+
 export class WmtsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
@@ -27,10 +29,12 @@ export class WmtsLayer extends AbstractLayer {
     title = null,
     description = null,
     legendUrl = null,
+    resourceURL = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
+    this.resourceURL = resourceURL;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
@@ -73,6 +77,10 @@ export class WmtsLayer extends AbstractLayer {
     if (api !== ApiType.WMTS) {
       throw new Error('Only WMTS is supported on this layer');
     }
+
+    if (!params.bbox && !params.tileCoord) {
+      throw new Error('No bbox or x,y coordinates provided');
+    }
     if (!this.resourceURL) {
       throw new Error('No resource URL provided');
     }
@@ -85,12 +93,20 @@ export class WmtsLayer extends AbstractLayer {
     if (params.effects) {
       throw new Error('Parameter effects is not supported in getMapUrl. Use getMap method instead.');
     }
-    const xyz = bboxToXyz(params.bbox, params.zoom, params.width);
+    const xyz =
+      params.bbox && !params.tileCoord
+        ? bboxToXyz(params.bbox, params.zoom, params.width)
+        : {
+            x: params.tileCoord.x,
+            y: params.tileCoord.y,
+            z: params.zoom,
+          };
     const urlParams: Record<string, any> = {
       '{TileMatrix}': xyz.z,
       '{TileCol}': xyz.x,
       '{TileRow}': xyz.y,
     };
+
     return this.resourceURL.replace(/\{ *([\w_ -]+) *\}/g, (m: string) => urlParams[m]);
   }
 }

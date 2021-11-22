@@ -4,6 +4,7 @@ declare global {
       toHaveQueryParams(expectedParamsKeys: Array<string>): R;
       toHaveQueryParamsValues(expectedParams: Record<string, string>): R;
       toHaveOrigin(expectedOrigin: string): R;
+      toHaveBaseUrl( expectedPathName:string): R;
     }
   }
 }
@@ -21,7 +22,9 @@ expect.extend({
     }
     return {
       message: () =>
-        `URL [${received}] should not include all of the parameters ${JSON.stringify(expectedParamsKeys)}, but it does`,
+        `URL [${received}] should not include all of the parameters ${JSON.stringify(
+          expectedParamsKeys,
+        )}, but it does`,
       pass: true,
     };
   },
@@ -31,14 +34,17 @@ expect.extend({
     for (let k in expectedParams) {
       if (String(params[k]) !== String(expectedParams[k])) {
         return {
-          message: () => `URL query parameter [${k}] should have value [${expectedParams[k]}], instead it has value [${params[k]}]`,
+          message: () =>
+            `URL query parameter [${k}] should have value [${expectedParams[k]}], instead it has value [${params[k]}]`,
           pass: false,
         };
       }
     }
     return {
       message: () =>
-        `URL [${received}] should not include all of the values [${JSON.stringify(expectedParams)}], but it does`,
+        `URL [${received}] should not include all of the values [${JSON.stringify(
+          expectedParams,
+        )}], but it does`,
       pass: true,
     };
   },
@@ -53,6 +59,21 @@ expect.extend({
     }
     return {
       message: () => `URL hostname should not have value [${expectedOrigin}], but it does`, // if .not is used
+      pass: true,
+    };
+  },
+
+  toHaveBaseUrl(received, expectedBaseUrl) {
+    const { baseUrl } = parseUrl(received);
+    if (baseUrl !== expectedBaseUrl) {
+      return {
+        message: () =>
+          `URL baseUrl should have value [${expectedBaseUrl}], instead it has value [${baseUrl}]`,
+        pass: false,
+      };
+    }
+    return {
+      message: () => `URL baseUrl should not have value [${expectedBaseUrl}], but it does`, // if .not is used
       pass: true,
     };
   },
