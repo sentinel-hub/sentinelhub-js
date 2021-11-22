@@ -33,6 +33,7 @@ export type GetCapabilitiesXmlWmsLayer = {
   Abstract: string[];
   Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
   Dimension?: any[];
+  ResourceURL: any[];
   Layer?: GetCapabilitiesXmlWmsLayer[];
 };
 
@@ -80,12 +81,13 @@ function parseOgcLayers(parsedXml: any, ogcServiceType: OgcServiceTypes): GetCap
   if (ogcServiceType === OgcServiceTypes.WMTS) {
     return (parsedXml.Capabilities.Contents[0].Layer as GetCapabilitiesXmlWmtsLayer[]).map(l => {
       return {
-        Name: [l['ows:Title']],
+        Name: l['ows:Identifier'],
         Title: [l['ows:Title']],
         Abstract: [l['ows:Abstract']],
         Style: l.Style,
         Dimension: [],
         Layer: [],
+        ResourceURL: l.ResourceURL,
       };
     });
   }

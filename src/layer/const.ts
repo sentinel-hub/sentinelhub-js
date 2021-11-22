@@ -36,6 +36,8 @@ export type GetMapParams = {
   // Sentinelhub-js can't deal with manipulating files inside the tar yet,
   // so we only allow setting one output response id.
   outputResponseId?: string;
+  // only used by WMTS tp calculate tilCol and tileRow from bbox
+  zoom?: number;
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
     [key: string]: string;
@@ -66,6 +68,7 @@ export enum MosaickingOrder {
 
 export enum ApiType {
   WMS = 'wms',
+  WMTS = 'wmts',
   PROCESSING = 'processing',
 }
 

@@ -42,6 +42,7 @@ import {
   DATASET_AWSUS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
+import { WmtsLayer } from './layer/WmtsLayer';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
@@ -135,6 +136,7 @@ export {
   DATASET_AWSUS_DEM,
   // layers:
   WmsLayer,
+  WmtsLayer,
   S1GRDAWSEULayer,
   S1GRDEOCloudLayer,
   S2L2ALayer,
