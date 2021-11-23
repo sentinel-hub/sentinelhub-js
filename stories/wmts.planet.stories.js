@@ -19,13 +19,13 @@ export default {
   title: 'WMTS - Planet',
 };
 
-export const getMapURL = () => {
+export const getMapBbox = () => {
   const img = document.createElement('img');
   img.width = '256';
   img.height = '256';
 
   const wrapperEl = document.createElement('div');
-  wrapperEl.innerHTML = '<h2>GetMapUrl (WMS)</h2>';
+  wrapperEl.innerHTML = '<h2>GetMap with bbox(WMTS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
   const perform = async () => {
     const layer = new WmtsLayer({ baseUrl, layerId });
@@ -42,6 +42,36 @@ export const getMapURL = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => {});
+  perform().then(() => { });
+  return wrapperEl;
+};
+
+export const getMap = () => {
+  const img = document.createElement('img');
+  img.width = '256';
+  img.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap (WMTS)</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+  const perform = async () => {
+    const layer = new WmtsLayer({ baseUrl, layerId });
+
+    const getMapParams = {
+      tileCoord: {
+        x: 8852,
+        y: 9247,
+      },
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+      zoom: 14,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => { });
   return wrapperEl;
 };
