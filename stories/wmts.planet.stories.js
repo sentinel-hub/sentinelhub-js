@@ -1,4 +1,4 @@
-import { WmtsLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType } from '../dist/sentinelHub.esm';
+import { WmtsLayer, CRS_EPSG3857, BBox, MimeTypes, ApiType, LayersFactory } from '../dist/sentinelHub.esm';
 
 if (!process.env.PLANET_API_KEY) {
   throw new Error('Please set the API Key for PLANET (PLANET_API_KEY env vars)');
@@ -42,7 +42,7 @@ export const getMapBbox = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
   return wrapperEl;
 };
 
@@ -72,6 +72,35 @@ export const getMap = () => {
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
   };
-  perform().then(() => { });
+  perform().then(() => {});
+  return wrapperEl;
+};
+
+export const getMapWTmsLayersFactory = () => {
+  const img = document.createElement('img');
+  img.width = '256';
+  img.height = '256';
+
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = '<h2>GetMap with WMTS</h2>';
+  wrapperEl.insertAdjacentElement('beforeend', img);
+
+  const perform = async () => {
+    const layer = (await LayersFactory.makeLayers(baseUrl, lId => layerId === lId))[0];
+
+    const getMapParams = {
+      bbox: bbox,
+      fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
+      toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
+      width: 256,
+      height: 256,
+      format: MimeTypes.JPEG,
+      zoom: 14,
+    };
+    const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
+    img.src = URL.createObjectURL(imageBlob);
+  };
+  perform().then(() => {});
+
   return wrapperEl;
 };
