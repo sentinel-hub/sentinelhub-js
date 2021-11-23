@@ -1,5 +1,6 @@
 import { BBox } from '../bbox';
 import { CRS_EPSG3857, CRS_EPSG4326 } from '../crs';
+import { GetCapabilitiesXmlLayer } from './utils';
 
 const D2R = Math.PI / 180;
 const R2D = 180 / Math.PI;
@@ -29,4 +30,12 @@ export function toPixel(ll: number[], tileSize: number, zoom: number): { pixelX:
   const pixelX = ((longitude + 180) / 360) * mapWidth;
   const pixelY = (0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI)) * mapWidth;
   return { pixelX, pixelY };
+}
+
+export function getResourceUrl(xmlLayer: GetCapabilitiesXmlLayer): string | null {
+  const resource = xmlLayer.ResourceURL[0].$;
+  if (resource.resourceType === 'tile') {
+    return resource.template;
+  }
+  return null;
 }

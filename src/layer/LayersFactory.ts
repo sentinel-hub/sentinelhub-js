@@ -59,6 +59,7 @@ import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { WmtsLayer } from './WmtsLayer';
+import { getResourceUrl } from './wmts';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -312,6 +313,7 @@ export class LayersFactory {
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
       dataset: null,
       legendUrl: layerInfo.Style[0].LegendURL,
+      resourceUrl: getResourceUrl(layerInfo),
     }));
 
     const filteredLayersInfos =

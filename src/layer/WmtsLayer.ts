@@ -7,7 +7,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
-import { bboxToXyz } from './wmts';
+import { bboxToXyz, getResourceUrl } from './wmts';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -46,10 +46,7 @@ export class WmtsLayer extends AbstractLayer {
           innerReqConfig,
         );
         const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
-        const resource = layer.ResourceURL[0].$;
-        if (resource.resourceType === 'tile') {
-          this.resourceURL = resource.template;
-        }
+        this.resourceURL = getResourceUrl(layer);
       }
     }, reqConfig);
   }
