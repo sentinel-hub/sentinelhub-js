@@ -59,7 +59,7 @@ import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { WmtsLayer } from './WmtsLayer';
-import { getResourceUrl } from './wmts';
+import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -306,22 +306,23 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMTS, reqConfig);
+    const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
+    console.log(parsedLayers);
     const layersInfos = parsedLayers.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
       dataset: null,
       legendUrl: layerInfo.Style[0].LegendURL,
-      resourceUrl: getResourceUrl(layerInfo),
+      resourceUrl: layerInfo.ResourceUrl,
     }));
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
-      ({ layerId, title, description, legendUrl }) =>
-        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl }),
+      ({ layerId, title, description, legendUrl, resourceUrl }) =>
+        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
     );
   }
 }

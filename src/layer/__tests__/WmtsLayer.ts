@@ -4,7 +4,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmtsLayer, invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
-import { bboxToXyz } from '../wmts';
+import { bboxToXyz } from '../wmts.utils';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -19,7 +19,7 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
   const layer = new WmtsLayer({
     baseUrl: 'https://getCapabilities.com',
     layerId,
-    resourceURL: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
+    resourceUrl: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
   });
 
   mockNetwork.reset();
@@ -56,7 +56,7 @@ test('WmtsLayer.getMap uses bbox', async () => {
   const layer = new WmtsLayer({
     baseUrl: 'https://getCapabilities.com',
     layerId,
-    resourceURL: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
+    resourceUrl: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
   });
 
   mockNetwork.reset();

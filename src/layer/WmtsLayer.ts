@@ -1,13 +1,12 @@
 import axios, { AxiosRequestConfig } from 'axios';
 
-import { GetMapParams, ApiType, OgcServiceTypes } from './const';
+import { GetMapParams, ApiType } from './const';
 import { AbstractLayer } from './AbstractLayer';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { fetchLayersFromGetCapabilitiesXml } from './utils';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
-import { bboxToXyz, getResourceUrl } from './wmts';
+import { bboxToXyz, fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -15,13 +14,13 @@ interface ConstructorParameters {
   title?: string | null;
   description?: string | null;
   legendUrl?: string | null;
-  resourceURL?: string | null;
+  resourceUrl?: string | null;
 }
 
 export class WmtsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
-  protected resourceURL: string;
+  protected resourceUrl: string;
 
   public constructor({
     baseUrl,
@@ -29,24 +28,20 @@ export class WmtsLayer extends AbstractLayer {
     title = null,
     description = null,
     legendUrl = null,
-    resourceURL = null,
+    resourceUrl = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
-    this.resourceURL = resourceURL;
+    this.resourceUrl = resourceUrl;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
     await ensureTimeout(async innerReqConfig => {
-      if (!this.resourceURL) {
-        const parsedLayers = await fetchLayersFromGetCapabilitiesXml(
-          this.baseUrl,
-          OgcServiceTypes.WMTS,
-          innerReqConfig,
-        );
+      if (!this.resourceUrl) {
+        const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(this.baseUrl, innerReqConfig);
         const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
-        this.resourceURL = getResourceUrl(layer);
+        this.resourceUrl = layer.ResourceUrl;
       }
     }, reqConfig);
   }
@@ -78,7 +73,7 @@ export class WmtsLayer extends AbstractLayer {
     if (!params.bbox && !params.tileCoord) {
       throw new Error('No bbox or x,y coordinates provided');
     }
-    if (!this.resourceURL) {
+    if (!this.resourceUrl) {
       throw new Error('No resource URL provided');
     }
     if (params.gain) {
@@ -104,6 +99,6 @@ export class WmtsLayer extends AbstractLayer {
       '{TileRow}': xyz.y,
     };
 
-    return this.resourceURL.replace(/\{ *([\w_ -]+) *\}/g, (m: string) => urlParams[m]);
+    return this.resourceUrl.replace(/\{ *([\w_ -]+) *\}/g, (m: string) => urlParams[m]);
   }
 }
