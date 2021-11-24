@@ -5,51 +5,28 @@ import { parseStringPromise } from 'xml2js';
 import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
+import { GetCapabilitiesWmtsXml } from './wmts.utils';
 
 export type GetCapabilitiesWmsXml = {
   WMS_Capabilities: {
     Service: [];
     Capability: [
       {
-        Layer: GetCapabilitiesXmlWmsLayer[][];
+        Layer: [GetCapabilitiesXmlLayer];
       },
     ];
   };
 };
 
-export type GetCapabilitiesWmtsXml = {
-  Capabilities: {
-    'ows:ServiceIdentification': any[][];
-    'ows:ServiceProvider': any[][];
-    'ows:OperationsMetadata': any[][];
-    Contents: GetCapabilitiesXmlWmtsLayer[][];
-    ServiceMetadataURL: any[][];
-  };
-};
-
-export type GetCapabilitiesXmlWmsLayer = {
+export type GetCapabilitiesXmlLayer = {
   Name?: string[];
   Title: string[];
   Abstract: string[];
   Style: any[]; // Depending on the service, it can be an array of strings or an array of objects
   Dimension?: any[];
-  ResourceURL: any[];
-  Layer?: GetCapabilitiesXmlWmsLayer[];
+  Layer?: GetCapabilitiesXmlLayer[];
+  ResourceUrl?: string;
 };
-
-export type GetCapabilitiesXmlWmtsLayer = {
-  'ows:Title': string;
-  'ows:Abstract': string;
-  'ows:WGS84BoundingBox': {}[][];
-  'ows:Identifier': string[];
-  Style: any[];
-  Format: string[];
-  TileMatrixSetLink: any[];
-  ResourceURL: any[];
-  Layer?: GetCapabilitiesXmlWmtsLayer[];
-};
-
-export type GetCapabilitiesXmlLayer = GetCapabilitiesXmlWmsLayer;
 
 export function createGetCapabilitiesXmlUrl(baseUrl: string, ogcServiceType: OgcServiceTypes): string {
   const defaultQueryParams = {
@@ -62,7 +39,7 @@ export function createGetCapabilitiesXmlUrl(baseUrl: string, ogcServiceType: Ogc
   return stringifyUrl({ url: url, query: { ...defaultQueryParams, ...query } }, { sort: false });
 }
 
-async function fetchGetCapabilitiesXml(
+export async function fetchGetCapabilitiesXml(
   baseUrl: string,
   ogcServiceType: OgcServiceTypes,
   reqConfig: RequestConfiguration,
@@ -75,25 +52,6 @@ async function fetchGetCapabilitiesXml(
   const res = await axios.get(url, axiosReqConfig);
   const parsedXml = await parseStringPromise(res.data);
   return parsedXml;
-}
-
-function parseOgcLayers(parsedXml: any, ogcServiceType: OgcServiceTypes): GetCapabilitiesXmlLayer[] {
-  if (ogcServiceType === OgcServiceTypes.WMTS) {
-    return (parsedXml.Capabilities.Contents[0].Layer as GetCapabilitiesXmlWmtsLayer[]).map(l => {
-      return {
-        Name: l['ows:Identifier'],
-        Title: [l['ows:Title']],
-        Abstract: [l['ows:Abstract']],
-        Style: l.Style,
-        Dimension: [],
-        Layer: [],
-        ResourceURL: l.ResourceURL,
-      };
-    });
-  }
-  if (ogcServiceType === OgcServiceTypes.WMS) {
-    return parsedXml.WMS_Capabilities.Capability[0].Layer;
-  }
 }
 
 function _flattenLayers(
@@ -114,10 +72,15 @@ export async function fetchLayersFromGetCapabilitiesXml(
   ogcServiceType: OgcServiceTypes,
   reqConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXmlLayer[]> {
-  const parsedXml = await fetchGetCapabilitiesXml(baseUrl, ogcServiceType, reqConfig);
+  const parsedXml = (await fetchGetCapabilitiesXml(
+    baseUrl,
+    ogcServiceType,
+    reqConfig,
+  )) as GetCapabilitiesWmsXml;
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
-  const layers = parseOgcLayers(parsedXml, ogcServiceType);
-  const layersInfos = _flattenLayers(layers).filter(layerInfo => layerInfo.Name);
+  const layersInfos = _flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer).filter(
+    layerInfo => layerInfo.Name,
+  );
   return layersInfos;
 }
 
