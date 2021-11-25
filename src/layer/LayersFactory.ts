@@ -307,7 +307,6 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
-    console.log(parsedLayers);
     const layersInfos = parsedLayers.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
