@@ -1,3 +1,5 @@
+import { stringify } from 'query-string';
+
 import {
   fetchLayersFromGetCapabilitiesXml,
   fetchGetCapabilitiesJsonV1,
@@ -5,7 +7,12 @@ import {
   parseSHInstanceId,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import {
+  OgcServiceTypes,
+  SH_SERVICE_HOSTNAMES_V1_OR_V2,
+  SH_SERVICE_HOSTNAMES_V3,
+  PLANET_FALSE_COLOR_TEMPLATES,
+} from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -167,6 +174,14 @@ export class LayersFactory {
         }
       }
       if (baseUrl.includes('/wmts')) {
+        if (baseUrl.includes('api.planet.com/basemaps/')) {
+          return this.makePlanetBasemapLayers(
+            baseUrl,
+            filterLayers,
+            overrideConstructorParams,
+            innerReqConfig,
+          );
+        }
         return await this.makeLayersWmts(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
       } else {
         return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
@@ -318,6 +333,49 @@ export class LayersFactory {
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description, legendUrl, resourceUrl }) =>
+        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
+    );
+  }
+
+  // Analtyc layers accept a proc parameter to specify a dynamically-rendered false color visualization, for example NDVI.
+  // Since proc is not a standard a WMTS parameter and there is a list of specified options at https://developers.planet.com/docs/basemaps/tile-services/indices/#remote-sensing-indices-legends
+  // we can treat these as extra layers and add them to makeLayers response.
+  private static async makePlanetBasemapLayers(
+    baseUrl: string,
+    filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    overrideConstructorParams: Record<string, any> | null,
+    reqConfig: RequestConfiguration,
+  ): Promise<AbstractLayer[]> {
+    let newLayers = [];
+    const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
+    for (let layerInfo of parsedLayers) {
+      const layer = {
+        layerId: layerInfo.Name[0],
+        title: layerInfo.Title[0],
+        description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+        dataset: null as string | null,
+        legendUrl: layerInfo.Style[0].LegendURL,
+        resourceUrl: layerInfo.ResourceUrl,
+      };
+      newLayers.push(layer);
+      if (layer.layerId.includes('analytic')) {
+        const falseColorLayers = PLANET_FALSE_COLOR_TEMPLATES.map(template => ({
+          layerId: `${layer.layerId}_${template.titleSuffix}`,
+          title: `${layer.title} ${template.titleSuffix}`,
+          description: template.description,
+          legendUrl: layer.legendUrl,
+          dataset: layer.dataset,
+          resourceUrl: `${layer.resourceUrl}&${stringify(template.resourceUrlParams)}`,
+        }));
+        newLayers.push(...falseColorLayers);
+      }
+    }
+    const filteredLayersInfos =
+      filterLayers === null ? newLayers : newLayers.filter(l => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl, resourceUrl }) =>

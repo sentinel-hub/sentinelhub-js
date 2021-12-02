@@ -262,3 +262,12 @@ export enum OgcServiceTypes {
   WMS = 'wms',
   WMTS = 'wmts',
 }
+
+export const PLANET_FALSE_COLOR_TEMPLATES = [
+  { description: '', titleSuffix: 'NDWI', resourceUrlParams: { proc: 'ndwi' } },
+  { description: '', titleSuffix: 'NDVI', resourceUrlParams: { proc: 'ndvi' } },
+  { description: '', titleSuffix: 'MSAVI2', resourceUrlParams: { proc: 'msavi2' } },
+  { description: '', titleSuffix: 'MTVI2', resourceUrlParams: { proc: 'mtvi2' } },
+  { description: '', titleSuffix: 'VARI', resourceUrlParams: { proc: 'vari' } },
+  { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
+];
