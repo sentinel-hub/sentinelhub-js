@@ -53,8 +53,10 @@ export function toPixel(coord: number[], tileSize: number, zoom: number): { pixe
   const [longitude, latitude] = coord;
   const mapWidth = tileSize * Math.pow(2, zoom);
   const sinLatitude = Math.min(Math.max(Math.sin(DEGREE_TO_RADIAN * latitude), -0.9999), 0.9999);
-  const pixelX = ((longitude + 180) / 360) * mapWidth;
-  const pixelY = (0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI)) * mapWidth;
+  const pixelX = Math.round(((longitude + 180) / 360) * mapWidth);
+  const pixelY = Math.round(
+    (0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI)) * mapWidth,
+  );
   return { pixelX, pixelY };
 }
 
