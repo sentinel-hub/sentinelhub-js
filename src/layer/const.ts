@@ -39,8 +39,9 @@ export type GetMapParams = {
   // only used by WMTS tp calculate tilCol and tileRow from bbox
   zoom?: number;
   tileCoord?: {
-    x?: number;
-    y?: number;
+    x: number;
+    y: number;
+    z: number;
   };
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {

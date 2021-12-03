@@ -87,11 +87,11 @@ export class WmtsLayer extends AbstractLayer {
     }
     const xyz =
       params.bbox && !params.tileCoord
-        ? bboxToXyz(params.bbox, params.zoom, params.width)
+        ? bboxToXyz(params.bbox, params.width)
         : {
             x: params.tileCoord.x,
             y: params.tileCoord.y,
-            z: params.zoom,
+            z: params.tileCoord.z,
           };
     const urlParams: Record<string, any> = {
       '{TileMatrix}': xyz.z,

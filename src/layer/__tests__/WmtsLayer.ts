@@ -34,8 +34,9 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
     tileCoord: {
       x: 8852,
       y: 9247,
+      z: 14,
     },
-    zoom: 14,
+
     format: MimeTypes.PNG,
   };
   await layer.getMap(getMapParams, ApiType.WMTS);
@@ -45,7 +46,7 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
   const { url } = mockNetwork.history.get[0];
   expect(url).toHaveOrigin('https://tiles.planet.com');
   expect(url).toHaveBaseUrl(
-    `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/${getMapParams.zoom}/${getMapParams.tileCoord.x}/${getMapParams.tileCoord.y}.png`,
+    `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/${getMapParams.tileCoord.z}/${getMapParams.tileCoord.x}/${getMapParams.tileCoord.y}.png`,
   );
 });
 
@@ -76,7 +77,7 @@ test('WmtsLayer.getMap uses bbox', async () => {
   expect(mockNetwork.history.get.length).toBe(1);
 
   const { url } = mockNetwork.history.get[0];
-  const { x, y, z } = bboxToXyz(bbox, getMapParams.zoom, tileSize);
+  const { x, y, z } = bboxToXyz(bbox, tileSize);
   expect(url).toHaveOrigin('https://tiles.planet.com');
   expect(url).toHaveBaseUrl(
     `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/${z}/${x}/${y}.png`,

@@ -7,6 +7,8 @@ import { fetchGetCapabilitiesXml, GetCapabilitiesXmlLayer } from './utils';
 const DEGREE_TO_RADIAN = Math.PI / 180;
 const RADIAN_TO_DEGREE = 180 / Math.PI;
 const EQUATOR_RADIUS = 6378137.0;
+const EQUATOR_LEN = 40075016.685578488;
+const MAXEXTENT = 20037508.342789244;
 
 export type GetCapabilitiesWmtsXml = {
   Capabilities: {
@@ -36,12 +38,39 @@ function toWgs84(xy: number[]): number[] {
   ];
 }
 
-export function bboxToXyz(bbox: BBox, zoom: number, tileSize: number): { x: number; y: number; z: number } {
+function toMercator(xy: number[]): number[] {
+  var xy = [
+    EQUATOR_RADIUS * xy[0] * DEGREE_TO_RADIAN,
+    EQUATOR_RADIUS * Math.log(Math.tan(Math.PI * 0.25 + 0.5 * xy[1] * DEGREE_TO_RADIAN)),
+  ];
+  // if xy value is beyond maxextent (e.g. poles), return maxextent.
+  xy[0] > MAXEXTENT && (xy[0] = MAXEXTENT);
+  xy[0] < -MAXEXTENT && (xy[0] = -MAXEXTENT);
+  xy[1] > MAXEXTENT && (xy[1] = MAXEXTENT);
+  xy[1] < -MAXEXTENT && (xy[1] = -MAXEXTENT);
+  return xy;
+}
+
+function getZoomFromBbox(bbox: BBox): number {
+  if (bbox.crs === CRS_EPSG4326) {
+    const topLeft = toMercator([bbox.minX, bbox.minY]);
+    const bottomRight = toMercator([bbox.maxX, bbox.maxY]);
+    bbox = new BBox(CRS_EPSG3857, topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
+  }
+  return Math.max(
+    0,
+    Math.min(19, 1 + Math.floor(Math.log(EQUATOR_LEN / ((bbox.maxX - bbox.minX) * 1.001)) / Math.log(2))),
+  );
+}
+
+export function bboxToXyz(bbox: BBox, tileSize: number): { x: number; y: number; z: number } {
+  const zoom = getZoomFromBbox(bbox);
   if (bbox.crs === CRS_EPSG3857) {
     const topLeft = toWgs84([bbox.minX, bbox.minY]);
     const bottomRight = toWgs84([bbox.maxX, bbox.maxY]);
     bbox = new BBox(CRS_EPSG4326, topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
   }
+
   const topLeft = [bbox.minX, bbox.maxY];
   const { pixelX, pixelY } = toPixel(topLeft, tileSize, zoom);
   const tileX = Math.floor(pixelX / tileSize);
