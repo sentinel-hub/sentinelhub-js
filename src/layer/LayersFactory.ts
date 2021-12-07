@@ -67,6 +67,7 @@ import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
+import { PlanetNicfiLayer } from './PlanetNicfi';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -379,7 +380,7 @@ export class LayersFactory {
 
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl, resourceUrl }) =>
-        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
+        new PlanetNicfiLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
     );
   }
 }
