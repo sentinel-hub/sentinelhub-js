@@ -1,10 +1,11 @@
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
     interface Matchers<R> {
-      toHaveQueryParams(expectedParamsKeys: Array<string>): R;
+      toHaveQueryParams(expectedParamsKeys: string[]): R;
       toHaveQueryParamsValues(expectedParams: Record<string, string>): R;
       toHaveOrigin(expectedOrigin: string): R;
-      toHaveBaseUrl( expectedPathName:string): R;
+      toHaveBaseUrl(expectedPathName: string): R;
     }
   }
 }
@@ -81,7 +82,13 @@ expect.extend({
 
 /* ************************ */
 
-function parseUrl(urlWithQueryParams: string) {
+function parseUrl(
+  urlWithQueryParams: string,
+): {
+  origin: string;
+  baseUrl: string;
+  params: Record<string, string>;
+} {
   const url = new URL(urlWithQueryParams);
   let params: Record<string, string> = {};
   url.searchParams.forEach((value, key) => {
