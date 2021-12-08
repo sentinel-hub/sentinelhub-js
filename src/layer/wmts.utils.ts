@@ -21,8 +21,8 @@ export type GetCapabilitiesWmtsXml = {
 };
 
 export type GetCapabilitiesXmlWmtsLayer = {
-  'ows:Title': string;
-  'ows:Abstract': string;
+  'ows:Title': string[];
+  'ows:Abstract': string[];
   'ows:WGS84BoundingBox': {}[][];
   'ows:Identifier': string[];
   Style: any[];
@@ -93,8 +93,8 @@ function parseXmlWmtsLayers(parsedXml: GetCapabilitiesWmtsXml): GetCapabilitiesX
   return parsedXml.Capabilities.Contents[0].Layer.map(l => {
     return {
       Name: l['ows:Identifier'],
-      Title: [l['ows:Title']],
-      Abstract: [l['ows:Abstract']],
+      Title: l['ows:Title'],
+      Abstract: l['ows:Abstract'],
       Style: l.Style,
       ResourceUrl: getResourceUrl(l),
     };
