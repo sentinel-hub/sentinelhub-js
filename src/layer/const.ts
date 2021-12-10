@@ -271,4 +271,5 @@ export const PLANET_FALSE_COLOR_TEMPLATES = [
   { description: '', titleSuffix: 'MTVI2', resourceUrlParams: { proc: 'mtvi2' } },
   { description: '', titleSuffix: 'VARI', resourceUrlParams: { proc: 'vari' } },
   { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
+  { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
 ];
