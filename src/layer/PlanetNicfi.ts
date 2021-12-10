@@ -7,6 +7,7 @@ import moment from 'moment';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 
 export const PLANET_FALSE_COLOR_TEMPLATES = [
+  { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
   { description: '', titleSuffix: 'NDWI', resourceUrlParams: { proc: 'ndwi' } },
   { description: '', titleSuffix: 'NDVI', resourceUrlParams: { proc: 'ndvi' } },
   { description: '', titleSuffix: 'MSAVI2', resourceUrlParams: { proc: 'msavi2' } },
