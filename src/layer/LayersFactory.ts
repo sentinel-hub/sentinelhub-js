@@ -38,6 +38,7 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
+  DATASET_PLANET_NICFI,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -358,7 +359,7 @@ export class LayersFactory {
         layerId: layerInfo.Name[0],
         title: layerInfo.Title[0],
         description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
-        dataset: null as string | null,
+        dataset: DATASET_PLANET_NICFI,
         legendUrl: layerInfo.Style[0].LegendURL,
         resourceUrl: layerInfo.ResourceUrl,
       };
