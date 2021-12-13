@@ -101,4 +101,8 @@ export class WmtsLayer extends AbstractLayer {
 
     return this.resourceUrl.replace(/\{ *([\w_ -]+) *\}/g, (m: string) => urlParams[m]);
   }
+
+  public supportsApiType(api: ApiType): boolean {
+    return api === ApiType.WMTS;
+  }
 }
