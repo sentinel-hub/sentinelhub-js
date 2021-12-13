@@ -341,7 +341,7 @@ export class LayersFactory {
     );
   }
 
-  // Analtyc layers accept a proc parameter to specify a dynamically-rendered false color visualization, for example NDVI.
+  // Analytic layers accept a proc parameter to specify a dynamically-rendered false color visualization, for example NDVI.
   // Since proc is not a standard a WMTS parameter and there is a list of specified options at https://developers.planet.com/docs/basemaps/tile-services/indices/#remote-sensing-indices-legends
   // we can treat these as extra layers and add them to makeLayers response.
   private static async makePlanetBasemapLayers(
