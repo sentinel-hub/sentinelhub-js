@@ -80,7 +80,7 @@ export class WmtsLayer extends AbstractLayer {
     }
 
     if (!params.bbox && !params.tileCoord) {
-      throw new Error('No bbox or x,y coordinates provided');
+      throw new Error('No bbox or x,y,z coordinates provided');
     }
     if (!this.resourceUrl) {
       throw new Error('No resource URL provided');
