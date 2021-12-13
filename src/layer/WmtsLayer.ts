@@ -7,6 +7,8 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
 import { bboxToXyz, fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
+import { Effects } from '..';
+import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 
 interface ConstructorParameters {
   baseUrl?: string;
@@ -61,7 +63,14 @@ export class WmtsLayer extends AbstractLayer {
         ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
       const response = await axios.get(url, requestConfig);
-      return response.data;
+      let blob = response.data;
+
+      // apply effects:
+      // support deprecated GetMapParams.gain and .gamma parameters
+      // but override them if they are also present in .effects
+      const effects: Effects = { gain: params.gain, gamma: params.gamma, ...params.effects };
+      blob = await runEffectFunctions(blob, effects);
+      return blob;
     });
   }
 
