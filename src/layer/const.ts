@@ -36,6 +36,13 @@ export type GetMapParams = {
   // Sentinelhub-js can't deal with manipulating files inside the tar yet,
   // so we only allow setting one output response id.
   outputResponseId?: string;
+  // only used by WMTS tp calculate tilCol and tileRow from bbox
+  zoom?: number;
+  tileCoord?: {
+    x: number;
+    y: number;
+    z: number;
+  };
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
     [key: string]: string;
@@ -66,6 +73,7 @@ export enum MosaickingOrder {
 
 export enum ApiType {
   WMS = 'wms',
+  WMTS = 'wmts',
   PROCESSING = 'processing',
 }
 
@@ -250,3 +258,18 @@ export enum BYOCSubTypes {
   BYOC = 'BYOC',
   ZARR = 'ZARR',
 }
+
+export enum OgcServiceTypes {
+  WMS = 'wms',
+  WMTS = 'wmts',
+}
+
+export const PLANET_FALSE_COLOR_TEMPLATES = [
+  { description: '', titleSuffix: 'NDWI', resourceUrlParams: { proc: 'ndwi' } },
+  { description: '', titleSuffix: 'NDVI', resourceUrlParams: { proc: 'ndvi' } },
+  { description: '', titleSuffix: 'MSAVI2', resourceUrlParams: { proc: 'msavi2' } },
+  { description: '', titleSuffix: 'MTVI2', resourceUrlParams: { proc: 'mtvi2' } },
+  { description: '', titleSuffix: 'VARI', resourceUrlParams: { proc: 'vari' } },
+  { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
+  { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
+];

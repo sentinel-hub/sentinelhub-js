@@ -350,3 +350,17 @@ export const DATASET_BYOC: Dataset = {
   maxDate: null,
   catalogCollectionId: null,
 };
+
+export const DATASET_PLANET_NICFI: Dataset = {
+  id: 'PLANET_NICFI',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: null,
+  shProcessingApiDatasourceAbbreviation: null,
+  datasetParametersType: null,
+  shServiceHostname: null,
+  searchIndexUrl: null,
+  findDatesUTCUrl: null,
+  orbitTimeMinutes: null,
+  minDate: new Date(Date.UTC(2016, 6 - 1, 31, 12, 0, 0)), // '2016-05-31',
+  maxDate: null,
+};
