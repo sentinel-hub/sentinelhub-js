@@ -374,7 +374,10 @@ export class LayersFactory {
           description: template.description,
           legendUrl: layer.legendUrl,
           dataset: layer.dataset,
-          resourceUrl: stringifyUrl({ url: parsedResourceUrl.url, query: template.resourceUrlParams }),
+          resourceUrl: stringifyUrl({
+            url: parsedResourceUrl.url,
+            query: { ...parsedResourceUrl.query, ...template.resourceUrlParams },
+          }),
         }));
         newLayers.push(...falseColorLayers);
       }
