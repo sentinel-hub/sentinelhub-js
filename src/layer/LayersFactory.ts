@@ -1,4 +1,4 @@
-import { stringify } from 'query-string';
+import { parseUrl, stringifyUrl } from 'query-string';
 
 import {
   fetchLayersFromGetCapabilitiesXml,
@@ -361,17 +361,23 @@ export class LayersFactory {
         description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
         dataset: DATASET_PLANET_NICFI,
         legendUrl: layerInfo.Style[0].LegendURL,
-        resourceUrl: layerInfo.ResourceUrl,
+        resourceUrl: layerInfo.Name[0].includes('analytic')
+          ? `${layerInfo.ResourceUrl}&proc=rgb`
+          : layerInfo.ResourceUrl,
       };
       newLayers.push(layer);
       if (layer.layerId.includes('analytic')) {
+        const parsedResourceUrl = parseUrl(layer.resourceUrl);
         const falseColorLayers = PLANET_FALSE_COLOR_TEMPLATES.map(template => ({
           layerId: `${layer.layerId}_${template.titleSuffix}`,
           title: `${layer.title} ${template.titleSuffix}`,
           description: template.description,
           legendUrl: layer.legendUrl,
           dataset: layer.dataset,
-          resourceUrl: `${layer.resourceUrl}&${stringify(template.resourceUrlParams)}`,
+          resourceUrl: stringifyUrl({
+            url: parsedResourceUrl.url,
+            query: { ...parsedResourceUrl.query, ...template.resourceUrlParams },
+          }),
         }));
         newLayers.push(...falseColorLayers);
       }
