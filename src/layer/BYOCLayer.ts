@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import axios from 'axios';
+import { Geometry } from '@turf/helpers';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
@@ -167,9 +168,18 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
+    intersects?: Geometry,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    const response = await super.findTilesInner(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      intersects,
+    );
     return response;
   }
 

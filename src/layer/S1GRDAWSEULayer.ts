@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { Geometry } from '@turf/helpers';
 
 import { BBox } from '../bbox';
 
@@ -238,9 +239,18 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
+    intersects?: Geometry,
   ): Promise<PaginatedTiles> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    const response = await super.findTilesInner(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      intersects,
+    );
 
     return response;
   }

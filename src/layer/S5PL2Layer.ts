@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { Geometry } from '@turf/helpers';
 
 import { BBox } from '../bbox';
 import { PaginatedTiles, Link, LinkType, DataProductId, FindTilesAdditionalParameters } from './const';
@@ -118,12 +119,21 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
+    intersects?: Geometry,
   ): Promise<PaginatedTiles> {
     if (this.productType === null) {
       throw new Error('Parameter productType must be specified!');
     }
 
-    const response = await super.findTilesInner(bbox, fromTime, toTime, maxCount, offset, reqConfig);
+    const response = await super.findTilesInner(
+      bbox,
+      fromTime,
+      toTime,
+      maxCount,
+      offset,
+      reqConfig,
+      intersects,
+    );
     return response;
   }
 

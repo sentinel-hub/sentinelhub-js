@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import WKT from 'terraformer-wkt-parser';
+import { Geometry } from '@turf/helpers';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
@@ -380,6 +381,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCount: number | null = null,
     offset: number | null = null,
     reqConfig?: RequestConfiguration,
+    intersects?: Geometry,
   ): Promise<PaginatedTiles> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     const canUseCatalog = authToken && !!this.getCatalogCollectionId();
@@ -395,6 +397,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         offset,
         reqConfig,
         this.getFindTilesAdditionalParameters(),
+        intersects,
       );
       result = this.convertResponseFromCatalog(response);
     } else {
@@ -483,6 +486,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     offset: number | null = null,
     reqConfig: RequestConfiguration,
     findTilesAdditionalParameters: FindTilesAdditionalParameters,
+    intersects?: null | Geometry,
   ): Promise<Record<string, any>> {
     if (maxCount !== null && maxCount > CATALOG_SEARCH_MAX_LIMIT) {
       throw new Error(`Parameter maxCount must be less than or equal to ${CATALOG_SEARCH_MAX_LIMIT}`);
@@ -522,6 +526,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.next = offset;
     }
 
+    if (intersects) {
+      payload.intersects = intersects;
+      payload.bbox = null;
+    }
+
     let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
 
     if (payloadQuery) {
@@ -531,7 +540,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (distinct) {
       payload['distinct'] = distinct;
     }
-
     const shServiceHostname = this.getShServiceHostname();
 
     return await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
@@ -610,7 +618,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
   ): Promise<Date[]> {
     const { maxCloudCoverage, datasetParameters } = await this.getFindDatesUTCAdditionalParameters();
-
     let findTilesAdditionalParameters: Record<string, any> = { datasetParameters: datasetParameters };
     if (maxCloudCoverage !== null && maxCloudCoverage !== undefined) {
       findTilesAdditionalParameters.maxCloudCoverPercent = maxCloudCoverage * 100;
