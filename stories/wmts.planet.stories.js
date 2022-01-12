@@ -37,7 +37,6 @@ export const getMapBbox = () => {
       width: 256,
       height: 256,
       format: MimeTypes.JPEG,
-      zoom: 14,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
