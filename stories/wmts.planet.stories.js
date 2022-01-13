@@ -37,7 +37,6 @@ export const getMapBbox = () => {
       width: 256,
       height: 256,
       format: MimeTypes.JPEG,
-      zoom: 14,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
@@ -61,13 +60,13 @@ export const getMap = () => {
       tileCoord: {
         x: 8852,
         y: 9247,
+        z: 14,
       },
       fromTime: new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0)),
       toTime: new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59)),
       width: 256,
       height: 256,
       format: MimeTypes.JPEG,
-      zoom: 14,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
@@ -76,7 +75,7 @@ export const getMap = () => {
   return wrapperEl;
 };
 
-export const getMapWTmsLayersFactory = () => {
+export const getMapWmtsLayersFactory = () => {
   const img = document.createElement('img');
   img.width = '256';
   img.height = '256';
@@ -95,7 +94,6 @@ export const getMapWTmsLayersFactory = () => {
       width: 256,
       height: 256,
       format: MimeTypes.JPEG,
-      zoom: 14,
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);

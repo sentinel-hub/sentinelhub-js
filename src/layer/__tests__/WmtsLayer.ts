@@ -69,7 +69,6 @@ test('WmtsLayer.getMap uses bbox', async () => {
     toTime: new Date(),
     width: tileSize,
     height: tileSize,
-    zoom: 14,
     format: MimeTypes.PNG,
   };
   await layer.getMap(getMapParams, ApiType.WMTS);

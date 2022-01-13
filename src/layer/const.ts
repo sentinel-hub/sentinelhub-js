@@ -36,8 +36,6 @@ export type GetMapParams = {
   // Sentinelhub-js can't deal with manipulating files inside the tar yet,
   // so we only allow setting one output response id.
   outputResponseId?: string;
-  // only used by WMTS tp calculate tilCol and tileRow from bbox
-  zoom?: number;
   tileCoord?: {
     x: number;
     y: number;
