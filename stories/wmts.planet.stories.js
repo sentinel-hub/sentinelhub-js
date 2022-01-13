@@ -75,7 +75,7 @@ export const getMap = () => {
   return wrapperEl;
 };
 
-export const getMapWTmsLayersFactory = () => {
+export const getMapWmtsLayersFactory = () => {
   const img = document.createElement('img');
   img.width = '256';
   img.height = '256';
