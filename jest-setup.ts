@@ -1,3 +1,4 @@
+import 'jest-canvas-mock';
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jest {
@@ -101,5 +102,23 @@ function parseUrl(
     params: params,
   };
 }
+
+if (typeof window.URL.createObjectURL === 'undefined') {
+  window.URL.createObjectURL = (): string => 'kjkj';
+  window.URL.revokeObjectURL = () => {};
+}
+
+document.createElement = (function(create) {
+  return function() {
+    const element: HTMLElement = create.apply(this, arguments);
+
+    if (element.tagName === 'IMG') {
+      setTimeout(() => {
+        element.onload(new Event('load'));
+      }, 100);
+    }
+    return element;
+  };
+})(document.createElement);
 
 export default undefined;

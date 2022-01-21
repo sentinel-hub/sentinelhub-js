@@ -7,8 +7,6 @@ import { fetchGetCapabilitiesXml, GetCapabilitiesXmlLayer } from './utils';
 const DEGREE_TO_RADIAN = Math.PI / 180;
 const RADIAN_TO_DEGREE = 180 / Math.PI;
 const EQUATOR_RADIUS = 6378137.0;
-const EQUATOR_LEN = 40075016.685578488;
-const MAXEXTENT = 20037508.342789244;
 
 export type GetCapabilitiesWmtsXml = {
   Capabilities: {
@@ -31,6 +29,12 @@ export type GetCapabilitiesXmlWmtsLayer = {
   ResourceURL: any[];
 };
 
+type BBOX_TO_XYZ_IMAGE_GRID = {
+  nativeWidth: number;
+  nativeHeight: number;
+  tiles: { x: number; y: number; z: number; imageOffsetX: number; imageOffsetY: number }[];
+};
+
 function toWgs84(xy: number[]): number[] {
   return [
     (xy[0] * RADIAN_TO_DEGREE) / EQUATOR_RADIUS,
@@ -38,44 +42,83 @@ function toWgs84(xy: number[]): number[] {
   ];
 }
 
-function toMercator(xy: number[]): number[] {
-  var xy = [
-    EQUATOR_RADIUS * xy[0] * DEGREE_TO_RADIAN,
-    EQUATOR_RADIUS * Math.log(Math.tan(Math.PI * 0.25 + 0.5 * xy[1] * DEGREE_TO_RADIAN)),
-  ];
-  // if xy value is beyond maxextent (e.g. poles), return maxextent.
-  xy[0] > MAXEXTENT && (xy[0] = MAXEXTENT);
-  xy[0] < -MAXEXTENT && (xy[0] = -MAXEXTENT);
-  xy[1] > MAXEXTENT && (xy[1] = MAXEXTENT);
-  xy[1] < -MAXEXTENT && (xy[1] = -MAXEXTENT);
-  return xy;
-}
-
-function getZoomFromBbox(bbox: BBox): number {
-  if (bbox.crs === CRS_EPSG4326) {
-    const topLeft = toMercator([bbox.minX, bbox.minY]);
-    const bottomRight = toMercator([bbox.maxX, bbox.maxY]);
-    bbox = new BBox(CRS_EPSG3857, topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
-  }
-  return Math.max(
-    0,
-    Math.min(19, 1 + Math.floor(Math.log(EQUATOR_LEN / ((bbox.maxX - bbox.minX) * 1.001)) / Math.log(2))),
-  );
-}
-
-export function bboxToXyz(bbox: BBox, tileSize: number): { x: number; y: number; z: number } {
-  const zoom = getZoomFromBbox(bbox);
+// Find the first zoom level where the requested imageWidth is lower than the pixel width of the bbox
+function bboxToWidthAndZoom(
+  bbox: BBox,
+  requestedImageWidth: number,
+  tileSize: number,
+): { zoom: number; mapWidth: number; bboxPixelWidth: number } {
   if (bbox.crs === CRS_EPSG3857) {
     const topLeft = toWgs84([bbox.minX, bbox.minY]);
     const bottomRight = toWgs84([bbox.maxX, bbox.maxY]);
     bbox = new BBox(CRS_EPSG4326, topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
   }
+  const degreeDiff = Math.abs(bbox.maxX - bbox.minX);
+  const pixelsPerDegree = tileSize / 360;
+
+  // Pixel width for the bbox at each zoom level between 0 and 19
+  let imageDimensionsAtZoom = [];
+  for (let z = 0; z < 20; z++) {
+    const mapWidth = tileSize * Math.pow(2, z);
+    imageDimensionsAtZoom.push({
+      zoom: z,
+      mapWidth,
+      bboxPixelWidth: Math.floor(((pixelsPerDegree * mapWidth) / tileSize) * degreeDiff),
+    });
+  }
+  return imageDimensionsAtZoom.find(dim => requestedImageWidth <= dim.bboxPixelWidth);
+}
+
+export function bboxToXyzGrid(
+  bbox: BBox,
+  imageWidth: number,
+  imageHeight: number,
+  tileSize: number,
+): BBOX_TO_XYZ_IMAGE_GRID {
+  if (bbox.crs === CRS_EPSG3857) {
+    const topLeft = toWgs84([bbox.minX, bbox.minY]);
+    const bottomRight = toWgs84([bbox.maxX, bbox.maxY]);
+    bbox = new BBox(CRS_EPSG4326, topLeft[0], topLeft[1], bottomRight[0], bottomRight[1]);
+  }
+  const { zoom, bboxPixelWidth } = bboxToWidthAndZoom(bbox, imageWidth, tileSize);
 
   const topLeft = [bbox.minX, bbox.maxY];
-  const { pixelX, pixelY } = toPixel(topLeft, tileSize, zoom);
-  const tileX = Math.floor(pixelX / tileSize);
-  const tileY = Math.floor(pixelY / tileSize);
-  return { x: tileX, y: tileY, z: zoom };
+  const bottomRight = [bbox.maxX, bbox.minY];
+  const { pixelX: topLeftPixelX, pixelY: topLeftpixelY } = toPixel(topLeft, tileSize, zoom);
+  const { pixelX: bottomRightPixelX, pixelY: bottomRightPixelY } = toPixel(bottomRight, tileSize, zoom);
+
+  const xTiles = [Math.floor(topLeftPixelX / tileSize), Math.floor((bottomRightPixelX - 1) / tileSize)].sort(
+    (a, b) => a - b,
+  );
+  const yTiles = [Math.floor(topLeftpixelY / tileSize), Math.floor((bottomRightPixelY - 1) / tileSize)].sort(
+    (a, b) => a - b,
+  );
+  const tileTopLeftX = xTiles[0] * tileSize;
+  const tileTopLeftY = yTiles[0] * tileSize;
+  const tiles = [];
+  let xIndex = 0;
+  let yIndex = 0;
+  for (let x = xTiles[0]; x <= xTiles[xTiles.length - 1]; x++) {
+    for (let y = yTiles[0]; y <= yTiles[yTiles.length - 1]; y++) {
+      const tile = {
+        x: x,
+        y: y,
+        z: zoom,
+        imageOffsetX: xIndex * tileSize - (topLeftPixelX - tileTopLeftX),
+        imageOffsetY: yIndex * tileSize - (topLeftpixelY - tileTopLeftY),
+      };
+      tiles.push(tile);
+      yIndex++;
+    }
+    xIndex++;
+    yIndex = 0;
+  }
+
+  return {
+    nativeWidth: bboxPixelWidth,
+    nativeHeight: bboxPixelWidth * (imageHeight / imageWidth),
+    tiles: tiles,
+  };
 }
 
 export function toPixel(coord: number[], tileSize: number, zoom: number): { pixelX: number; pixelY: number } {
