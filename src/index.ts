@@ -105,6 +105,7 @@ import {
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
+  ResamplingKernel,
 } from './dataimport/const';
 
 registerInitialAxiosInterceptors();
@@ -224,4 +225,5 @@ export {
   PlanetProductBundle,
   PlanetScopeHarmonization,
   MaxarSensor,
+  ResamplingKernel,
 };

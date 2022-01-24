@@ -125,3 +125,9 @@ export enum PlanetScopeHarmonization {
   PS2 = 'PS2',
   NONE = 'NONE',
 }
+
+export enum ResamplingKernel {
+  CC = 'CC',
+  NN = 'NN',
+  MTF = 'MTF',
+}
