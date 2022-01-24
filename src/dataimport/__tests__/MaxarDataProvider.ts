@@ -7,7 +7,7 @@ import { setAuthToken, invalidateCaches, BBox, CRS_EPSG4326 } from '../../index'
 import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
-import { MaxarSensor, TPDISearchParams, TPDProvider } from '../const';
+import { MaxarSensor, ResamplingKernel, TPDISearchParams, TPDProvider } from '../const';
 import { Polygon } from '@turf/helpers';
 import { checkSearchPayload } from './testUtils.MaxarDataProvider';
 import { MaxarDataProvider } from '../MaxarDataProvider';
@@ -123,7 +123,7 @@ describe('Test search', () => {
 
 describe('Test create order payload', () => {
   it.each([
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, null],
     [
       'name',
       'collectionId',
@@ -137,42 +137,54 @@ describe('Test create order payload', () => {
         maxSunElevation: 30,
         sensor: MaxarSensor.GE01,
       },
+      null,
     ],
-    ['name', 'collectionId', null, { ...defaultSearchParams }],
-    ['name', 'collectionId', [], { ...defaultSearchParams }],
-    ['name', null, null, { ...defaultSearchParams }],
-    [null, null, null, { ...defaultSearchParams }],
-  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
-    const tpdp = new MaxarDataProvider();
-    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, { productKernel: ResamplingKernel.MTF }],
 
-    if (!!name) {
-      expect(payload.name).toBeDefined();
-      expect(payload.name).toStrictEqual(name);
-    } else {
-      expect(payload.name).toBeUndefined();
-    }
+    ['name', 'collectionId', null, { ...defaultSearchParams }, null],
+    ['name', 'collectionId', [], { ...defaultSearchParams }, null],
+    ['name', null, null, { ...defaultSearchParams }, null],
+    [null, null, null, { ...defaultSearchParams }, null],
+  ])(
+    'checks if parameters are set correctly',
+    async (name, collectionId, items, searchParams, orderParams) => {
+      const tpdp = new MaxarDataProvider();
+      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
 
-    if (!!collectionId) {
-      expect(payload.collectionId).toBeDefined();
-      expect(payload.collectionId).toStrictEqual(collectionId);
-    } else {
-      expect(payload.collectionId).toBeUndefined();
-    }
+      if (!!name) {
+        expect(payload.name).toBeDefined();
+        expect(payload.name).toStrictEqual(name);
+      } else {
+        expect(payload.name).toBeUndefined();
+      }
 
-    const { input } = payload;
+      if (!!collectionId) {
+        expect(payload.collectionId).toBeDefined();
+        expect(payload.collectionId).toStrictEqual(collectionId);
+      } else {
+        expect(payload.collectionId).toBeUndefined();
+      }
 
-    const dataObject = input.data[0];
-    const { selectedImages } = dataObject;
+      const { input } = payload;
 
-    if (!!items && items.length) {
-      expect(selectedImages).toBeDefined();
-      expect(selectedImages.length).toStrictEqual(items.length);
-      expect(selectedImages).toStrictEqual(items);
-      expect(dataObject.dataFilter).toBeUndefined();
-    } else {
-      expect(selectedImages).toBeUndefined();
-      checkSearchPayload(input, params);
-    }
-  });
+      const dataObject = input.data[0];
+      const { selectedImages } = dataObject;
+
+      if (!!items && items.length) {
+        expect(selectedImages).toBeDefined();
+        expect(selectedImages.length).toStrictEqual(items.length);
+        expect(selectedImages).toStrictEqual(items);
+        expect(dataObject.dataFilter).toBeUndefined();
+      } else {
+        expect(selectedImages).toBeUndefined();
+        checkSearchPayload(input, searchParams);
+      }
+
+      if (orderParams?.productKernel) {
+        expect(input.productKernel).toEqual(orderParams.productKernel);
+      } else {
+        expect(input.productKernel).toBeUndefined();
+      }
+    },
+  );
 });
