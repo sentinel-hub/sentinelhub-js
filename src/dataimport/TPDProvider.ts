@@ -82,11 +82,10 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     return payload;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getAdditionalOrderParams(
-    items: string[],
-    searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams,
+    items: string[], // eslint-disable-line @typescript-eslint/no-unused-vars
+    searchParams: TPDISearchParams, // eslint-disable-line @typescript-eslint/no-unused-vars
+    orderParams: TPDIOrderParams, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): any {
     return {};
   }

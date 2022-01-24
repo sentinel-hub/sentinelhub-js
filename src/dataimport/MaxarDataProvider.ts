@@ -71,6 +71,11 @@ export class MaxarDataProvider extends AbstractTPDProvider {
       dataObject.selectedImages = items;
       delete dataObject.dataFilter;
     }
+
+    if (orderParams?.productKernel) {
+      input.productKernel = orderParams.productKernel;
+    }
+
     return input;
   }
 }

@@ -59,8 +59,12 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
 
-    if (!!params.harmonizeTo) {
-      dataObject.harmonizeTo = params.harmonizeTo;
+    if (orderParams?.harmonizeTo) {
+      dataObject.harmonizeTo = orderParams.harmonizeTo;
+    }
+
+    if (orderParams?.planetApiKey) {
+      input.planetApiKey = orderParams.planetApiKey;
     }
 
     if (!!items && items.length) {
