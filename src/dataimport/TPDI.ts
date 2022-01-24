@@ -130,7 +130,7 @@ export class TPDI {
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams,
+    orderParams?: TPDIOrderParams,
     reqConfig?: RequestConfiguration,
   ): Promise<Order> {
     return await ensureTimeout(async innerReqConfig => {

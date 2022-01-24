@@ -179,4 +179,42 @@ describe('Test create order payload', () => {
       }
     },
   );
+
+  test('creating an order without any dataprovider specific order params', async () => {
+    const name = 'name';
+    const collectionId = 'collectionId';
+    const items = ['id'];
+    const searchParams = { ...defaultSearchParams };
+
+    const tpdp = new AirbusDataProvider();
+    const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams);
+
+    if (!!name) {
+      expect(payload.name).toBeDefined();
+      expect(payload.name).toStrictEqual(name);
+    } else {
+      expect(payload.name).toBeUndefined();
+    }
+
+    if (!!collectionId) {
+      expect(payload.collectionId).toBeDefined();
+      expect(payload.collectionId).toStrictEqual(collectionId);
+    } else {
+      expect(payload.collectionId).toBeUndefined();
+    }
+
+    const { input } = payload;
+
+    const dataObject = input.data[0];
+    const { products } = dataObject;
+
+    if (!!items && items.length) {
+      expect(products).toBeDefined();
+      expect(dataObject.products.length).toStrictEqual(items.length);
+      expect(dataObject.dataFilter).toBeUndefined();
+    } else {
+      expect(products).toBeUndefined();
+      checkSearchPayload(input, searchParams);
+    }
+  });
 });

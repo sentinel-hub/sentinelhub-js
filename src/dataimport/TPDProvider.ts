@@ -8,7 +8,7 @@ export interface TPDProviderInterface {
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams,
+    orderParams?: TPDIOrderParams,
   ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
 }
