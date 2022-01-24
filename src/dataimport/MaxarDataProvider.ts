@@ -1,4 +1,4 @@
-import { TPDProvider, TPDISearchParams, MaxarProductBands } from './const';
+import { TPDProvider, TPDISearchParams, MaxarProductBands, TPDIOrderParams } from './const';
 import { AbstractTPDProvider } from './TPDProvider';
 
 export class MaxarDataProvider extends AbstractTPDProvider {
@@ -60,8 +60,12 @@ export class MaxarDataProvider extends AbstractTPDProvider {
     return { data: [data] };
   }
 
-  protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
-    const input = this.getSearchPayload(params);
+  protected getAdditionalOrderParams(
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams: TPDIOrderParams,
+  ): any {
+    const input = this.getSearchPayload(searchParams);
     if (!!items && items.length) {
       const dataObject = input.data[0];
       dataObject.selectedImages = items;

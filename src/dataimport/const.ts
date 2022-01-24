@@ -63,11 +63,15 @@ export type TPDISearchParams = {
   minSunElevation?: number;
   maxSunElevation?: number;
   constellation?: AirbusConstellation;
-  planetApiKey?: string;
   nativeFilter?: any;
   sensor?: MaxarSensor;
   productBundle?: PlanetProductBundle;
+};
+
+export type TPDIOrderParams = {
   harmonizeTo?: PlanetScopeHarmonization;
+  planetApiKey?: string;
+  productKernel?: ResamplingKernel;
 };
 
 type LinksType = {

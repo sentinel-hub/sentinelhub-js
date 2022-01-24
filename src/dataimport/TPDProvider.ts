@@ -1,9 +1,15 @@
 import { AxiosRequestConfig } from 'axios';
-import { TPDProvider, TPDISearchParams } from './const';
+import { TPDProvider, TPDISearchParams, TPDIOrderParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
-  getOrderPayload(name: string, collectionId: string, items: string[], params: TPDISearchParams): any;
+  getOrderPayload(
+    name: string,
+    collectionId: string,
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams: TPDIOrderParams,
+  ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
 }
 
@@ -77,11 +83,21 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
+  protected getAdditionalOrderParams(
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams: TPDIOrderParams,
+  ): any {
     return {};
   }
 
-  public getOrderPayload(name: string, collectionId: string, items: string[], params: TPDISearchParams): any {
+  public getOrderPayload(
+    name: string,
+    collectionId: string,
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams: TPDIOrderParams | null = null,
+  ): any {
     const payload: any = {};
 
     if (!!name) {
@@ -91,7 +107,7 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     if (!!collectionId) {
       payload.collectionId = collectionId;
     }
-    payload.input = this.getAdditionalOrderParams(items, params);
+    payload.input = this.getAdditionalOrderParams(items, searchParams, orderParams);
 
     return payload;
   }
