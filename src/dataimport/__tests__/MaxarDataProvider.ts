@@ -181,9 +181,9 @@ describe('Test create order payload', () => {
       }
 
       if (orderParams?.productKernel) {
-        expect(input.productKernel).toEqual(orderParams.productKernel);
+        expect(dataObject.productKernel).toEqual(orderParams.productKernel);
       } else {
-        expect(input.productKernel).toBeUndefined();
+        expect(dataObject.productKernel).toBeUndefined();
       }
     },
   );

@@ -66,14 +66,15 @@ export class MaxarDataProvider extends AbstractTPDProvider {
     orderParams: TPDIOrderParams,
   ): any {
     const input = this.getSearchPayload(searchParams);
-    if (!!items && items.length) {
-      const dataObject = input.data[0];
-      dataObject.selectedImages = items;
-      delete dataObject.dataFilter;
-    }
+    const dataObject = input.data[0];
 
     if (orderParams?.productKernel) {
-      input.productKernel = orderParams.productKernel;
+      dataObject.productKernel = orderParams.productKernel;
+    }
+
+    if (!!items && items.length) {
+      dataObject.selectedImages = items;
+      delete dataObject.dataFilter;
     }
 
     return input;
