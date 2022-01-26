@@ -1,4 +1,4 @@
-import { TPDProvider, TPDISearchParams, PlanetItemType } from './const';
+import { TPDProvider, TPDISearchParams, PlanetItemType, TPDIOrderParams } from './const';
 import { AbstractTPDProvider } from './TPDProvider';
 
 export class PlanetDataProvider extends AbstractTPDProvider {
@@ -47,17 +47,24 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     data.dataFilter = dataFilter;
 
     return {
-      planetApiKey: params.planetApiKey,
       data: [data],
     };
   }
 
-  protected getAdditionalOrderParams(items: string[], params: TPDISearchParams): any {
-    const input = this.getSearchPayload(params);
+  protected getAdditionalOrderParams(
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams: TPDIOrderParams,
+  ): any {
+    const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
 
-    if (!!params.harmonizeTo) {
-      dataObject.harmonizeTo = params.harmonizeTo;
+    if (orderParams?.harmonizeTo) {
+      dataObject.harmonizeTo = orderParams.harmonizeTo;
+    }
+
+    if (orderParams?.planetApiKey) {
+      input.planetApiKey = orderParams.planetApiKey;
     }
 
     if (!!items && items.length) {

@@ -63,11 +63,15 @@ export type TPDISearchParams = {
   minSunElevation?: number;
   maxSunElevation?: number;
   constellation?: AirbusConstellation;
-  planetApiKey?: string;
   nativeFilter?: any;
   sensor?: MaxarSensor;
   productBundle?: PlanetProductBundle;
+};
+
+export type TPDIOrderParams = {
   harmonizeTo?: PlanetScopeHarmonization;
+  planetApiKey?: string;
+  productKernel?: ResamplingKernel;
 };
 
 type LinksType = {
@@ -124,4 +128,10 @@ export type OrderSearchResult = {
 export enum PlanetScopeHarmonization {
   PS2 = 'PS2',
   NONE = 'NONE',
+}
+
+export enum ResamplingKernel {
+  CC = 'CC',
+  NN = 'NN',
+  MTF = 'MTF',
 }
