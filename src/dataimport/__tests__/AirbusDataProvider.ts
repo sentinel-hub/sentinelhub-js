@@ -125,7 +125,7 @@ describe('Test search', () => {
 
 describe('Test create order payload', () => {
   it.each([
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, null],
     [
       'name',
       'collectionId',
@@ -137,15 +137,57 @@ describe('Test create order payload', () => {
         maxSnowCoverage: 20,
         maxIncidenceAngle: 30,
       },
+      null,
     ],
 
-    ['name', 'collectionId', null, { ...defaultSearchParams }],
-    ['name', 'collectionId', [], { ...defaultSearchParams }],
-    ['name', null, null, { ...defaultSearchParams }],
-    [null, null, null, { ...defaultSearchParams }],
-  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
+    ['name', 'collectionId', null, { ...defaultSearchParams }, null],
+    ['name', 'collectionId', [], { ...defaultSearchParams }, null],
+    ['name', null, null, { ...defaultSearchParams }, null],
+    [null, null, null, { ...defaultSearchParams }, null],
+  ])(
+    'checks if parameters are set correctly',
+    async (name, collectionId, items, searchParams, orderParams) => {
+      const tpdp = new AirbusDataProvider();
+      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+
+      if (!!name) {
+        expect(payload.name).toBeDefined();
+        expect(payload.name).toStrictEqual(name);
+      } else {
+        expect(payload.name).toBeUndefined();
+      }
+
+      if (!!collectionId) {
+        expect(payload.collectionId).toBeDefined();
+        expect(payload.collectionId).toStrictEqual(collectionId);
+      } else {
+        expect(payload.collectionId).toBeUndefined();
+      }
+
+      const { input } = payload;
+
+      const dataObject = input.data[0];
+      const { products } = dataObject;
+
+      if (!!items && items.length) {
+        expect(products).toBeDefined();
+        expect(dataObject.products.length).toStrictEqual(items.length);
+        expect(dataObject.dataFilter).toBeUndefined();
+      } else {
+        expect(products).toBeUndefined();
+        checkSearchPayload(input, searchParams);
+      }
+    },
+  );
+
+  test('creating an order without any dataprovider specific order params', async () => {
+    const name = 'name';
+    const collectionId = 'collectionId';
+    const items = ['id'];
+    const searchParams = { ...defaultSearchParams };
+
     const tpdp = new AirbusDataProvider();
-    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+    const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams);
 
     if (!!name) {
       expect(payload.name).toBeDefined();
@@ -172,7 +214,7 @@ describe('Test create order payload', () => {
       expect(dataObject.dataFilter).toBeUndefined();
     } else {
       expect(products).toBeUndefined();
-      checkSearchPayload(input, params);
+      checkSearchPayload(input, searchParams);
     }
   });
 });

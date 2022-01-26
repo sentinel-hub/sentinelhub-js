@@ -2,7 +2,6 @@ import { TPDISearchParams, TPDProvider } from '../const';
 
 export function checkSearchPayload(requestData: any, params: TPDISearchParams): void {
   expect(requestData.provider).toStrictEqual(TPDProvider.PLANET);
-  expect(requestData.planetApiKey).toStrictEqual(params.planetApiKey);
 
   if (!!params.bbox) {
     expect(requestData.bounds.bbox).toStrictEqual([
