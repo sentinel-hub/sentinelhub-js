@@ -6,7 +6,13 @@ import { RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
-import { bboxToXyzGrid, fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
+import {
+  bboxToXyzGrid,
+  fetchLayersFromWmtsGetCapabilitiesXml,
+  getMatrixSets,
+  MatrixSet,
+  TileMatrix,
+} from './wmts.utils';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 import { validateCanvasDimensions, drawBlobOnCanvas, canvasToBlob, scaleCanvasImage } from '../utils/canvas';
 import { Effects } from '../mapDataManipulation/const';
@@ -18,13 +24,16 @@ interface ConstructorParameters {
   description?: string | null;
   legendUrl?: string | null;
   resourceUrl?: string | null;
+  matrixSet?: string | null;
 }
 
 export class WmtsLayer extends AbstractLayer {
   protected baseUrl: string;
   protected layerId: string;
   protected resourceUrl: string;
-  protected tileSize: number;
+  protected matrixSet: string;
+  protected matrixSets: MatrixSet[];
+  protected tileMatrix: TileMatrix[];
 
   public constructor({
     baseUrl,
@@ -33,12 +42,14 @@ export class WmtsLayer extends AbstractLayer {
     description = null,
     legendUrl = null,
     resourceUrl = null,
+    matrixSet = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
     this.baseUrl = baseUrl;
     this.layerId = layerId;
     this.resourceUrl = resourceUrl;
-    this.tileSize = 256;
+    this.matrixSet = matrixSet;
+    this.tileMatrix = null;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
@@ -47,6 +58,14 @@ export class WmtsLayer extends AbstractLayer {
         const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(this.baseUrl, innerReqConfig);
         const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
         this.resourceUrl = layer.ResourceUrl;
+      }
+      if (!this.tileMatrix) {
+        const matrixSets = await getMatrixSets(this.baseUrl, innerReqConfig);
+        const matrixSet = matrixSets.find(set => set.id === this.matrixSet);
+        if (!matrixSet) {
+          throw new Error(`No matrixSet found for: ${this.matrixSet}`);
+        }
+        this.tileMatrix = matrixSet.tileMatrices;
       }
     }, reqConfig);
   }
@@ -127,7 +146,7 @@ export class WmtsLayer extends AbstractLayer {
         bbox,
         requestedImageWidth,
         requestedImageHeight,
-        this.tileSize,
+        this.tileMatrix,
       );
 
       const canvas = document.createElement('canvas');

@@ -47,7 +47,7 @@ export const getMapBbox = () => {
   wrapperEl.innerHTML = '<h2>GetMap with bbox(WMTS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId });
+    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
 
     const getMapParams = {
       bbox: bbox,
@@ -78,7 +78,7 @@ export const getMapBboxStitched = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
   wrapperEl.insertAdjacentElement('beforeend', s2Img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId });
+    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2LayerId });
 
     const getMapParams = {
@@ -117,7 +117,7 @@ export const getMap = () => {
   wrapperEl.innerHTML = '<h2>GetMap (WMTS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId });
+    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
 
     const getMapParams = {
       tileCoord: {
@@ -130,6 +130,7 @@ export const getMap = () => {
       width: 256,
       height: 256,
       format: MimeTypes.JPEG,
+      matrixSet: 'GoogleMapsCompatible15',
     };
     const imageBlob = await layer.getMap(getMapParams, ApiType.WMTS);
     img.src = URL.createObjectURL(imageBlob);
@@ -149,6 +150,7 @@ export const getMapWmtsLayersFactory = () => {
 
   const perform = async () => {
     const layer = (await LayersFactory.makeLayers(baseUrl, lId => layerId === lId))[0];
+    layer.matrixSet = 'GoogleMapsCompatible15';
 
     const getMapParams = {
       bbox: bbox,

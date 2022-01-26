@@ -41,6 +41,7 @@ export const getMapBbox = () => {
       baseUrl: `https://services.sentinel-hub.com/ogc/wmts/${instanceId}`,
       layerId: s2LayerId,
       resourceUrl: `https://services.sentinel-hub.com/ogc/wmts/${instanceId}?REQUEST=GetTile&&showlogo=false&TILEMATRIXSET=PopularWebMercator256&LAYER=${s2LayerId}&TILEMATRIX={TileMatrix}&TILEROW={TileRow}&TILECOL={TileCol}&TIME=2019-04-17/2019-04-17&&format=image%2Fpng`,
+      matrixSet: 'PopularWebMercator256',
     });
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2LayerId });
 
@@ -91,7 +92,8 @@ export const getMapBboxRectangular = () => {
     const layer = new WmtsLayer({
       baseUrl: `https://services.sentinel-hub.com/ogc/wmts/${instanceId}`,
       layerId: s2LayerId,
-      resourceUrl: `https://services.sentinel-hub.com/ogc/wmts/${instanceId}?REQUEST=GetTile&&showlogo=false&TILEMATRIXSET=PopularWebMercator256&LAYER=${s2LayerId}&TILEMATRIX={TileMatrix}&TILEROW={TileRow}&TILECOL={TileCol}&TIME=2019-04-18/2019-04-18&&format=image%2Fpng`,
+      resourceUrl: `https://services.sentinel-hub.com/ogc/wmts/${instanceId}?REQUEST=GetTile&&showlogo=false&TILEMATRIXSET=PopularWebMercator512&LAYER=${s2LayerId}&TILEMATRIX={TileMatrix}&TILEROW={TileRow}&TILECOL={TileCol}&TIME=2019-04-18/2019-04-18&&format=image%2Fpng`,
+      matrixSet: 'PopularWebMercator512',
     });
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2LayerId });
 
