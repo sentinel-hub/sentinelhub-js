@@ -1,5 +1,4 @@
 import {
-  WmtsLayer,
   CRS_EPSG3857,
   BBox,
   MimeTypes,
@@ -7,6 +6,7 @@ import {
   LayersFactory,
   CRS_EPSG4326,
   S2L1CLayer,
+  PlanetNicfiLayer,
 } from '../dist/sentinelHub.esm';
 
 if (!process.env.PLANET_API_KEY) {
@@ -47,7 +47,7 @@ export const getMapBbox = () => {
   wrapperEl.innerHTML = '<h2>GetMap with bbox(WMTS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
+    const layer = new PlanetNicfiLayer({ baseUrl, layerId });
 
     const getMapParams = {
       bbox: bbox,
@@ -78,7 +78,7 @@ export const getMapBboxStitched = () => {
   wrapperEl.insertAdjacentElement('beforeend', img);
   wrapperEl.insertAdjacentElement('beforeend', s2Img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
+    const layer = new PlanetNicfiLayer({ baseUrl, layerId });
     const layerS2L1C = new S2L1CLayer({ instanceId, layerId: s2LayerId });
 
     const getMapParams = {
@@ -117,7 +117,7 @@ export const getMap = () => {
   wrapperEl.innerHTML = '<h2>GetMap (WMTS)</h2>';
   wrapperEl.insertAdjacentElement('beforeend', img);
   const perform = async () => {
-    const layer = new WmtsLayer({ baseUrl, layerId, matrixSet: 'GoogleMapsCompatible15' });
+    const layer = new PlanetNicfiLayer({ baseUrl, layerId });
 
     const getMapParams = {
       tileCoord: {
