@@ -26,6 +26,7 @@ export class PlanetNicfiLayer extends WmtsLayer {
   protected baseUrl: string;
   protected layerId: string;
   protected resourceUrl: string;
+  protected matrixSet: string;
 
   public constructor({
     baseUrl,
@@ -39,6 +40,7 @@ export class PlanetNicfiLayer extends WmtsLayer {
     this.baseUrl = baseUrl;
     this.layerId = layerId;
     this.resourceUrl = resourceUrl;
+    this.matrixSet = 'GoogleMapsCompatible15'; //only matrixSet available for PlanetNicfi
   }
 
   public async findDatesUTC(

@@ -150,7 +150,6 @@ export const getMapWmtsLayersFactory = () => {
 
   const perform = async () => {
     const layer = (await LayersFactory.makeLayers(baseUrl, lId => layerId === lId))[0];
-    layer.matrixSet = 'GoogleMapsCompatible15';
 
     const getMapParams = {
       bbox: bbox,
