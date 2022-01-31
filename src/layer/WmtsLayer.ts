@@ -10,7 +10,6 @@ import {
   bboxToXyzGrid,
   fetchLayersFromWmtsGetCapabilitiesXml,
   getMatrixSets,
-  MatrixSet,
   TileMatrix,
 } from './wmts.utils';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
@@ -32,7 +31,6 @@ export class WmtsLayer extends AbstractLayer {
   protected layerId: string;
   protected resourceUrl: string;
   protected matrixSet: string;
-  protected matrixSets: MatrixSet[];
   protected tileMatrix: TileMatrix[];
 
   public constructor({
