@@ -104,7 +104,7 @@ function parseUrl(
 }
 
 if (typeof window.URL.createObjectURL === 'undefined') {
-  window.URL.createObjectURL = (): string => 'kjkj';
+  window.URL.createObjectURL = () => `blob:https://mocked-create-object-url.com/${Math.random()}`;
   window.URL.revokeObjectURL = () => {};
 }
 
