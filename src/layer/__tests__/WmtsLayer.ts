@@ -2,9 +2,9 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { BBox, CRS_EPSG4326, ApiType, MimeTypes, WmtsLayer, invalidateCaches } from '../../index';
-
 import '../../../jest-setup';
-import { bboxToXyz } from '../wmts.utils';
+import { CRS_EPSG3857 } from '../../crs';
+import { getCapabilitiesWmtsXMLResponse } from './fixtures.getCapabilitiesWMTS';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -20,11 +20,9 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
     baseUrl: 'https://getCapabilities.com',
     layerId,
     resourceUrl: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
+    matrixSet: 'GoogleMapsCompatible15',
   });
-
   mockNetwork.reset();
-  mockNetwork.onAny().replyOnce(200, ''); // we don't care about the response, we will just inspect the request params
-
   const getMapParams = {
     bbox: bbox,
     fromTime: new Date(),
@@ -39,11 +37,12 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
 
     format: MimeTypes.PNG,
   };
+  mockNetwork.onAny().replyOnce(200, getCapabilitiesWmtsXMLResponse); // updateLayerFromServiceIfNeeded response
+  mockNetwork.onAny().replyOnce(200, '');
   await layer.getMap(getMapParams, ApiType.WMTS);
+  expect(mockNetwork.history.get.length).toBe(2);
 
-  expect(mockNetwork.history.get.length).toBe(1);
-
-  const { url } = mockNetwork.history.get[0];
+  const { url } = mockNetwork.history.get[1];
   expect(url).toHaveOrigin('https://tiles.planet.com');
   expect(url).toHaveBaseUrl(
     `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/${getMapParams.tileCoord.z}/${getMapParams.tileCoord.x}/${getMapParams.tileCoord.y}.png`,
@@ -51,18 +50,25 @@ test('WmtsLayer.getMap uses tileCoord instead of bbox', async () => {
 });
 
 test('WmtsLayer.getMap uses bbox', async () => {
-  const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
+  const bbox = new BBox(
+    CRS_EPSG3857,
+    1289034.0450012125,
+    1188748.6638910607,
+    1291480.029906338,
+    1191194.6487961877,
+  );
+  const tileSize = 256;
+
   const layerId = 'planet_medres_normalized_analytic_2019-06_2019-11_mosaic';
   const baseTemplateUrl = `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/{TileMatrix}/{TileCol}/{TileRow}.png`;
   const layer = new WmtsLayer({
     baseUrl: 'https://getCapabilities.com',
     layerId,
     resourceUrl: baseTemplateUrl + `?api_key=${process.env.PLANET_API_KEY}`,
+    matrixSet: 'GoogleMapsCompatible15',
   });
 
   mockNetwork.reset();
-  mockNetwork.onAny().replyOnce(200, ''); // we don't care about the response, we will just inspect the request params
-  const tileSize = 256;
   const getMapParams = {
     bbox: bbox,
     fromTime: new Date(),
@@ -71,14 +77,16 @@ test('WmtsLayer.getMap uses bbox', async () => {
     height: tileSize,
     format: MimeTypes.PNG,
   };
+  mockNetwork.onAny().replyOnce(200, getCapabilitiesWmtsXMLResponse); // updateLayerFromServiceIfNeeded response
+  mockNetwork.onAny().replyOnce(200, ''); // we don't care about the response, we will just inspect the request params
+
   await layer.getMap(getMapParams, ApiType.WMTS);
 
-  expect(mockNetwork.history.get.length).toBe(1);
+  expect(mockNetwork.history.get.length).toBe(2);
 
-  const { url } = mockNetwork.history.get[0];
-  const { x, y, z } = bboxToXyz(bbox, tileSize);
+  const { url } = mockNetwork.history.get[1];
   expect(url).toHaveOrigin('https://tiles.planet.com');
   expect(url).toHaveBaseUrl(
-    `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/${z}/${x}/${y}.png`,
+    `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_normalized_analytic_2019-06_2019-11_mosaic/gmap/14/8719/7705.png`,
   );
 });
