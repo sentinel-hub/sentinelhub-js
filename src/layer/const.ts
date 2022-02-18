@@ -177,6 +177,7 @@ export type GetStatsParams = {
   bins?: number;
   crs?: CRS;
   bbox?: BBox;
+  output?: string;
 };
 
 export type FisPayload = {

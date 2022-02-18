@@ -84,7 +84,7 @@ export class StatisticalApi implements StatisticsProvider {
     params: GetStatsParams,
     reqConfig?: RequestConfiguration,
   ): Promise<Stats> {
-    return this.getBasicStats(layer, params, STATS_DEFAULT_OUTPUT, reqConfig);
+    return this.getBasicStats(layer, params, params?.output || STATS_DEFAULT_OUTPUT, reqConfig);
   }
 
   public async getBasicStats(
@@ -121,6 +121,6 @@ export class StatisticalApi implements StatisticsProvider {
       requestConfig,
     );
 
-    return this.convertToFISResponse(response.data, STATS_DEFAULT_OUTPUT);
+    return this.convertToFISResponse(response.data, output);
   }
 }
