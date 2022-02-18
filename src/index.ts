@@ -42,6 +42,8 @@ import {
   DATASET_AWSUS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
+import { WmtsLayer } from './layer/WmtsLayer';
+import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
@@ -104,6 +106,7 @@ import {
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
+  ResamplingKernel,
 } from './dataimport/const';
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
@@ -137,6 +140,8 @@ export {
   DATASET_AWSUS_DEM,
   // layers:
   WmsLayer,
+  WmtsLayer,
+  PlanetNicfiLayer,
   S1GRDAWSEULayer,
   S1GRDEOCloudLayer,
   S2L2ALayer,
@@ -226,4 +231,5 @@ export {
   PlanetProductBundle,
   PlanetScopeHarmonization,
   MaxarSensor,
+  ResamplingKernel,
 };

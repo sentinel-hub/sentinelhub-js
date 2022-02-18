@@ -23,7 +23,7 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
-  minDate: new Date(Date.UTC(2014, 12 - 1, 7, 4, 14, 15)), // 2014-12-07T04:14:15
+  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 47, 14)), // 2014-10-03T00:47:14Z
   maxDate: null,
   catalogCollectionId: 'sentinel-1-grd',
 };
@@ -38,7 +38,7 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
   findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
   orbitTimeMinutes: 49.3,
-  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 4, 5, 50)), // 2014-10-03T04:05:50.000
+  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 37, 40)), // 2014-10-03T00:37:40Z
   maxDate: null,
 };
 
@@ -52,7 +52,7 @@ export const DATASET_S2L2A: Dataset = {
   searchIndexUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
   findDatesUTCUrl: 'https://services.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
   orbitTimeMinutes: 50.3,
-  minDate: new Date(Date.UTC(2016, 10 - 1, 20, 8, 9, 58)), // 2016-10-20T08:09:58
+  minDate: new Date(Date.UTC(2016, 10 - 1, 20, 8, 9, 58)), // 2016-10-20T08:09:58Z
   maxDate: null,
   catalogCollectionId: 'sentinel-2-l2a',
 };
@@ -142,7 +142,7 @@ export const DATASET_AWS_LOTL1: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL1/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL1/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 59, 2)), // 2013-03-18T15:59:02.334
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
   maxDate: null,
   catalogCollectionId: 'landsat-ot-l1',
 };
@@ -157,7 +157,7 @@ export const DATASET_AWS_LOTL2: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL2/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LOTL2/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 59, 2)), // 2013-03-18T15:59:02.334
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
   maxDate: null,
   catalogCollectionId: 'landsat-ot-l2',
 };
@@ -187,7 +187,7 @@ export const DATASET_AWS_LTML2: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/LTML2/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(1984, 7 - 1, 16, 1, 23, 2)), // 1984-07-16  01:23:02 UTC
+  minDate: new Date(Date.UTC(1982, 8 - 1, 22, 14, 18, 20)), // 1982-08-22 14:18:20 UTC
   maxDate: new Date(Date.UTC(2012, 5 - 1, 5, 17, 54, 6)), // 2012-05-05  17:54:06 UTC
   catalogCollectionId: 'landsat-tm-l2',
 };
@@ -349,4 +349,18 @@ export const DATASET_BYOC: Dataset = {
   minDate: null,
   maxDate: null,
   catalogCollectionId: null,
+};
+
+export const DATASET_PLANET_NICFI: Dataset = {
+  id: 'PLANET_NICFI',
+  shJsonGetCapabilitiesDataset: null,
+  shWmsEvalsource: null,
+  shProcessingApiDatasourceAbbreviation: null,
+  datasetParametersType: null,
+  shServiceHostname: null,
+  searchIndexUrl: null,
+  findDatesUTCUrl: null,
+  orbitTimeMinutes: null,
+  minDate: new Date(Date.UTC(2016, 6 - 1, 31, 12, 0, 0)), // '2016-05-31',
+  maxDate: null,
 };

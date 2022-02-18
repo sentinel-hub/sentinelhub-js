@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 import { RequestConfiguration } from '../utils/cancelRequests';
-import { CRS_EPSG4326, findCrsFromUrn } from '../crs';
+import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
 import { AbstractLayer } from '../layer/AbstractLayer';
 import { AbstractSentinelHubV1OrV2Layer } from '../layer/AbstractSentinelHubV1OrV2Layer';
 import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
@@ -30,7 +30,7 @@ export class Fis implements StatisticsProvider {
 
     const payload: FisPayload = {
       layer: layer.getLayerId(),
-      crs: CRS_EPSG4326.authId,
+      crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
       geometry: WKT.convert(params.geometry),
       time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
         .utc(params.toTime)
@@ -46,8 +46,8 @@ export class Fis implements StatisticsProvider {
       payload.crs = selectedCrs.authId;
     }
 
-    // When using CRS=EPSG:4326 one has to add the "m" suffix to enforce resolution in meters per pixel
-    if (payload.crs === CRS_EPSG4326.authId) {
+    // When using CRS=EPSG:4326 or CRS_WGS84 one has to add the "m" suffix to enforce resolution in meters per pixel
+    if (payload.crs === CRS_EPSG4326.authId || payload.crs === CRS_WGS84.authId) {
       payload.resolution = params.resolution + 'm';
     } else {
       payload.resolution = params.resolution;

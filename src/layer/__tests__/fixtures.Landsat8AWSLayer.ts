@@ -304,6 +304,7 @@ export function constructFixtureFindTilesCatalog({
       meta: {
         cloudCoverPercent: 36.66,
         sunElevation: 60.455486,
+        projEpsg: 32632,
       },
       links: [
         {

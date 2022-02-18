@@ -13,6 +13,7 @@ import {
   Interpolator,
   Link,
   DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  OgcServiceTypes,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { AbstractLayer } from './AbstractLayer';
@@ -259,7 +260,11 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
       }
 
       const baseUrl = `${this.dataset.shServiceHostname}v1/wms/${this.instanceId}`;
-      const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, innerReqConfig);
+      const parsedLayers = await fetchLayersFromGetCapabilitiesXml(
+        baseUrl,
+        OgcServiceTypes.WMS,
+        innerReqConfig,
+      );
       const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');

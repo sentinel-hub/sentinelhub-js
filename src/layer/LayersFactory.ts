@@ -1,3 +1,5 @@
+import { parseUrl, stringifyUrl } from 'query-string';
+
 import {
   fetchLayersFromGetCapabilitiesXml,
   fetchGetCapabilitiesJsonV1,
@@ -5,7 +7,12 @@ import {
   parseSHInstanceId,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import {
+  OgcServiceTypes,
+  SH_SERVICE_HOSTNAMES_V1_OR_V2,
+  SH_SERVICE_HOSTNAMES_V3,
+  PLANET_FALSE_COLOR_TEMPLATES,
+} from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -31,6 +38,7 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
+  DATASET_PLANET_NICFI,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -58,6 +66,9 @@ import { Landsat45AWSLTML2Layer } from './Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
+import { WmtsLayer } from './WmtsLayer';
+import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
+import { PlanetNicfiLayer } from './PlanetNicfi';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -164,8 +175,19 @@ export class LayersFactory {
           return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
         }
       }
-
-      return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      if (baseUrl.includes('/wmts')) {
+        if (baseUrl.includes('api.planet.com/basemaps/')) {
+          return this.makePlanetBasemapLayers(
+            baseUrl,
+            filterLayers,
+            overrideConstructorParams,
+            innerReqConfig,
+          );
+        }
+        return await this.makeLayersWmts(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      } else {
+        return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      }
     }, reqConfig);
     return returnValue;
   }
@@ -271,7 +293,7 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
-    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, reqConfig);
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMS, reqConfig);
     const layersInfos = parsedLayers.map(layerInfo => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
@@ -291,6 +313,81 @@ export class LayersFactory {
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl }) =>
         new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
+    );
+  }
+
+  private static async makeLayersWmts(
+    baseUrl: string,
+    filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    overrideConstructorParams: Record<string, any> | null,
+    reqConfig: RequestConfiguration,
+  ): Promise<AbstractLayer[]> {
+    const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
+    const layersInfos = parsedLayers.map(layerInfo => ({
+      layerId: layerInfo.Name[0],
+      title: layerInfo.Title[0],
+      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+      dataset: null,
+      legendUrl: layerInfo.Style[0].LegendURL,
+      resourceUrl: layerInfo.ResourceUrl,
+    }));
+
+    const filteredLayersInfos =
+      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description, legendUrl, resourceUrl }) =>
+        new WmtsLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
+    );
+  }
+
+  // Analytic layers accept a proc parameter to specify a dynamically-rendered false color visualization, for example NDVI.
+  // Since proc is not a standard a WMTS parameter and there is a list of specified options at https://developers.planet.com/docs/basemaps/tile-services/indices/#remote-sensing-indices-legends
+  // we can treat these as extra layers and add them to makeLayers response.
+  private static async makePlanetBasemapLayers(
+    baseUrl: string,
+    filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    overrideConstructorParams: Record<string, any> | null,
+    reqConfig: RequestConfiguration,
+  ): Promise<AbstractLayer[]> {
+    let newLayers = [];
+    const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
+    for (let layerInfo of parsedLayers) {
+      const layer = {
+        layerId: layerInfo.Name[0],
+        title: layerInfo.Title[0],
+        description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+        dataset: DATASET_PLANET_NICFI,
+        legendUrl: layerInfo.Style[0].LegendURL,
+        resourceUrl: layerInfo.Name[0].includes('analytic')
+          ? `${layerInfo.ResourceUrl}&proc=rgb`
+          : layerInfo.ResourceUrl,
+      };
+      newLayers.push(layer);
+      if (layer.layerId.includes('analytic')) {
+        const parsedResourceUrl = parseUrl(layer.resourceUrl);
+        const falseColorLayers = PLANET_FALSE_COLOR_TEMPLATES.map(template => ({
+          layerId: `${layer.layerId}_${template.titleSuffix}`,
+          title: `${layer.title} ${template.titleSuffix}`,
+          description: template.description,
+          legendUrl: layer.legendUrl,
+          dataset: layer.dataset,
+          resourceUrl: stringifyUrl({
+            url: parsedResourceUrl.url,
+            query: { ...parsedResourceUrl.query, ...template.resourceUrlParams },
+          }),
+        }));
+        newLayers.push(...falseColorLayers);
+      }
+    }
+    const filteredLayersInfos =
+      filterLayers === null ? newLayers : newLayers.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description, legendUrl, resourceUrl }) =>
+        new PlanetNicfiLayer({ baseUrl, layerId, title, description, legendUrl, resourceUrl }),
     );
   }
 }
