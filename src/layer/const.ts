@@ -3,7 +3,7 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 import { BBox } from '../bbox';
 import { CRS, CRS_IDS } from '../crs';
 import { Effects } from '../mapDataManipulation/const';
-import { StatisticalApiResponse } from '../statistics/StatisticalApiTypes';
+import { StatisticalApiResponse } from '../statistics/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
