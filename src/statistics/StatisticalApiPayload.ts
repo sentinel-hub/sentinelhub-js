@@ -106,7 +106,7 @@ export function createAggregationPayload(
       to: params.toTime.toISOString(),
     },
     aggregationInterval: {
-      of: params.aggregationInterval ? params.aggregationInterval : 'P1D',
+      of: params.aggregationInterval,
     },
     resx: resX,
     resy: resY,
@@ -134,11 +134,13 @@ type StatisticalApiPayload = {
 export function createCalculationsPayload(
   layer: AbstractSentinelHubV3Layer,
   params: any,
-  output?: string,
+  output: string = 'default',
 ): StatisticalApiCalculationsPayload {
-  const outputId = output ? output : 'default';
-  const defaultOutput: StatisticalApiOutput = {
+  //calculate percentiles for selected output
+
+  const statisticsForAllBands: StatisticalApiOutput = {
     statistics: {
+      //If it is "default", the statistics specified below will be calculated for all bands of this output
       default: {
         percentiles: {
           k: Array.from({ length: params.bins - 1 }, (_, i) => ((i + 1) * 100) / params.bins),
@@ -148,6 +150,6 @@ export function createCalculationsPayload(
   };
 
   return {
-    [outputId]: defaultOutput,
+    [output]: statisticsForAllBands,
   };
 }
