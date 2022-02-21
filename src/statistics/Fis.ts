@@ -6,7 +6,7 @@ import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
 import { AbstractLayer } from '../layer/AbstractLayer';
 import { AbstractSentinelHubV1OrV2Layer } from '../layer/AbstractSentinelHubV1OrV2Layer';
 import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
-import { FisPayload, FisResponse, GetStatsParams, HistogramType, Stats } from '../layer/const';
+import { FisPayload, FisResponse, GetStatsParams, HistogramType } from '../layer/const';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
 import { StatisticsProvider } from './StatisticsProvider';
