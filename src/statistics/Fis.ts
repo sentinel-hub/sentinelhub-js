@@ -10,8 +10,13 @@ import { FisPayload, FisResponse, GetStatsParams, HistogramType } from '../layer
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
 import { StatisticsProvider } from './StatisticsProvider';
+import { StatisticalApiResponse } from './const';
 
 export class Fis implements StatisticsProvider {
+  public getStatistics(): Promise<StatisticalApiResponse> {
+    throw new Error('Method not implemented.');
+  }
+
   private createFISPayload(
     layer: AbstractSentinelHubV3Layer | AbstractSentinelHubV1OrV2Layer,
     params: GetStatsParams,

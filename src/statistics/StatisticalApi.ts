@@ -6,13 +6,9 @@ import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
 import { StatisticsProvider } from './StatisticsProvider';
 import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
-import {
-  createAggregationPayload,
-  createCalculationsPayload,
-  createInputPayload,
-} from './StatisticalApiPayload';
+import { StatisticsUtils } from './statistics.utils';
 
-import { StatisticalApiResponse } from './StatisticalApiTypes';
+import { StatisticalApiResponse, StatisticalApiPayload } from './const';
 
 const STATS_DEFAULT_OUTPUT = 'default';
 
@@ -22,24 +18,44 @@ export class StatisticalApi implements StatisticsProvider {
     params: GetStatsParams,
     reqConfig?: RequestConfiguration,
   ): Promise<StatisticalApiResponse> {
-    return this.getBasicStats(layer, params, params?.output || STATS_DEFAULT_OUTPUT, reqConfig);
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    if (!authToken) {
+      throw new Error('Must be authenticated to use Statistical API');
+    }
+
+    await layer.updateLayerFromServiceIfNeeded(reqConfig);
+
+    const input = await StatisticsUtils.createInputPayload(layer, params, reqConfig);
+    const aggregation = StatisticsUtils.createAggregationPayload(layer, {
+      ...params,
+      aggregationInterval: 'P1D',
+    });
+    const calculations = StatisticsUtils.createCalculationsPayload(
+      layer,
+      params,
+      params?.output || STATS_DEFAULT_OUTPUT,
+    );
+
+    const payload: StatisticalApiPayload = {
+      input: input,
+      aggregation: aggregation,
+      calculations: calculations,
+    };
+
+    const data = this.getStatistics(`${layer.getShServiceHostname()}api/v1/statistics`, payload, reqConfig);
+
+    return data;
   }
 
-  public async getBasicStats(
-    layer: AbstractSentinelHubV3Layer,
-    params: GetStatsParams,
-    output: string,
+  public async getStatistics(
+    shServiceHostname: string,
+    payload: StatisticalApiPayload,
     reqConfig?: RequestConfiguration,
   ): Promise<StatisticalApiResponse> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     if (!authToken) {
       throw new Error('Must be authenticated to use Statistical API');
     }
-    await layer.updateLayerFromServiceIfNeeded(reqConfig);
-
-    const input = await createInputPayload(layer, params, reqConfig);
-    const aggregation = createAggregationPayload(layer, { ...params, aggregationInterval: 'P1D' });
-    const calculations = createCalculationsPayload(layer, params, output);
 
     const requestConfig: AxiosRequestConfig = {
       headers: {
@@ -49,15 +65,8 @@ export class StatisticalApi implements StatisticsProvider {
       },
       ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
-    const response = await axios.post(
-      `${layer.getShServiceHostname()}api/v1/statistics`,
-      {
-        input: input,
-        aggregation: aggregation,
-        calculations: calculations,
-      },
-      requestConfig,
-    );
+
+    const response = await axios.post(shServiceHostname, payload, requestConfig);
 
     if (response.status !== 200) {
       throw new Error('Unable to get statistics');
