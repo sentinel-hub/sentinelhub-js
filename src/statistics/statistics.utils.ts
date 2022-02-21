@@ -1,6 +1,15 @@
-import { Stats, DailyChannelStats } from '../layer/const';
+import { DailyChannelStats, MosaickingOrder, Stats } from '../layer/const';
+import {
+  StatisticalApiInputPayload,
+  StatisticalApiAggregationPayload,
+  StatisticalApiCalculationsPayload,
+  StatisticalApiOutput,
+  StatisticalApiResponse,
+} from './const';
 
-import { StatisticalApiResponse } from './StatisticalApiTypes';
+import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
+import { CRS_EPSG4326 } from '../crs';
+import { RequestConfiguration } from '../utils/cancelRequests';
 
 function convertToFISResponse(data: StatisticalApiResponse, defaultOutput: string = 'default'): Stats {
   //array of stats objects (interval+outputs)
@@ -62,6 +71,116 @@ function convertToFISResponse(data: StatisticalApiResponse, defaultOutput: strin
   return result;
 }
 
+async function createInputPayload(
+  layer: AbstractSentinelHubV3Layer,
+  params: any,
+  reqConfig: RequestConfiguration,
+): Promise<StatisticalApiInputPayload> {
+  const payload: StatisticalApiInputPayload = {
+    bounds: {
+      properties: {
+        crs: params.bbox ? CRS_EPSG4326.opengisUrl : params.crs ? params.crs.opengisUrl : null,
+      },
+    },
+    data: [
+      {
+        dataFilter: {
+          timeRange: {
+            from: params.fromTime.toISOString(),
+            to: params.toTime.toISOString(),
+          },
+          mosaickingOrder: layer.mosaickingOrder ? layer.mosaickingOrder : MosaickingOrder.MOST_RECENT,
+        },
+        processing: {},
+        type: layer.dataset.shProcessingApiDatasourceAbbreviation,
+      },
+    ],
+  };
+
+  if (params.bbox) {
+    payload.bounds.bbox = [params.bbox.minX, params.bbox.minY, params.bbox.maxX, params.bbox.maxY];
+  } else if (params.geometry) {
+    payload.bounds.geometry = params.geometry;
+  }
+
+  if (params.upsampling || layer.upsampling) {
+    payload.data[0].processing.upsampling = params.upsampling ? params.upsampling : layer.upsampling;
+  }
+  if (params.downsampling || layer.downsampling) {
+    payload.data[0].processing.downsampling = params.downsampling ? params.downsampling : layer.downsampling;
+  }
+
+  const processingPayload = await layer._updateProcessingGetMapPayload(
+    { input: payload, output: null },
+    0,
+    reqConfig,
+  );
+  const { input } = processingPayload;
+
+  return input;
+}
+
+function createAggregationPayload(
+  layer: AbstractSentinelHubV3Layer,
+  params: any,
+): StatisticalApiAggregationPayload {
+  if (!params.fromTime) {
+    throw new Error('fromTime must be defined');
+  }
+
+  if (!params.toTime) {
+    throw new Error('toTime must be defined');
+  }
+
+  if (!params.aggregationInterval) {
+    throw new Error('aggregationInterval must be defined');
+  }
+  //TODO: properly handle resolution
+  const resX = params.resolution;
+  const resY = params.resolution;
+
+  const payload: StatisticalApiAggregationPayload = {
+    timeRange: {
+      from: params.fromTime.toISOString(),
+      to: params.toTime.toISOString(),
+    },
+    aggregationInterval: {
+      of: params.aggregationInterval,
+    },
+    resx: resX,
+    resy: resY,
+    evalscript: layer.getEvalscript(),
+  };
+
+  return payload;
+}
+
+function createCalculationsPayload(
+  layer: AbstractSentinelHubV3Layer,
+  params: any,
+  output: string = 'default',
+): StatisticalApiCalculationsPayload {
+  //calculate percentiles for selected output
+
+  const statisticsForAllBands: StatisticalApiOutput = {
+    statistics: {
+      //If it is "default", the statistics specified below will be calculated for all bands of this output
+      default: {
+        percentiles: {
+          k: Array.from({ length: params.bins - 1 }, (_, i) => ((i + 1) * 100) / params.bins),
+        },
+      },
+    },
+  };
+
+  return {
+    [output]: statisticsForAllBands,
+  };
+}
+
 export const StatisticsUtils = {
   convertToFISResponse: convertToFISResponse,
+  createInputPayload: createInputPayload,
+  createAggregationPayload: createAggregationPayload,
+  createCalculationsPayload: createCalculationsPayload,
 };
