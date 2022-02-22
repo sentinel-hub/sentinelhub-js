@@ -65,13 +65,7 @@ export class StatisticalApi implements StatisticsProvider {
       },
       ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
     };
-
-    const response = await axios.post(shServiceHostname, payload, requestConfig);
-
-    if (response.status !== 200) {
-      throw new Error('Unable to get statistics');
-    }
-
-    return response.data;
+    const { data } = await axios.post(shServiceHostname, payload, requestConfig);
+    return data;
   }
 }
