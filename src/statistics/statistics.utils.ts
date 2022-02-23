@@ -1,4 +1,4 @@
-import { DailyChannelStats, MosaickingOrder, Stats } from '../layer/const';
+import { DailyChannelStats, Stats } from '../layer/const';
 import {
   StatisticalApiInputPayload,
   StatisticalApiAggregationPayload,
@@ -8,8 +8,8 @@ import {
 } from './const';
 
 import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
-import { CRS_EPSG4326 } from '../crs';
 import { RequestConfiguration } from '../utils/cancelRequests';
+import { createProcessingPayload } from '../layer/processing';
 
 function convertToFISResponse(data: StatisticalApiResponse, defaultOutput: string = 'default'): Stats {
   //array of stats objects (interval+outputs)
@@ -76,47 +76,21 @@ async function createInputPayload(
   params: any,
   reqConfig: RequestConfiguration,
 ): Promise<StatisticalApiInputPayload> {
-  const payload: StatisticalApiInputPayload = {
-    bounds: {
-      properties: {
-        crs: params.bbox ? CRS_EPSG4326.opengisUrl : params.crs ? params.crs.opengisUrl : null,
-      },
-    },
-    data: [
-      {
-        dataFilter: {
-          timeRange: {
-            from: params.fromTime.toISOString(),
-            to: params.toTime.toISOString(),
-          },
-          mosaickingOrder: layer.mosaickingOrder ? layer.mosaickingOrder : MosaickingOrder.MOST_RECENT,
-        },
-        processing: {},
-        type: layer.dataset.shProcessingApiDatasourceAbbreviation,
-      },
-    ],
-  };
-
-  if (params.bbox) {
-    payload.bounds.bbox = [params.bbox.minX, params.bbox.minY, params.bbox.maxX, params.bbox.maxY];
-  } else if (params.geometry) {
-    payload.bounds.geometry = params.geometry;
-  }
-
-  if (params.upsampling || layer.upsampling) {
-    payload.data[0].processing.upsampling = params.upsampling ? params.upsampling : layer.upsampling;
-  }
-  if (params.downsampling || layer.downsampling) {
-    payload.data[0].processing.downsampling = params.downsampling ? params.downsampling : layer.downsampling;
-  }
-
-  const processingPayload = await layer._updateProcessingGetMapPayload(
-    { input: payload, output: null },
+  const processingPayload = createProcessingPayload(
+    layer.dataset,
+    { ...params },
+    layer.getEvalscript(),
+    layer.getDataProduct(),
+    layer.mosaickingOrder,
+    layer.upsampling,
+    layer.downsampling,
+  );
+  const updatedProcessingPayload = await layer._updateProcessingGetMapPayload(
+    processingPayload,
     0,
     reqConfig,
   );
-  const { input } = processingPayload;
-
+  const { input } = updatedProcessingPayload;
   return input;
 }
 

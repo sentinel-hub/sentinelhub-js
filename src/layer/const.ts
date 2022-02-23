@@ -22,6 +22,7 @@ export type GetMapParams = {
   // optional additional parameters:
   preview?: PreviewMode;
   geometry?: Polygon | MultiPolygon;
+  crs?: CRS;
   quality?: number;
   gain?: number;
   gamma?: number;

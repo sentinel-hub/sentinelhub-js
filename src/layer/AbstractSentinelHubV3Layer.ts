@@ -97,6 +97,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.evalscript;
   }
 
+  public getDataProduct(): string {
+    return this.dataProduct;
+  }
+
   public getInstanceId(): string {
     return this.instanceId;
   }
