@@ -300,7 +300,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
       };
     }
 
-    return result;
+    return result && Object.keys(result).length > 0 ? result : null;
   }
 
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {

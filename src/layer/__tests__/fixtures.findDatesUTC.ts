@@ -206,6 +206,10 @@ export function constructFixtureFindDatesUTCCatalog(
     delete expectedRequest['query']['eo:cloud_cover'];
   }
 
+  if (expectedRequest['query'] && Object.keys(expectedRequest['query']).length === 0) {
+    delete expectedRequest['query'];
+  }
+
   /* eslint-disable */
   const mockedResponse = {
     type: 'FeatureCollection',
