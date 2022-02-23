@@ -471,7 +471,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
     datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Record<string, any> {
-    return {};
+    return null;
   }
 
   protected async findTilesUsingCatalog(

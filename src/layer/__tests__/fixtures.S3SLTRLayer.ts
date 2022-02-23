@@ -292,7 +292,7 @@ export function constructFixtureFindTilesCatalog({
   };
 
   if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query']['eo:cloud_cover'];
+    delete expectedRequest['query'];
   }
 
   /* eslint-disable */
