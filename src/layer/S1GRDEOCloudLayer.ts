@@ -92,7 +92,7 @@ export class S1GRDEOCloudLayer extends AbstractSentinelHubV1OrV2Layer {
     });
   }
 
-  protected getEvalsource(): string {
+  public getEvalsource(): string {
     // ignore this.dataset.shWmsEvalsource and return the string based on acquisitionMode:
     if (this.acquisitionMode === AcquisitionMode.IW && this.polarization === Polarization.DV) {
       // note that on EO Cloud, for IW acquisition mode only DV is available (SV is not available)

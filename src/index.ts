@@ -109,6 +109,9 @@ import {
   ResamplingKernel,
 } from './dataimport/const';
 
+import { StatisticsProviderType } from './statistics/StatisticsProvider';
+import { StatisticsUtils } from './statistics/statistics.utils';
+
 registerInitialAxiosInterceptors();
 
 export {
@@ -214,6 +217,9 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
+  //StatisticalApi
+  StatisticsProviderType,
+  StatisticsUtils,
   //TPDI
   TPDI,
   TPDICollections,
