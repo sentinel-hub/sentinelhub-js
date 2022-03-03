@@ -89,7 +89,7 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
         lte: maxCloudCoverPercent,
       };
     }
-    return result;
+    return result && Object.keys(result).length > 0 ? result : null;
   }
 
   protected getFindTilesAdditionalParameters(): FindTilesAdditionalParameters {

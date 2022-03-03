@@ -109,7 +109,6 @@ function createAggregationPayload(
   if (!params.aggregationInterval) {
     throw new Error('aggregationInterval must be defined');
   }
-  //TODO: properly handle resolution
   const resX = params.resolution;
   const resY = params.resolution;
 

@@ -173,7 +173,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
       };
     }
 
-    return result;
+    return result && Object.keys(result).length > 0 ? result : null;
   }
 
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {

@@ -244,7 +244,6 @@ export function constructFixtureFindTilesCatalog({
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-3-olci'],
     limit: 5,
-    query: {},
   };
 
   /* eslint-disable */

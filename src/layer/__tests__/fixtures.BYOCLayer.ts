@@ -155,7 +155,6 @@ export function constructFixtureFindTilesCatalog({
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: [`${subType === BYOCSubTypes.BATCH ? 'batch' : 'byoc'}-${collectionId}`],
     limit: 5,
-    query: {},
   };
 
   /* eslint-disable */
