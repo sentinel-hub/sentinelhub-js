@@ -11,6 +11,7 @@ import {
   BackscatterCoeff,
   DEMInstanceType,
   DEMInstanceTypeOrthorectification,
+  BYOCSubTypes,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -29,6 +30,9 @@ import {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -38,6 +42,8 @@ import {
   DATASET_AWSUS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
+import { WmtsLayer } from './layer/WmtsLayer';
+import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
@@ -57,7 +63,9 @@ import { Landsat8AWSLOTL1Layer } from './layer/Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './layer/Landsat8AWSLOTL2Layer';
 import { Landsat45AWSLTML1Layer } from './layer/Landsat45AWSLTML1Layer';
 import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
-
+import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
+import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
+import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
@@ -68,7 +76,7 @@ import {
   parseLegacyWmsGetMapParams,
 } from './legacyCompat';
 
-import { AcquisitionMode, Polarization, Resolution } from './layer/S1GRDAWSEULayer';
+import { AcquisitionMode, Polarization, Resolution, SpeckleFilterType } from './layer/S1GRDAWSEULayer';
 import {
   LocationIdSHv3,
   GetMapParams,
@@ -85,6 +93,24 @@ import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
+import { TPDI } from './dataimport/TPDI';
+import {
+  AirbusConstellation,
+  AirbusProcessingLevel,
+  MaxarSensor,
+  OrderSearchParams,
+  OrderSearchResult,
+  OrderStatus,
+  PlanetProductBundle,
+  PlanetScopeHarmonization,
+  TPDICollections,
+  TPDISearchParams,
+  TPDProvider,
+  ResamplingKernel,
+} from './dataimport/const';
+
+import { StatisticsProviderType } from './statistics/StatisticsProvider';
+import { StatisticsUtils } from './statistics/statistics.utils';
 
 registerInitialAxiosInterceptors();
 
@@ -103,6 +129,9 @@ export {
   DATASET_AWS_LOTL2,
   DATASET_AWS_LTML1,
   DATASET_AWS_LTML2,
+  DATASET_AWS_LMSSL1,
+  DATASET_AWS_LETML1,
+  DATASET_AWS_LETML2,
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
@@ -112,6 +141,8 @@ export {
   DATASET_AWSUS_DEM,
   // layers:
   WmsLayer,
+  WmtsLayer,
+  PlanetNicfiLayer,
   S1GRDAWSEULayer,
   S1GRDEOCloudLayer,
   S2L2ALayer,
@@ -131,6 +162,9 @@ export {
   Landsat8AWSLOTL2Layer,
   Landsat45AWSLTML1Layer,
   Landsat45AWSLTML2Layer,
+  Landsat15AWSLMSSL1Layer,
+  Landsat7AWSLETML1Layer,
+  Landsat7AWSLETML2Layer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   // auth:
@@ -150,6 +184,7 @@ export {
   AcquisitionMode,
   Polarization,
   Resolution,
+  SpeckleFilterType,
   OrbitDirection,
   PreviewMode,
   MosaickingOrder,
@@ -171,6 +206,7 @@ export {
   drawBlobOnCanvas,
   canvasToBlob,
   SHV3_LOCATIONS_ROOT_URL,
+  BYOCSubTypes,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
@@ -181,4 +217,21 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
+  //StatisticalApi
+  StatisticsProviderType,
+  StatisticsUtils,
+  //TPDI
+  TPDI,
+  TPDICollections,
+  TPDProvider,
+  TPDISearchParams,
+  AirbusConstellation,
+  AirbusProcessingLevel,
+  OrderSearchParams,
+  OrderSearchResult,
+  OrderStatus,
+  PlanetProductBundle,
+  PlanetScopeHarmonization,
+  MaxarSensor,
+  ResamplingKernel,
 };

@@ -1,5 +1,5 @@
 import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
-import { CacheConfig } from './cacheHandlers';
+import { CacheConfig, removeCacheableRequestsInProgress } from './cacheHandlers';
 import { getDefaultRequestsConfig } from './defaultReqsConfig';
 
 export type RequestConfiguration = {
@@ -14,13 +14,25 @@ export type RequestConfiguration = {
 export class CancelToken {
   protected token: CancelTokenAxios | null = null;
   protected source: CancelTokenSource | null = null;
+  //list of all request that can be cancelled by token instance
+  protected cacheKeys: Set<string> = new Set();
 
   public constructor() {
     this.source = axios.CancelToken.source();
     this.token = this.source.token;
   }
 
+  public setCancelTokenCacheKey(cacheKey: string): void {
+    this.cacheKeys.add(cacheKey);
+  }
+
   public cancel(): void {
+    if (this.cacheKeys.size > 0) {
+      for (let cacheKey of this.cacheKeys) {
+        removeCacheableRequestsInProgress(cacheKey);
+      }
+      this.cacheKeys.clear();
+    }
     this.source.cancel();
   }
 
@@ -47,6 +59,8 @@ export const getAxiosReqParams = (
   };
 
   if (reqConfigWithDefault.cancelToken) {
+    axiosReqConfig.setCancelTokenCacheKey = (cacheKey: string): void =>
+      reqConfigWithDefault.cancelToken.setCancelTokenCacheKey(cacheKey);
     axiosReqConfig.cancelToken = reqConfigWithDefault.cancelToken.getToken();
   }
   if (reqConfigWithDefault.retries !== null && reqConfigWithDefault.retries !== undefined) {

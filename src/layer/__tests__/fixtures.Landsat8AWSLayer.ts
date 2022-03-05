@@ -170,7 +170,7 @@ export function constructFixtureFindTilesCatalog({
   };
 
   if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query']['eo:cloud_cover'];
+    delete expectedRequest['query'];
   }
 
   /* eslint-disable */
@@ -304,6 +304,7 @@ export function constructFixtureFindTilesCatalog({
       meta: {
         cloudCoverPercent: 36.66,
         sunElevation: 60.455486,
+        projEpsg: 32632,
       },
       links: [
         {

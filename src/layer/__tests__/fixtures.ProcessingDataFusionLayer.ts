@@ -6,7 +6,7 @@ export function constructFixtureGetMapRequest({
   height = 512,
   format = MimeTypes.JPEG,
   evalscript = '',
-  data = [],
+  data = [] as any[],
 }): Record<any, any> {
   const expectedRequest = {
     evalscript: evalscript,

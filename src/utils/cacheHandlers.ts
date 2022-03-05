@@ -1,9 +1,13 @@
 import { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { stringify } from 'query-string';
-import { CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
+import { CacheTarget, CacheTargets, cacheFactory, SUPPORTED_TARGETS } from './Cache';
 
 export const CACHE_CONFIG_30MIN = { expiresIn: 1800 };
 export const CACHE_CONFIG_NOCACHE = { expiresIn: 0 };
+export const CACHE_CONFIG_30MIN_MEMORY = {
+  targets: [CacheTarget.MEMORY],
+  expiresIn: CACHE_CONFIG_30MIN.expiresIn,
+};
 export const EXPIRY_HEADER_KEY = 'cache_expires';
 
 export type CacheConfig = {
@@ -15,7 +19,7 @@ export type CacheConfig = {
 // still all be executed - because by the time first response is saved in cache, the other 9
 // requests are already made too. To combat this, we save cacheKeys of ongoing requests and
 // simply delay new requests with the same cacheKey.
-const cacheableRequestsInProgress = new Set();
+export const cacheableRequestsInProgress = new Set();
 
 export const removeCacheableRequestsInProgress = (cacheKey: string): void => {
   cacheableRequestsInProgress.delete(cacheKey);
@@ -29,6 +33,12 @@ export const fetchCachedResponse = async (request: any): Promise<any> => {
   // resource not cacheable? It couldn't have been saved to cache:
   if (cacheKey === null) {
     return request;
+  }
+
+  // When request is cancelled, it must also be removed from list of cacheableRequestsInProgress.
+  // In order to remove requests from cacheableRequestsInProgress, cancelToken must be aware of requests(cacheKeys) it is responsible for.
+  if (request.cancelToken && request.setCancelTokenCacheKey) {
+    request.setCancelTokenCacheKey(cacheKey);
   }
 
   // there is a request with the same cacheKey in progress - wait until it

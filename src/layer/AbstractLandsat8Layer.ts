@@ -26,6 +26,7 @@ export class AbstractLandsat8Layer extends AbstractSentinelHubV3WithCCLayer {
     return {
       ...super.extractFindTilesMetaFromCatalog(feature),
       sunElevation: feature.properties['view:sun_elevation'],
+      projEpsg: feature.properties['proj:epsg'],
     };
   }
 

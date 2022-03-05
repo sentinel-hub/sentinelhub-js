@@ -1,8 +1,9 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from '../bbox';
-import { CRS_IDS } from '../crs';
+import { CRS, CRS_IDS } from '../crs';
 import { Effects } from '../mapDataManipulation/const';
+import { StatisticalApiResponse } from '../statistics/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -21,6 +22,7 @@ export type GetMapParams = {
   // optional additional parameters:
   preview?: PreviewMode;
   geometry?: Polygon | MultiPolygon;
+  crs?: CRS;
   quality?: number;
   gain?: number;
   gamma?: number;
@@ -36,6 +38,11 @@ export type GetMapParams = {
   // Sentinelhub-js can't deal with manipulating files inside the tar yet,
   // so we only allow setting one output response id.
   outputResponseId?: string;
+  tileCoord?: {
+    x: number;
+    y: number;
+    z: number;
+  };
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
     [key: string]: string;
@@ -66,6 +73,7 @@ export enum MosaickingOrder {
 
 export enum ApiType {
   WMS = 'wms',
+  WMTS = 'wmts',
   PROCESSING = 'processing',
 }
 
@@ -153,20 +161,25 @@ export enum LocationIdSHv3 {
   awsUsWest2 = 'aws-us-west-2',
   creo = 'creo',
   mundi = 'mundi',
+  gcpUsCentral1 = 'gcp-us-central1',
 }
 export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
   [LocationIdSHv3.awsUsWest2]: 'https://services-uswest2.sentinel-hub.com/',
   [LocationIdSHv3.creo]: 'https://creodias.sentinel-hub.com/',
   [LocationIdSHv3.mundi]: 'https://shservices.mundiwebservices.com/',
+  [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
 };
 
 export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
   resolution: number;
-  geometry: Polygon;
+  geometry?: Polygon;
   bins?: number;
+  crs?: CRS;
+  bbox?: BBox;
+  output?: string;
 };
 
 export type FisPayload = {
@@ -195,20 +208,20 @@ export type DailyChannelStats = {
     mean: number;
     stDev: number;
   };
-  histogram: {
-    bins: [
-      {
-        lowEdge: number;
-        mean: number;
-        count: number;
-      },
-    ];
+  histogram?: {
+    bins: {
+      lowEdge: number;
+      mean: number;
+      count: number;
+    }[];
   };
 };
 
-export type Stats = {
+export type FisResponse = {
   [key: string]: DailyChannelStats[];
 };
+
+export type Stats = FisResponse | StatisticalApiResponse;
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
 
@@ -241,3 +254,24 @@ export enum DEMInstanceTypeOrthorectification {
   COPERNICUS_30 = 'COPERNICUS_30',
   COPERNICUS_90 = 'COPERNICUS_90',
 }
+
+export enum BYOCSubTypes {
+  BATCH = 'BATCH',
+  BYOC = 'BYOC',
+  ZARR = 'ZARR',
+}
+
+export enum OgcServiceTypes {
+  WMS = 'wms',
+  WMTS = 'wmts',
+}
+
+export const PLANET_FALSE_COLOR_TEMPLATES = [
+  { description: '', titleSuffix: 'NDWI', resourceUrlParams: { proc: 'ndwi' } },
+  { description: '', titleSuffix: 'NDVI', resourceUrlParams: { proc: 'ndvi' } },
+  { description: '', titleSuffix: 'MSAVI2', resourceUrlParams: { proc: 'msavi2' } },
+  { description: '', titleSuffix: 'MTVI2', resourceUrlParams: { proc: 'mtvi2' } },
+  { description: '', titleSuffix: 'VARI', resourceUrlParams: { proc: 'vari' } },
+  { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
+  { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
+];

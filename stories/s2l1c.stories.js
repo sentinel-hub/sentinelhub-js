@@ -5,6 +5,7 @@ import {
   S2L1CLayer,
   CRS_EPSG4326,
   CRS_EPSG3857,
+  CRS_WGS84,
   BBox,
   MimeTypes,
   ApiType,
@@ -487,3 +488,80 @@ export const cancelRequests = () => {
   setToken();
   return wrapperEl;
 };
+
+
+export const getStatsGeoJSONDifferentCRS = () => {
+  // GeoJSON is in CRS:84. Use geometry with longitude > 90, so switched coordinates aren't valid
+const geometry = {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              131.8359375,
+              50.958426723359935
+            ],
+            [
+              144.755859375,
+              50.958426723359935
+            ],
+            [
+              144.755859375,
+              57.468589192089354
+            ],
+            [
+              131.8359375,
+              57.468589192089354
+            ],
+            [
+              131.8359375,
+              50.958426723359935
+            ]
+          ]
+        ]
+      }
+     const layerS2L1C = new S2L1CLayer({
+    instanceId,
+    layerId,
+  });
+
+     const wrapperElCRS84 = document.createElement('div');
+     const wrapperElEPSG426 = document.createElement('div');
+     wrapperElEPSG426.innerHTML = `<h4>Request with EPSG:4326. Should return an empty object.</h4>`;
+     wrapperElCRS84.innerHTML = `<h4>Request with CRS:84. Should return results.</h4>`;
+
+      const containerElCRS84 = document.createElement('pre');
+     const containerElEPSG426 = document.createElement('pre');
+     wrapperElCRS84.insertAdjacentElement('beforeend', containerElCRS84);
+     wrapperElEPSG426.insertAdjacentElement('beforeend', containerElEPSG426)
+  const wrapperEl = document.createElement('div');
+  wrapperEl.innerHTML = `<h2>getStats using GeoJSON with correct (CRS:84) and incorrect (EPSG:4326) crs</h2>`;
+  wrapperEl.insertAdjacentElement('beforeend', wrapperElEPSG426);
+  wrapperEl.insertAdjacentElement('beforeend', wrapperElCRS84);
+  
+
+
+     const fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
+const toTime= new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
+
+const getStatsParams = {
+       fromTime: fromTime,
+       toTime: toTime,
+       geometry: geometry,
+       resolution: 20000,
+          bins: 1,
+     }
+     const perform = async () => {
+  
+     getStatsParams['crs'] = CRS_EPSG4326
+     const statsESPG4326 = await layerS2L1C.getStats(getStatsParams)
+     containerElEPSG426.innerHTML = JSON.stringify(statsESPG4326,null, 4);
+
+     getStatsParams['crs'] = CRS_WGS84
+     const statsCRS84 = await layerS2L1C.getStats(getStatsParams)
+     containerElCRS84.innerHTML = JSON.stringify(statsCRS84,null, 4);
+   }
+
+     perform().then(() => {});
+
+     return wrapperEl;
+}
