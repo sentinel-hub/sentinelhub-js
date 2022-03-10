@@ -101,9 +101,8 @@ export function createProcessingPayload(
   const payload: ProcessingPayload = {
     input: {
       bounds: {
-        bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
         properties: {
-          crs: params.bbox.crs.opengisUrl,
+          crs: params.bbox ? params.bbox.crs.opengisUrl : params?.crs?.opengisUrl,
         },
       },
       data: [
@@ -134,6 +133,9 @@ export function createProcessingPayload(
     },
   };
 
+  if (bbox) {
+    payload.input.bounds.bbox = [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY];
+  }
   if (params.upsampling || upsampling) {
     payload.input.data[0].processing.upsampling = params.upsampling ? params.upsampling : upsampling;
   }

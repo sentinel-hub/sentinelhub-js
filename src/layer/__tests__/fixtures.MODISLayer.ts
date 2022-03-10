@@ -125,7 +125,6 @@ export function constructFixtureFindTilesCatalog({
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['modis'],
     limit: 5,
-    query: {},
   };
 
   /* eslint-disable */

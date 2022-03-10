@@ -7,7 +7,13 @@ import { setAuthToken, invalidateCaches, BBox, CRS_EPSG4326 } from '../../index'
 import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
-import { PlanetProductBundle, TPDISearchParams, TPDProvider } from '../const';
+import {
+  PlanetProductBundle,
+  PlanetScopeHarmonization,
+  TPDIOrderParams,
+  TPDISearchParams,
+  TPDProvider,
+} from '../const';
 import { Polygon } from '@turf/helpers';
 import { checkSearchPayload } from './testUtils.PlanetDataProvider';
 import { PlanetDataProvider } from '../PlanetDataProvider';
@@ -20,6 +26,9 @@ const defaultSearchParams: TPDISearchParams = {
   fromTime: new Date(2021, 5 - 1, 30, 0, 0, 0, 0),
   toTime: new Date(2021, 6 - 1, 31, 23, 59, 59, 999),
   bbox: new BBox(CRS_EPSG4326, 18, 20, 20, 22),
+};
+
+const defaultOrderParams: TPDIOrderParams = {
   planetApiKey: 'PLANET_API_KEY',
 };
 
@@ -114,7 +123,7 @@ describe('Test search', () => {
 
 describe('Test create order payload', () => {
   it.each([
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }],
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, { ...defaultOrderParams }],
     [
       'name',
       'collectionId',
@@ -125,43 +134,68 @@ describe('Test create order payload', () => {
         productBundle: PlanetProductBundle.ANALYTIC,
         nativeFilter: { id: 1 },
       },
+      { ...defaultOrderParams },
+    ],
+    [
+      'name',
+      'collectionId',
+      ['id'],
+      { ...defaultSearchParams },
+      { ...defaultOrderParams, harmonizeTo: PlanetScopeHarmonization.NONE },
     ],
 
-    ['name', 'collectionId', null, { ...defaultSearchParams }],
-    ['name', 'collectionId', [], { ...defaultSearchParams }],
-    ['name', null, null, { ...defaultSearchParams }],
-    [null, null, null, { ...defaultSearchParams }],
-  ])('checks if parameters are set correctly', async (name, collectionId, items, params) => {
-    const tpdp = new PlanetDataProvider();
-    const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+    ['name', 'collectionId', null, { ...defaultSearchParams }, { ...defaultOrderParams }],
+    ['name', 'collectionId', [], { ...defaultSearchParams }, { ...defaultOrderParams }],
+    ['name', null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
+    [null, null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, {}],
+    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, null],
+  ])(
+    'checks if parameters are set correctly',
+    async (name, collectionId, items, searchParams, orderParams) => {
+      const tpdp = new PlanetDataProvider();
+      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
 
-    if (!!name) {
-      expect(payload.name).toBeDefined();
-      expect(payload.name).toStrictEqual(name);
-    } else {
-      expect(payload.name).toBeUndefined();
-    }
+      if (!!name) {
+        expect(payload.name).toBeDefined();
+        expect(payload.name).toStrictEqual(name);
+      } else {
+        expect(payload.name).toBeUndefined();
+      }
 
-    if (!!collectionId) {
-      expect(payload.collectionId).toBeDefined();
-      expect(payload.collectionId).toStrictEqual(collectionId);
-    } else {
-      expect(payload.collectionId).toBeUndefined();
-    }
+      if (!!collectionId) {
+        expect(payload.collectionId).toBeDefined();
+        expect(payload.collectionId).toStrictEqual(collectionId);
+      } else {
+        expect(payload.collectionId).toBeUndefined();
+      }
 
-    const { input } = payload;
+      const { input } = payload;
 
-    const dataObject = input.data[0];
-    const { itemIds } = dataObject;
+      if (orderParams?.planetApiKey) {
+        expect(input.planetApiKey).toEqual(orderParams.planetApiKey);
+      } else {
+        expect(input.planetApiKey).toBeUndefined();
+      }
 
-    if (!!items && items.length) {
-      expect(itemIds).toBeDefined();
-      expect(itemIds.length).toStrictEqual(items.length);
-      expect(itemIds).toStrictEqual(items);
-      expect(dataObject.dataFilter).toBeUndefined();
-    } else {
-      expect(itemIds).toBeUndefined();
-      checkSearchPayload(input, params);
-    }
-  });
+      const dataObject = input.data[0];
+      const { itemIds } = dataObject;
+
+      if (orderParams?.harmonizeTo) {
+        expect(dataObject.harmonizeTo).toEqual(orderParams.harmonizeTo);
+      } else {
+        expect(dataObject.harmonizeTo).toBeUndefined();
+      }
+
+      if (!!items && items.length) {
+        expect(itemIds).toBeDefined();
+        expect(itemIds.length).toStrictEqual(items.length);
+        expect(itemIds).toStrictEqual(items);
+        expect(dataObject.dataFilter).toBeUndefined();
+      } else {
+        expect(itemIds).toBeUndefined();
+        checkSearchPayload(input, searchParams);
+      }
+    },
+  );
 });

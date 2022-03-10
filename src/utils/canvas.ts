@@ -84,3 +84,17 @@ export async function validateCanvasDimensions(canvas: HTMLCanvasElement): Promi
   }
   return true;
 }
+
+export async function scaleCanvasImage(
+  canvas: HTMLCanvasElement,
+  width: number,
+  height: number,
+): Promise<HTMLCanvasElement> {
+  const newSizeCanvas = document.createElement('canvas');
+  newSizeCanvas.width = width;
+  newSizeCanvas.height = height;
+  const newSizeCtx = newSizeCanvas.getContext('2d');
+  newSizeCtx.imageSmoothingEnabled = false;
+  newSizeCtx.drawImage(canvas, 0, 0, width, height);
+  return newSizeCanvas;
+}

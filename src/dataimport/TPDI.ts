@@ -9,6 +9,7 @@ import {
   TPDSearchResult,
   OrderSearchParams,
   OrderSearchResult,
+  TPDIOrderParams,
 } from './const';
 import { AirbusDataProvider } from './AirbusDataProvider';
 import { PlanetDataProvider } from './PlanetDataProvider';
@@ -128,13 +129,14 @@ export class TPDI {
     name: string,
     collectionId: string,
     items: string[],
-    params: TPDISearchParams,
+    searchParams: TPDISearchParams,
+    orderParams?: TPDIOrderParams,
     reqConfig?: RequestConfiguration,
   ): Promise<Order> {
     return await ensureTimeout(async innerReqConfig => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const tpdp = getThirdPartyDataProvider(provider);
-      const payload = tpdp.getOrderPayload(name, collectionId, items, params);
+      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
       const response = await axios.post<Order>(`${TPDI_SERVICE_URL}/orders`, payload, requestConfig);
       const order: Order = response.data;
       return order;

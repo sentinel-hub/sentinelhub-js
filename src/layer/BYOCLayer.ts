@@ -24,6 +24,7 @@ import { ProcessingPayload } from './processing';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
+import { StatisticsProviderType } from '../statistics/StatisticsProvider';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -183,7 +184,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return response;
   }
 
-  protected getShServiceHostname(): string {
+  public getShServiceHostname(): string {
     if (this.locationId === null) {
       throw new Error('Parameter locationId must be specified');
     }
@@ -241,9 +242,13 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return result;
   }
 
-  public async getStats(params: GetStatsParams): Promise<Stats> {
+  public async getStats(
+    params: GetStatsParams,
+    reqConfig: RequestConfiguration = {},
+    statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
+  ): Promise<Stats> {
     await this.updateLayerFromServiceIfNeeded();
-    return super.getStats(params);
+    return super.getStats(params, reqConfig, statsProvider);
   }
 
   public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {

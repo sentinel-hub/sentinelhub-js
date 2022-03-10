@@ -1,8 +1,9 @@
 import { Polygon, MultiPolygon } from '@turf/helpers';
 
 import { BBox } from '../bbox';
-import { CRS_IDS, CRS } from '../crs';
+import { CRS, CRS_IDS } from '../crs';
 import { Effects } from '../mapDataManipulation/const';
+import { StatisticalApiResponse } from '../statistics/const';
 
 /**
  * Specifies the content that should be fetched (area, time or time interval, modifiers, output format,...).
@@ -21,6 +22,7 @@ export type GetMapParams = {
   // optional additional parameters:
   preview?: PreviewMode;
   geometry?: Polygon | MultiPolygon;
+  crs?: CRS;
   quality?: number;
   gain?: number;
   gamma?: number;
@@ -36,8 +38,6 @@ export type GetMapParams = {
   // Sentinelhub-js can't deal with manipulating files inside the tar yet,
   // so we only allow setting one output response id.
   outputResponseId?: string;
-  // only used by WMTS tp calculate tilCol and tileRow from bbox
-  zoom?: number;
   tileCoord?: {
     x: number;
     y: number;
@@ -175,9 +175,11 @@ export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
   resolution: number;
-  geometry: Polygon;
+  geometry?: Polygon;
   bins?: number;
   crs?: CRS;
+  bbox?: BBox;
+  output?: string;
 };
 
 export type FisPayload = {
@@ -206,20 +208,20 @@ export type DailyChannelStats = {
     mean: number;
     stDev: number;
   };
-  histogram: {
-    bins: [
-      {
-        lowEdge: number;
-        mean: number;
-        count: number;
-      },
-    ];
+  histogram?: {
+    bins: {
+      lowEdge: number;
+      mean: number;
+      count: number;
+    }[];
   };
 };
 
-export type Stats = {
+export type FisResponse = {
   [key: string]: DailyChannelStats[];
 };
+
+export type Stats = FisResponse | StatisticalApiResponse;
 
 export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
 

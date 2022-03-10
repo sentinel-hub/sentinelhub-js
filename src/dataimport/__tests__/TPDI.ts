@@ -13,6 +13,7 @@ import {
   TPDISearchParams,
   TPDProvider,
   TPDI_SERVICE_URL,
+  ResamplingKernel,
 } from '../const';
 import { CACHE_CONFIG_NOCACHE } from '../../utils/cacheHandlers';
 
@@ -54,10 +55,17 @@ describe('Test TPDI service enpoints', () => {
   it('uses correct endpoint to create an order', async () => {
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200);
-    await TPDI.createOrder(TPDProvider.AIRBUS, 'name', 'collectionId', null, {
-      ...defaultSearchParams,
-      constellation: AirbusConstellation.SPOT,
-    });
+    await TPDI.createOrder(
+      TPDProvider.AIRBUS,
+      'name',
+      'collectionId',
+      null,
+      {
+        ...defaultSearchParams,
+        constellation: AirbusConstellation.SPOT,
+      },
+      null,
+    );
     expect(mockNetwork.history.post.length).toBe(1);
     const request = mockNetwork.history.post[0];
     expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders`);
@@ -166,20 +174,20 @@ describe('Test createOrder', () => {
   });
 
   it.each([
-    [TPDProvider.AIRBUS, { ...defaultSearchParams, constellation: AirbusConstellation.SPOT }],
-    [TPDProvider.PLANET, { ...defaultSearchParams, planetApiKey: 'planetApiKey' }],
-    [TPDProvider.MAXAR, { ...defaultSearchParams }],
-  ])('requires authenthication', async (provider, params) => {
+    [TPDProvider.AIRBUS, { ...defaultSearchParams, constellation: AirbusConstellation.SPOT }, null],
+    [TPDProvider.PLANET, { ...defaultSearchParams }, { planetApiKey: 'planetApiKey' }],
+    [TPDProvider.MAXAR, { ...defaultSearchParams }, { productKernel: ResamplingKernel.CC }],
+  ])('requires authenthication', async (provider, searchParams, orderParams) => {
     setAuthToken(undefined);
 
-    await expect(TPDI.createOrder(provider, 'name', 'collectionId', null, params)).rejects.toThrow(
-      new Error('Must be authenticated to perform request'),
-    );
+    await expect(
+      TPDI.createOrder(provider, 'name', 'collectionId', null, searchParams, orderParams),
+    ).rejects.toThrow(new Error('Must be authenticated to perform request'));
 
     setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200);
-    await TPDI.createOrder(provider, 'name', 'collectionId', null, params);
+    await TPDI.createOrder(provider, 'name', 'collectionId', null, searchParams, orderParams);
     expect(mockNetwork.history.post.length).toBe(1);
   });
 });

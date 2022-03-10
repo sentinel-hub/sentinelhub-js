@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
-import WKT from 'terraformer-wkt-parser';
 import { Geometry } from '@turf/helpers';
 
 import { getAuthToken } from '../auth';
@@ -9,8 +8,6 @@ import {
   GetMapParams,
   ApiType,
   PaginatedTiles,
-  HistogramType,
-  FisPayload,
   MosaickingOrder,
   GetStatsParams,
   Stats,
@@ -26,13 +23,13 @@ import {
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
 import { AbstractLayer } from './AbstractLayer';
-import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
+import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -91,6 +88,22 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
+  }
+
+  public getLayerId(): string {
+    return this.layerId;
+  }
+
+  public getEvalscript(): string {
+    return this.evalscript;
+  }
+
+  public getDataProduct(): string {
+    return this.dataProduct;
+  }
+
+  public getInstanceId(): string {
+    return this.instanceId;
   }
 
   protected async fetchLayerParamsFromSHServiceV3(reqConfig: RequestConfiguration): Promise<any> {
@@ -156,7 +169,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return payload;
   }
 
-  protected getShServiceHostname(): string {
+  public getShServiceHostname(): string {
     return this.dataset.shServiceHostname;
   }
 
@@ -474,7 +487,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
     datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Record<string, any> {
-    return {};
+    return null;
   }
 
   protected async findTilesUsingCatalog(
@@ -551,7 +564,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected getStatsAdditionalParameters(): Record<string, any> {
+  public getStatsAdditionalParameters(): Record<string, any> {
     return {};
   }
 
@@ -655,66 +668,14 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return results.sort((a: Date, b: Date) => b.getTime() - a.getTime());
   }
 
-  public async getStats(params: GetStatsParams, reqConfig?: RequestConfiguration): Promise<Stats> {
+  public async getStats(
+    params: GetStatsParams,
+    reqConfig: RequestConfiguration = {},
+    statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
+  ): Promise<Stats> {
     const stats = await ensureTimeout(async innerReqConfig => {
-      if (!params.geometry) {
-        throw new Error('Parameter "geometry" needs to be provided');
-      }
-      if (!params.resolution) {
-        throw new Error('Parameter "resolution" needs to be provided');
-      }
-      if (!params.fromTime || !params.toTime) {
-        throw new Error('Parameters "fromTime" and "toTime" need to be provided');
-      }
-
-      const payload: FisPayload = {
-        layer: this.layerId,
-        crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
-        geometry: WKT.convert(params.geometry),
-        time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-          .utc(params.toTime)
-          .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
-        resolution: undefined,
-        bins: params.bins || 5,
-        type: HistogramType.EQUALFREQUENCY,
-        ...this.getStatsAdditionalParameters(),
-      };
-
-      if (params.geometry.crs) {
-        const selectedCrs = findCrsFromUrn(params.geometry.crs.properties.name);
-        payload.crs = selectedCrs.authId;
-      }
-      // When using CRS=EPSG:4326 or CRS_WGS84 one has to add the "m" suffix to enforce resolution in meters per pixel
-      if (payload.crs === CRS_EPSG4326.authId || payload.crs === CRS_WGS84.authId) {
-        payload.resolution = params.resolution + 'm';
-      } else {
-        payload.resolution = params.resolution;
-      }
-      if (this.evalscript) {
-        if (typeof window !== 'undefined' && window.btoa) {
-          payload.evalscript = btoa(this.evalscript);
-        } else {
-          payload.evalscript = Buffer.from(this.evalscript, 'utf8').toString('base64');
-        }
-      }
-
-      const axiosReqConfig: AxiosRequestConfig = {
-        ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_NOCACHE),
-      };
-
-      const shServiceHostname = this.getShServiceHostname();
-      const { data } = await axios.post(
-        shServiceHostname + 'ogc/fis/' + this.instanceId,
-        payload,
-        axiosReqConfig,
-      );
-      // convert date strings to Date objects
-      for (let channel in data) {
-        data[channel] = data[channel].map((dailyStats: any) => ({
-          ...dailyStats,
-          date: new Date(dailyStats.date),
-        }));
-      }
+      const sp = getStatisticsProvider(statsProvider);
+      const data: Stats = await sp.getStats(this, params, innerReqConfig);
       return data;
     }, reqConfig);
     return stats;
