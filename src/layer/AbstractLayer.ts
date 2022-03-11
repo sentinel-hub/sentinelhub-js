@@ -2,6 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import area from '@turf/area';
 import { union, intersection, Geom } from 'polygon-clipping';
+import { Geometry } from '@turf/helpers';
 
 import { BBox } from '../bbox';
 import { CRS_EPSG4326 } from '../crs';
@@ -222,6 +223,7 @@ export class AbstractLayer {
     maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    intersects?: Geometry, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     throw new Error('findTilesInner() not implemented yet');
   }
@@ -233,10 +235,11 @@ export class AbstractLayer {
     maxCount: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     offset: number | null = null, // eslint-disable-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
+    intersects?: Geometry, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     const findTilesResponse = await ensureTimeout(
       async innerReqConfig =>
-        await this.findTilesInner(bbox, fromTime, toTime, maxCount, offset, innerReqConfig),
+        await this.findTilesInner(bbox, fromTime, toTime, maxCount, offset, innerReqConfig, intersects),
       reqConfig,
     );
     return findTilesResponse;
