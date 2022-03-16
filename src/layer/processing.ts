@@ -62,6 +62,7 @@ export type ProcessingPayloadDatasource = {
     [key: string]: any;
   };
   type: string;
+  accessToken?: string;
 };
 
 export function convertPreviewToString(preview: PreviewMode): PreviewModeString {

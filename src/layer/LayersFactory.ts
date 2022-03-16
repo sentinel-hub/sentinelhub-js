@@ -66,6 +66,7 @@ import { Landsat45AWSLTML2Layer } from './Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
+import { PlanetScopeLiveLayer, PLANETSCOPE_LIVE_CONFIGURATIONS } from './PlanetScopeLiveLayer';
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
@@ -164,6 +165,9 @@ export class LayersFactory {
     reqConfig?: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async innerReqConfig => {
+      if (baseUrl === 'planetscope-live-experimental') {
+        return this.createPlanetScopeLiveLayers();
+      }
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
           return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
@@ -190,6 +194,20 @@ export class LayersFactory {
       }
     }, reqConfig);
     return returnValue;
+  }
+
+  private static createPlanetScopeLiveLayers(): any {
+    const layers = [];
+    for (let configuration of PLANETSCOPE_LIVE_CONFIGURATIONS) {
+      layers.push(
+        new PlanetScopeLiveLayer({
+          layerId: configuration.layerId,
+          instanceId: 'test-instance',
+          title: configuration.title,
+        }),
+      );
+    }
+    return layers;
   }
 
   private static async makeLayersSHv3(

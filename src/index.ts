@@ -1,6 +1,6 @@
 import { BBox } from './bbox';
 import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs';
-import { setAuthToken, isAuthTokenSet, requestAuthToken } from './auth';
+import { setAuthToken, isAuthTokenSet, requestAuthToken, setPlanetScopeAccessToken } from './auth';
 import {
   ApiType,
   MimeTypes,
@@ -40,6 +40,7 @@ import {
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
+  DATASET_PLANETSCOPE_LIVE,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
@@ -67,6 +68,7 @@ import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
 import { BYOCLayer } from './layer/BYOCLayer';
+import { PlanetScopeLiveLayer } from './layer/PlanetScopeLiveLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
 import {
@@ -139,6 +141,7 @@ export {
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
+  DATASET_PLANETSCOPE_LIVE,
   // layers:
   WmsLayer,
   WmtsLayer,
@@ -167,10 +170,12 @@ export {
   Landsat7AWSLETML2Layer,
   BYOCLayer,
   ProcessingDataFusionLayer,
+  PlanetScopeLiveLayer,
   // auth:
   setAuthToken,
   isAuthTokenSet,
   requestAuthToken,
+  setPlanetScopeAccessToken,
   // other:
   GetMapParams,
   OverrideGetMapParams,

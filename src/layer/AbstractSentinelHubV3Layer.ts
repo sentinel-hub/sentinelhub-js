@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import { Geometry } from '@turf/helpers';
 
-import { getAuthToken } from '../auth';
+import { getAuthToken, getPlanetScopeAccessToken } from '../auth';
 import { BBox } from '../bbox';
 import {
   GetMapParams,
@@ -398,6 +398,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   ): Promise<PaginatedTiles> {
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     const canUseCatalog = authToken && !!this.getCatalogCollectionId();
+
     let result: PaginatedTiles = null;
 
     if (canUseCatalog) {
@@ -517,6 +518,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
       'Content-Type': 'application/json',
+      'SH-SecretToken': getPlanetScopeAccessToken(),
     };
     const requestConfig: AxiosRequestConfig = {
       headers: headers,

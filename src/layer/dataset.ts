@@ -364,3 +364,18 @@ export const DATASET_PLANET_NICFI: Dataset = {
   minDate: new Date(Date.UTC(2016, 6 - 1, 31, 12, 0, 0)), // '2016-05-31',
   maxDate: null,
 };
+
+export const DATASET_PLANETSCOPE_LIVE: Dataset = {
+  id: 'PLANETSCOPE_LIVE',
+  shJsonGetCapabilitiesDataset: 'planet-scorpius',
+  shWmsEvalsource: 'planet-scorpius',
+  shProcessingApiDatasourceAbbreviation: 'planet-scorpius',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services.sentinel-hub.com/', // depends on location, for example: https://services.sentinel-hub.com/
+  searchIndexUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex
+  findDatesUTCUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData
+  orbitTimeMinutes: null,
+  minDate: null,
+  maxDate: null,
+  catalogCollectionId: 'planet-scorpius',
+};
