@@ -84,7 +84,7 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
       },
@@ -96,7 +96,7 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: true,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
       },
@@ -108,7 +108,7 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: false,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         //not authenticated
         return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
@@ -121,11 +121,24 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: false,
         authToken: 'authToken',
       },
-      [],
+      [{ code: 200, data: [] }],
       function expectedEndpoint(instanceId: string): string {
         return `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
       },
     ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'authToken',
+      },
+      [{ code: 401 }, { code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+
     [
       {
         baseUrl: `${DATASET_AWS_LOTL1.shServiceHostname}ogc/wms/`,
@@ -133,7 +146,7 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://services-uswest2.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
       },
@@ -145,7 +158,7 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
       },
@@ -157,7 +170,19 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      { layers: [] },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_EOCLOUD_ENVISAT_MERIS.shServiceHostname}v1/wms/`,
+        instanceId: '3d0a2106-affd-11ec-b909-0242ac120002',
+        preferGetCapabilities: false,
+        authToken: 'token',
+      },
+      [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
       },
@@ -169,7 +194,19 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      getCapabilitiesWmsXmlResponse,
+      [{ code: 200, data: getCapabilitiesWmsXmlResponse }],
+      function expectedEndpoint(): string {
+        return `https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?service=wms&request=GetCapabilities&format=text%2Fxml`;
+      },
+    ],
+    [
+      {
+        baseUrl: `https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows`,
+        instanceId: '',
+        preferGetCapabilities: false,
+        authToken: 'token',
+      },
+      [{ code: 200, data: getCapabilitiesWmsXmlResponse }],
       function expectedEndpoint(): string {
         return `https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?service=wms&request=GetCapabilities&format=text%2Fxml`;
       },
@@ -181,20 +218,34 @@ describe('Test endpoints for getting layers parameters', () => {
         preferGetCapabilities: undefined,
         authToken: undefined,
       },
-      getCapabilitiesWmtsXMLResponse,
+      [{ code: 200, data: getCapabilitiesWmtsXMLResponse }],
       function expectedEndpoint(): string {
         return `https://api.planet.com/basemaps/v1/mosaics/wmts?service=wmts&request=GetCapabilities&format=text%2Fxml`;
       },
     ],
-  ])('checks if correct endpoint is used', async (inputParams, response, expectedEndpoint) => {
+    [
+      {
+        baseUrl: `https://api.planet.com/basemaps/v1/mosaics/wmts`,
+        instanceId: '',
+        preferGetCapabilities: false,
+        authToken: 'token',
+      },
+      [{ code: 200, data: getCapabilitiesWmtsXMLResponse }],
+      function expectedEndpoint(): string {
+        return `https://api.planet.com/basemaps/v1/mosaics/wmts?service=wmts&request=GetCapabilities&format=text%2Fxml`;
+      },
+    ],
+  ])('checks if correct endpoint is used', async (inputParams, responses, expectedEndpoint) => {
     const { baseUrl, instanceId, preferGetCapabilities, authToken } = inputParams;
 
     if (!!authToken) {
       setAuthToken(authToken);
     }
-    mockNetwork.onGet().reply(200, response);
+    responses.forEach((response: Record<string, any>) => {
+      mockNetwork.onGet().replyOnce(response.code, response.data);
+    });
     await LayersFactory.makeLayers(baseUrl + instanceId, null, null, null, preferGetCapabilities);
-    expect(mockNetwork.history.get.length).toBe(1);
-    expect(mockNetwork.history.get[0].url).toBe(expectedEndpoint(instanceId));
+    expect(mockNetwork.history.get.length).toBe(responses.length);
+    expect(mockNetwork.history.get[responses.length - 1].url).toBe(expectedEndpoint(instanceId));
   });
 });
