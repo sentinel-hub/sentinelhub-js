@@ -141,6 +141,7 @@ export class LayersFactory {
     layerId: string,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer> {
     const layer = await ensureTimeout(async innerReqConfig => {
       const layers = await LayersFactory.makeLayers(
@@ -148,6 +149,7 @@ export class LayersFactory {
         (lId: string) => lId === layerId,
         overrideConstructorParams,
         innerReqConfig,
+        preferGetCapabilities,
       );
       if (layers.length === 0) {
         return null;
@@ -162,11 +164,18 @@ export class LayersFactory {
     filterLayers: Function | null = null,
     overrideConstructorParams?: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async innerReqConfig => {
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+          return await this.makeLayersSHv3(
+            baseUrl,
+            filterLayers,
+            overrideConstructorParams,
+            innerReqConfig,
+            preferGetCapabilities,
+          );
         }
       }
 
@@ -197,21 +206,14 @@ export class LayersFactory {
     filterLayers: Function | null,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
+    preferGetCapabilities: boolean = false,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
-    const layersInfos = getCapabilitiesJson.map(layerInfo => ({
-      layerId: layerInfo.id,
-      title: layerInfo.name,
-      description: layerInfo.description,
-      dataset:
-        layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          : null,
-      legendUrl: layerInfo.legendUrl,
-    }));
-
-    const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+    const filteredLayersInfos = await this.getSHv3LayersInfo(
+      baseUrl,
+      reqConfig,
+      filterLayers,
+      preferGetCapabilities,
+    );
 
     return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
       if (!dataset) {
@@ -236,6 +238,36 @@ export class LayersFactory {
         ...overrideConstructorParams,
       });
     });
+  }
+
+  private static async getSHv3LayersInfo(
+    baseUrl: string,
+    reqConfig: RequestConfiguration,
+    filterLayers: Function,
+    preferGetCapabilities: boolean = true,
+  ): Promise<any[]> {
+    let layersInfos;
+    //also check if auth token is present
+    if (preferGetCapabilities) {
+      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
+      layersInfos = getCapabilitiesJson.map(layerInfo => ({
+        layerId: layerInfo.id,
+        title: layerInfo.name,
+        description: layerInfo.description,
+        dataset:
+          layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            : null,
+        legendUrl: layerInfo.legendUrl,
+      }));
+    } else {
+      // fetch layer params from SH v3 service
+      // fallback to getCapabilities
+    }
+
+    const filteredLayersInfos =
+      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+    return filteredLayersInfos;
   }
 
   private static async makeLayersSHv12(
