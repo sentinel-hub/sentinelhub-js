@@ -208,7 +208,7 @@ export class LayersFactory {
     filterLayers: Function | null,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
-    preferGetCapabilities: boolean = false,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
     const filteredLayersInfos = await this.getSHv3LayersInfo(
       baseUrl,
@@ -252,11 +252,17 @@ export class LayersFactory {
     //also check if auth token is present
     const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
     let layersInfoFetched = false;
-
     // use configuration if possible
     if (authToken && preferGetCapabilities === false) {
       try {
-        layersInfos = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
+        const layers = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
+        layersInfos = layers.map((l: any) => ({
+          ...l,
+          dataset:
+            l.type && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
+              ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
+              : null,
+        }));
         layersInfoFetched = true;
       } catch (e) {
         console.error(e);
@@ -280,6 +286,7 @@ export class LayersFactory {
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
     return filteredLayersInfos;
   }
 

@@ -173,6 +173,8 @@ export async function fetchLayerParamsFromConfigurationService(
   const res = await axios.get(url, requestConfig);
   const layersParams = res.data.map((l: any) => ({
     layerId: l.id,
+    title: l.title,
+    description: l.description,
     ...l.datasourceDefaults,
     evalscript: l.styles[0].evalScript,
     dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
