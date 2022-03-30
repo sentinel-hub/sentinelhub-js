@@ -5,6 +5,7 @@ import {
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
+  fetchLayerParamsFromConfigurationService,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import {
@@ -69,6 +70,7 @@ import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
+import { getAuthToken } from '../auth';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -248,7 +250,21 @@ export class LayersFactory {
   ): Promise<any[]> {
     let layersInfos;
     //also check if auth token is present
-    if (preferGetCapabilities) {
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    let layersInfoFetched = false;
+
+    // use configuration if possible
+    if (authToken && preferGetCapabilities === false) {
+      try {
+        layersInfos = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
+        layersInfoFetched = true;
+      } catch (e) {
+        console.error(e);
+        // fallback to getCapabilities
+      }
+    }
+
+    if (!layersInfoFetched) {
       const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
       layersInfos = getCapabilitiesJson.map(layerInfo => ({
         layerId: layerInfo.id,
@@ -260,9 +276,6 @@ export class LayersFactory {
             : null,
         legendUrl: layerInfo.legendUrl,
       }));
-    } else {
-      // fetch layer params from SH v3 service
-      // fallback to getCapabilities
     }
 
     const filteredLayersInfos =
