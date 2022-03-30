@@ -1,8 +1,8 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { DATASET_S2L2A, DATASET_S5PL2 } from '../dataset';
+import { DATASET_S2L2A, DATASET_S5PL2, DATASET_EOCLOUD_ENVISAT_MERIS, DATASET_AWS_LOTL1 } from '../dataset';
 import { LayersFactory } from '../LayersFactory';
-import { WmsLayer, setAuthToken } from '../../index';
+import { WmsLayer, setAuthToken, invalidateCaches } from '../../index';
 import { S2L1CLayer } from '../S2L1CLayer';
 import { S5PL2Layer } from '../S5PL2Layer';
 import { getCapabilitiesWmsXmlResponse } from './fixtures.getCapabilitiesWMS';
@@ -65,6 +65,113 @@ describe('Test LayersFactory', () => {
       const layer = (await LayersFactory.makeLayers(url, null))[0];
 
       expect(layer).toBeInstanceOf(expectedInstanceType);
+    },
+  );
+});
+
+describe.only('Test endpoints for getting layers parameters', () => {
+  beforeEach(async () => {
+    await invalidateCaches();
+    mockNetwork.reset();
+  });
+
+  it.each([
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: true,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
+      },
+    ],
+
+    [
+      {
+        baseUrl: `${DATASET_AWS_LOTL1.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services-uswest2.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S5PL2.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_EOCLOUD_ENVISAT_MERIS.shServiceHostname}v1/wms/`,
+        instanceId: '3d0a2106-affd-11ec-b909-0242ac120002',
+        preferGetCapabilities: undefined,
+      },
+      { layers: [] },
+      function expectedEndpoint(instanceId: string): string {
+        return `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
+      },
+    ],
+    [
+      {
+        baseUrl: `https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows`,
+        instanceId: '',
+        preferGetCapabilities: undefined,
+      },
+      getCapabilitiesWmsXmlResponse,
+      function expectedEndpoint(): string {
+        return `https://proba-v-mep.esa.int/applications/geo-viewer/app/geoserver/ows?service=wms&request=GetCapabilities&format=text%2Fxml`;
+      },
+    ],
+    [
+      {
+        baseUrl: `https://api.planet.com/basemaps/v1/mosaics/wmts`,
+        instanceId: '',
+        preferGetCapabilities: undefined,
+      },
+      getCapabilitiesWmtsXMLResponse,
+      function expectedEndpoint(): string {
+        return `https://api.planet.com/basemaps/v1/mosaics/wmts?service=wmts&request=GetCapabilities&format=text%2Fxml`;
+      },
+    ],
+  ])(
+    'checks if correct endpoint is used',
+    async ({ baseUrl, instanceId, preferGetCapabilities }, response, expectedEndpoint) => {
+      mockNetwork.onGet().reply(200, response);
+      await LayersFactory.makeLayers(baseUrl + instanceId, null, null, null, preferGetCapabilities);
+      expect(mockNetwork.history.get.length).toBe(1);
+      expect(mockNetwork.history.get[0].url).toBe(expectedEndpoint(instanceId));
     },
   );
 });
