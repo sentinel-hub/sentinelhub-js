@@ -69,10 +69,11 @@ describe('Test LayersFactory', () => {
   );
 });
 
-describe.only('Test endpoints for getting layers parameters', () => {
+describe('Test endpoints for getting layers parameters', () => {
   beforeEach(async () => {
     await invalidateCaches();
     mockNetwork.reset();
+    setAuthToken(null);
   });
 
   it.each([
