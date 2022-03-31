@@ -217,29 +217,32 @@ export class LayersFactory {
       preferGetCapabilities,
     );
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
-      if (!dataset) {
-        return new WmsLayer({ baseUrl, layerId, title, description });
-      }
+    return filteredLayersInfos.map(
+      ({ layerId, dataset, title, description, legendUrl, evalscript, dataProduct, ...rest }) => {
+        if (!dataset) {
+          return new WmsLayer({ baseUrl, layerId, title, description });
+        }
 
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
-      if (!SHLayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-      }
-      return new SHLayerClass({
-        instanceId: parseSHInstanceId(baseUrl),
-        layerId,
-        evalscript: null,
-        evalscriptUrl: null,
-        dataProduct: null,
-        title,
-        description,
-        legendUrl,
-        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-        // otherwise the default values from layer definition on the service will be used.
-        ...overrideConstructorParams,
-      });
-    });
+        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
+        if (!SHLayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+        }
+        return new SHLayerClass({
+          instanceId: parseSHInstanceId(baseUrl),
+          layerId,
+          evalscript: evalscript || null,
+          evalscriptUrl: null,
+          dataProduct: dataProduct || null,
+          title,
+          description,
+          legendUrl,
+          ...rest,
+          // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+          // otherwise the default values from layer definition on the service will be used.
+          ...overrideConstructorParams,
+        });
+      },
+    );
   }
 
   private static async getSHv3LayersInfo(

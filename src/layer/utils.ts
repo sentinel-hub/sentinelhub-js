@@ -176,6 +176,10 @@ export async function fetchLayerParamsFromConfigurationService(
     title: l.title,
     description: l.description,
     ...l.datasourceDefaults,
+    //maxCloudCoverPercent vs maxCloudCoverage
+    ...(l.datasourceDefaults.maxCloudCoverage !== undefined && {
+      maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
+    }),
     evalscript: l.styles[0].evalScript,
     dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
     legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
