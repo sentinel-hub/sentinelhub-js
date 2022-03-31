@@ -1,4 +1,4 @@
-import { MimeType, ImageProperties } from '../layer/const';
+import { MimeType, FormatJpegOrPng, MimeTypes, ImageProperties } from '../layer/const';
 
 export async function drawBlobOnCanvas(
   ctx: CanvasRenderingContext2D,
@@ -21,7 +21,13 @@ export async function drawBlobOnCanvas(
   }
 }
 
-export async function canvasToBlob(canvas: HTMLCanvasElement, mimeFormat: MimeType): Promise<Blob> {
+export async function canvasToBlob(
+  canvas: HTMLCanvasElement,
+  mimeFormat: MimeType | FormatJpegOrPng,
+): Promise<Blob> {
+  if (mimeFormat === MimeTypes.JPEG_OR_PNG) {
+    return Promise.reject('This format is not supported');
+  }
   return await new Promise(resolve => canvas.toBlob(resolve, mimeFormat));
 }
 
