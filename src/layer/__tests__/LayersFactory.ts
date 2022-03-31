@@ -7,7 +7,14 @@ import { S2L1CLayer } from '../S2L1CLayer';
 import { S5PL2Layer } from '../S5PL2Layer';
 import { getCapabilitiesWmsXmlResponse } from './fixtures.getCapabilitiesWMS';
 import { getCapabilitiesWmtsXMLResponse } from './fixtures.getCapabilitiesWMTS';
+import {
+  getLayersFromConfigurationService,
+  getLayersFromJsonCapabilities,
+  expectedResultJsonCapabilities,
+  expectedResultConfigurationService,
+} from './fixtures.makeLayersSHv3';
 import { WmtsLayer } from '../WmtsLayer';
+import { S2L2ALayer } from '../S2L2ALayer';
 
 const mockNetwork = new MockAdapter(axios);
 
@@ -247,5 +254,92 @@ describe('Test endpoints for getting layers parameters', () => {
     await LayersFactory.makeLayers(baseUrl + instanceId, null, null, null, preferGetCapabilities);
     expect(mockNetwork.history.get.length).toBe(responses.length);
     expect(mockNetwork.history.get[responses.length - 1].url).toBe(expectedEndpoint(instanceId));
+  });
+});
+
+describe('Test makeLayersSHv3', () => {
+  beforeEach(async () => {
+    await invalidateCaches();
+    mockNetwork.reset();
+    setAuthToken(null);
+  });
+
+  it.each([
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+        authToken: undefined,
+        overrideConstructorParams: undefined,
+      },
+      [{ code: 200, data: getLayersFromJsonCapabilities }],
+      expectedResultJsonCapabilities,
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'token',
+        overrideConstructorParams: undefined,
+      },
+      [{ code: 200, data: getLayersFromConfigurationService }],
+      expectedResultConfigurationService,
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+        authToken: undefined,
+        overrideConstructorParams: { upsampling: 'NN', maxCloudCoverPercent: 25 },
+      },
+      [{ code: 200, data: getLayersFromJsonCapabilities }],
+      expectedResultJsonCapabilities,
+    ],
+    [
+      {
+        baseUrl: `${DATASET_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'token',
+        overrideConstructorParams: { upsampling: 'NN', maxCloudCoverPercent: 25 },
+      },
+      [{ code: 200, data: getLayersFromConfigurationService }],
+      expectedResultConfigurationService,
+    ],
+    ,
+  ])('test result of makeLayersSHv3 ', async (inputParams, responses, expectedResult) => {
+    const { baseUrl, instanceId, preferGetCapabilities, authToken, overrideConstructorParams } = inputParams;
+
+    if (!!authToken) {
+      setAuthToken(authToken);
+    }
+    responses.forEach((response: Record<string, any>) => {
+      mockNetwork.onGet().replyOnce(response.code, response.data);
+    });
+    const layers = await LayersFactory.makeLayers(
+      baseUrl + instanceId,
+      null,
+      overrideConstructorParams,
+      null,
+      preferGetCapabilities,
+    );
+    expect(mockNetwork.history.get.length).toBe(responses.length);
+    const expected = expectedResult(overrideConstructorParams);
+    expect(layers.length).toBe(expected.length);
+    layers.forEach((layer: S2L2ALayer, i) => {
+      expect(layer.getLayerId()).toEqual(expected[i].layerId);
+      expect(layer.title).toEqual(expected[i].title);
+      expect(layer.description).toEqual(expected[i].description);
+      expect(layer.dataset).toEqual(expected[i].dataset);
+      expect(layer.getEvalscript()).toEqual(expected[i].evalscript);
+      expect(layer.getDataProduct()).toEqual(expected[i].dataProduct);
+      expect(layer.upsampling).toEqual(expected[i].upsampling);
+      expect(layer.downsampling).toEqual(expected[i].downsampling);
+      expect(layer.mosaickingOrder).toEqual(expected[i].mosaickingOrder);
+      expect(layer.maxCloudCoverPercent).toEqual(expected[i].maxCloudCoverPercent);
+    });
   });
 });
