@@ -3,7 +3,6 @@ import { CRS_EPSG4326, CRS_EPSG3857, CRS_WGS84, SUPPORTED_CRS_OBJ } from './crs'
 import { setAuthToken, isAuthTokenSet, requestAuthToken } from './auth';
 import {
   ApiType,
-  MimeType,
   MimeTypes,
   OrbitDirection,
   PreviewMode,
@@ -181,7 +180,6 @@ export {
   CRS_EPSG4326,
   CRS_EPSG3857,
   CRS_WGS84,
-  MimeType,
   MimeTypes,
   AcquisitionMode,
   Polarization,
