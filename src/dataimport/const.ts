@@ -40,9 +40,29 @@ export enum PlanetProductBundle {
   ANALYTIC_UDM2 = 'analytic_udm2',
   ANALYTIC_SR = 'analytic_sr',
   ANALYTIC_SR_UDM2 = 'analytic_sr_udm2',
+  ANALYTIC_8B_UDM2 = 'analytic_8b_udm2',
+  ANALYTIC_8B_SR_UDM2 = 'analytic_8b_sr_udm2',
 }
 
-export const PlanetItemType = 'PSScene4Band';
+export enum PlanetItemType {
+  PSScene4Band = 'PSScene4Band',
+  PSScene = 'PSScene',
+}
+
+export const PlanetSupportedProductBundles = {
+  [PlanetItemType.PSScene4Band]: [
+    PlanetProductBundle.ANALYTIC,
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_SR,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+  ],
+  [PlanetItemType.PSScene]: [
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_8B_UDM2,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+    PlanetProductBundle.ANALYTIC_8B_SR_UDM2,
+  ],
+};
 
 export const MaxarProductBands = '4BB';
 
@@ -65,6 +85,7 @@ export type TPDISearchParams = {
   constellation?: AirbusConstellation;
   nativeFilter?: any;
   sensor?: MaxarSensor;
+  itemType?: PlanetItemType;
   productBundle?: PlanetProductBundle;
 };
 
