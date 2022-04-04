@@ -45,8 +45,8 @@ export enum PlanetProductBundle {
 }
 
 export enum PlanetItemType {
-  PSScene4Band = 'PSScene4Band',
   PSScene = 'PSScene',
+  PSScene4Band = 'PSScene4Band',
 }
 
 export const PlanetSupportedProductBundles = {
