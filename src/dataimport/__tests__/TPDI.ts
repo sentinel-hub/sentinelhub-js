@@ -14,6 +14,8 @@ import {
   TPDProvider,
   TPDI_SERVICE_URL,
   ResamplingKernel,
+  PlanetItemType,
+  PlanetProductBundle,
 } from '../const';
 import { CACHE_CONFIG_NOCACHE } from '../../utils/cacheHandlers';
 
@@ -175,7 +177,15 @@ describe('Test createOrder', () => {
 
   it.each([
     [TPDProvider.AIRBUS, { ...defaultSearchParams, constellation: AirbusConstellation.SPOT }, null],
-    [TPDProvider.PLANET, { ...defaultSearchParams }, { planetApiKey: 'planetApiKey' }],
+    [
+      TPDProvider.PLANET,
+      {
+        ...defaultSearchParams,
+        itemType: PlanetItemType.PSScene4Band,
+        productBundle: PlanetProductBundle.ANALYTIC,
+      },
+      { planetApiKey: 'planetApiKey' },
+    ],
     [TPDProvider.MAXAR, { ...defaultSearchParams }, { productKernel: ResamplingKernel.CC }],
   ])('requires authenthication', async (provider, searchParams, orderParams) => {
     setAuthToken(undefined);

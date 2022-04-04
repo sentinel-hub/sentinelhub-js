@@ -8,6 +8,7 @@ import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
 import {
+  PlanetItemType,
   PlanetProductBundle,
   PlanetScopeHarmonization,
   TPDIOrderParams,
@@ -26,6 +27,8 @@ const defaultSearchParams: TPDISearchParams = {
   fromTime: new Date(2021, 5 - 1, 30, 0, 0, 0, 0),
   toTime: new Date(2021, 6 - 1, 31, 23, 59, 59, 999),
   bbox: new BBox(CRS_EPSG4326, 18, 20, 20, 22),
+  itemType: PlanetItemType.PSScene4Band,
+  productBundle: PlanetProductBundle.ANALYTIC,
 };
 
 const defaultOrderParams: TPDIOrderParams = {
@@ -109,7 +112,6 @@ describe('Test search', () => {
     [{ ...defaultSearchParams, maxCloudCoverage: null }],
     [{ ...defaultSearchParams, maxCloudCoverage: undefined }],
     [{ ...defaultSearchParams, nativeFilter: undefined }],
-    [{ ...defaultSearchParams, productBundle: undefined }],
   ])('checks if parameters are set correctly', async params => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, params);
