@@ -149,6 +149,7 @@ export type OrderSearchResult = {
 export enum PlanetScopeHarmonization {
   PS2 = 'PS2',
   NONE = 'NONE',
+  SENTINEL2 = 'Sentinel-2',
 }
 
 export enum ResamplingKernel {
