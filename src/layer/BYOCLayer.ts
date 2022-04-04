@@ -103,7 +103,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         }
       }
 
-      if (this.locationId === null) {
+      if (this.locationId === null && this.subType !== BYOCSubTypes.ZARR) {
         const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
         const headers = { Authorization: `Bearer ${getAuthToken()}` };
         const res = await axios.get(url, {
@@ -113,6 +113,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         });
 
         this.locationId = res.data.location.id;
+      } else if (this.subType === BYOCSubTypes.ZARR) {
+        // Obtaining location ID is currently not possible for ZARR.
+        // We hardcode AWS EU as the only currently supported location.
+        this.locationId = LocationIdSHv3.awsEuCentral1;
       }
     }, reqConfig);
   }
@@ -255,6 +259,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     const bandsResponseData = await ensureTimeout(async innerReqConfig => {
       if (this.collectionId === null) {
         throw new Error('Parameter collectionId is not set');
+      }
+      if (this.subType === BYOCSubTypes.ZARR) {
+        throw new Error('Fetching available bands for ZARR not supported.');
       }
 
       const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
