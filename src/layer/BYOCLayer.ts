@@ -46,9 +46,9 @@ type BYOCFindTilesDatasetParameters = {
 
 export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public readonly dataset = DATASET_BYOC;
-  protected collectionId: string;
-  protected locationId: LocationIdSHv3;
-  protected subType: BYOCSubTypes;
+  public collectionId: string;
+  public locationId: LocationIdSHv3;
+  public subType: BYOCSubTypes;
 
   public constructor({
     instanceId = null,
@@ -103,20 +103,22 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         }
       }
 
-      if (this.locationId === null && this.subType !== BYOCSubTypes.ZARR) {
-        const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
-        const headers = { Authorization: `Bearer ${getAuthToken()}` };
-        const res = await axios.get(url, {
-          responseType: 'json',
-          headers: headers,
-          ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-        });
+      if (this.locationId === null) {
+        if (this.subType !== BYOCSubTypes.ZARR) {
+          const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
+          const headers = { Authorization: `Bearer ${getAuthToken()}` };
+          const res = await axios.get(url, {
+            responseType: 'json',
+            headers: headers,
+            ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
+          });
 
-        this.locationId = res.data.location.id;
-      } else if (this.subType === BYOCSubTypes.ZARR) {
-        // Obtaining location ID is currently not possible for ZARR.
-        // We hardcode AWS EU as the only currently supported location.
-        this.locationId = LocationIdSHv3.awsEuCentral1;
+          this.locationId = res.data.location.id;
+        } else {
+          // Obtaining location ID is currently not possible for ZARR.
+          // We hardcode AWS EU as the only currently supported location.
+          this.locationId = LocationIdSHv3.awsEuCentral1;
+        }
       }
     }, reqConfig);
   }

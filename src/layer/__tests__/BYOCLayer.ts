@@ -190,3 +190,43 @@ describe('Test findDatesUTC using catalog', () => {
 });
 
 test.todo('check if correct location is used');
+
+describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+  const mockedLayerId = 'LAYER_ID';
+  const mockedLayersResponse = [{ id: mockedLayerId, styles: [{}] }];
+
+  test('AWS EU locationId is set by default if not specified', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: mockedLayerId,
+      collectionId: 'mockCollectionId',
+      subType: BYOCSubTypes.ZARR,
+    });
+    expect(layer.locationId).toEqual(null);
+    mockNetwork
+      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .replyOnce(200, mockedLayersResponse);
+    await layer.updateLayerFromServiceIfNeeded();
+    expect(layer.locationId).toEqual(LocationIdSHv3.awsEuCentral1);
+  });
+
+  test('location Id is not overridden', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: mockedLayerId,
+      collectionId: 'mockCollectionId',
+      subType: BYOCSubTypes.ZARR,
+      locationId: LocationIdSHv3.creo,
+    });
+    expect(layer.locationId).toEqual(LocationIdSHv3.creo);
+    mockNetwork
+      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .replyOnce(200, mockedLayersResponse);
+    await layer.updateLayerFromServiceIfNeeded();
+    expect(layer.locationId).toEqual(LocationIdSHv3.creo);
+  });
+});
