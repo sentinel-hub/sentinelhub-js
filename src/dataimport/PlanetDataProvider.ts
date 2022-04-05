@@ -11,7 +11,6 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     const data: any = {};
 
     //itemType is a required parameter
-
     if (!params.itemType) {
       throw new Error('Parameter itemType must be specified');
     }
@@ -19,7 +18,6 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     data.itemType = params.itemType;
 
     //productBundle is a required parameter
-
     if (!params.productBundle) {
       throw new Error('Parameter productBundle must be specified');
     }
@@ -27,10 +25,9 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     data.productBundle = params.productBundle;
 
     //check if productBundle is supported for selected itemType
-
     if (
       PlanetSupportedProductBundles[params.itemType] &&
-      !PlanetSupportedProductBundles[params.itemType].includes(data.productBundle)
+      !PlanetSupportedProductBundles[params.itemType].includes(params.productBundle)
     ) {
       throw new Error(`Product bundle is not supported for selected item type`);
     }
