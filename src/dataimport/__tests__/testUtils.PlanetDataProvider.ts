@@ -17,7 +17,9 @@ export function checkSearchPayload(requestData: any, params: TPDISearchParams): 
   expect(requestData.bounds.properties.crs).toStrictEqual(params.bbox.crs.opengisUrl);
   const dataObject = requestData.data[0];
 
-  expect(dataObject.itemType).toStrictEqual('PSScene4Band');
+  if (!!params.itemType) {
+    expect(dataObject.itemType).toStrictEqual(params.itemType);
+  }
 
   const { dataFilter } = dataObject;
   expect(dataFilter.timeRange.from).toStrictEqual(params.fromTime.toISOString());

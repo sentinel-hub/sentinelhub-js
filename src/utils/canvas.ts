@@ -21,7 +21,7 @@ export async function drawBlobOnCanvas(
   }
 }
 
-export async function canvasToBlob(canvas: HTMLCanvasElement, mimeFormat: MimeType): Promise<Blob> {
+export async function canvasToBlob(canvas: HTMLCanvasElement, mimeFormat: MimeType | string): Promise<Blob> {
   return await new Promise(resolve => canvas.toBlob(resolve, mimeFormat));
 }
 

@@ -177,7 +177,7 @@ export async function fetchLayerParamsFromConfigurationService(
     description: l.description,
     ...l.datasourceDefaults,
     //maxCloudCoverPercent vs maxCloudCoverage
-    ...(l.datasourceDefaults.maxCloudCoverage !== undefined && {
+    ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
       maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
     }),
     evalscript: l.styles[0].evalScript,
