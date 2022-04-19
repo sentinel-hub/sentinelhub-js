@@ -4,8 +4,9 @@ import { parseStringPromise } from 'xml2js';
 
 import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
+import { getAuthToken } from '../auth';
 
 export type GetCapabilitiesWmsXml = {
   WMS_Capabilities: {
@@ -137,4 +138,53 @@ export function parseSHInstanceId(baseUrl: string): string {
     return instanceId;
   }
   throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
+}
+
+export async function fetchLayerParamsFromConfigurationService(
+  instanceId: string,
+  reqConfig: RequestConfiguration,
+): Promise<any[]> {
+  const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+  if (!authToken) {
+    throw new Error('Must be authenticated to fetch layer params');
+  }
+  // Note that for SH v3 service, the endpoint for fetching the list of layers is always
+  // https://services.sentinel-hub.com/, even for creodias datasets:
+  const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  // reqConfig might include the cache config from getMap, which could cache instances/${this.instanceId}/layers
+  // we do not want this as layer updates will not invalidate this cache, so we rather cache to memory
+  const reqConfigWithMemoryCache = {
+    ...reqConfig,
+    // Do not override cache if cache is disabled with `expiresIn: 0`
+    cache:
+      reqConfig && reqConfig.cache && reqConfig.cache.expiresIn === 0
+        ? reqConfig.cache
+        : CACHE_CONFIG_30MIN_MEMORY,
+  };
+  const requestConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    headers: headers,
+    ...getAxiosReqParams(reqConfigWithMemoryCache, null),
+  };
+  const res = await axios.get(url, requestConfig);
+  const layersParams = res.data.map((l: any) => ({
+    layerId: l.id,
+    title: l.title,
+    description: l.description,
+    ...l.datasourceDefaults,
+    //maxCloudCoverPercent vs maxCloudCoverage
+    ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
+      maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
+    }),
+    evalscript: l.styles[0].evalScript,
+    dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
+    legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
+      ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
+      : null,
+  }));
+  return layersParams;
 }

@@ -5,6 +5,7 @@ import {
   fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
+  fetchLayerParamsFromConfigurationService,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import {
@@ -69,6 +70,7 @@ import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
+import { getAuthToken } from '../auth';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -141,6 +143,7 @@ export class LayersFactory {
     layerId: string,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer> {
     const layer = await ensureTimeout(async innerReqConfig => {
       const layers = await LayersFactory.makeLayers(
@@ -148,6 +151,7 @@ export class LayersFactory {
         (lId: string) => lId === layerId,
         overrideConstructorParams,
         innerReqConfig,
+        preferGetCapabilities,
       );
       if (layers.length === 0) {
         return null;
@@ -162,11 +166,18 @@ export class LayersFactory {
     filterLayers: Function | null = null,
     overrideConstructorParams?: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async innerReqConfig => {
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+          return await this.makeLayersSHv3(
+            baseUrl,
+            filterLayers,
+            overrideConstructorParams,
+            innerReqConfig,
+            preferGetCapabilities,
+          );
         }
       }
 
@@ -197,45 +208,89 @@ export class LayersFactory {
     filterLayers: Function | null,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
-    const layersInfos = getCapabilitiesJson.map(layerInfo => ({
-      layerId: layerInfo.id,
-      title: layerInfo.name,
-      description: layerInfo.description,
-      dataset:
-        layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          : null,
-      legendUrl: layerInfo.legendUrl,
-    }));
+    const filteredLayersInfos = await this.getSHv3LayersInfo(
+      baseUrl,
+      reqConfig,
+      filterLayers,
+      preferGetCapabilities,
+    );
+
+    return filteredLayersInfos.map(
+      ({ layerId, dataset, title, description, legendUrl, evalscript, dataProduct, ...rest }) => {
+        if (!dataset) {
+          return new WmsLayer({ baseUrl, layerId, title, description });
+        }
+
+        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
+        if (!SHLayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+        }
+        return new SHLayerClass({
+          instanceId: parseSHInstanceId(baseUrl),
+          layerId,
+          evalscript: evalscript || null,
+          evalscriptUrl: null,
+          dataProduct: dataProduct || null,
+          title,
+          description,
+          legendUrl,
+          ...rest,
+          // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+          // otherwise the default values from layer definition on the service will be used.
+          ...overrideConstructorParams,
+        });
+      },
+    );
+  }
+
+  private static async getSHv3LayersInfo(
+    baseUrl: string,
+    reqConfig: RequestConfiguration,
+    filterLayers: Function,
+    preferGetCapabilities: boolean = true,
+  ): Promise<any[]> {
+    let layersInfos;
+    //also check if auth token is present
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    let layersInfoFetched = false;
+    // use configuration if possible
+    if (authToken && preferGetCapabilities === false) {
+      try {
+        const layers = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
+        layersInfos = layers.map((l: any) => ({
+          ...l,
+          dataset:
+            l.type && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
+              ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
+              : null,
+        }));
+        layersInfoFetched = true;
+      } catch (e) {
+        console.error(e);
+        // fallback to getCapabilities
+      }
+    }
+
+    if (!layersInfoFetched) {
+      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
+      layersInfos = getCapabilitiesJson.map(layerInfo => ({
+        layerId: layerInfo.id,
+        title: layerInfo.name,
+        description: layerInfo.description,
+        dataset:
+          layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
+            : null,
+        legendUrl: layerInfo.legendUrl,
+      }));
+    }
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
-      if (!dataset) {
-        return new WmsLayer({ baseUrl, layerId, title, description });
-      }
-
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
-      if (!SHLayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-      }
-      return new SHLayerClass({
-        instanceId: parseSHInstanceId(baseUrl),
-        layerId,
-        evalscript: null,
-        evalscriptUrl: null,
-        dataProduct: null,
-        title,
-        description,
-        legendUrl,
-        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-        // otherwise the default values from layer definition on the service will be used.
-        ...overrideConstructorParams,
-      });
-    });
+    return filteredLayersInfos;
   }
 
   private static async makeLayersSHv12(

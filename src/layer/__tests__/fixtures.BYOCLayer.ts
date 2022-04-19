@@ -393,6 +393,8 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
       '}',
     dataProduct: undefined as any,
     legend: undefined as any,
+    title: 'byoc3',
+    description: '',
   };
 
   return {

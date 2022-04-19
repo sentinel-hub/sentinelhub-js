@@ -8,6 +8,7 @@ import { ServiceType } from './layer/wms';
 import { AbstractSentinelHubV3Layer } from './layer/AbstractSentinelHubV3Layer';
 import { LayersFactory } from './layer/LayersFactory';
 import { WmsLayer } from './layer/WmsLayer';
+import { RequestConfiguration } from './utils/cancelRequests';
 
 export async function legacyGetMapFromUrl(
   urlWithQueryParams: string,
@@ -45,6 +46,8 @@ export async function legacyGetMapFromParams(
   fallbackToWmsApi: boolean = false,
   overrideLayerConstructorParams?: Record<string, any>,
   overrideGetMapParams?: OverrideGetMapParams,
+  requestConfig?: RequestConfiguration,
+  preferGetCapabilities: boolean = true,
 ): Promise<Blob> {
   const {
     layers,
@@ -67,7 +70,13 @@ export async function legacyGetMapFromParams(
     const overrideConstructorParams = { ...otherLayerParams, ...overrideLayerConstructorParams };
 
     // Warning: overrideConstructorParams override layer's params that are retrieved from service.
-    layer = await LayersFactory.makeLayer(baseUrl, layerId, overrideConstructorParams);
+    layer = await LayersFactory.makeLayer(
+      baseUrl,
+      layerId,
+      overrideConstructorParams,
+      requestConfig,
+      preferGetCapabilities,
+    );
     if (!layer) {
       throw new Error(`Layer with id ${layerId} was not found on service endpoint ${baseUrl}`);
     }
