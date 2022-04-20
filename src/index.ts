@@ -41,6 +41,7 @@ import {
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
   DATASET_PLANETSCOPE_LIVE,
+  DATASET_PLANETSCOPE_NICFI,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
@@ -69,6 +70,7 @@ import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { PlanetScopeLiveLayer } from './layer/PlanetScopeLiveLayer';
+import { PlanetScopeNicfiLayer } from './layer/PlanetScopeNicfiLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
 import {
@@ -142,6 +144,7 @@ export {
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
   DATASET_PLANETSCOPE_LIVE,
+  DATASET_PLANETSCOPE_NICFI,
   // layers:
   WmsLayer,
   WmtsLayer,
@@ -171,6 +174,7 @@ export {
   BYOCLayer,
   ProcessingDataFusionLayer,
   PlanetScopeLiveLayer,
+  PlanetScopeNicfiLayer,
   // auth:
   setAuthToken,
   isAuthTokenSet,

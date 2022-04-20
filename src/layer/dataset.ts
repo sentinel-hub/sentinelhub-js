@@ -379,3 +379,18 @@ export const DATASET_PLANETSCOPE_LIVE: Dataset = {
   maxDate: null,
   catalogCollectionId: 'planet-scorpius',
 };
+
+export const DATASET_PLANETSCOPE_NICFI: Dataset = {
+  id: 'PLANETSCOPE_NICFI',
+  shJsonGetCapabilitiesDataset: 'nicfi',
+  shWmsEvalsource: 'nicfi',
+  shProcessingApiDatasourceAbbreviation: 'nicfi',
+  datasetParametersType: null,
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/', // depends on location, for example: https://services.sentinel-hub.com/
+  searchIndexUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/searchIndex
+  findDatesUTCUrl: null, // depends on location, for example: https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData
+  orbitTimeMinutes: null,
+  minDate: null,
+  maxDate: null,
+  catalogCollectionId: 'nicfi',
+};

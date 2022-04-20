@@ -67,6 +67,7 @@ import { Landsat15AWSLMSSL1Layer } from './Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './Landsat7AWSLETML2Layer';
 import { PlanetScopeLiveLayer, PLANETSCOPE_LIVE_CONFIGURATIONS } from './PlanetScopeLiveLayer';
+import { PlanetScopeNicfiLayer, PLANETSCOPE_NICFI_CONFIGURATIONS } from './PlanetScopeNicfiLayer';
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
@@ -168,6 +169,9 @@ export class LayersFactory {
       if (baseUrl === 'planetscope-live-experimental') {
         return this.createPlanetScopeLiveLayers();
       }
+      if (baseUrl === 'planetscope-nicfi-experimental') {
+        return this.createPlanetScopeNicfiLayers();
+      }
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
           return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
@@ -201,6 +205,20 @@ export class LayersFactory {
     for (let configuration of PLANETSCOPE_LIVE_CONFIGURATIONS) {
       layers.push(
         new PlanetScopeLiveLayer({
+          layerId: configuration.layerId,
+          instanceId: 'test-instance',
+          title: configuration.title,
+        }),
+      );
+    }
+    return layers;
+  }
+
+  private static createPlanetScopeNicfiLayers(): any {
+    const layers = [];
+    for (let configuration of PLANETSCOPE_NICFI_CONFIGURATIONS) {
+      layers.push(
+        new PlanetScopeNicfiLayer({
           layerId: configuration.layerId,
           instanceId: 'test-instance',
           title: configuration.title,
