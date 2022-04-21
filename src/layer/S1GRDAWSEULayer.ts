@@ -12,6 +12,8 @@ import {
   LinkType,
   DataProductId,
   FindTilesAdditionalParameters,
+  MosaickingOrder,
+  Interpolator,
 } from './const';
 import { ProcessingPayload } from './processing';
 import { DATASET_AWSEU_S1GRD } from './dataset';
@@ -56,8 +58,11 @@ interface ConstructorParameters {
   evalscript?: string | null;
   evalscriptUrl?: string | null;
   dataProduct?: DataProductId | null;
+  mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
+  upsampling?: Interpolator | null;
+  downsampling?: Interpolator | null;
   legendUrl?: string | null;
   acquisitionMode?: AcquisitionMode | null;
   polarization?: Polarization | null;
@@ -90,14 +95,6 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public speckleFilter: SpeckleFilter | null;
 
   public constructor({
-    instanceId = null,
-    layerId = null,
-    evalscript = null,
-    evalscriptUrl = null,
-    dataProduct = null,
-    title = null,
-    description = null,
-    legendUrl = null,
     acquisitionMode = null,
     polarization = null,
     resolution = null,
@@ -106,8 +103,9 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
     speckleFilter = null,
+    ...rest
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
+    super(rest);
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
     this.resolution = resolution;
