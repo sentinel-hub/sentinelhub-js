@@ -140,6 +140,27 @@ export function parseSHInstanceId(baseUrl: string): string {
   throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
 }
 
+/*
+  rename some layer parameters as they are named differently in the configuration service response
+*/
+const convertLayerParams = (params: Record<string, any>): Record<string, any> => {
+  return {
+    ...params,
+    ...(params?.maxCloudCoverage !== undefined && {
+      maxCloudCoverPercent: params.maxCloudCoverage,
+    }),
+    ...(params?.demInstance !== undefined && {
+      demInstanceType: params.demInstance,
+    }),
+    ...(params?.backCoeff !== undefined && {
+      backscatterCoeff: params.backCoeff,
+    }),
+    ...(params?.EGM !== undefined && {
+      egm: params.EGM,
+    }),
+  };
+};
+
 export async function fetchLayerParamsFromConfigurationService(
   instanceId: string,
   reqConfig: RequestConfiguration,
@@ -175,11 +196,7 @@ export async function fetchLayerParamsFromConfigurationService(
     layerId: l.id,
     title: l.title,
     description: l.description,
-    ...l.datasourceDefaults,
-    //maxCloudCoverPercent vs maxCloudCoverage
-    ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
-      maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
-    }),
+    ...convertLayerParams(l.datasourceDefaults),
     evalscript: l.styles[0].evalScript,
     dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
     legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
