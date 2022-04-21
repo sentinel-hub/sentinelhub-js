@@ -35,7 +35,7 @@ import {
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
 import { DATASET_AWSEU_S1GRD } from '../dataset';
-import { DEMInstanceType, DEMInstanceTypeOrthorectification, Interpolator, MosaickingOrder } from '../const';
+import { DEMInstanceTypeOrthorectification, Interpolator, MosaickingOrder } from '../const';
 import { SpeckleFilterType } from '../S1GRDAWSEULayer';
 
 test('timezone should NOT be UTC', () => {
