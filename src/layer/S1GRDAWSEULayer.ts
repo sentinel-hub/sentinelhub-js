@@ -13,7 +13,6 @@ import {
   DataProductId,
   FindTilesAdditionalParameters,
   MosaickingOrder,
-  Interpolator,
 } from './const';
 import { ProcessingPayload } from './processing';
 import { DATASET_AWSEU_S1GRD } from './dataset';
