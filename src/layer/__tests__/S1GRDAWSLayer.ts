@@ -389,8 +389,6 @@ describe('test constructor', () => {
       dataProduct: 'dataProduct',
       title: 'title',
       description: 'description',
-      upsampling: Interpolator.BOX,
-      downsampling: Interpolator.BOX,
       legendUrl: 'legendUrl',
       acquisitionMode: AcquisitionMode.EW,
       polarization: Polarization.SV,

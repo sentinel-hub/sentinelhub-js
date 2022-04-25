@@ -61,8 +61,6 @@ interface ConstructorParameters {
   mosaickingOrder?: MosaickingOrder | null;
   title?: string | null;
   description?: string | null;
-  upsampling?: Interpolator | null;
-  downsampling?: Interpolator | null;
   legendUrl?: string | null;
   acquisitionMode?: AcquisitionMode | null;
   polarization?: Polarization | null;
