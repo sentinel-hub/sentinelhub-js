@@ -109,6 +109,7 @@ import {
   TPDISearchParams,
   TPDProvider,
   ResamplingKernel,
+  TPDIOrderCompatibleCollection,
 } from './dataimport/const';
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
@@ -238,4 +239,5 @@ export {
   PlanetScopeHarmonization,
   MaxarSensor,
   ResamplingKernel,
+  TPDIOrderCompatibleCollection,
 };

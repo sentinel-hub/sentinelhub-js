@@ -95,6 +95,16 @@ export type TPDIOrderParams = {
   productKernel?: ResamplingKernel;
 };
 
+export type TPDIOrderCompatibleCollection = {
+  id: string;
+  name: string;
+  created: string;
+  isConfigured: boolean;
+  requiresMetadataUpdate: boolean;
+  s3Bucket: string;
+  userId: string;
+};
+
 type LinksType = {
   currentToken: string;
   nextToken: string;
