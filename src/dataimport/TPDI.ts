@@ -221,7 +221,7 @@ export class TPDI {
         requestConfig,
       );
       if (data?.data) {
-        compatibleCollections = data.data;
+        compatibleCollections = data.data.map((c: Record<string, any>) => ({ id: c.id, name: c.name }));
       }
 
       return compatibleCollections;

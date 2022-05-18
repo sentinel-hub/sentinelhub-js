@@ -98,12 +98,6 @@ export type TPDIOrderParams = {
 export type TPDIOrderCompatibleCollection = {
   id: string;
   name: string;
-  created: string;
-  isConfigured: boolean;
-  requiresMetadataUpdate: boolean;
-  s3Bucket: string;
-  userId: string;
-  additionalData?: Record<string, any>;
 };
 
 type LinksType = {
