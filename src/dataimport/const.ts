@@ -95,6 +95,11 @@ export type TPDIOrderParams = {
   productKernel?: ResamplingKernel;
 };
 
+export type TPDIOrderCompatibleCollection = {
+  id: string;
+  name: string;
+};
+
 type LinksType = {
   currentToken: string;
   nextToken: string;
@@ -112,8 +117,8 @@ export type TPDSearchResult = {
 
 export type Quota = {
   collectionId: TPDICollections;
-  quotaSqkm: number;
-  quotaUsed: number;
+  quotaSqkm: number | null;
+  quotaUsed: number | null;
 };
 
 export enum OrderStatus {

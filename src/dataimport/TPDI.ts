@@ -10,6 +10,7 @@ import {
   OrderSearchParams,
   OrderSearchResult,
   TPDIOrderParams,
+  TPDIOrderCompatibleCollection,
 } from './const';
 import { AirbusDataProvider } from './AirbusDataProvider';
 import { PlanetDataProvider } from './PlanetDataProvider';
@@ -197,6 +198,33 @@ export class TPDI {
       );
       const order: Order = response.data;
       return order;
+    }, reqConfig);
+  }
+
+  public static async getCompatibleCollections(
+    provider: TPDProvider,
+    params: TPDISearchParams,
+    reqConfig?: RequestConfiguration,
+  ): Promise<TPDIOrderCompatibleCollection[]> {
+    return await ensureTimeout(async innerReqConfig => {
+      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+      const tpdp = getThirdPartyDataProvider(provider);
+
+      const searchPayload = tpdp.getSearchPayload(params);
+
+      const payload = { input: searchPayload };
+      let compatibleCollections: TPDIOrderCompatibleCollection[];
+
+      const { data } = await axios.post(
+        `${TPDI_SERVICE_URL}/orders/searchcompatiblecollections/`,
+        payload,
+        requestConfig,
+      );
+      if (data?.data) {
+        compatibleCollections = data.data.map((c: Record<string, any>) => ({ id: c.id, name: c.name }));
+      }
+
+      return compatibleCollections;
     }, reqConfig);
   }
 }
