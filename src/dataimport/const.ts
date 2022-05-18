@@ -103,6 +103,7 @@ export type TPDIOrderCompatibleCollection = {
   requiresMetadataUpdate: boolean;
   s3Bucket: string;
   userId: string;
+  additionalData?: Record<string, any>;
 };
 
 type LinksType = {
@@ -122,8 +123,8 @@ export type TPDSearchResult = {
 
 export type Quota = {
   collectionId: TPDICollections;
-  quotaSqkm: number;
-  quotaUsed: number;
+  quotaSqkm: number | null;
+  quotaUsed: number | null;
 };
 
 export enum OrderStatus {
