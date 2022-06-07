@@ -1,9 +1,10 @@
-import { DATASET_AWS_L8L1C } from './dataset';
-import { AbstractLandsat8Layer } from './AbstractLandsat8Layer';
+import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { Link, LinkType } from './const';
 
-export class Landsat8AWSLayer extends AbstractLandsat8Layer {
-  public readonly dataset = DATASET_AWS_L8L1C;
+export class AbstractLandsatLayer extends AbstractSentinelHubV3WithCCLayer {
+  protected getPreviewUrl(productId: string): string {
+    return `https://landsatlook.usgs.gov/gen-browse?size=thumb&type=refl&product_id=${productId}`;
+  }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [
@@ -12,7 +13,7 @@ export class Landsat8AWSLayer extends AbstractLandsat8Layer {
         type: LinkType.AWS,
       },
       {
-        target: `${tile.dataUri}_thumb_small.jpg`,
+        target: this.getPreviewUrl(tile.originalId),
         type: LinkType.PREVIEW,
       },
     ];
@@ -26,12 +27,11 @@ export class Landsat8AWSLayer extends AbstractLandsat8Layer {
       result.push({ target: assets.data.href, type: LinkType.AWS });
     }
 
-    if (assets.data && assets.data.href) {
-      result.push({
-        target: assets.data.href.replace('/index.html', `/${feature.id}_thumb_small.jpg`),
-        type: LinkType.PREVIEW,
-      });
-    }
+    result.push({
+      target: this.getPreviewUrl(feature.id),
+      type: LinkType.PREVIEW,
+    });
+
     return result;
   }
 }
