@@ -1,11 +1,9 @@
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
-import { Link, LinkType } from './const';
+import { landsatPreviewUrl, Link, LinkType } from './const';
 
 export class AbstractLandsatLayer extends AbstractSentinelHubV3WithCCLayer {
-  protected landsatPreviewUrl = 'https://landsatlook.usgs.gov/gen-browse?size=thumb&type=refl';
-
   protected getPreviewUrl(productId: string): string | null {
-    return `${this.landsatPreviewUrl}&product_id=${productId}`;
+    return `${landsatPreviewUrl}&product_id=${productId}`;
   }
 
   protected getTileLinks(tile: Record<string, any>): Link[] {

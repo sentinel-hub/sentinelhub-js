@@ -275,3 +275,5 @@ export const PLANET_FALSE_COLOR_TEMPLATES = [
   { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
   { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
 ];
+
+export const landsatPreviewUrl = 'https://landsatlook.usgs.gov/gen-browse?size=thumb&type=refl';
