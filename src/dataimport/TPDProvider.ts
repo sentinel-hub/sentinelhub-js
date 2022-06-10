@@ -11,6 +11,7 @@ export interface TPDProviderInterface {
     orderParams?: TPDIOrderParams,
   ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
+  checkSubscriptionsSupported(): boolean;
 }
 
 export abstract class AbstractTPDProvider implements TPDProviderInterface {
@@ -109,5 +110,9 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     payload.input = this.getAdditionalOrderParams(items, searchParams, orderParams);
 
     return payload;
+  }
+
+  public checkSubscriptionsSupported(): boolean {
+    throw new Error('Subscriptions are not supported for selected provider');
   }
 }

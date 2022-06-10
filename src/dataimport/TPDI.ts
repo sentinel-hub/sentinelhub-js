@@ -62,6 +62,92 @@ function createRequestConfig(innerReqConfig: RequestConfiguration): AxiosRequest
   return requestConfig;
 }
 
+async function getPurchases(
+  serviceEndpoint: string,
+  params?: OrderSearchParams,
+  reqConfig?: RequestConfiguration,
+  count?: number,
+  viewtoken?: string,
+): Promise<OrderSearchResult> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+
+    let queryParams: Record<string, any> = {};
+    if (params) {
+      queryParams = { ...params };
+    }
+    if (!isNaN(count) && count !== null) {
+      //set page size
+      queryParams.count = count;
+    }
+
+    //set offset
+    if (viewtoken) {
+      queryParams.viewtoken = viewtoken;
+    }
+    requestConfig.params = queryParams;
+    //`${TPDI_SERVICE_URL}/orders`
+    const { data } = await axios.get<OrderSearchResult>(serviceEndpoint, requestConfig);
+    return data;
+  }, reqConfig);
+}
+
+async function getPurchase(
+  serviceEndpoint: string,
+  id: string,
+  reqConfig?: RequestConfiguration,
+): Promise<Order> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    const response = await axios.get<Order>(`${serviceEndpoint}/${id}`, requestConfig);
+    const order: Order = response.data;
+    return order;
+  }, reqConfig);
+}
+
+async function deletePurchase(
+  serviceEndpoint: string,
+  id: string,
+  reqConfig?: RequestConfiguration,
+): Promise<void> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    await axios.delete(`${serviceEndpoint}/${id}`, requestConfig);
+  }, reqConfig);
+}
+
+async function confirmPurchase(
+  serviceEndpoint: string,
+  id: string,
+  reqConfig?: RequestConfiguration,
+): Promise<Order> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    const response = await axios.post<Order>(`${serviceEndpoint}/${id}/confirm`, {}, requestConfig);
+    const order: Order = response.data;
+    return order;
+  }, reqConfig);
+}
+
+async function createPurchase(
+  serviceEndpoint: string,
+  tpdiProvider: TPDProviderInterface,
+  name: string,
+  collectionId: string,
+  items: string[],
+  searchParams: TPDISearchParams,
+  orderParams?: TPDIOrderParams,
+  reqConfig?: RequestConfiguration,
+): Promise<Order> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    const payload = tpdiProvider.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+    const response = await axios.post<Order>(serviceEndpoint, payload, requestConfig);
+    const order: Order = response.data;
+    return order;
+  }, reqConfig);
+}
+
 export class TPDI {
   public static async getQuota(
     TDPICollectionId: TPDICollections,
@@ -134,14 +220,40 @@ export class TPDI {
     orderParams?: TPDIOrderParams,
     reqConfig?: RequestConfiguration,
   ): Promise<Order> {
-    return await ensureTimeout(async innerReqConfig => {
-      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      const tpdp = getThirdPartyDataProvider(provider);
-      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
-      const response = await axios.post<Order>(`${TPDI_SERVICE_URL}/orders`, payload, requestConfig);
-      const order: Order = response.data;
-      return order;
-    }, reqConfig);
+    const tpdiProvider = getThirdPartyDataProvider(provider);
+    return await createPurchase(
+      `${TPDI_SERVICE_URL}/orders`,
+      tpdiProvider,
+      name,
+      collectionId,
+      items,
+      searchParams,
+      orderParams,
+      reqConfig,
+    );
+  }
+
+  public static async createSubscription(
+    provider: TPDProvider,
+    name: string,
+    collectionId: string,
+    items: string[],
+    searchParams: TPDISearchParams,
+    orderParams?: TPDIOrderParams,
+    reqConfig?: RequestConfiguration,
+  ): Promise<Order> {
+    const tpdiProvider = getThirdPartyDataProvider(provider);
+    tpdiProvider.checkSubscriptionsSupported();
+    return await createPurchase(
+      `${TPDI_SERVICE_URL}/subscriptions`,
+      tpdiProvider,
+      name,
+      collectionId,
+      items,
+      searchParams,
+      orderParams,
+      reqConfig,
+    );
   }
 
   public static async getOrders(
@@ -150,55 +262,40 @@ export class TPDI {
     count?: number,
     viewtoken?: string,
   ): Promise<OrderSearchResult> {
-    return await ensureTimeout(async innerReqConfig => {
-      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    return await getPurchases(`${TPDI_SERVICE_URL}/orders`, params, reqConfig, count, viewtoken);
+  }
 
-      let queryParams: Record<string, any> = {};
-      if (params) {
-        queryParams = { ...params };
-      }
-      if (!isNaN(count) && count !== null) {
-        //set page size
-        queryParams.count = count;
-      }
-
-      //set offset
-      if (viewtoken) {
-        queryParams.viewtoken = viewtoken;
-      }
-      requestConfig.params = queryParams;
-      const { data } = await axios.get<OrderSearchResult>(`${TPDI_SERVICE_URL}/orders`, requestConfig);
-      return data;
-    }, reqConfig);
+  public static async getSubscriptions(
+    params?: OrderSearchParams,
+    reqConfig?: RequestConfiguration,
+    count?: number,
+    viewtoken?: string,
+  ): Promise<OrderSearchResult> {
+    return await getPurchases(`${TPDI_SERVICE_URL}/subscriptions`, params, reqConfig, count, viewtoken);
   }
 
   public static async getOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<Order> {
-    return await ensureTimeout(async innerReqConfig => {
-      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      const response = await axios.get<Order>(`${TPDI_SERVICE_URL}/orders/${orderId}`, requestConfig);
-      const order: Order = response.data;
-      return order;
-    }, reqConfig);
+    return await getPurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+  }
+
+  public static async getSubscription(id: string, reqConfig?: RequestConfiguration): Promise<Order> {
+    return await getPurchase(`${TPDI_SERVICE_URL}/orders`, id, reqConfig);
   }
 
   public static async deleteOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<void> {
-    return await ensureTimeout(async innerReqConfig => {
-      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      await axios.delete(`${TPDI_SERVICE_URL}/orders/${orderId}`, requestConfig);
-    }, reqConfig);
+    return await deletePurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+  }
+
+  public static async deleteSubscription(id: string, reqConfig?: RequestConfiguration): Promise<void> {
+    return await deletePurchase(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
   }
 
   public static async confirmOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<Order> {
-    return await ensureTimeout(async innerReqConfig => {
-      const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-      const response = await axios.post<Order>(
-        `${TPDI_SERVICE_URL}/orders/${orderId}/confirm`,
-        {},
-        requestConfig,
-      );
-      const order: Order = response.data;
-      return order;
-    }, reqConfig);
+    return await confirmPurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+  }
+
+  public static async confirmSubscription(id: string, reqConfig?: RequestConfiguration): Promise<Order> {
+    return await confirmPurchase(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
   }
 
   public static async getCompatibleCollections(

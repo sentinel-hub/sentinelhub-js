@@ -85,4 +85,7 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     }
     return input;
   }
+  public checkSubscriptionsSupported(): boolean {
+    return true;
+  }
 }
