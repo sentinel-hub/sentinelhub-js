@@ -126,6 +126,16 @@ async function confirmTransaction(
     return data;
   }, reqConfig);
 }
+
+async function cancelTransaction(
+  serviceEndpoint: string,
+  id: string,
+  reqConfig?: RequestConfiguration,
+): Promise<TPDITransaction> {
+  return await ensureTimeout(async innerReqConfig => {
+    const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
+    const { data } = await axios.post<TPDITransaction>(`${serviceEndpoint}/${id}/cancel`, {}, requestConfig);
+    return data;
   }, reqConfig);
 }
 
@@ -304,6 +314,13 @@ export class TPDI {
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
     return await confirmTransaction(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
+  }
+
+  public static async cancelSubscription(
+    id: string,
+    reqConfig?: RequestConfiguration,
+  ): Promise<TPDITransaction> {
+    return await cancelTransaction(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
   }
 
   public static async getCompatibleCollections(
