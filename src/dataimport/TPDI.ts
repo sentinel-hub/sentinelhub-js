@@ -62,7 +62,7 @@ function createRequestConfig(innerReqConfig: RequestConfiguration): AxiosRequest
   return requestConfig;
 }
 
-async function getPurchases(
+async function getTransactions(
   serviceEndpoint: string,
   params?: TPDITransactionSearchParams,
   reqConfig?: RequestConfiguration,
@@ -92,20 +92,19 @@ async function getPurchases(
   }, reqConfig);
 }
 
-async function getPurchase(
+async function getTransaction(
   serviceEndpoint: string,
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
   return await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-    const response = await axios.get<TPDITransaction>(`${serviceEndpoint}/${id}`, requestConfig);
-    const order: TPDITransaction = response.data;
-    return order;
+    const { data } = await axios.get<TPDITransaction>(`${serviceEndpoint}/${id}`, requestConfig);
+    return data;
   }, reqConfig);
 }
 
-async function deletePurchase(
+async function deleteTransaction(
   serviceEndpoint: string,
   id: string,
   reqConfig?: RequestConfiguration,
@@ -116,20 +115,21 @@ async function deletePurchase(
   }, reqConfig);
 }
 
-async function confirmPurchase(
+async function confirmTransaction(
   serviceEndpoint: string,
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
   return await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-    const response = await axios.post<TPDITransaction>(`${serviceEndpoint}/${id}/confirm`, {}, requestConfig);
-    const order: TPDITransaction = response.data;
-    return order;
+    const { data } = await axios.post<TPDITransaction>(`${serviceEndpoint}/${id}/confirm`, {}, requestConfig);
+    return data;
+  }, reqConfig);
+}
   }, reqConfig);
 }
 
-async function createPurchase(
+async function createTransaction(
   serviceEndpoint: string,
   tpdiProvider: TPDProviderInterface,
   name: string,
@@ -142,9 +142,8 @@ async function createPurchase(
   return await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     const payload = tpdiProvider.getOrderPayload(name, collectionId, items, searchParams, orderParams);
-    const response = await axios.post<TPDITransaction>(serviceEndpoint, payload, requestConfig);
-    const order: TPDITransaction = response.data;
-    return order;
+    const { data } = await axios.post<TPDITransaction>(serviceEndpoint, payload, requestConfig);
+    return data;
   }, reqConfig);
 }
 
@@ -221,7 +220,7 @@ export class TPDI {
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
     const tpdiProvider = getThirdPartyDataProvider(provider);
-    return await createPurchase(
+    return await createTransaction(
       `${TPDI_SERVICE_URL}/orders`,
       tpdiProvider,
       name,
@@ -244,7 +243,7 @@ export class TPDI {
   ): Promise<TPDITransaction> {
     const tpdiProvider = getThirdPartyDataProvider(provider);
     tpdiProvider.checkSubscriptionsSupported();
-    return await createPurchase(
+    return await createTransaction(
       `${TPDI_SERVICE_URL}/subscriptions`,
       tpdiProvider,
       name,
@@ -262,7 +261,7 @@ export class TPDI {
     count?: number,
     viewtoken?: string,
   ): Promise<TPDITransactionSearchResult> {
-    return await getPurchases(`${TPDI_SERVICE_URL}/orders`, params, reqConfig, count, viewtoken);
+    return await getTransactions(`${TPDI_SERVICE_URL}/orders`, params, reqConfig, count, viewtoken);
   }
 
   public static async getSubscriptions(
@@ -271,40 +270,40 @@ export class TPDI {
     count?: number,
     viewtoken?: string,
   ): Promise<TPDITransactionSearchResult> {
-    return await getPurchases(`${TPDI_SERVICE_URL}/subscriptions`, params, reqConfig, count, viewtoken);
+    return await getTransactions(`${TPDI_SERVICE_URL}/subscriptions`, params, reqConfig, count, viewtoken);
   }
 
   public static async getOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<TPDITransaction> {
-    return await getPurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+    return await getTransaction(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
   }
 
   public static async getSubscription(
     id: string,
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
-    return await getPurchase(`${TPDI_SERVICE_URL}/orders`, id, reqConfig);
+    return await getTransaction(`${TPDI_SERVICE_URL}/orders`, id, reqConfig);
   }
 
   public static async deleteOrder(orderId: string, reqConfig?: RequestConfiguration): Promise<void> {
-    return await deletePurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+    return await deleteTransaction(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
   }
 
   public static async deleteSubscription(id: string, reqConfig?: RequestConfiguration): Promise<void> {
-    return await deletePurchase(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
+    return await deleteTransaction(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
   }
 
   public static async confirmOrder(
     orderId: string,
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
-    return await confirmPurchase(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
+    return await confirmTransaction(`${TPDI_SERVICE_URL}/orders`, orderId, reqConfig);
   }
 
   public static async confirmSubscription(
     id: string,
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
-    return await confirmPurchase(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
+    return await confirmTransaction(`${TPDI_SERVICE_URL}/subscriptions`, id, reqConfig);
   }
 
   public static async getCompatibleCollections(
