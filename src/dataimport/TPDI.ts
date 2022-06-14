@@ -146,12 +146,12 @@ async function createTransaction(
   collectionId: string,
   items: string[],
   searchParams: TPDISearchParams,
-  orderParams?: TPDITransactionParams,
+  transactionParams?: TPDITransactionParams,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
   return await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-    const payload = tpdiProvider.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+    const payload = tpdiProvider.getOrderPayload(name, collectionId, items, searchParams, transactionParams);
     const { data } = await axios.post<TPDITransaction>(serviceEndpoint, payload, requestConfig);
     return data;
   }, reqConfig);
@@ -248,7 +248,7 @@ export class TPDI {
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams?: TPDITransactionParams,
+    subscriptionParams?: TPDITransactionParams,
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransaction> {
     const tpdiProvider = getThirdPartyDataProvider(provider);
@@ -260,7 +260,7 @@ export class TPDI {
       collectionId,
       items,
       searchParams,
-      orderParams,
+      subscriptionParams,
       reqConfig,
     );
   }
