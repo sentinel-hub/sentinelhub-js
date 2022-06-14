@@ -11,7 +11,7 @@ import {
   PlanetItemType,
   PlanetProductBundle,
   PlanetScopeHarmonization,
-  TPDIOrderParams,
+  TPDITransactionParams,
   TPDISearchParams,
   TPDProvider,
 } from '../const';
@@ -31,7 +31,7 @@ const defaultSearchParams: TPDISearchParams = {
   productBundle: PlanetProductBundle.ANALYTIC,
 };
 
-const defaultOrderParams: TPDIOrderParams = {
+const defaultOrderParams: TPDITransactionParams = {
   planetApiKey: 'PLANET_API_KEY',
 };
 

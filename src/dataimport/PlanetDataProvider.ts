@@ -1,4 +1,4 @@
-import { TPDProvider, TPDISearchParams, PlanetSupportedProductBundles, TPDIOrderParams } from './const';
+import { TPDProvider, TPDISearchParams, PlanetSupportedProductBundles, TPDITransactionParams } from './const';
 import { AbstractTPDProvider } from './TPDProvider';
 
 export class PlanetDataProvider extends AbstractTPDProvider {
@@ -66,7 +66,7 @@ export class PlanetDataProvider extends AbstractTPDProvider {
   protected getAdditionalOrderParams(
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams,
+    orderParams: TPDITransactionParams,
   ): any {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];

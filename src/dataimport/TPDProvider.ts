@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { TPDProvider, TPDISearchParams, TPDIOrderParams } from './const';
+import { TPDProvider, TPDISearchParams, TPDITransactionParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
@@ -8,7 +8,7 @@ export interface TPDProviderInterface {
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams?: TPDIOrderParams,
+    orderParams?: TPDITransactionParams,
   ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
   checkSubscriptionsSupported(): boolean;
@@ -86,7 +86,7 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
   protected getAdditionalOrderParams(
     items: string[], // eslint-disable-line @typescript-eslint/no-unused-vars
     searchParams: TPDISearchParams, // eslint-disable-line @typescript-eslint/no-unused-vars
-    orderParams: TPDIOrderParams, // eslint-disable-line @typescript-eslint/no-unused-vars
+    orderParams: TPDITransactionParams, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): any {
     return {};
   }
@@ -96,7 +96,7 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams | null = null,
+    orderParams: TPDITransactionParams | null = null,
   ): any {
     const payload: any = {};
 

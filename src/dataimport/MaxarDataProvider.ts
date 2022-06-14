@@ -1,4 +1,4 @@
-import { TPDProvider, TPDISearchParams, MaxarProductBands, TPDIOrderParams } from './const';
+import { TPDProvider, TPDISearchParams, MaxarProductBands, TPDITransactionParams } from './const';
 import { AbstractTPDProvider } from './TPDProvider';
 
 export class MaxarDataProvider extends AbstractTPDProvider {
@@ -63,7 +63,7 @@ export class MaxarDataProvider extends AbstractTPDProvider {
   protected getAdditionalOrderParams(
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams,
+    orderParams: TPDITransactionParams,
   ): any {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
