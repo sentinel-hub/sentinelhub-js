@@ -202,7 +202,7 @@ describe('Test create order payload', () => {
     'checks if parameters are set correctly',
     async (name, collectionId, items, searchParams, orderParams) => {
       const tpdp = new PlanetDataProvider();
-      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+      const payload = tpdp.getTransactionPayload(name, collectionId, items, searchParams, orderParams);
 
       if (!!name) {
         expect(payload.name).toBeDefined();

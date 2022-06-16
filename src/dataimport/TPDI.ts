@@ -151,7 +151,13 @@ async function createTransaction(
 ): Promise<TPDITransaction> {
   return await ensureTimeout(async innerReqConfig => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
-    const payload = tpdiProvider.getOrderPayload(name, collectionId, items, searchParams, transactionParams);
+    const payload = tpdiProvider.getTransactionPayload(
+      name,
+      collectionId,
+      items,
+      searchParams,
+      transactionParams,
+    );
     const { data } = await axios.post<TPDITransaction>(serviceEndpoint, payload, requestConfig);
     return data;
   }, reqConfig);

@@ -3,12 +3,12 @@ import { TPDProvider, TPDISearchParams, TPDITransactionParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
-  getOrderPayload(
+  getTransactionPayload(
     name: string,
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams?: TPDITransactionParams,
+    transactionParams?: TPDITransactionParams,
   ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
   checkSubscriptionsSupported(): boolean;
@@ -91,7 +91,7 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     return {};
   }
 
-  public getOrderPayload(
+  public getTransactionPayload(
     name: string,
     collectionId: string,
     items: string[],
