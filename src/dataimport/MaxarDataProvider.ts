@@ -60,16 +60,16 @@ export class MaxarDataProvider extends AbstractTPDProvider {
     return { data: [data] };
   }
 
-  protected getAdditionalOrderParams(
+  protected getAdditionalTransactionParams(
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDITransactionParams,
+    transactionParams: TPDITransactionParams,
   ): any {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
 
-    if (orderParams?.productKernel) {
-      dataObject.productKernel = orderParams.productKernel;
+    if (transactionParams?.productKernel) {
+      dataObject.productKernel = transactionParams.productKernel;
     }
 
     if (!!items && items.length) {

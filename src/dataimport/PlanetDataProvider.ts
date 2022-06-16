@@ -63,21 +63,23 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     };
   }
 
-  protected getAdditionalOrderParams(
+  protected getAdditionalTransactionParams(
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDITransactionParams,
+    transactionParams: TPDITransactionParams,
   ): any {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
 
-    if (orderParams?.harmonizeTo) {
-      dataObject.harmonizeTo = orderParams.harmonizeTo;
+    if (transactionParams?.harmonizeTo) {
+      dataObject.harmonizeTo = transactionParams.harmonizeTo;
     }
 
-    if (orderParams?.planetApiKey) {
-      input.planetApiKey = orderParams.planetApiKey;
+    if (!transactionParams?.planetApiKey) {
+      throw new Error('Parameter planetApiKey must be specified');
     }
+
+    input.planetApiKey = transactionParams.planetApiKey;
 
     if (!!items && items.length) {
       dataObject.itemIds = items;

@@ -60,7 +60,7 @@ export class AirbusDataProvider extends AbstractTPDProvider {
     return { data: [data] };
   }
 
-  protected getAdditionalOrderParams(items: string[], searchParams: TPDISearchParams): any {
+  protected getAdditionalTransactionParams(items: string[], searchParams: TPDISearchParams): any {
     const input = this.getSearchPayload(searchParams);
     if (!!items && items.length) {
       const dataObject = input.data[0];
