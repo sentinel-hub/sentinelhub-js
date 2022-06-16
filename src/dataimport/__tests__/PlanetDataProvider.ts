@@ -171,6 +171,18 @@ describe('Test search', () => {
 
 describe('Test create order payload', () => {
   it.each([
+    [{ ...defaultSearchParams }, {}, 'Parameter planetApiKey must be specified'],
+    [{ ...defaultSearchParams }, null, 'Parameter planetApiKey must be specified'],
+  ])(
+    'throws an error when mandatory parameters are not set',
+    async (searchParams, orderParams, errorMessage) => {
+      await expect(
+        TPDI.createOrder(TPDProvider.PLANET, 'name', 'collectionId', null, searchParams, orderParams),
+      ).rejects.toThrow(new Error(errorMessage));
+    },
+  );
+
+  it.each([
     ['name', 'collectionId', ['id'], { ...defaultSearchParams }, { ...defaultOrderParams }],
     [
       'name',
@@ -196,8 +208,6 @@ describe('Test create order payload', () => {
     ['name', 'collectionId', [], { ...defaultSearchParams }, { ...defaultOrderParams }],
     ['name', null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
     [null, null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, {}],
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, null],
   ])(
     'checks if parameters are set correctly',
     async (name, collectionId, items, searchParams, orderParams) => {
