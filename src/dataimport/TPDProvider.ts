@@ -1,16 +1,17 @@
 import { AxiosRequestConfig } from 'axios';
-import { TPDProvider, TPDISearchParams, TPDIOrderParams } from './const';
+import { TPDProvider, TPDISearchParams, TPDITransactionParams } from './const';
 
 export interface TPDProviderInterface {
   getSearchPayload(params: TPDISearchParams): any;
-  getOrderPayload(
+  getTransactionPayload(
     name: string,
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams?: TPDIOrderParams,
+    transactionParams?: TPDITransactionParams,
   ): any;
   addSearchPagination(requestConfig: AxiosRequestConfig, count: number, viewtoken: string): void;
+  checkSubscriptionsSupported(): boolean;
 }
 
 export abstract class AbstractTPDProvider implements TPDProviderInterface {
@@ -82,20 +83,20 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     return payload;
   }
 
-  protected getAdditionalOrderParams(
+  protected getAdditionalTransactionParams(
     items: string[], // eslint-disable-line @typescript-eslint/no-unused-vars
     searchParams: TPDISearchParams, // eslint-disable-line @typescript-eslint/no-unused-vars
-    orderParams: TPDIOrderParams, // eslint-disable-line @typescript-eslint/no-unused-vars
+    transactionParams: TPDITransactionParams, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): any {
     return {};
   }
 
-  public getOrderPayload(
+  public getTransactionPayload(
     name: string,
     collectionId: string,
     items: string[],
     searchParams: TPDISearchParams,
-    orderParams: TPDIOrderParams | null = null,
+    transactionParams: TPDITransactionParams | null = null,
   ): any {
     const payload: any = {};
 
@@ -106,8 +107,12 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     if (!!collectionId) {
       payload.collectionId = collectionId;
     }
-    payload.input = this.getAdditionalOrderParams(items, searchParams, orderParams);
+    payload.input = this.getAdditionalTransactionParams(items, searchParams, transactionParams);
 
     return payload;
+  }
+
+  public checkSubscriptionsSupported(): boolean {
+    throw new Error('Subscriptions are not supported for selected provider');
   }
 }

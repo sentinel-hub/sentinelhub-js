@@ -148,7 +148,7 @@ describe('Test create order payload', () => {
     'checks if parameters are set correctly',
     async (name, collectionId, items, searchParams, orderParams) => {
       const tpdp = new AirbusDataProvider();
-      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+      const payload = tpdp.getTransactionPayload(name, collectionId, items, searchParams, orderParams);
 
       if (!!name) {
         expect(payload.name).toBeDefined();
@@ -187,7 +187,7 @@ describe('Test create order payload', () => {
     const searchParams = { ...defaultSearchParams };
 
     const tpdp = new AirbusDataProvider();
-    const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams);
+    const payload = tpdp.getTransactionPayload(name, collectionId, items, searchParams);
 
     if (!!name) {
       expect(payload.name).toBeDefined();

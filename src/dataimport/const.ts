@@ -89,13 +89,13 @@ export type TPDISearchParams = {
   productBundle?: PlanetProductBundle;
 };
 
-export type TPDIOrderParams = {
+export type TPDITransactionParams = {
   harmonizeTo?: PlanetScopeHarmonization;
   planetApiKey?: string;
   productKernel?: ResamplingKernel;
 };
 
-export type TPDIOrderCompatibleCollection = {
+export type TPDITransactionCompatibleCollection = {
   id: string;
   name: string;
 };
@@ -121,33 +121,34 @@ export type Quota = {
   quotaUsed: number | null;
 };
 
-export enum OrderStatus {
+export enum TPDITransactionStatus {
   CREATED = 'CREATED',
   CANCELLED = 'CANCELLED',
   RUNNING = 'RUNNING',
   DONE = 'DONE',
   PARTIAL = 'PARTIAL',
   FAILED = 'FAILED',
+  COMPLETED = 'COMPLETED',
 }
 
-export type Order = {
+export type TPDITransaction = {
   id: string;
   name: string;
   userId: string;
   collectionId: string;
-  status: OrderStatus;
+  status: TPDITransactionStatus;
   sqkm: number;
   input: Record<string, any>;
 };
 
-export type OrderSearchParams = {
-  status?: OrderStatus;
+export type TPDITransactionSearchParams = {
+  status?: TPDITransactionStatus;
   collectionId?: string;
   search?: string;
 };
 
-export type OrderSearchResult = {
-  data: Order[];
+export type TPDITransactionSearchResult = {
+  data: TPDITransaction[];
   links?: LinksType;
 };
 
