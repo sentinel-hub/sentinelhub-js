@@ -8,6 +8,7 @@ export type RequestConfiguration = {
   timeout?: number | null;
   cancelToken?: CancelToken;
   cache?: CacheConfig;
+  responseType?: string;
   rewriteUrlFunc?: (url: string) => string;
 };
 
@@ -71,6 +72,9 @@ export const getAxiosReqParams = (
   }
   if (reqConfigWithDefault.rewriteUrlFunc) {
     axiosReqConfig.rewriteUrlFunc = reqConfigWithDefault.rewriteUrlFunc;
+  }
+  if (reqConfigWithDefault.responseType) {
+    axiosReqConfig.responseType = reqConfigWithDefault.responseType;
   }
   return axiosReqConfig;
 };
