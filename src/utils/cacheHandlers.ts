@@ -15,6 +15,8 @@ export type CacheConfig = {
   targets?: CacheTargets;
 };
 
+const CLEAR_CACHE_INTERVAL = 60 * 1000;
+
 // Even though we have caching enabled, if we fire 10 (equal) requests in parallel, they will
 // still all be executed - because by the time first response is saved in cache, the other 9
 // requests are already made too. To combat this, we save cacheKeys of ongoing requests and
@@ -155,7 +157,15 @@ const stringToHash = (message: string): number => {
   return hash;
 };
 
-export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
+export const deleteExpiredCachedItemsAtInterval = (): void => {
+  // delete expired items on initialization
+  findAndDeleteExpiredCachedItems();
+  setInterval(() => {
+    findAndDeleteExpiredCachedItems();
+  }, CLEAR_CACHE_INTERVAL);
+};
+
+const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
   for (const target of SUPPORTED_TARGETS) {
     const shCache = await cacheFactory([target]);
     if (!shCache) {

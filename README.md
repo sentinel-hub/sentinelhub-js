@@ -345,7 +345,8 @@ try {
 }
 ```
 
-To enable caching for the requests, one can add `expiresIn` to the requests configuration object. The values are in seconds. Value `0` disables caching.
+Caching is enabled by default where items expire in 30 minutes. Expired items are deleted every minute.  
+To modify the caching, one can add `expiresIn` to the requests configuration object. The values are in seconds. Value `0` disables caching.
 ```javascript
 // cache is valid for 30 minutes:
 const requestsConfig = {

@@ -4,9 +4,9 @@ import { isDebugEnabled } from './debug';
 import {
   fetchCachedResponse,
   saveCacheResponse,
-  findAndDeleteExpiredCachedItems,
   CacheConfig,
   removeCacheableRequestsInProgress,
+  deleteExpiredCachedItemsAtInterval,
 } from './cacheHandlers';
 
 const DEFAULT_RETRY_DELAY = 3000;
@@ -26,7 +26,7 @@ declare module 'axios' {
 }
 
 export const registerInitialAxiosInterceptors = (): any => {
-  findAndDeleteExpiredCachedItems();
+  deleteExpiredCachedItemsAtInterval();
   // - the interceptors are called in reverse order in which they are registered - last
   //   defined interceptor is called first
   // - some interceptors might also be added in other places (`registerHostnameReplacing()`)
