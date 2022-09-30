@@ -17,6 +17,7 @@ import {
   BYOCBand,
   FindTilesAdditionalParameters,
   BYOCSubTypes,
+  Interpolator,
 } from './const';
 import { DATASET_BYOC } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -37,6 +38,8 @@ interface ConstructorParameters {
   collectionId?: string | null;
   locationId?: LocationIdSHv3 | null;
   subType?: BYOCSubTypes | null;
+  upsampling?: Interpolator | null;
+  downsampling?: Interpolator | null;
 }
 
 type BYOCFindTilesDatasetParameters = {
@@ -61,8 +64,20 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     collectionId = null,
     locationId = null,
     subType = null,
+    upsampling = null,
+    downsampling = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+    super({
+      instanceId,
+      layerId,
+      evalscript,
+      evalscriptUrl,
+      dataProduct,
+      title,
+      description,
+      upsampling,
+      downsampling,
+    });
     this.collectionId = collectionId;
     this.locationId = locationId;
     this.subType = subType;

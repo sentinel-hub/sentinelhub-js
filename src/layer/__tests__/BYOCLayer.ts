@@ -1,5 +1,5 @@
 import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
-import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes } from '../const';
+import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes, Interpolator } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
@@ -186,6 +186,23 @@ describe('Test findDatesUTC using catalog', () => {
       locationId: LocationIdSHv3.awsEuCentral1,
     });
     await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
+  });
+});
+
+describe('Test if resampling parameter is set', () => {
+  test('Upsampling and downsampling are set', () => {
+    const upsampling = Interpolator.BICUBIC;
+    const downsampling = Interpolator.BILINEAR;
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: 'LAYER_ID',
+      collectionId: 'mockCollectionId',
+      locationId: LocationIdSHv3.awsEuCentral1,
+      upsampling: upsampling,
+      downsampling: downsampling,
+    });
+    expect(layer.upsampling).toEqual(upsampling);
+    expect(layer.downsampling).toEqual(downsampling);
   });
 });
 
