@@ -165,7 +165,7 @@ export const deleteExpiredCachedItemsAtInterval = (): void => {
   }, CLEAR_CACHE_INTERVAL);
 };
 
-export const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
+const findAndDeleteExpiredCachedItems = async (): Promise<void> => {
   for (const target of SUPPORTED_TARGETS) {
     const shCache = await cacheFactory([target]);
     if (!shCache) {
