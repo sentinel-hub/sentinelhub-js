@@ -83,6 +83,14 @@ import {
   LinkType,
   OverrideGetMapParams,
   SHV3_LOCATIONS_ROOT_URL,
+  PaginatedTiles,
+  Tile,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  BYOCBand,
 } from './layer/const';
 import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
@@ -114,6 +122,16 @@ import {
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
 import { StatisticsUtils } from './statistics/statistics.utils';
+import {
+  StatisticalApiResponse,
+  StatisticalApiInputPayload,
+  BandStats,
+  StatisticalApiAggregationPayload,
+  StatisticalApiOutput,
+  StatisticalApiCalculationsPayload,
+  StatisticalApiPayload,
+  BandHistogram,
+} from './statistics/const';
 
 registerInitialAxiosInterceptors();
 
@@ -177,7 +195,6 @@ export {
   // other:
   GetMapParams,
   OverrideGetMapParams,
-  LinkType,
   ApiType,
   SUPPORTED_CRS_OBJ,
   CRS_EPSG4326,
@@ -210,6 +227,23 @@ export {
   canvasToBlob,
   SHV3_LOCATIONS_ROOT_URL,
   BYOCSubTypes,
+  Tile,
+  PaginatedTiles,
+  LinkType,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  StatisticalApiResponse,
+  StatisticalApiInputPayload,
+  BandStats,
+  StatisticalApiAggregationPayload,
+  StatisticalApiOutput,
+  StatisticalApiCalculationsPayload,
+  StatisticalApiPayload,
+  BandHistogram,
+  BYOCBand,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
