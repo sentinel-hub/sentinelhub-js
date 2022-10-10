@@ -160,11 +160,13 @@ export function constructFixtureFindTilesCatalog({
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-2-l1c'],
     limit: 5,
-    query: { 'eo:cloud_cover': { lte: maxCloudCoverPercent } },
+    filter: { op: '<=', args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent] },
+    'filter-lang': 'cql2-json',
   };
 
   if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query'];
+    delete expectedRequest['filter'];
+    delete expectedRequest['filter-lang'];
   }
 
   /* eslint-disable */
