@@ -24,7 +24,7 @@ import {
 } from './fixtures.findDatesUTC';
 
 const SEARCH_INDEX_URL = 'https://services-uswest2.sentinel-hub.com/index/v3/collections/L8L1C/searchIndex';
-const CATALOG_URL = 'https://services-uswest2.sentinel-hub.com/api/v1/catalog/search';
+const CATALOG_URL = 'https://services-uswest2.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));

@@ -230,7 +230,7 @@ export function constructFixtureFindTilesCatalog({
     ],
     links: [
       {
-        href: 'https://services.sentinel-hub.com/api/v1/catalog/search',
+        href: 'https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search',
         rel: 'self',
         type: 'application/json',
       },

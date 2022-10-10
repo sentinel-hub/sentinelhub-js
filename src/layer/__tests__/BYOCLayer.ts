@@ -24,7 +24,7 @@ import {
 const SEARCH_INDEX_URL = `${
   SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]
 }byoc/v3/collections/CUSTOM/searchIndex`;
-const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/search`;
+const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/1.0.0/search`;
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
