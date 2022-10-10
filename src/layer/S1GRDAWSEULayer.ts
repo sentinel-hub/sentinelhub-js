@@ -280,39 +280,6 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     ];
   }
 
-  protected createCatalogPayloadQuery(
-    maxCloudCoverPercent?: number | null,
-    datasetParameters?: Record<string, any> | null,
-  ): Record<string, any> {
-    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
-
-    if (datasetParameters && datasetParameters.acquisitionMode) {
-      result['sar:instrument_mode'] = {
-        eq: datasetParameters.acquisitionMode,
-      };
-    }
-
-    if (datasetParameters && datasetParameters.polarization) {
-      result['polarization'] = {
-        eq: datasetParameters.polarization,
-      };
-    }
-
-    if (datasetParameters && datasetParameters.resolution) {
-      result['resolution'] = {
-        eq: datasetParameters.resolution,
-      };
-    }
-
-    if (datasetParameters && datasetParameters.orbitDirection) {
-      result['sat:orbit_state'] = {
-        eq: datasetParameters.orbitDirection,
-      };
-    }
-
-    return result && Object.keys(result).length > 0 ? result : null;
-  }
-
   protected createCatalogFilterQuery(
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,

@@ -449,13 +449,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.convertResponseFromSearchIndex(response);
   }
 
-  protected createCatalogPayloadQuery(
-    maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): Record<string, any> {
-    return null;
-  }
-
   protected createCatalogFilterQuery(
     maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
     datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
