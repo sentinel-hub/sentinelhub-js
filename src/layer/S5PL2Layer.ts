@@ -186,6 +186,20 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     return result && Object.keys(result).length > 0 ? result : null;
   }
 
+  protected createCatalogFilterQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogFilterQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (datasetParameters && datasetParameters.productType) {
+      result['op'] = '=';
+      result['args'] = [{ property: 's5p:type' }, datasetParameters.productType];
+    }
+
+    return result && Object.keys(result).length > 0 ? result : null;
+  }
+
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
     const { assets } = feature;
     let result: Link[] = super.getTileLinksFromCatalog(feature);
