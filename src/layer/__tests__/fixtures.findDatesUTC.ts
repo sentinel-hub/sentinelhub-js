@@ -172,7 +172,11 @@ export function constructFixtureFindDatesUTCCatalog(
     collections: [layer.dataset.catalogCollectionId],
     limit: CATALOG_SEARCH_MAX_LIMIT,
     distinct: 'date',
-    query: { 'eo:cloud_cover': { lte: maxCloudCoverPercent !== null ? maxCloudCoverPercent : 100 } },
+    filter: {
+      op: '<=',
+      args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent !== null ? maxCloudCoverPercent : 100],
+    },
+    'filter-lang': 'cql2-json',
   };
 
   if (layer instanceof S1GRDAWSEULayer && acquisitionMode) {
