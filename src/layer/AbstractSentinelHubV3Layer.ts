@@ -456,6 +456,13 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return null;
   }
 
+  protected createCatalogFilterQuery(
+    maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+    datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  ): Record<string, any> {
+    return null;
+  }
+
   protected async findTilesUsingCatalog(
     authToken: string,
     bbox: BBox,
@@ -510,10 +517,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.bbox = null;
     }
 
-    let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
-
-    if (payloadQuery) {
-      payload.query = payloadQuery;
+    const filterQuery = this.createCatalogFilterQuery(maxCloudCoverPercent, datasetParameters);
+    if (filterQuery) {
+      payload.filter = filterQuery;
+      payload['filter-lang'] = 'cql2-json';
     }
 
     if (distinct) {
@@ -521,7 +528,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const shServiceHostname = this.getShServiceHostname();
 
-    return await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
+    return await axios.post(`${shServiceHostname}api/v1/catalog/1.0.0/search`, payload, requestConfig);
   }
 
   protected async getFindDatesUTCAdditionalParameters(
