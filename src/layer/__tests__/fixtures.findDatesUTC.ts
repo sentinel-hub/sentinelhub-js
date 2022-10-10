@@ -172,12 +172,15 @@ export function constructFixtureFindDatesUTCCatalog(
     collections: [layer.dataset.catalogCollectionId],
     limit: CATALOG_SEARCH_MAX_LIMIT,
     distinct: 'date',
-    filter: {
+  };
+
+  if (layer instanceof AbstractSentinelHubV3WithCCLayer) {
+    expectedRequest['filter'] = {
       op: '<=',
       args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent !== null ? maxCloudCoverPercent : 100],
-    },
-    'filter-lang': 'cql2-json',
-  };
+    };
+    expectedRequest['filter-lang'] = 'cql2-json';
+  }
 
   if (layer instanceof S1GRDAWSEULayer) {
     let args = [];
@@ -204,7 +207,8 @@ export function constructFixtureFindDatesUTCCatalog(
   }
 
   if (layer instanceof S5PL2Layer && productType) {
-    expectedRequest['query'] = { type: { eq: productType } };
+    expectedRequest['filter'] = { op: '=', args: [{ property: 's5p:type' }, productType] };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   if (layer instanceof BYOCLayer && collectionId) {
