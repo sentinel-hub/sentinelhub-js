@@ -271,33 +271,33 @@ export function constructFixtureFindTilesCatalog({
     orbitDirection: orbitDirection,
   });
 
-  const expectedRequest = {
+  const expectedRequest: any = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-1-grd'],
     limit: 5,
-    query: {
-      polarization: { eq: polarization },
-      resolution: { eq: resolution },
-      'sar:instrument_mode': { eq: acquisitionMode },
-      'sat:orbit_state': { eq: orbitDirection },
-    },
   };
 
-  if (!polarization) {
-    delete expectedRequest['query']['polarization'];
+  let args = [];
+  if (acquisitionMode) {
+    args.push({ op: '=', args: [{ property: 'sar:instrument_mode' }, acquisitionMode] });
   }
 
-  if (!resolution) {
-    delete expectedRequest['query']['resolution'];
+  if (polarization) {
+    args.push({ op: '=', args: [{ property: 's1:polarization' }, polarization] });
   }
 
-  if (!acquisitionMode) {
-    delete expectedRequest['query']['sar:instrument_mode'];
+  if (resolution) {
+    args.push({ op: '=', args: [{ property: 's1:resolution' }, resolution] });
   }
 
-  if (!orbitDirection) {
-    delete expectedRequest['query']['sat:orbit_state'];
+  if (orbitDirection) {
+    args.push({ op: '=', args: [{ property: 'sat:orbit_state' }, orbitDirection] });
+  }
+
+  if (args) {
+    expectedRequest['filter'] = { op: 'and', args: args };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   /* eslint-disable */

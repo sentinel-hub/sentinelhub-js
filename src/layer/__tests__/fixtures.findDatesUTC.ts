@@ -179,20 +179,28 @@ export function constructFixtureFindDatesUTCCatalog(
     'filter-lang': 'cql2-json',
   };
 
-  if (layer instanceof S1GRDAWSEULayer && acquisitionMode) {
-    expectedRequest['query']['sar:instrument_mode'] = { eq: acquisitionMode };
-  }
+  if (layer instanceof S1GRDAWSEULayer) {
+    let args = [];
+    if (acquisitionMode) {
+      args.push({ op: '=', args: [{ property: 'sar:instrument_mode' }, acquisitionMode] });
+    }
 
-  if (layer instanceof S1GRDAWSEULayer && orbitDirection) {
-    expectedRequest['query']['sat:orbit_state'] = { eq: orbitDirection };
-  }
+    if (polarization) {
+      args.push({ op: '=', args: [{ property: 's1:polarization' }, polarization] });
+    }
 
-  if (layer instanceof S1GRDAWSEULayer && polarization) {
-    expectedRequest['query']['polarization'] = { eq: polarization };
-  }
+    if (resolution) {
+      args.push({ op: '=', args: [{ property: 's1:resolution' }, resolution] });
+    }
 
-  if (layer instanceof S1GRDAWSEULayer && resolution) {
-    expectedRequest['query']['resolution'] = { eq: resolution };
+    if (orbitDirection) {
+      args.push({ op: '=', args: [{ property: 'sat:orbit_state' }, orbitDirection] });
+    }
+
+    if (args) {
+      expectedRequest['filter'] = { op: 'and', args: args };
+      expectedRequest['filter-lang'] = 'cql2-json';
+    }
   }
 
   if (layer instanceof S5PL2Layer && productType) {
@@ -201,17 +209,6 @@ export function constructFixtureFindDatesUTCCatalog(
 
   if (layer instanceof BYOCLayer && collectionId) {
     expectedRequest['collections'] = [`${subType === BYOCSubTypes.BATCH ? 'batch' : 'byoc'}-${collectionId}`];
-  }
-
-  if (
-    !(layer instanceof AbstractSentinelHubV3WithCCLayer) &&
-    (maxCloudCoverPercent === null || maxCloudCoverPercent === undefined)
-  ) {
-    delete expectedRequest['query']['eo:cloud_cover'];
-  }
-
-  if (expectedRequest['query'] && Object.keys(expectedRequest['query']).length === 0) {
-    delete expectedRequest['query'];
   }
 
   /* eslint-disable */
