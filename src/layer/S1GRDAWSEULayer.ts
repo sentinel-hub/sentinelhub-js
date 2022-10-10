@@ -313,6 +313,50 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     return result && Object.keys(result).length > 0 ? result : null;
   }
 
+  protected createCatalogFilterQuery(
+    maxCloudCoverPercent?: number | null,
+    datasetParameters?: Record<string, any> | null,
+  ): Record<string, any> {
+    let result = { ...super.createCatalogFilterQuery(maxCloudCoverPercent, datasetParameters) };
+
+    if (datasetParameters) {
+      let args: { op: string; args: any[] }[] = [];
+
+      if (datasetParameters.acquisitionMode) {
+        args.push({
+          op: '=',
+          args: [{ property: 'sar:instrument_mode' }, datasetParameters.acquisitionMode],
+        });
+      }
+
+      if (datasetParameters.polarization) {
+        args.push({
+          op: '=',
+          args: [{ property: 's1:polarization' }, datasetParameters.polarization],
+        });
+      }
+
+      if (datasetParameters.resolution) {
+        args.push({
+          op: '=',
+          args: [{ property: 's1:resolution' }, datasetParameters.resolution],
+        });
+      }
+
+      if (datasetParameters.orbitDirection) {
+        args.push({
+          op: '=',
+          args: [{ property: 'sat:orbit_state' }, datasetParameters.orbitDirection],
+        });
+      }
+
+      result.op = 'and';
+      result.args = args;
+    }
+
+    return result && Object.keys(result).length > 0 ? result : null;
+  }
+
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
     const { assets } = feature;
     let result: Link[] = super.getTileLinksFromCatalog(feature);
