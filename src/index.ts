@@ -12,6 +12,7 @@ import {
   DEMInstanceType,
   DEMInstanceTypeOrthorectification,
   BYOCSubTypes,
+  GetStatsParams,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -96,7 +97,7 @@ import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
-import { CacheTarget, invalidateCaches } from './utils/Cache';
+import { CacheTarget, CacheTargets, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
@@ -118,6 +119,7 @@ import {
   TPDProvider,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
+  TPDITransactionParams,
 } from './dataimport/const';
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
@@ -132,6 +134,7 @@ import {
   StatisticalApiPayload,
   BandHistogram,
 } from './statistics/const';
+import { ProcessingPayload } from './layer/processing';
 
 registerInitialAxiosInterceptors();
 
@@ -244,6 +247,9 @@ export {
   StatisticalApiPayload,
   BandHistogram,
   BYOCBand,
+  GetStatsParams,
+  ProcessingPayload,
+  CacheTargets,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
@@ -274,4 +280,5 @@ export {
   MaxarSensor,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
+  TPDITransactionParams,
 };
