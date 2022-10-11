@@ -155,18 +155,16 @@ export function constructFixtureFindTilesCatalog({
     maxCloudCoverPercent: maxCloudCoverPercent,
   });
 
-  const expectedRequest = {
+  const expectedRequest: any = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-2-l1c'],
     limit: 5,
-    filter: { op: '<=', args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent] },
-    'filter-lang': 'cql2-json',
   };
 
-  if (maxCloudCoverPercent === null) {
-    delete expectedRequest['filter'];
-    delete expectedRequest['filter-lang'];
+  if (maxCloudCoverPercent !== null) {
+    expectedRequest['filter'] = { op: '<=', args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent] };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   /* eslint-disable */
