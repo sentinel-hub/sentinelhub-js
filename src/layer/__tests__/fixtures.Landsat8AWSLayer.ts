@@ -161,7 +161,7 @@ export function constructFixtureFindTilesCatalog({
     maxCloudCoverPercent: maxCloudCoverPercent,
   });
 
-  const expectedRequest: any = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['landsat-8-l1c'],

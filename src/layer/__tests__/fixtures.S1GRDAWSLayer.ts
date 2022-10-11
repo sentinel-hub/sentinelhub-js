@@ -271,7 +271,7 @@ export function constructFixtureFindTilesCatalog({
     orbitDirection: orbitDirection,
   });
 
-  const expectedRequest: any = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-1-grd'],

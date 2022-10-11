@@ -224,7 +224,7 @@ export function constructFixtureFindTilesCatalog({
     productType: productType,
   });
 
-  const expectedRequest: any = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-5p-l2'],
