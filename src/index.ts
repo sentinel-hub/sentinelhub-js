@@ -36,6 +36,7 @@ import {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_AWS_HLS,
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
@@ -66,6 +67,7 @@ import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
+import { HLSAWSLayer } from './layer/HLSAWSLayer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
 
@@ -138,6 +140,7 @@ export {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_AWS_HLS,
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
@@ -168,6 +171,7 @@ export {
   Landsat15AWSLMSSL1Layer,
   Landsat7AWSLETML1Layer,
   Landsat7AWSLETML2Layer,
+  HLSAWSLayer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   // auth:

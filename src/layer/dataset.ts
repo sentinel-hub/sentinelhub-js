@@ -279,6 +279,21 @@ export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
   maxDate: null,
 };
 
+export const DATASET_AWS_HLS: Dataset = {
+  id: 'AWS_HLS',
+  shJsonGetCapabilitiesDataset: 'HLS',
+  shWmsEvalsource: 'HLS',
+  shProcessingApiDatasourceAbbreviation: 'HLS',
+  datasetParametersType: 'HLS',
+  shServiceHostname: 'https://services-uswest2.sentinel-hub.com/',
+  searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/HLS/searchIndex',
+  findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/HLS/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 24, 0, 25, 55)), // 2013-03-24T00:25:55.457
+  maxDate: null,
+  catalogCollectionId: 'hls',
+};
+
 export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
   id: 'EOC_ENVISAT_MERIS',
   shJsonGetCapabilitiesDataset: null,
