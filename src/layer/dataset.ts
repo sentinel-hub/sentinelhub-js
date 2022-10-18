@@ -289,7 +289,7 @@ export const DATASET_AWS_HLS: Dataset = {
   searchIndexUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/HLS/searchIndex',
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/HLS/findAvailableData',
   orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(2013, 3 - 1, 24, 0, 25, 55)), // 2013-03-24T00:25:55.457
+  minDate: new Date(Date.UTC(2013, 4 - 1, 1, 0, 25, 55)), // 2013-04-01T00:25:55.457
   maxDate: null,
   catalogCollectionId: 'hls',
 };
