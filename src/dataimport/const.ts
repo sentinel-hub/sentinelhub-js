@@ -163,3 +163,8 @@ export enum ResamplingKernel {
   NN = 'NN',
   MTF = 'MTF',
 }
+
+export enum HSLConstellation {
+  LANDSAT = 'LANDSAT',
+  SENTINEL = 'SENTINEL',
+}

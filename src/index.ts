@@ -112,6 +112,7 @@ import {
   TPDProvider,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
+  HSLConstellation,
 } from './dataimport/const';
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
@@ -244,4 +245,5 @@ export {
   MaxarSensor,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
+  HSLConstellation,
 };
