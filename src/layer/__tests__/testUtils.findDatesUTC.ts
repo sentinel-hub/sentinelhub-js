@@ -2,7 +2,7 @@ import { setAuthToken, isAuthTokenSet } from '../../index';
 import { mockNetwork } from './testUtils.findTiles';
 
 export const AUTH_TOKEN = 'AUTH_TOKEN';
-export const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/search';
+export const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 
 export async function checkIfCorrectEndpointIsUsedFindDatesUTC(
   token: string,

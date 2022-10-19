@@ -224,16 +224,16 @@ export function constructFixtureFindTilesCatalog({
     productType: productType,
   });
 
-  const expectedRequest = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-5p-l2'],
     limit: 5,
-    query: { type: { eq: productType } },
   };
 
-  if (!productType) {
-    delete expectedRequest['query']['type'];
+  if (productType) {
+    expectedRequest['filter'] = { op: '=', args: [{ property: 's5p:type' }, productType] };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   /* eslint-disable */

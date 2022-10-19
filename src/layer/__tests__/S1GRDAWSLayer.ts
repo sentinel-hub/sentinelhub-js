@@ -159,7 +159,7 @@ test.each([
   },
 );
 
-const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/search';
+const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
