@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import area from '@turf/area';
-import { union, intersection, Geom } from 'polygon-clipping';
+import polygonClipping, { Geom } from 'polygon-clipping';
 import { Geometry } from '@turf/helpers';
 
 import { BBox } from '../bbox';
@@ -352,7 +352,7 @@ export class AbstractLayer {
           } else {
             // the same flyover:
             flyovers[flyoverIndex].fromTime = tiles[tileIndex].sensingTime;
-            currentFlyoverGeometry = union(
+            currentFlyoverGeometry = polygonClipping.union(
               this.roundCoordinates(currentFlyoverGeometry),
               this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
             );
@@ -400,7 +400,7 @@ export class AbstractLayer {
   private calculateCoveragePercent(bboxGeometry: Geom, bboxArea: number, flyoverGeometry: Geom): number {
     let bboxedFlyoverGeometry;
     try {
-      bboxedFlyoverGeometry = intersection(
+      bboxedFlyoverGeometry = polygonClipping.intersection(
         this.roundCoordinates(bboxGeometry),
         this.roundCoordinates(flyoverGeometry),
       );
