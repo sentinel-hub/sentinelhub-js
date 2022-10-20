@@ -12,6 +12,7 @@ import {
   DEMInstanceType,
   DEMInstanceTypeOrthorectification,
   BYOCSubTypes,
+  GetStatsParams,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -85,12 +86,20 @@ import {
   LinkType,
   OverrideGetMapParams,
   SHV3_LOCATIONS_ROOT_URL,
+  PaginatedTiles,
+  Tile,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  BYOCBand,
 } from './layer/const';
 import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
-import { CacheTarget, invalidateCaches } from './utils/Cache';
+import { CacheTarget, CacheTargets, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
@@ -113,10 +122,22 @@ import {
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
   HSLConstellation,
+  TPDITransactionParams,
 } from './dataimport/const';
 
 import { StatisticsProviderType } from './statistics/StatisticsProvider';
 import { StatisticsUtils } from './statistics/statistics.utils';
+import {
+  StatisticalApiResponse,
+  StatisticalApiInputPayload,
+  BandStats,
+  StatisticalApiAggregationPayload,
+  StatisticalApiOutput,
+  StatisticalApiCalculationsPayload,
+  StatisticalApiPayload,
+  BandHistogram,
+} from './statistics/const';
+import { ProcessingPayload } from './layer/processing';
 
 registerInitialAxiosInterceptors();
 
@@ -182,7 +203,6 @@ export {
   // other:
   GetMapParams,
   OverrideGetMapParams,
-  LinkType,
   ApiType,
   SUPPORTED_CRS_OBJ,
   CRS_EPSG4326,
@@ -215,6 +235,26 @@ export {
   canvasToBlob,
   SHV3_LOCATIONS_ROOT_URL,
   BYOCSubTypes,
+  Tile,
+  PaginatedTiles,
+  LinkType,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  StatisticalApiResponse,
+  StatisticalApiInputPayload,
+  BandStats,
+  StatisticalApiAggregationPayload,
+  StatisticalApiOutput,
+  StatisticalApiCalculationsPayload,
+  StatisticalApiPayload,
+  BandHistogram,
+  BYOCBand,
+  GetStatsParams,
+  ProcessingPayload,
+  CacheTargets,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
@@ -246,4 +286,5 @@ export {
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
   HSLConstellation,
+  TPDITransactionParams,
 };
