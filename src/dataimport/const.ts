@@ -9,6 +9,7 @@ export enum TPDICollections {
   AIRBUS_SPOT = 'AIRBUS_SPOT',
   PLANET_SCOPE = 'PLANET_SCOPE',
   MAXAR_WORLDVIEW = 'MAXAR_WORLDVIEW',
+  PLANET_SKYSAT = 'PLANET_SKYSAT',
 }
 
 export enum TPDProvider {
@@ -42,11 +43,13 @@ export enum PlanetProductBundle {
   ANALYTIC_SR_UDM2 = 'analytic_sr_udm2',
   ANALYTIC_8B_UDM2 = 'analytic_8b_udm2',
   ANALYTIC_8B_SR_UDM2 = 'analytic_8b_sr_udm2',
+  PANCHROMATIC = 'panchromatic',
 }
 
 export enum PlanetItemType {
   PSScene = 'PSScene',
   PSScene4Band = 'PSScene4Band',
+  SkySatCollect = 'SkySatCollect',
 }
 
 export const PlanetSupportedProductBundles = {
@@ -61,6 +64,11 @@ export const PlanetSupportedProductBundles = {
     PlanetProductBundle.ANALYTIC_8B_UDM2,
     PlanetProductBundle.ANALYTIC_SR_UDM2,
     PlanetProductBundle.ANALYTIC_8B_SR_UDM2,
+  ],
+  [PlanetItemType.SkySatCollect]: [
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+    PlanetProductBundle.PANCHROMATIC,
   ],
 };
 
