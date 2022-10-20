@@ -14,7 +14,7 @@ interface ConstructorParameters {
   description?: string | null;
   legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
-  constellation?: any | null;
+  constellation?: HSLConstellation | null;
 }
 
 type HLSFindTilesDatasetParameters = {
