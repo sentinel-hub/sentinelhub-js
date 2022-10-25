@@ -1,7 +1,7 @@
 import { DATASET_AWS_HLS } from './dataset';
 import { DataProductId, FindTilesAdditionalParameters, MosaickingOrder } from './const';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
-import { HSLConstellation } from '../dataimport/const';
+import { HLSConstellation } from '../dataimport/const';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -14,17 +14,17 @@ interface ConstructorParameters {
   description?: string | null;
   legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
-  constellation?: HSLConstellation | null;
+  constellation?: HLSConstellation | null;
 }
 
 type HLSFindTilesDatasetParameters = {
   type: string;
-  constellation: HSLConstellation;
+  constellation: HLSConstellation;
 };
 
 export class HLSAWSLayer extends AbstractSentinelHubV3WithCCLayer {
   public readonly dataset = DATASET_AWS_HLS;
-  public constellation: HSLConstellation | null;
+  public constellation: HLSConstellation | null;
 
   public constructor({ constellation = null, ...params }: ConstructorParameters) {
     super(params);

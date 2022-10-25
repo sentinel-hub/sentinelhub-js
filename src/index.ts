@@ -121,7 +121,7 @@ import {
   TPDProvider,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
-  HSLConstellation,
+  HLSConstellation,
   TPDITransactionParams,
 } from './dataimport/const';
 
@@ -285,6 +285,6 @@ export {
   MaxarSensor,
   ResamplingKernel,
   TPDITransactionCompatibleCollection,
-  HSLConstellation,
+  HLSConstellation,
   TPDITransactionParams,
 };
