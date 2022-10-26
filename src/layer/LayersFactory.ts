@@ -30,6 +30,7 @@ import {
   DATASET_EOCLOUD_LANDSAT5,
   DATASET_EOCLOUD_LANDSAT7,
   DATASET_EOCLOUD_LANDSAT8,
+  DATASET_AWS_HLS,
   DATASET_EOCLOUD_ENVISAT_MERIS,
   Dataset,
   DATASET_AWS_LOTL1,
@@ -71,6 +72,7 @@ import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
 import { getAuthToken } from '../auth';
+import { HLSAWSLayer } from './HLSAWSLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -93,6 +95,7 @@ export class LayersFactory {
     [DATASET_AWS_LMSSL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LMSSL1,
     [DATASET_AWS_LETML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML1,
     [DATASET_AWS_LETML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML2,
+    [DATASET_AWS_HLS.shJsonGetCapabilitiesDataset]: DATASET_AWS_HLS,
     [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
     [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
     [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
@@ -124,6 +127,7 @@ export class LayersFactory {
     [DATASET_AWS_LMSSL1.id]: Landsat15AWSLMSSL1Layer,
     [DATASET_AWS_LETML1.id]: Landsat7AWSLETML1Layer,
     [DATASET_AWS_LETML2.id]: Landsat7AWSLETML2Layer,
+    [DATASET_AWS_HLS.id]: HLSAWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
     [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
