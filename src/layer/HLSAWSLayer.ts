@@ -2,6 +2,7 @@ import { DATASET_AWS_HLS } from './dataset';
 import { DataProductId, FindTilesAdditionalParameters, MosaickingOrder } from './const';
 import { AbstractSentinelHubV3WithCCLayer } from './AbstractSentinelHubV3WithCCLayer';
 import { HLSConstellation } from '../dataimport/const';
+import { ProcessingPayload } from './processing';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -70,5 +71,18 @@ export class HLSAWSLayer extends AbstractSentinelHubV3WithCCLayer {
       maxCloudCoverPercent: this.maxCloudCoverPercent,
       datasetParameters: findTilesDatasetParameters,
     };
+  }
+
+  public async _updateProcessingGetMapPayload(
+    payload: ProcessingPayload,
+    datasetSeqNo: number = 0,
+  ): Promise<ProcessingPayload> {
+    payload = await super._updateProcessingGetMapPayload(payload);
+
+    if (this.constellation !== null) {
+      payload.input.data[datasetSeqNo].dataFilter.constellation = this.constellation;
+    }
+
+    return payload;
   }
 }
