@@ -8,6 +8,7 @@ import {
   OrbitDirection,
   LinkType,
   setAuthToken,
+  BackscatterCoeff,
 } from '../../index';
 
 import {
@@ -34,6 +35,8 @@ import {
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
 import { DATASET_AWSEU_S1GRD } from '../dataset';
+import { DEMInstanceTypeOrthorectification, MosaickingOrder } from '../const';
+import { SpeckleFilterType } from '../S1GRDAWSEULayer';
 
 test('timezone should NOT be UTC', () => {
   // We are testing correctness in case of local timezones, so it doesn't make sense to
@@ -373,5 +376,40 @@ describe('Test findDatesUTC using catalog', () => {
         orbitDirection: OrbitDirection.ASCENDING,
       }),
     );
+  });
+});
+
+describe('test constructor', () => {
+  test('params are set correctly', async () => {
+    const defaultValues = {
+      instanceId: 'instanceId',
+      layerId: 'layerId',
+      evalscript: '//evalscript',
+      evalscriptUrl: 'evalscriptUrl',
+      dataProduct: 'dataProduct',
+      title: 'title',
+      description: 'description',
+      legendUrl: 'legendUrl',
+      acquisitionMode: AcquisitionMode.EW,
+      polarization: Polarization.SV,
+      resolution: Resolution.MEDIUM,
+      orthorectify: true,
+      demInstanceType: DEMInstanceTypeOrthorectification.COPERNICUS_90,
+      backscatterCoeff: BackscatterCoeff.GAMMA0_ELLIPSOID,
+      orbitDirection: OrbitDirection.DESCENDING,
+      speckleFilter: {
+        type: SpeckleFilterType.LEE,
+        windowSizeX: 5,
+        windowSizeY: 5,
+      },
+      mosaickingOrder: MosaickingOrder.LEAST_RECENT,
+    };
+
+    const layer = new S1GRDAWSEULayer(defaultValues);
+    Object.keys(defaultValues).forEach(key => {
+      const expectedValue = (defaultValues as any)[key];
+      const value = (layer as any)[key];
+      expect(value).toStrictEqual(expectedValue);
+    });
   });
 });
