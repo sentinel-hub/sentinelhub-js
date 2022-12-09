@@ -42,6 +42,20 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   maxDate: null,
 };
 
+export const DATASET_CREODIAS_S1GRD: Dataset = {
+  id: 'CRE_S1GRD',
+  shJsonGetCapabilitiesDataset: 'S1GRD',
+  shWmsEvalsource: 'S1GRD',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
+  datasetParametersType: 'S1GRD',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
+  orbitTimeMinutes: 49.3,
+  minDate: new Date(Date.UTC(2022, 11 - 1, 1, 0, 0, 0)), // 2022-11-01T00:00:00Z
+  maxDate: null,
+};
+
 export const DATASET_S2L2A: Dataset = {
   id: 'AWS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',

@@ -21,6 +21,7 @@ import {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
+  DATASET_CREODIAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
   DATASET_S3SLSTR,
@@ -48,6 +49,7 @@ import { WmtsLayer } from './layer/WmtsLayer';
 import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
+import { S1GRDCREOLayer } from './layer/S1GRDCREOLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
 import { S2L1CLayer } from './layer/S2L1CLayer';
 import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
@@ -146,6 +148,7 @@ export {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
+  DATASET_CREODIAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
   DATASET_S3SLSTR,
@@ -173,6 +176,7 @@ export {
   PlanetNicfiLayer,
   S1GRDAWSEULayer,
   S1GRDEOCloudLayer,
+  S1GRDCREOLayer,
   S2L2ALayer,
   S2L1CLayer,
   S3SLSTRLayer,
