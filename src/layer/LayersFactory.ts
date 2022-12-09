@@ -41,6 +41,7 @@ import {
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
   DATASET_PLANET_NICFI,
+  DATASET_CREODIAS_S1GRD,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -73,6 +74,7 @@ import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
 import { getAuthToken } from '../auth';
 import { HLSAWSLayer } from './HLSAWSLayer';
+import { S1GRDCREOLayer } from './S1GRDCREOLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -82,6 +84,7 @@ export class LayersFactory {
 
   private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
     [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
+    [DATASET_CREODIAS_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_CREODIAS_S1GRD,
     [DATASET_S2L2A.shJsonGetCapabilitiesDataset]: DATASET_S2L2A,
     [DATASET_S2L1C.shJsonGetCapabilitiesDataset]: DATASET_S2L1C,
     [DATASET_S3SLSTR.shJsonGetCapabilitiesDataset]: DATASET_S3SLSTR,
@@ -114,6 +117,7 @@ export class LayersFactory {
 
   private static readonly LAYER_FROM_DATASET_V3 = {
     [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
+    [DATASET_CREODIAS_S1GRD.id]: S1GRDCREOLayer,
     [DATASET_S2L2A.id]: S2L2ALayer,
     [DATASET_S2L1C.id]: S2L1CLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
