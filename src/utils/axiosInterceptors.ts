@@ -138,3 +138,7 @@ const shouldRetry = (error: AxiosError): boolean => {
   }
   return error.response.status == 429 || (error.response.status >= 500 && error.response.status <= 599);
 };
+
+export const addAxiosRequestInterceptor = (customInterceptor: any): void => {
+  axios.interceptors.request.use(customInterceptor, error => Promise.reject(error));
+};
