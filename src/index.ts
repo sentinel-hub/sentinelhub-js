@@ -24,6 +24,8 @@ import {
   DATASET_CREODIAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CREODIAS_S2L2A,
+  DATASET_CREODIAS_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
@@ -52,6 +54,8 @@ import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
 import { S1GRDCREOLayer } from './layer/S1GRDCREOLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
 import { S2L1CLayer } from './layer/S2L1CLayer';
+import { S2L2ACREOLayer } from './layer/S2L2ACREOLayer';
+import { S2L1CCREOLayer } from './layer/S2L1CCREOLayer';
 import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
 import { S3OLCILayer } from './layer/S3OLCILayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
@@ -151,6 +155,8 @@ export {
   DATASET_CREODIAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CREODIAS_S2L2A,
+  DATASET_CREODIAS_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
@@ -179,6 +185,8 @@ export {
   S1GRDCREOLayer,
   S2L2ALayer,
   S2L1CLayer,
+  S2L2ACREOLayer,
+  S2L1CCREOLayer,
   S3SLSTRLayer,
   S3OLCILayer,
   S5PL2Layer,
