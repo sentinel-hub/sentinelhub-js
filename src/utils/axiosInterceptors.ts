@@ -1,10 +1,4 @@
-import axios, {
-  AxiosRequestConfig,
-  CancelToken,
-  AxiosError,
-  AxiosInterceptorManager,
-  AxiosResponse,
-} from 'axios';
+import axios, { AxiosRequestConfig, CancelToken, AxiosError, AxiosResponse } from 'axios';
 
 import { isDebugEnabled } from './debug';
 import {
