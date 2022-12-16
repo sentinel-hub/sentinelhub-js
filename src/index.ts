@@ -101,7 +101,11 @@ import {
   Stats,
   BYOCBand,
 } from './layer/const';
-import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
+import {
+  addAxiosRequestInterceptor,
+  addAxiosResponseInterceptor,
+  registerInitialAxiosInterceptors,
+} from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
@@ -299,4 +303,6 @@ export {
   TPDITransactionCompatibleCollection,
   HLSConstellation,
   TPDITransactionParams,
+  addAxiosRequestInterceptor,
+  addAxiosResponseInterceptor,
 };

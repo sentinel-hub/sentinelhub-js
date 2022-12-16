@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, CancelToken, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, CancelToken, AxiosError, AxiosResponse } from 'axios';
 
 import { isDebugEnabled } from './debug';
 import {
@@ -137,4 +137,16 @@ const shouldRetry = (error: AxiosError): boolean => {
     return false;
   }
   return error.response.status == 429 || (error.response.status >= 500 && error.response.status <= 599);
+};
+
+export const addAxiosRequestInterceptor = (
+  customInterceptor: (config: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>,
+): void => {
+  axios.interceptors.request.use(customInterceptor, error => Promise.reject(error));
+};
+
+export const addAxiosResponseInterceptor = (
+  customInterceptor: (config: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>,
+): void => {
+  axios.interceptors.response.use(customInterceptor, error => Promise.reject(error));
 };
