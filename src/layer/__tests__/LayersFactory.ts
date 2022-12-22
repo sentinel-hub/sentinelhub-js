@@ -1,8 +1,15 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { DATASET_S2L2A, DATASET_S5PL2, DATASET_EOCLOUD_ENVISAT_MERIS, DATASET_AWS_LOTL1 } from '../dataset';
+import {
+  DATASET_S2L2A,
+  DATASET_S5PL2,
+  DATASET_EOCLOUD_ENVISAT_MERIS,
+  DATASET_AWS_LOTL1,
+  DATASET_S2L1C,
+  DATASET_CREODIAS_S2L1C,
+} from '../dataset';
 import { LayersFactory } from '../LayersFactory';
-import { WmsLayer, setAuthToken, invalidateCaches } from '../../index';
+import { WmsLayer, setAuthToken, invalidateCaches, S2L1CCREOLayer } from '../../index';
 import { S2L1CLayer } from '../S2L1CLayer';
 import { S5PL2Layer } from '../S5PL2Layer';
 import { getCapabilitiesWmsXmlResponse } from './fixtures.getCapabilitiesWMS';
@@ -20,7 +27,7 @@ const mockNetwork = new MockAdapter(axios);
 
 const cases = [
   {
-    url: `${DATASET_S2L2A.shServiceHostname}ogc/wms/instanceID`,
+    url: `${DATASET_S2L1C.shServiceHostname}ogc/wms/instanceID`,
     response: {
       layers: [
         {
@@ -33,6 +40,22 @@ const cases = [
       ],
     },
     expectedInstanceType: S2L1CLayer,
+  },
+
+  {
+    url: `${DATASET_CREODIAS_S2L1C.shServiceHostname}ogc/wms/instanceID`,
+    response: {
+      layers: [
+        {
+          id: 'S2L1C',
+          name: 's2l1c',
+          description: '',
+          dataset: 'S2L1C',
+          legendUrl: '',
+        },
+      ],
+    },
+    expectedInstanceType: S2L1CCREOLayer,
   },
 
   {
