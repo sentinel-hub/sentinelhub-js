@@ -152,6 +152,7 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://services.sentinel-hub.com/',
   'https://services-uswest2.sentinel-hub.com/',
   'https://creodias.sentinel-hub.com/',
+  'https://services.cdasstage.sentinel-hub.com/',
 ];
 
 // See https://services.sentinel-hub.com/api/v1/metadata/location/ for an up-to-date
