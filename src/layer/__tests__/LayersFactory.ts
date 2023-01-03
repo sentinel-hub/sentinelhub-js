@@ -6,10 +6,10 @@ import {
   DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_AWS_LOTL1,
   DATASET_S2L1C,
-  DATASET_CREODIAS_S2L1C,
+  DATASET_CDAS_S2L1C,
 } from '../dataset';
 import { LayersFactory } from '../LayersFactory';
-import { WmsLayer, setAuthToken, invalidateCaches, S2L1CCREOLayer } from '../../index';
+import { WmsLayer, setAuthToken, invalidateCaches, S2L1CCDASLayer } from '../../index';
 import { S2L1CLayer } from '../S2L1CLayer';
 import { S5PL2Layer } from '../S5PL2Layer';
 import { getCapabilitiesWmsXmlResponse } from './fixtures.getCapabilitiesWMS';
@@ -43,7 +43,7 @@ const cases = [
   },
 
   {
-    url: `${DATASET_CREODIAS_S2L1C.shServiceHostname}ogc/wms/instanceID`,
+    url: `${DATASET_CDAS_S2L1C.shServiceHostname}ogc/wms/instanceID`,
     response: {
       layers: [
         {
@@ -55,7 +55,7 @@ const cases = [
         },
       ],
     },
-    expectedInstanceType: S2L1CCREOLayer,
+    expectedInstanceType: S2L1CCDASLayer,
   },
 
   {
