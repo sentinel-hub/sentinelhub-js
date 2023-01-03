@@ -1,9 +1,9 @@
-import { DATASET_CREODIAS_S2L2A, S2L2ACREOLayer, setAuthToken } from '../../index';
-import { BBox, CRS_EPSG4326 } from '../../index';
+import { DATASET_CDAS_S2L1C, S2L1CCDASLayer, setAuthToken } from '../../index';
+import { ApiType, BBox, CRS_EPSG4326 } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
-} from './fixtures.S2L2ACREOLayer';
+} from './fixtures.S2L1CCDASLayer';
 
 import {
   AUTH_TOKEN,
@@ -25,7 +25,7 @@ import {
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
 
-const SEARCH_INDEX_URL = 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex';
+const SEARCH_INDEX_URL = 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -109,14 +109,14 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('findAvailableData is used if token is not set', async () => {
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
     await checkIfCorrectEndpointIsUsedFindDatesUTC(
       null,
       constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      DATASET_CREODIAS_S2L2A.findDatesUTCUrl,
+      DATASET_CDAS_S2L1C.findDatesUTCUrl,
     );
   });
 
@@ -126,7 +126,7 @@ describe('Test findDatesUTC using searchIndex', () => {
       constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
     }
 
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -136,7 +136,7 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -150,7 +150,7 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('catalog is used if token is set', async () => {
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -167,7 +167,7 @@ describe('Test findDatesUTC using catalog', () => {
       constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
     }
 
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -177,10 +177,23 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S2L2ACREOLayer({
+    const layer = new S2L1CCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
     await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
   });
 });
+
+test.each([
+  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/99999', false],
+  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643', true],
+])(
+  'AbstractSentinelHubV3Layer.supportsApiType correctly handles DataProducts supported by Processing API',
+  (dataProduct, expectedResult) => {
+    const layer = new S2L1CCDASLayer({
+      dataProduct: dataProduct,
+    });
+    expect(layer.supportsApiType(ApiType.PROCESSING)).toBe(expectedResult);
+  },
+);

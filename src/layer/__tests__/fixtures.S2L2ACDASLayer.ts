@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { LinkType, BBox, CRS_EPSG4326, S2L2ACREOLayer } from '../../index';
+import { LinkType, BBox, CRS_EPSG4326, S2L2ACDASLayer } from '../../index';
 
 export function constructFixtureFindTilesSearchIndex({
   sensingTime = '2020-04-30T10:09:22Z',
@@ -10,7 +10,7 @@ export function constructFixtureFindTilesSearchIndex({
   bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
   maxCloudCoverPercent = 20,
 }): Record<any, any> {
-  const layer = new S2L2ACREOLayer({
+  const layer = new S2L2ACDASLayer({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     maxCloudCoverPercent: maxCloudCoverPercent,
@@ -213,7 +213,7 @@ export function constructFixtureFindTilesCatalog({
   bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
   maxCloudCoverPercent = 20,
 }): Record<any, any> {
-  const layer = new S2L2ACREOLayer({
+  const layer = new S2L2ACDASLayer({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     maxCloudCoverPercent: maxCloudCoverPercent,

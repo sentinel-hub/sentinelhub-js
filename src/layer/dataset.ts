@@ -42,8 +42,8 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   maxDate: null,
 };
 
-export const DATASET_CREODIAS_S1GRD: Dataset = {
-  id: 'CRE_S1GRD',
+export const DATASET_CDAS_S1GRD: Dataset = {
+  id: 'CDAS_S1GRD',
   shJsonGetCapabilitiesDataset: 'S1GRD',
   shWmsEvalsource: 'S1GRD',
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
@@ -86,8 +86,8 @@ export const DATASET_S2L1C: Dataset = {
   catalogCollectionId: 'sentinel-2-l1c',
 };
 
-export const DATASET_CREODIAS_S2L2A: Dataset = {
-  id: 'CRE_S2L2A',
+export const DATASET_CDAS_S2L2A: Dataset = {
+  id: 'CDAS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',
   shWmsEvalsource: 'S2L2A',
   shProcessingApiDatasourceAbbreviation: 'S2L2A',
@@ -101,8 +101,8 @@ export const DATASET_CREODIAS_S2L2A: Dataset = {
   catalogCollectionId: 'sentinel-2-l2a',
 };
 
-export const DATASET_CREODIAS_S2L1C: Dataset = {
-  id: 'CRE_S2L1C',
+export const DATASET_CDAS_S2L1C: Dataset = {
+  id: 'CDAS_S2L1C',
   shJsonGetCapabilitiesDataset: 'S2L1C',
   shWmsEvalsource: 'S2',
   shProcessingApiDatasourceAbbreviation: 'S2L1C',
