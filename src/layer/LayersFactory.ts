@@ -13,6 +13,8 @@ import {
   SH_SERVICE_HOSTNAMES_V1_OR_V2,
   SH_SERVICE_HOSTNAMES_V3,
   PLANET_FALSE_COLOR_TEMPLATES,
+  SHV3_LOCATIONS_ROOT_URL,
+  LocationIdSHv3,
 } from './const';
 import {
   DATASET_S2L2A,
@@ -231,12 +233,24 @@ export class LayersFactory {
         if (!SHLayerClass) {
           throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
         }
+
+        const locationUrl = baseUrl.substring(0, baseUrl.indexOf('ogc/wms/'));
+        let locationId = null;
+        for (let id of Object.keys(SHV3_LOCATIONS_ROOT_URL)) {
+          const index: LocationIdSHv3 = id as LocationIdSHv3;
+          if (SHV3_LOCATIONS_ROOT_URL[index] === locationUrl) {
+            locationId = id;
+            break;
+          }
+        }
+
         return new SHLayerClass({
           instanceId: parseSHInstanceId(baseUrl),
           layerId,
           evalscript: evalscript || null,
           evalscriptUrl: null,
           dataProduct: dataProduct || null,
+          locationId,
           title,
           description,
           legendUrl,

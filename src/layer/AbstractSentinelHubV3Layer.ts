@@ -19,6 +19,8 @@ import {
   DataProductId,
   FindTilesAdditionalParameters,
   CATALOG_SEARCH_MAX_LIMIT,
+  LocationIdSHv3,
+  SHV3_LOCATIONS_ROOT_URL,
 } from './const';
 import { wmsGetMapUrl } from './wms';
 import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
@@ -43,6 +45,7 @@ interface ConstructorParameters {
   upsampling?: Interpolator | null;
   downsampling?: Interpolator | null;
   legendUrl?: string | null;
+  locationId?: LocationIdSHv3 | null;
 }
 
 // this class provides any SHv3-specific functionality to the subclasses:
@@ -56,6 +59,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
   public upsampling: Interpolator | null;
   public downsampling: Interpolator | null;
+  public locationId: LocationIdSHv3;
 
   public constructor({
     instanceId = null,
@@ -69,6 +73,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     upsampling = null,
     downsampling = null,
     legendUrl = null,
+    locationId = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
     if (
@@ -89,6 +94,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
+    this.locationId = locationId;
   }
 
   public getLayerId(): string {
@@ -136,7 +142,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public getShServiceHostname(): string {
-    return this.dataset.shServiceHostname;
+    if (this.locationId === null) {
+      return this.dataset.shServiceHostname;
+    }
+    const shServiceHostname = SHV3_LOCATIONS_ROOT_URL[this.locationId];
+    return shServiceHostname;
   }
 
   protected getCatalogCollectionId(): string {
