@@ -42,6 +42,20 @@ export const DATASET_EOCLOUD_S1GRD: Dataset = {
   maxDate: null,
 };
 
+export const DATASET_CDAS_S1GRD: Dataset = {
+  id: 'CDAS_S1GRD',
+  shJsonGetCapabilitiesDataset: 'S1GRD',
+  shWmsEvalsource: 'S1GRD',
+  shProcessingApiDatasourceAbbreviation: 'S1GRD',
+  datasetParametersType: 'S1GRD',
+  shServiceHostname: 'https://creodias.sentinel-hub.com/',
+  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
+  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
+  orbitTimeMinutes: 49.3,
+  minDate: new Date(Date.UTC(2022, 11 - 1, 1, 0, 0, 0)), // 2022-11-01T00:00:00Z
+  maxDate: null,
+};
+
 export const DATASET_S2L2A: Dataset = {
   id: 'AWS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',
@@ -72,6 +86,35 @@ export const DATASET_S2L1C: Dataset = {
   catalogCollectionId: 'sentinel-2-l1c',
 };
 
+export const DATASET_CDAS_S2L2A: Dataset = {
+  id: 'CDAS_S2L2A',
+  shJsonGetCapabilitiesDataset: 'S2L2A',
+  shWmsEvalsource: 'S2L2A',
+  shProcessingApiDatasourceAbbreviation: 'S2L2A',
+  datasetParametersType: 'S2',
+  shServiceHostname: 'https://services.cdasstage.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L2A/searchIndex',
+  findDatesUTCUrl: 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L2A/findAvailableData',
+  orbitTimeMinutes: 50.3,
+  minDate: new Date(Date.UTC(2016, 10 - 1, 20, 8, 9, 58)), // 2016-10-20T08:09:58Z
+  maxDate: null,
+  catalogCollectionId: 'sentinel-2-l2a',
+};
+
+export const DATASET_CDAS_S2L1C: Dataset = {
+  id: 'CDAS_S2L1C',
+  shJsonGetCapabilitiesDataset: 'S2L1C',
+  shWmsEvalsource: 'S2',
+  shProcessingApiDatasourceAbbreviation: 'S2L1C',
+  datasetParametersType: 'S2',
+  shServiceHostname: 'https://services.cdasstage.sentinel-hub.com/',
+  searchIndexUrl: 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex',
+  findDatesUTCUrl: 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L1C/findAvailableData',
+  orbitTimeMinutes: 50.3,
+  minDate: new Date(Date.UTC(2015, 6 - 1, 27, 10, 25, 31)), // 2015-06-27T10:25:31
+  maxDate: null,
+  catalogCollectionId: 'sentinel-2-l1c',
+};
 export const DATASET_S3SLSTR: Dataset = {
   id: 'CRE_S3SLSTR',
   shJsonGetCapabilitiesDataset: 'S3SLSTR',

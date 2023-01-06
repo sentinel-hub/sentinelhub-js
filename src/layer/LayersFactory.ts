@@ -41,6 +41,9 @@ import {
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
   DATASET_PLANET_NICFI,
+  DATASET_CDAS_S1GRD,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -73,6 +76,9 @@ import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
 import { getAuthToken } from '../auth';
 import { HLSAWSLayer } from './HLSAWSLayer';
+import { S1GRDCDASLayer } from './S1GRDCDASLayer';
+import { S2L2ACDASLayer } from './S2L2ACDASLayer';
+import { S2L1CCDASLayer } from './S2L1CCDASLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -80,27 +86,30 @@ export class LayersFactory {
     instantiate appropriate layers.
   */
 
-  private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
-    [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
-    [DATASET_S2L2A.shJsonGetCapabilitiesDataset]: DATASET_S2L2A,
-    [DATASET_S2L1C.shJsonGetCapabilitiesDataset]: DATASET_S2L1C,
-    [DATASET_S3SLSTR.shJsonGetCapabilitiesDataset]: DATASET_S3SLSTR,
-    [DATASET_S3OLCI.shJsonGetCapabilitiesDataset]: DATASET_S3OLCI,
-    [DATASET_S5PL2.shJsonGetCapabilitiesDataset]: DATASET_S5PL2,
-    [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
-    [DATASET_AWS_LOTL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL1,
-    [DATASET_AWS_LOTL2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL2,
-    [DATASET_AWS_LTML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML1,
-    [DATASET_AWS_LTML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML2,
-    [DATASET_AWS_LMSSL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LMSSL1,
-    [DATASET_AWS_LETML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML1,
-    [DATASET_AWS_LETML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML2,
-    [DATASET_AWS_HLS.shJsonGetCapabilitiesDataset]: DATASET_AWS_HLS,
-    [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
-    [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
-    [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
-    [DATASET_BYOC.shJsonGetCapabilitiesDataset]: DATASET_BYOC,
-  };
+  private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = [
+    DATASET_AWSEU_S1GRD,
+    DATASET_CDAS_S1GRD,
+    DATASET_S2L2A,
+    DATASET_S2L1C,
+    DATASET_CDAS_S2L2A,
+    DATASET_CDAS_S2L1C,
+    DATASET_S3SLSTR,
+    DATASET_S3OLCI,
+    DATASET_S5PL2,
+    DATASET_AWS_L8L1C,
+    DATASET_AWS_LOTL1,
+    DATASET_AWS_LOTL2,
+    DATASET_AWS_LTML1,
+    DATASET_AWS_LTML2,
+    DATASET_AWS_LMSSL1,
+    DATASET_AWS_LETML1,
+    DATASET_AWS_LETML2,
+    DATASET_AWS_HLS,
+    DATASET_EOCLOUD_ENVISAT_MERIS,
+    DATASET_MODIS,
+    DATASET_AWS_DEM,
+    DATASET_BYOC,
+  ];
 
   private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
     S1: DATASET_EOCLOUD_S1GRD,
@@ -114,8 +123,11 @@ export class LayersFactory {
 
   private static readonly LAYER_FROM_DATASET_V3 = {
     [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
+    [DATASET_CDAS_S1GRD.id]: S1GRDCDASLayer,
     [DATASET_S2L2A.id]: S2L2ALayer,
     [DATASET_S2L1C.id]: S2L1CLayer,
+    [DATASET_CDAS_S2L2A.id]: S2L2ACDASLayer,
+    [DATASET_CDAS_S2L1C.id]: S2L1CCDASLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
     [DATASET_S3OLCI.id]: S3OLCILayer,
     [DATASET_S5PL2.id]: S5PL2Layer,
@@ -141,6 +153,24 @@ export class LayersFactory {
     [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
     [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
+
+  private static matchDatasetFromGetCapabilities(datasetId: string, baseUrl: string): Dataset | undefined {
+    if (!datasetId) {
+      return undefined;
+    }
+
+    const matchingDatasetIds: Dataset[] = LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES.filter(
+      (dataset: Dataset) => dataset.shJsonGetCapabilitiesDataset === datasetId,
+    );
+
+    if (matchingDatasetIds.length === 1) {
+      return matchingDatasetIds[0];
+    }
+
+    return matchingDatasetIds.find((dataset: Dataset) => {
+      return dataset.shServiceHostname && baseUrl.includes(dataset.shServiceHostname);
+    });
+  }
 
   public static async makeLayer(
     baseUrl: string,
@@ -265,10 +295,7 @@ export class LayersFactory {
         const layers = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
         layersInfos = layers.map((l: any) => ({
           ...l,
-          dataset:
-            l.type && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
-              ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[l.type]
-              : null,
+          dataset: LayersFactory.matchDatasetFromGetCapabilities(l.type, baseUrl),
         }));
         layersInfoFetched = true;
       } catch (e) {
@@ -283,10 +310,7 @@ export class LayersFactory {
         layerId: layerInfo.id,
         title: layerInfo.name,
         description: layerInfo.description,
-        dataset:
-          layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-            ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-            : null,
+        dataset: LayersFactory.matchDatasetFromGetCapabilities(layerInfo.dataset, baseUrl),
         legendUrl: layerInfo.legendUrl,
       }));
     }

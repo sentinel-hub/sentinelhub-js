@@ -21,8 +21,11 @@ import {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
+  DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
@@ -48,8 +51,11 @@ import { WmtsLayer } from './layer/WmtsLayer';
 import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
 import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
+import { S1GRDCDASLayer } from './layer/S1GRDCDASLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
 import { S2L1CLayer } from './layer/S2L1CLayer';
+import { S2L2ACDASLayer } from './layer/S2L2ACDASLayer';
+import { S2L1CCDASLayer } from './layer/S2L1CCDASLayer';
 import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
 import { S3OLCILayer } from './layer/S3OLCILayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
@@ -150,8 +156,11 @@ export {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
   DATASET_EOCLOUD_S1GRD,
+  DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_S5PL2,
@@ -177,8 +186,11 @@ export {
   PlanetNicfiLayer,
   S1GRDAWSEULayer,
   S1GRDEOCloudLayer,
+  S1GRDCDASLayer,
   S2L2ALayer,
   S2L1CLayer,
+  S2L2ACDASLayer,
+  S2L1CCDASLayer,
   S3SLSTRLayer,
   S3OLCILayer,
   S5PL2Layer,
