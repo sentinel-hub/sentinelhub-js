@@ -15,6 +15,3 @@ jobs:
     - run: git config --local user.email "${{ github.event.pusher.name }}"
     - run: git commit -a -m "Build and commit dist"
     - run: git push origin $GITHUB_REF
-
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
