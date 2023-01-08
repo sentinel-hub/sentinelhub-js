@@ -11,4 +11,5 @@ jobs:
     - run: npm run build
     - run: git add dist
     - run: git config --local user.name "$GITHUB_ACTOR"
+    - run: git commit -m "Build and commit dist"
     - run: git push origin $GITHUB_REF
