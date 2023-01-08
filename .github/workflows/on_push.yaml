@@ -11,10 +11,8 @@ jobs:
     - run: rm -rf dist
     - run: git rm -r dist
     - run: npm run build
-    - run: |
-        EMAIL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/users/$GITHUB_ACTOR | jq -r .email)
-        git config --local user.name "$GITHUB_ACTOR"
-        git config --local user.email "$EMAIL"
+    - run: git config --local user.name "$GITHUB_ACTOR"
+    - run: git config --local user.email "${{ github.event.pusher.name }}"
     - run: git commit -a -m "Build and commit dist"
     - run: git push origin $GITHUB_REF
 
