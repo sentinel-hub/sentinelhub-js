@@ -11,11 +11,11 @@ jobs:
       with:
         node-version: 12
     - run: npm install
-    - if: -d dist
+    - if: test -d dist
       run: git rm -r dist
     - run: rm -rf dist
     - run: npm run build
     - run: git config --local user.name "$GITHUB_ACTOR"
-    - run: git config --local user.email "${{ github.event.pusher.name }}"
+    - run: git config --local user.email "${{ github.event.pusher.email }}"
     - run: git commit -a -m "Build and commit dist"
     - run: git push origin $GITHUB_REF
