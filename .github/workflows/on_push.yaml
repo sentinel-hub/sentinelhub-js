@@ -24,5 +24,30 @@ jobs:
     - run: npm run build
     - run: git config --local user.name "$GITHUB_ACTOR"
     - run: git config --local user.email "${{ github.event.pusher.email }}"
+    - run: git add dist
     - run: git commit -a -m "Build and commit dist"
     - run: git push origin $GITHUB_REF
+
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Run linter
+        run: |
+          npm ci
+          npm run lint
+
+      - name: Run tests
+        run: |
+          npm run test
