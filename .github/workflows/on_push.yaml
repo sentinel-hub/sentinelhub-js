@@ -8,6 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: npm install
+    - run: rm -rf dist
     - run: npm run build
     - run: |
         EMAIL=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/users/$GITHUB_ACTOR | jq -r .email)
