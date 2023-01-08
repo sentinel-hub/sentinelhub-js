@@ -1,27 +1,14 @@
-name: Lint
-on: [push, pull_request]
+name: Build and Deploy
+
+on: [push]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [8.x, 10.x, 12.x]
-
     steps:
-      - uses: actions/checkout@v1
-
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: Run linter
-        run: |
-          npm ci
-          npm run lint
-
-      - name: Run tests
-        run: |
-          npm run test
+    - uses: actions/checkout@v2
+    - run: npm install
+    - run: npm run build
+    - run: git add dist
+    - run: git commit -m "Build and commit dist"
+    - run: git push origin master
