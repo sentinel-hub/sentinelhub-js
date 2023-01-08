@@ -11,4 +11,4 @@ jobs:
     - run: npm run build
     - run: git add dist
     - run: git commit -m "Build and commit dist"
-    - run: git push origin master
+    - run: git push origin $GITHUB_REF
