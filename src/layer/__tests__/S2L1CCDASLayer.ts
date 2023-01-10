@@ -25,7 +25,7 @@ import {
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
 
-const SEARCH_INDEX_URL = 'https://services.cdasstage.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
+const SEARCH_INDEX_URL = 'https://sh.dataspace.copernicus.eu/index/v3/collections/S2L1C/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -88,7 +88,7 @@ describe('Test findTiles using catalog', () => {
     await checkIfCorrectEndpointIsUsed(
       AUTH_TOKEN,
       constructFixtureFindTilesCatalog({}),
-      CATALOG_URL.replace('https://services.sentinel-hub.com', 'https://services.cdasstage.sentinel-hub.com'),
+      CATALOG_URL.replace('https://services.sentinel-hub.com', 'https://sh.dataspace.copernicus.eu'),
     );
   });
 
@@ -157,7 +157,7 @@ describe('Test findDatesUTC using catalog', () => {
     await checkIfCorrectEndpointIsUsedFindDatesUTC(
       AUTH_TOKEN,
       constructFixtureFindDatesUTCCatalog(layer, {}),
-      CATALOG_URL.replace('https://services.sentinel-hub.com', 'https://services.cdasstage.sentinel-hub.com'),
+      CATALOG_URL.replace('https://services.sentinel-hub.com', 'https://sh.dataspace.copernicus.eu'),
     );
   });
 
