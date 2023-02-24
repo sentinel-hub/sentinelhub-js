@@ -17,7 +17,7 @@ import {
 } from '../../index';
 import { DataFusionLayerInfo, DEFAULT_SH_SERVICE_HOSTNAME } from '../ProcessingDataFusionLayer';
 import '../../../jest-setup';
-import { DEMInstanceTypeOrthorectification, LocationIdSHv3 } from '../const';
+import { DEMInstanceTypeOrthorectification, LocationIdSHv3, SHV3_LOCATIONS_ROOT_URL } from '../const';
 import { constructFixtureGetMapRequest } from './fixtures.ProcessingDataFusionLayer';
 import { AcquisitionMode, Resolution } from '../S1GRDAWSEULayer';
 
@@ -36,6 +36,13 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
     locationId: LocationIdSHv3.awsEuCentral1,
   });
 
+  const byocLayerMundi = new BYOCLayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    collectionId: 'mockCollectionId',
+    locationId: LocationIdSHv3.mundi,
+  });
+
   const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
   const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
   const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
@@ -45,8 +52,32 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
     [[creodiasLayer, shServicesLayer, usWestLayer], DEFAULT_SH_SERVICE_HOSTNAME],
     [[creodiasLayer, creodiasLayer], creodiasLayer.dataset.shServiceHostname],
     [[shServicesLayer, byocLayer], shServicesLayer.dataset.shServiceHostname],
-    [[byocLayer, byocLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [
+      [
+        byocLayer,
+        new BYOCLayer({
+          instanceId: 'INSTANCE_ID2',
+          layerId: 'LAYER_ID2',
+          collectionId: 'mockCollectionId2',
+          locationId: LocationIdSHv3.awsEuCentral1,
+        }),
+      ],
+      SHV3_LOCATIONS_ROOT_URL[byocLayer.locationId],
+    ],
     [[byocLayer, shServicesLayer, creodiasLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [[byocLayerMundi, byocLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [
+      [
+        byocLayerMundi,
+        new BYOCLayer({
+          instanceId: 'INSTANCE_ID2',
+          layerId: 'LAYER_ID2',
+          collectionId: 'mockCollectionId2',
+          locationId: LocationIdSHv3.mundi,
+        }),
+      ],
+      SHV3_LOCATIONS_ROOT_URL[byocLayerMundi.locationId],
+    ],
   ])(
     'ProcessingDataFusionLayer chooses the correct shServiceHostname',
     async (layers: AbstractSentinelHubV3Layer[], expectedShServiceHostname) => {
