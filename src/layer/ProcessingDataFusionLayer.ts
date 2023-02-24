@@ -117,10 +117,10 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       let shServiceHostname;
       if (
         this.layers.every(
-          layer => layer.layer.dataset.shServiceHostname === bogusFirstLayer.dataset.shServiceHostname,
+          layer => layer.layer.getShServiceHostname() === bogusFirstLayer.getShServiceHostname(),
         )
       ) {
-        shServiceHostname = bogusFirstLayer.dataset.shServiceHostname;
+        shServiceHostname = bogusFirstLayer.getShServiceHostname();
       } else {
         shServiceHostname = DEFAULT_SH_SERVICE_HOSTNAME;
       }
