@@ -27,7 +27,9 @@ import {
   DATASET_CDAS_S2L2A,
   DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
+  DATASET_CDAS_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
@@ -57,7 +59,9 @@ import { S2L1CLayer } from './layer/S2L1CLayer';
 import { S2L2ACDASLayer } from './layer/S2L2ACDASLayer';
 import { S2L1CCDASLayer } from './layer/S2L1CCDASLayer';
 import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
+import { S3SLSTRCDASLayer } from './layer/S3SLSTRCDASLayer';
 import { S3OLCILayer } from './layer/S3OLCILayer';
+import { S3OLCICDASLayer } from './layer/S3OLCICDASLayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
 import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from './layer/MODISLayer';
@@ -162,7 +166,9 @@ export {
   DATASET_CDAS_S2L2A,
   DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
+  DATASET_CDAS_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
@@ -192,7 +198,9 @@ export {
   S2L2ACDASLayer,
   S2L1CCDASLayer,
   S3SLSTRLayer,
+  S3SLSTRCDASLayer,
   S3OLCILayer,
+  S3OLCICDASLayer,
   S5PL2Layer,
   EnvisatMerisEOCloudLayer,
   MODISLayer,

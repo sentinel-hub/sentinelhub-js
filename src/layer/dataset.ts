@@ -130,6 +130,21 @@ export const DATASET_S3SLSTR: Dataset = {
   catalogCollectionId: 'sentinel-3-slstr',
 };
 
+export const DATASET_CDAS_S3SLSTR: Dataset = {
+  id: 'CDAS_S3SLSTR',
+  shJsonGetCapabilitiesDataset: 'S3SLSTR',
+  shWmsEvalsource: 'S3SLSTR',
+  shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
+  datasetParametersType: 'S3SLSTR',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SLSTR/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SLSTR/findAvailableData',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-slstr',
+};
+
 export const DATASET_S3OLCI: Dataset = {
   id: 'CRE_S3OLCI',
   shJsonGetCapabilitiesDataset: 'S3OLCI',
@@ -139,6 +154,21 @@ export const DATASET_S3OLCI: Dataset = {
   shServiceHostname: 'https://creodias.sentinel-hub.com/',
   searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex',
   findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/findAvailableData',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-olci',
+};
+
+export const DATASET_CDAS_S3OLCI: Dataset = {
+  id: 'CDAS_S3OLCI',
+  shJsonGetCapabilitiesDataset: 'S3OLCI',
+  shWmsEvalsource: 'S3OLCI',
+  shProcessingApiDatasourceAbbreviation: 'S3OLCI',
+  datasetParametersType: 'S3',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3OLCI/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3OLCI/findAvailableData',
   orbitTimeMinutes: 50.495,
   minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
   maxDate: null,
