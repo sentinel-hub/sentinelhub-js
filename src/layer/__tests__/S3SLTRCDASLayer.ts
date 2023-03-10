@@ -1,8 +1,9 @@
-import { BBox, CRS_EPSG4326, S3OLCILayer, setAuthToken, DATASET_S3OLCI } from '../../index';
+import { setAuthToken } from '../../index';
+import { BBox, CRS_EPSG4326, S3SLSTRCDASLayer, DATASET_CDAS_S3SLSTR } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
-} from './fixtures.S3OLCILayer';
+} from './fixtures.S3SLTRLayer';
 
 import {
   AUTH_TOKEN,
@@ -23,8 +24,8 @@ import {
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
 
-const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/1.0.0/search';
-const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex';
+const CATALOG_URL = 'https://sh.dataspace.copernicus.eu/api/v1/catalog/1.0.0/search';
+const SEARCH_INDEX_URL = 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SLSTR/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -35,6 +36,25 @@ const layerParamsArr: Record<string, any>[] = [
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
+  },
+
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: 20,
+  },
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: 0,
+  },
+  {
+    fromTime: fromTime,
+    toTime: toTime,
+    bbox: bbox,
+    maxCloudCoverPercent: null,
   },
 ];
 
@@ -47,18 +67,18 @@ describe('Test findTiles using searchIndex', () => {
   test('searchIndex is used if token is not set', async () => {
     await checkIfCorrectEndpointIsUsed(
       null,
-      constructFixtureFindTilesSearchIndex(S3OLCILayer, {}),
+      constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, {}),
       SEARCH_INDEX_URL,
     );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesSearchIndex(S3OLCILayer, layerParams);
+    const fixtures = constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S3OLCILayer, {}));
+    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, {}));
   });
 });
 
@@ -71,18 +91,18 @@ describe('Test findTiles using catalog', () => {
   test('Catalog is used if token is set', async () => {
     await checkIfCorrectEndpointIsUsed(
       AUTH_TOKEN,
-      constructFixtureFindTilesCatalog(S3OLCILayer, {}),
+      constructFixtureFindTilesCatalog(S3SLSTRCDASLayer, {}),
       CATALOG_URL,
     );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesCatalog(S3OLCILayer, layerParams);
+    const fixtures = constructFixtureFindTilesCatalog(S3SLSTRCDASLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from catalog', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S3OLCILayer, {}));
+    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S3SLSTRCDASLayer, {}));
   });
 });
 
@@ -93,21 +113,24 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('findAvailableData is used if token is not set', async () => {
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
     await checkIfCorrectEndpointIsUsedFindDatesUTC(
       null,
       constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      DATASET_S3OLCI.findDatesUTCUrl,
+      DATASET_CDAS_S3SLSTR.findDatesUTCUrl,
     );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
     let constructorParams: Record<string, any> = {};
+    if (layerParams.maxCloudCoverPercent !== null && layerParams.maxCloudCoverPercent !== undefined) {
+      constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
+    }
 
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -117,7 +140,7 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -131,7 +154,7 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('catalog is used if token is set', async () => {
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -144,8 +167,11 @@ describe('Test findDatesUTC using catalog', () => {
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
     let constructorParams: Record<string, any> = {};
+    if (layerParams.maxCloudCoverPercent !== null && layerParams.maxCloudCoverPercent !== undefined) {
+      constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
+    }
 
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -155,7 +181,7 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S3OLCILayer({
+    const layer = new S3SLSTRCDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
