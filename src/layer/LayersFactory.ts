@@ -44,6 +44,8 @@ import {
   DATASET_CDAS_S1GRD,
   DATASET_CDAS_S2L2A,
   DATASET_CDAS_S2L1C,
+  DATASET_CDAS_S3SLSTR,
+  DATASET_CDAS_S3OLCI,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -79,6 +81,8 @@ import { HLSAWSLayer } from './HLSAWSLayer';
 import { S1GRDCDASLayer } from './S1GRDCDASLayer';
 import { S2L2ACDASLayer } from './S2L2ACDASLayer';
 import { S2L1CCDASLayer } from './S2L1CCDASLayer';
+import { S3OLCICDASLayer } from './S3OLCICDASLayer';
+import { S3SLSTRCDASLayer } from './S3SLSTRCDASLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -95,6 +99,8 @@ export class LayersFactory {
     DATASET_CDAS_S2L1C,
     DATASET_S3SLSTR,
     DATASET_S3OLCI,
+    DATASET_CDAS_S3SLSTR,
+    DATASET_CDAS_S3OLCI,
     DATASET_S5PL2,
     DATASET_AWS_L8L1C,
     DATASET_AWS_LOTL1,
@@ -129,7 +135,9 @@ export class LayersFactory {
     [DATASET_CDAS_S2L2A.id]: S2L2ACDASLayer,
     [DATASET_CDAS_S2L1C.id]: S2L1CCDASLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
+    [DATASET_CDAS_S3SLSTR.id]: S3SLSTRCDASLayer,
     [DATASET_S3OLCI.id]: S3OLCILayer,
+    [DATASET_CDAS_S3OLCI.id]: S3OLCICDASLayer,
     [DATASET_S5PL2.id]: S5PL2Layer,
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_AWS_LOTL1.id]: Landsat8AWSLOTL1Layer,

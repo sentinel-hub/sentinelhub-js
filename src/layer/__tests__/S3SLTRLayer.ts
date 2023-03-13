@@ -65,16 +65,20 @@ describe('Test findTiles using searchIndex', () => {
   });
 
   test('searchIndex is used if token is not set', async () => {
-    await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
+    await checkIfCorrectEndpointIsUsed(
+      null,
+      constructFixtureFindTilesSearchIndex(S3SLSTRLayer, {}),
+      SEARCH_INDEX_URL,
+    );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
+    const fixtures = constructFixtureFindTilesSearchIndex(S3SLSTRLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex({}));
+    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S3SLSTRLayer, {}));
   });
 });
 
@@ -85,16 +89,20 @@ describe('Test findTiles using catalog', () => {
   });
 
   test('Catalog is used if token is set', async () => {
-    await checkIfCorrectEndpointIsUsed(AUTH_TOKEN, constructFixtureFindTilesCatalog({}), CATALOG_URL);
+    await checkIfCorrectEndpointIsUsed(
+      AUTH_TOKEN,
+      constructFixtureFindTilesCatalog(S3SLSTRLayer, {}),
+      CATALOG_URL,
+    );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesCatalog(layerParams);
+    const fixtures = constructFixtureFindTilesCatalog(S3SLSTRLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from catalog', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
+    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S3SLSTRLayer, {}));
   });
 });
 
