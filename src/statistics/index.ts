@@ -1,12 +1,12 @@
-export { StatisticsProviderType, getStatisticsProvider } from './StatisticsProvider';
-export { StatisticsUtils } from './statistics.utils';
 export {
-  StatisticalApiResponse,
-  StatisticalApiInputPayload,
+  BandHistogram,
   BandStats,
   StatisticalApiAggregationPayload,
-  StatisticalApiOutput,
   StatisticalApiCalculationsPayload,
+  StatisticalApiInputPayload,
+  StatisticalApiOutput,
   StatisticalApiPayload,
-  BandHistogram,
+  StatisticalApiResponse,
 } from './const';
+export { StatisticsProviderType, getStatisticsProvider } from './StatisticsProvider';
+export { StatisticsUtils } from './statistics.utils';
