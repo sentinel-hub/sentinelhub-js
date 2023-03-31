@@ -139,18 +139,6 @@ import {
   TPDITransactionParams,
 } from './dataimport/const';
 
-import { StatisticsProviderType } from './statistics/StatisticsProvider';
-import { StatisticsUtils } from './statistics/statistics.utils';
-import {
-  StatisticalApiResponse,
-  StatisticalApiInputPayload,
-  BandStats,
-  StatisticalApiAggregationPayload,
-  StatisticalApiOutput,
-  StatisticalApiCalculationsPayload,
-  StatisticalApiPayload,
-  BandHistogram,
-} from './statistics/const';
 import { ProcessingPayload } from './layer/processing';
 
 registerInitialAxiosInterceptors();
@@ -267,14 +255,6 @@ export {
   DailyChannelStats,
   FisResponse,
   Stats,
-  StatisticalApiResponse,
-  StatisticalApiInputPayload,
-  BandStats,
-  StatisticalApiAggregationPayload,
-  StatisticalApiOutput,
-  StatisticalApiCalculationsPayload,
-  StatisticalApiPayload,
-  BandHistogram,
   BYOCBand,
   GetStatsParams,
   ProcessingPayload,
@@ -289,9 +269,6 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
-  //StatisticalApi
-  StatisticsProviderType,
-  StatisticsUtils,
   //TPDI
   TPDI,
   TPDICollections,
@@ -314,3 +291,5 @@ export {
   addAxiosRequestInterceptor,
   addAxiosResponseInterceptor,
 };
+
+export * from './statistics/';
