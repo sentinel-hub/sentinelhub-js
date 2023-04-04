@@ -190,6 +190,21 @@ export const DATASET_S5PL2: Dataset = {
   catalogCollectionId: 'sentinel-5p-l2',
 };
 
+export const DATASET_CDAS_S5PL2: Dataset = {
+  id: 'CDAS_S5PL2',
+  shJsonGetCapabilitiesDataset: 'S5PL2',
+  shWmsEvalsource: 'S5P_L2',
+  shProcessingApiDatasourceAbbreviation: 'S5PL2',
+  datasetParametersType: 'S5PL2',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S5PL2/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S5PL2/findAvailableData',
+  orbitTimeMinutes: 101,
+  minDate: new Date(Date.UTC(2018, 4 - 1, 30, 0, 18, 51)), // 2018-04-30T00:18:51
+  maxDate: null,
+  catalogCollectionId: 'sentinel-5p-l2',
+};
+
 export const DATASET_AWS_L8L1C: Dataset = {
   id: 'AWS_L8L1C',
   shJsonGetCapabilitiesDataset: 'L8L1C',
