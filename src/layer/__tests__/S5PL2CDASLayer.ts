@@ -1,5 +1,4 @@
-import { DATASET_CDAS_S5PL2, setAuthToken } from '../../index';
-import { BBox, CRS_EPSG4326, S5PL2CDASLayer, DATASET_S5PL2 } from '../../index';
+import { BBox, CRS_EPSG4326, DATASET_CDAS_S5PL2, setAuthToken, S5PL2CDASLayer } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
