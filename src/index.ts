@@ -31,6 +31,7 @@ import {
   DATASET_S3OLCI,
   DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
+  DATASET_CDAS_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -63,6 +64,7 @@ import { S3SLSTRCDASLayer } from './layer/S3SLSTRCDASLayer';
 import { S3OLCILayer } from './layer/S3OLCILayer';
 import { S3OLCICDASLayer } from './layer/S3OLCICDASLayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
+import { S5PL2CDASLayer } from './layer/S5PL2CDASLayer';
 import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from './layer/MODISLayer';
 import { DEMAWSUSLayer } from './layer/DEMAWSUSLayer';
@@ -170,6 +172,7 @@ export {
   DATASET_S3OLCI,
   DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
+  DATASET_CDAS_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -202,6 +205,7 @@ export {
   S3OLCILayer,
   S3OLCICDASLayer,
   S5PL2Layer,
+  S5PL2CDASLayer,
   EnvisatMerisEOCloudLayer,
   MODISLayer,
   DEMAWSUSLayer,

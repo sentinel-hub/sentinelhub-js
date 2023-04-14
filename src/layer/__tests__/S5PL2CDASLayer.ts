@@ -1,5 +1,4 @@
-import { setAuthToken } from '../../index';
-import { BBox, CRS_EPSG4326, S5PL2Layer, DATASET_S5PL2 } from '../../index';
+import { BBox, CRS_EPSG4326, DATASET_CDAS_S5PL2, setAuthToken, S5PL2CDASLayer } from '../../index';
 import {
   constructFixtureFindTilesSearchIndex,
   constructFixtureFindTilesCatalog,
@@ -26,8 +25,8 @@ import {
 
 import { ProductType } from '../S5PL2Layer';
 
-const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/1.0.0/search';
-const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex';
+const CATALOG_URL = 'https://sh.dataspace.copernicus.eu/api/v1/catalog/1.0.0/search';
+const SEARCH_INDEX_URL = 'https://sh.dataspace.copernicus.eu/index/v3/collections/S5PL2/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -56,18 +55,18 @@ describe('Test findTiles using searchIndex', () => {
   test('searchIndex is used if token is not set', async () => {
     await checkIfCorrectEndpointIsUsed(
       null,
-      constructFixtureFindTilesSearchIndex(S5PL2Layer, {}),
+      constructFixtureFindTilesSearchIndex(S5PL2CDASLayer, {}),
       SEARCH_INDEX_URL,
     );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesSearchIndex(S5PL2Layer, layerParams);
+    const fixtures = constructFixtureFindTilesSearchIndex(S5PL2CDASLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S5PL2Layer, {}));
+    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S5PL2CDASLayer, {}));
   });
 });
 
@@ -80,18 +79,18 @@ describe('Test findTiles using catalog', () => {
   test('Catalog is used if token is set', async () => {
     await checkIfCorrectEndpointIsUsed(
       AUTH_TOKEN,
-      constructFixtureFindTilesCatalog(S5PL2Layer, {}),
+      constructFixtureFindTilesCatalog(S5PL2CDASLayer, {}),
       CATALOG_URL,
     );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesCatalog(S5PL2Layer, layerParams);
+    const fixtures = constructFixtureFindTilesCatalog(S5PL2CDASLayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from catalog', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S5PL2Layer, {}));
+    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S5PL2CDASLayer, {}));
   });
 });
 
@@ -102,14 +101,14 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('findAvailableData is used if token is not set', async () => {
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
     await checkIfCorrectEndpointIsUsedFindDatesUTC(
       null,
       constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      DATASET_S5PL2.findDatesUTCUrl,
+      DATASET_CDAS_S5PL2.findDatesUTCUrl,
     );
   });
 
@@ -119,7 +118,7 @@ describe('Test findDatesUTC using searchIndex', () => {
       constructorParams.productType = layerParams.productType;
     }
 
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -129,7 +128,7 @@ describe('Test findDatesUTC using searchIndex', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -143,7 +142,7 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('catalog is used if token is set', async () => {
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
@@ -159,7 +158,7 @@ describe('Test findDatesUTC using catalog', () => {
     if (layerParams && layerParams.productType) {
       constructorParams.productType = layerParams.productType;
     }
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
       ...constructorParams,
@@ -169,7 +168,7 @@ describe('Test findDatesUTC using catalog', () => {
   });
 
   test('response from service', async () => {
-    const layer = new S5PL2Layer({
+    const layer = new S5PL2CDASLayer({
       instanceId: 'INSTANCE_ID',
       layerId: 'LAYER_ID',
     });
