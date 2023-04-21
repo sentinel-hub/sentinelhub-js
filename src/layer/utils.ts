@@ -159,8 +159,8 @@ export async function fetchLayerParamsFromConfigurationService(
   if (!authToken) {
     throw new Error('Must be authenticated to fetch layer params');
   }
-
-  const url = `${shServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
+  const configurationServiceHostName = shServiceHostName ?? 'https://services.sentinel-hub.com/';
+  const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
   const headers = {
     Authorization: `Bearer ${authToken}`,
   };
