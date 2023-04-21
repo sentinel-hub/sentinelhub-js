@@ -2,13 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import {
-  LocationIdSHv3,
-  OgcServiceTypes,
-  SHV3_LOCATIONS_ROOT_URL,
-  SH_SERVICE_HOSTNAMES_V1_OR_V2,
-  SH_SERVICE_HOSTNAMES_V3,
-} from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
