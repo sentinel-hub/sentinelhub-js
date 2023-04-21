@@ -115,7 +115,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       throw new Error('This layer does not support Processing API (unknown dataset)');
     }
     const layersParams = await fetchLayerParamsFromConfigurationService(
-      this.getShServiceHostname(),
+      this.dataset.shServiceHostname,
       this.instanceId,
       reqConfig,
     );
