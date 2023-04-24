@@ -1,5 +1,13 @@
 import { BBox } from '../bbox';
-import { GetMapParams, Interpolator, PreviewMode, ApiType, PaginatedTiles, MosaickingOrder } from './const';
+import {
+  GetMapParams,
+  Interpolator,
+  PreviewMode,
+  ApiType,
+  PaginatedTiles,
+  MosaickingOrder,
+  DEFAULT_SH_SERVICE_HOSTNAME,
+} from './const';
 import {
   createProcessingPayload,
   convertPreviewToString,
@@ -36,8 +44,6 @@ export type DataFusionLayerInfo = {
   upsampling?: Interpolator;
   downsampling?: Interpolator;
 };
-
-export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
 
 export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   protected layers: DataFusionLayerInfo[];

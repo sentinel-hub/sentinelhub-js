@@ -2,7 +2,12 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import {
+  DEFAULT_SH_SERVICE_HOSTNAME,
+  OgcServiceTypes,
+  SH_SERVICE_HOSTNAMES_V1_OR_V2,
+  SH_SERVICE_HOSTNAMES_V3,
+} from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
@@ -147,7 +152,7 @@ export function getConfigurationServiceHostFromBaseUrl(baseUrl: string): string 
 
   // Note that for SH v3 service, the endpoint for fetching the list of layers is always
   // https://services.sentinel-hub.com/, even for creodias datasets:
-  return 'https://services.sentinel-hub.com/';
+  return DEFAULT_SH_SERVICE_HOSTNAME;
 }
 
 export async function fetchLayerParamsFromConfigurationService(
@@ -159,7 +164,7 @@ export async function fetchLayerParamsFromConfigurationService(
   if (!authToken) {
     throw new Error('Must be authenticated to fetch layer params');
   }
-  const configurationServiceHostName = shServiceHostName ?? 'https://services.sentinel-hub.com/';
+  const configurationServiceHostName = shServiceHostName ?? DEFAULT_SH_SERVICE_HOSTNAME;
   const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
   const headers = {
     Authorization: `Bearer ${authToken}`,
