@@ -24,6 +24,7 @@ import {
   constructFixtureFindDatesUTCSearchIndex,
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
+import { checkLayersParamsEndpoint } from './testUtils.layers';
 
 const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S2L1C/searchIndex';
 
@@ -193,3 +194,14 @@ test.each([
     expect(layer.supportsApiType(ApiType.PROCESSING)).toBe(expectedResult);
   },
 );
+
+describe('correct endpoint is used for layer params', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('updateLayerFromServiceIfNeeded', async () => {
+    await checkLayersParamsEndpoint(mockNetwork, S2L1CLayer, 'https://services.sentinel-hub.com');
+  });
+});

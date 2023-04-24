@@ -22,6 +22,7 @@ import {
   constructFixtureFindDatesUTCSearchIndex,
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
+import { checkLayersParamsEndpoint } from './testUtils.layers';
 
 const CATALOG_URL = 'https://sh.dataspace.copernicus.eu/api/v1/catalog/1.0.0/search';
 const SEARCH_INDEX_URL = 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3OLCI/searchIndex';
@@ -160,5 +161,16 @@ describe('Test findDatesUTC using catalog', () => {
       layerId: 'LAYER_ID',
     });
     await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
+  });
+});
+
+describe('correct endpoint is used for layer params', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('updateLayerFromServiceIfNeeded', async () => {
+    await checkLayersParamsEndpoint(mockNetwork, S3OLCICDASLayer, 'https://sh.dataspace.copernicus.eu');
   });
 });
