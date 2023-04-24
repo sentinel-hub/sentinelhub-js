@@ -146,8 +146,14 @@ export function parseSHInstanceId(baseUrl: string): string {
 }
 
 export function getConfigurationServiceHostFromBaseUrl(baseUrl: string): string {
-  if (/dataspace.copernicus.eu/.test(baseUrl)) {
-    return 'https://sh.dataspace.copernicus.eu/';
+  let host = baseUrl;
+
+  if (/\ogc\/wms/.test(baseUrl)) {
+    host = baseUrl.substring(0, baseUrl.indexOf('/ogc/wms') + 1);
+  }
+
+  if (/dataspace.copernicus.eu/.test(host)) {
+    return host;
   }
 
   // Note that for SH v3 service, the endpoint for fetching the list of layers is always
