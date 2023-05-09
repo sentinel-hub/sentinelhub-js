@@ -6,6 +6,7 @@ import {
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
   fetchLayerParamsFromConfigurationService,
+  getConfigurationServiceHostFromBaseUrl,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import {
@@ -304,7 +305,11 @@ export class LayersFactory {
     // use configuration if possible
     if (authToken && preferGetCapabilities === false) {
       try {
-        const layers = await fetchLayerParamsFromConfigurationService(parseSHInstanceId(baseUrl), reqConfig);
+        const layers = await fetchLayerParamsFromConfigurationService(
+          getConfigurationServiceHostFromBaseUrl(baseUrl),
+          parseSHInstanceId(baseUrl),
+          reqConfig,
+        );
         layersInfos = layers.map((l: any) => ({
           ...l,
           dataset: LayersFactory.matchDatasetFromGetCapabilities(l.type, baseUrl),

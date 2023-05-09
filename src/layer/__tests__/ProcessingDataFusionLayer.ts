@@ -15,9 +15,14 @@ import {
   Polarization,
   BYOCLayer,
 } from '../../index';
-import { DataFusionLayerInfo, DEFAULT_SH_SERVICE_HOSTNAME } from '../ProcessingDataFusionLayer';
+import { DataFusionLayerInfo } from '../ProcessingDataFusionLayer';
 import '../../../jest-setup';
-import { DEMInstanceTypeOrthorectification, LocationIdSHv3, SHV3_LOCATIONS_ROOT_URL } from '../const';
+import {
+  DEMInstanceTypeOrthorectification,
+  LocationIdSHv3,
+  SHV3_LOCATIONS_ROOT_URL,
+  DEFAULT_SH_SERVICE_HOSTNAME,
+} from '../const';
 import { constructFixtureGetMapRequest } from './fixtures.ProcessingDataFusionLayer';
 import { AcquisitionMode, Resolution } from '../S1GRDAWSEULayer';
 

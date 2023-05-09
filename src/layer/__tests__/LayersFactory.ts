@@ -7,6 +7,9 @@ import {
   DATASET_AWS_LOTL1,
   DATASET_S2L1C,
   DATASET_CDAS_S2L1C,
+  DATASET_S3OLCI,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S3OLCI,
 } from '../dataset';
 import { LayersFactory } from '../LayersFactory';
 import { WmsLayer, setAuthToken, invalidateCaches, S2L1CCDASLayer } from '../../index';
@@ -171,6 +174,120 @@ describe('Test endpoints for getting layers parameters', () => {
 
     [
       {
+        baseUrl: `${DATASET_CDAS_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+        authToken: undefined,
+      },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: true,
+        authToken: undefined,
+      },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: undefined,
+      },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        //not authenticated
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'authToken',
+      },
+      [{ code: 200, data: [] }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/configuration/v1/wms/instances/${instanceId}/layers`;
+      },
+    ],
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S2L2A.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'authToken',
+      },
+      [{ code: 401 }, { code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+
+    [
+      {
+        baseUrl: `${DATASET_S3OLCI.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: true,
+        authToken: undefined,
+      },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+
+    [
+      {
+        baseUrl: `${DATASET_S3OLCI.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'authToken',
+      },
+      [{ code: 200, data: [] }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
+      },
+    ],
+
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S3OLCI.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: undefined,
+        authToken: undefined,
+      },
+      [{ code: 200, data: { layers: [] } }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+      },
+    ],
+
+    [
+      {
+        baseUrl: `${DATASET_CDAS_S3OLCI.shServiceHostname}ogc/wms/`,
+        instanceId: 'instanceId',
+        preferGetCapabilities: false,
+        authToken: 'authToken',
+      },
+      [{ code: 200, data: [] }],
+      function expectedEndpoint(instanceId: string): string {
+        return `https://sh.dataspace.copernicus.eu/configuration/v1/wms/instances/${instanceId}/layers`;
+      },
+    ],
+
+    [
+      {
         baseUrl: `${DATASET_AWS_LOTL1.shServiceHostname}ogc/wms/`,
         instanceId: 'instanceId',
         preferGetCapabilities: undefined,
@@ -265,7 +382,7 @@ describe('Test endpoints for getting layers parameters', () => {
         return `https://api.planet.com/basemaps/v1/mosaics/wmts?service=wmts&request=GetCapabilities&format=text%2Fxml`;
       },
     ],
-  ])('checks if correct endpoint is used', async (inputParams, responses, expectedEndpoint) => {
+  ])('checks if correct endpoint is used ', async (inputParams, responses, expectedEndpoint) => {
     const { baseUrl, instanceId, preferGetCapabilities, authToken } = inputParams;
 
     if (!!authToken) {

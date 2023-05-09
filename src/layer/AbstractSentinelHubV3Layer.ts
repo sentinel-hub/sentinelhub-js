@@ -30,7 +30,7 @@ import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
-import { fetchLayerParamsFromConfigurationService } from './utils';
+import { fetchLayerParamsFromConfigurationService, getConfigurationServiceHostFromBaseUrl } from './utils';
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -114,7 +114,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not support Processing API (unknown dataset)');
     }
-    const layersParams = await fetchLayerParamsFromConfigurationService(this.instanceId, reqConfig);
+    const layersParams = await fetchLayerParamsFromConfigurationService(
+      getConfigurationServiceHostFromBaseUrl(this.dataset.shServiceHostname),
+      this.instanceId,
+      reqConfig,
+    );
 
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
     if (!layerParams) {

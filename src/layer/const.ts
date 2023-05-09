@@ -172,6 +172,8 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
 };
 
+export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
+
 export type GetStatsParams = {
   fromTime: Date;
   toTime: Date;
