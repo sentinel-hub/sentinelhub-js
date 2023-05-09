@@ -152,12 +152,15 @@ export function getConfigurationServiceHostFromBaseUrl(baseUrl: string): string 
     host = baseUrl.substring(0, baseUrl.indexOf('/ogc/wms') + 1);
   }
 
+  // Copernicus datasets require different endpoint
   if (/dataspace.copernicus.eu/.test(host)) {
     return host;
   }
 
-  // Note that for SH v3 service, the endpoint for fetching the list of layers is always
-  // https://services.sentinel-hub.com/, even for creodias datasets:
+  // The endpoint for fetching the list of layers is typically
+  // https://services.sentinel-hub.com/, even for creodias datasets.
+  // However there is an exception for Copernicus datasets, which have a different
+  // a different endpoint for fetching the list of layers
   return DEFAULT_SH_SERVICE_HOSTNAME;
 }
 
