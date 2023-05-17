@@ -407,7 +407,7 @@ export const DATASET_MODIS: Dataset = {
   findDatesUTCUrl: 'https://services-uswest2.sentinel-hub.com/index/v3/collections/MODIS/findAvailableData',
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2000, 2 - 1, 24, 12, 0, 0)), // 2000-02-24T12:00:00
-  maxDate: null,
+  maxDate: new Date(Date.UTC(2023, 2 - 1, 10, 12, 0, 0)), // 2023-02-10T12:00:00
   catalogCollectionId: 'modis',
 };
 
