@@ -48,12 +48,13 @@ export const DATASET_CDAS_S1GRD: Dataset = {
   shWmsEvalsource: 'S1GRD',
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
   datasetParametersType: 'S1GRD',
-  shServiceHostname: 'https://creodias.sentinel-hub.com/',
-  searchIndexUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex',
-  findDatesUTCUrl: 'https://creodias.sentinel-hub.com/index/v3/collections/S1GRD/findAvailableData',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S1GRD/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S1GRD/findAvailableData',
   orbitTimeMinutes: 49.3,
-  minDate: new Date(Date.UTC(2022, 11 - 1, 1, 0, 0, 0)), // 2022-11-01T00:00:00Z
+  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 47, 14)), // 2014-10-03T00:47:14Z
   maxDate: null,
+  catalogCollectionId: 'sentinel-1-grd',
 };
 
 export const DATASET_S2L2A: Dataset = {
