@@ -48,6 +48,7 @@ import {
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
+  DATASET_CDAS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
@@ -69,6 +70,7 @@ import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from './layer/MODISLayer';
 import { DEMAWSUSLayer } from './layer/DEMAWSUSLayer';
 import { DEMLayer } from './layer/DEMLayer';
+import { DEMCDASLayer } from './layer/DEMCDASLayer';
 import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
 import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
 import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
@@ -177,6 +179,7 @@ export {
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
+  DATASET_CDAS_DEM,
   // layers:
   WmsLayer,
   WmtsLayer,
@@ -198,6 +201,7 @@ export {
   MODISLayer,
   DEMAWSUSLayer,
   DEMLayer,
+  DEMCDASLayer,
   Landsat5EOCloudLayer,
   Landsat7EOCloudLayer,
   Landsat8EOCloudLayer,

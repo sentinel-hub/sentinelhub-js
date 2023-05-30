@@ -440,6 +440,20 @@ export const DATASET_AWSUS_DEM: Dataset = {
   maxDate: null,
 };
 
+export const DATASET_CDAS_DEM: Dataset = {
+  id: 'CDAS_DEM',
+  shJsonGetCapabilitiesDataset: 'DEM',
+  shWmsEvalsource: 'DEM',
+  shProcessingApiDatasourceAbbreviation: 'DEM',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: null,
+  findDatesUTCUrl: null,
+  orbitTimeMinutes: null,
+  minDate: null,
+  maxDate: null,
+};
+
 export const DATASET_BYOC: Dataset = {
   id: 'CUSTOM',
   shJsonGetCapabilitiesDataset: 'CUSTOM',
