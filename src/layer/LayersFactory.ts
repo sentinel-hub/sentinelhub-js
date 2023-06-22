@@ -28,12 +28,7 @@ import {
   DATASET_S3OLCI,
   DATASET_BYOC,
   DATASET_S5PL2,
-  DATASET_EOCLOUD_S1GRD,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
   DATASET_AWS_HLS,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
   Dataset,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -64,11 +59,6 @@ import { DEMLayer } from './DEMLayer';
 import { DEMCDASLayer } from './DEMCDASLayer';
 import { Landsat8AWSLayer } from './Landsat8AWSLayer';
 import { BYOCLayer } from './BYOCLayer';
-import { S1GRDEOCloudLayer } from './S1GRDEOCloudLayer';
-import { Landsat5EOCloudLayer } from './Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from './Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
-import { EnvisatMerisEOCloudLayer } from './EnvisatMerisEOCloudLayer';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { Landsat8AWSLOTL1Layer } from './Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './Landsat8AWSLOTL2Layer';
@@ -117,7 +107,6 @@ export class LayersFactory {
     DATASET_AWS_LETML1,
     DATASET_AWS_LETML2,
     DATASET_AWS_HLS,
-    DATASET_EOCLOUD_ENVISAT_MERIS,
     DATASET_MODIS,
     DATASET_AWS_DEM,
     DATASET_CDAS_DEM,
@@ -125,13 +114,13 @@ export class LayersFactory {
   ];
 
   private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
-    S1: DATASET_EOCLOUD_S1GRD,
-    S1_EW: DATASET_EOCLOUD_S1GRD,
-    S1_EW_SH: DATASET_EOCLOUD_S1GRD,
-    L5: DATASET_EOCLOUD_LANDSAT5,
-    L7: DATASET_EOCLOUD_LANDSAT7,
-    L8: DATASET_EOCLOUD_LANDSAT8,
-    ENV: DATASET_EOCLOUD_ENVISAT_MERIS,
+    // S1: DATASET_EOCLOUD_S1GRD,
+    // S1_EW: DATASET_EOCLOUD_S1GRD,
+    // S1_EW_SH: DATASET_EOCLOUD_S1GRD,
+    // L5: DATASET_EOCLOUD_LANDSAT5,
+    // L7: DATASET_EOCLOUD_LANDSAT7,
+    // L8: DATASET_EOCLOUD_LANDSAT8,
+    // ENV: DATASET_EOCLOUD_ENVISAT_MERIS,
   };
 
   private static readonly LAYER_FROM_DATASET_V3 = {
@@ -161,14 +150,6 @@ export class LayersFactory {
     [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
     [DATASET_CDAS_DEM.id]: DEMCDASLayer,
     [DATASET_BYOC.id]: BYOCLayer,
-  };
-
-  private static readonly LAYER_FROM_DATASET_V12 = {
-    [DATASET_EOCLOUD_S1GRD.id]: S1GRDEOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT5.id]: Landsat5EOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT7.id]: Landsat7EOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
-    [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
   };
 
   private static matchDatasetFromGetCapabilities(datasetId: string, baseUrl: string): Dataset | undefined {
@@ -365,27 +346,28 @@ export class LayersFactory {
         }
       }
 
-      const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
-      if (!SH12LayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
-      }
+      return;
+      // const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
+      // if (!SH12LayerClass) {
+      //   throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
+      // }
 
-      // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-      // otherwise the default values from layer definition on the service will be used.
-      if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
-        layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
-      }
+      // // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+      // // otherwise the default values from layer definition on the service will be used.
+      // if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
+      //   layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
+      // }
 
-      const layer = SH12LayerClass.makeLayer(
-        layerInfo,
-        parseSHInstanceId(baseUrl),
-        layerId,
-        layerInfo.settings.evalJSScript || null,
-        null,
-        layerInfo.settings.title,
-        layerInfo.settings.description,
-      );
-      result.push(layer);
+      // const layer = SH12LayerClass.makeLayer(
+      //   layerInfo,
+      //   parseSHInstanceId(baseUrl),
+      //   layerId,
+      //   layerInfo.settings.evalJSScript || null,
+      //   null,
+      //   layerInfo.settings.title,
+      //   layerInfo.settings.description,
+      // );
+      // result.push(layer);
     }
     return result;
   }
