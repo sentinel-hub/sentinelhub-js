@@ -20,7 +20,6 @@ import { LayersFactory } from './layer/LayersFactory';
 import {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
-  DATASET_EOCLOUD_S1GRD,
   DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
@@ -40,11 +39,7 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
   DATASET_AWS_HLS,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
@@ -54,7 +49,6 @@ import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
 import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
-import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
 import { S1GRDCDASLayer } from './layer/S1GRDCDASLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
 import { S2L1CLayer } from './layer/S2L1CLayer';
@@ -66,14 +60,10 @@ import { S3OLCILayer } from './layer/S3OLCILayer';
 import { S3OLCICDASLayer } from './layer/S3OLCICDASLayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
 import { S5PL2CDASLayer } from './layer/S5PL2CDASLayer';
-import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
 import { MODISLayer } from './layer/MODISLayer';
 import { DEMAWSUSLayer } from './layer/DEMAWSUSLayer';
 import { DEMLayer } from './layer/DEMLayer';
 import { DEMCDASLayer } from './layer/DEMCDASLayer';
-import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
 import { Landsat8AWSLayer } from './layer/Landsat8AWSLayer';
 import { Landsat8AWSLOTL1Layer } from './layer/Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './layer/Landsat8AWSLOTL2Layer';
@@ -151,7 +141,6 @@ export {
   LayersFactory,
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
-  DATASET_EOCLOUD_S1GRD,
   DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
@@ -171,11 +160,7 @@ export {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
   DATASET_AWS_HLS,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
@@ -185,7 +170,6 @@ export {
   WmtsLayer,
   PlanetNicfiLayer,
   S1GRDAWSEULayer,
-  S1GRDEOCloudLayer,
   S1GRDCDASLayer,
   S2L2ALayer,
   S2L1CLayer,
@@ -197,14 +181,10 @@ export {
   S3OLCICDASLayer,
   S5PL2Layer,
   S5PL2CDASLayer,
-  EnvisatMerisEOCloudLayer,
   MODISLayer,
   DEMAWSUSLayer,
   DEMLayer,
   DEMCDASLayer,
-  Landsat5EOCloudLayer,
-  Landsat7EOCloudLayer,
-  Landsat8EOCloudLayer,
   Landsat8AWSLayer,
   Landsat8AWSLOTL1Layer,
   Landsat8AWSLOTL2Layer,
