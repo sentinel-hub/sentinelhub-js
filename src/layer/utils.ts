@@ -2,12 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import {
-  DEFAULT_SH_SERVICE_HOSTNAME,
-  OgcServiceTypes,
-  SH_SERVICE_HOSTNAMES_V1_OR_V2,
-  SH_SERVICE_HOSTNAMES_V3,
-} from './const';
+import { DEFAULT_SH_SERVICE_HOSTNAME, OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
@@ -127,15 +122,6 @@ export function parseSHInstanceId(baseUrl: string): string {
   // AWS:
   for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
     const prefix = `${hostname}ogc/wms/`;
-    if (!baseUrl.startsWith(prefix)) {
-      continue;
-    }
-    const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
-    return instanceId;
-  }
-  // EOCloud:
-  for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-    const prefix = `${hostname}v1/wms/`;
     if (!baseUrl.startsWith(prefix)) {
       continue;
     }
