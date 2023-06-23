@@ -2,7 +2,6 @@ import { parseUrl, stringifyUrl } from 'query-string';
 
 import {
   fetchLayersFromGetCapabilitiesXml,
-  fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
   fetchLayerParamsFromConfigurationService,
