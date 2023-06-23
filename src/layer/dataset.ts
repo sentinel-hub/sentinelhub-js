@@ -28,8 +28,6 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   catalogCollectionId: 'sentinel-1-grd',
 };
 
-console.log('sdffs');
-
 export const DATASET_CDAS_S1GRD: Dataset = {
   id: 'CDAS_S1GRD',
   shJsonGetCapabilitiesDataset: 'S1GRD',
