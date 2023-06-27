@@ -3,7 +3,6 @@ import MockAdapter from 'axios-mock-adapter';
 import {
   DATASET_S2L2A,
   DATASET_S5PL2,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
   DATASET_AWS_LOTL1,
   DATASET_S2L1C,
   DATASET_CDAS_S2L1C,
@@ -308,30 +307,6 @@ describe('Test endpoints for getting layers parameters', () => {
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
-      },
-    ],
-    [
-      {
-        baseUrl: `${DATASET_EOCLOUD_ENVISAT_MERIS.shServiceHostname}v1/wms/`,
-        instanceId: '3d0a2106-affd-11ec-b909-0242ac120002',
-        preferGetCapabilities: undefined,
-        authToken: undefined,
-      },
-      [{ code: 200, data: { layers: [] } }],
-      function expectedEndpoint(instanceId: string): string {
-        return `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
-      },
-    ],
-    [
-      {
-        baseUrl: `${DATASET_EOCLOUD_ENVISAT_MERIS.shServiceHostname}v1/wms/`,
-        instanceId: '3d0a2106-affd-11ec-b909-0242ac120002',
-        preferGetCapabilities: false,
-        authToken: 'token',
-      },
-      [{ code: 200, data: { layers: [] } }],
-      function expectedEndpoint(instanceId: string): string {
-        return `https://eocloud.sentinel-hub.com/v1/config/instance/instance.${instanceId}?scope=ALL`;
       },
     ],
     [

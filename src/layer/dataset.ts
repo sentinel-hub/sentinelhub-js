@@ -28,20 +28,6 @@ export const DATASET_AWSEU_S1GRD: Dataset = {
   catalogCollectionId: 'sentinel-1-grd',
 };
 
-export const DATASET_EOCLOUD_S1GRD: Dataset = {
-  id: 'EOC_S1GRD_IW',
-  shJsonGetCapabilitiesDataset: null,
-  shWmsEvalsource: null, // it's complicated - allowed values are 'S1' (for IW) and 'S1_EW'
-  shProcessingApiDatasourceAbbreviation: null,
-  datasetParametersType: 'S1GRD',
-  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/search',
-  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/s1/v1/finddates',
-  orbitTimeMinutes: 49.3,
-  minDate: new Date(Date.UTC(2014, 10 - 1, 3, 0, 37, 40)), // 2014-10-03T00:37:40Z
-  maxDate: null,
-};
-
 export const DATASET_CDAS_S1GRD: Dataset = {
   id: 'CDAS_S1GRD',
   shJsonGetCapabilitiesDataset: 'S1GRD',
@@ -326,48 +312,6 @@ export const DATASET_AWS_LETML2: Dataset = {
   catalogCollectionId: 'landsat-etm-l2',
 };
 
-export const DATASET_EOCLOUD_LANDSAT5: Dataset = {
-  id: 'EOC_L5',
-  shJsonGetCapabilitiesDataset: null,
-  shWmsEvalsource: 'L5',
-  shProcessingApiDatasourceAbbreviation: null,
-  datasetParametersType: null,
-  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/search',
-  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat5/v2/dates',
-  orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(1984, 4 - 1, 6, 7, 45, 13)), // 1984-04-06T07:45:13.428
-  maxDate: new Date(Date.UTC(2011, 11 - 1, 16, 10, 2, 33)), // 2011-11-16T10:02:32.340
-};
-
-export const DATASET_EOCLOUD_LANDSAT7: Dataset = {
-  id: 'EOC_L7',
-  shJsonGetCapabilitiesDataset: null,
-  shWmsEvalsource: 'L7',
-  shProcessingApiDatasourceAbbreviation: null,
-  datasetParametersType: null,
-  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/search',
-  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat7/v2/dates',
-  orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(1999, 7 - 1, 3, 19, 16, 17)), // 1999-07-03T19:16:17.163
-  maxDate: new Date(Date.UTC(2017, 1 - 1, 15, 23, 49, 15)), // 2017-01-15T23:49:14.495
-};
-
-export const DATASET_EOCLOUD_LANDSAT8: Dataset = {
-  id: 'EOC_L8',
-  shJsonGetCapabilitiesDataset: null,
-  shWmsEvalsource: 'L8',
-  shProcessingApiDatasourceAbbreviation: null,
-  datasetParametersType: null,
-  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/search',
-  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/landsat8/v2/dates',
-  orbitTimeMinutes: 99,
-  minDate: new Date(Date.UTC(2013, 3 - 1, 24, 0, 25, 55)), // 2013-03-24T00:25:55.457
-  maxDate: null,
-};
-
 export const DATASET_AWS_HLS: Dataset = {
   id: 'AWS_HLS',
   shJsonGetCapabilitiesDataset: 'HLS',
@@ -381,20 +325,6 @@ export const DATASET_AWS_HLS: Dataset = {
   minDate: new Date(Date.UTC(2013, 4 - 1, 1, 0, 25, 55)), // 2013-04-01T00:25:55.457
   maxDate: null,
   catalogCollectionId: 'hls',
-};
-
-export const DATASET_EOCLOUD_ENVISAT_MERIS: Dataset = {
-  id: 'EOC_ENVISAT_MERIS',
-  shJsonGetCapabilitiesDataset: null,
-  shWmsEvalsource: 'ENV',
-  shProcessingApiDatasourceAbbreviation: null,
-  datasetParametersType: null,
-  shServiceHostname: 'https://eocloud.sentinel-hub.com/',
-  searchIndexUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/search',
-  findDatesUTCUrl: 'https://eocloud.sentinel-hub.com/index/envisat/v1/finddates',
-  orbitTimeMinutes: 100.16,
-  minDate: new Date(Date.UTC(2002, 5 - 1, 17, 14, 0, 27)), // 2002-05-17T14:00:27.893
-  maxDate: new Date(Date.UTC(2012, 4 - 1, 8, 10, 58, 58)), // 2012-04-08T10:58:57.237
 };
 
 export const DATASET_MODIS: Dataset = {
