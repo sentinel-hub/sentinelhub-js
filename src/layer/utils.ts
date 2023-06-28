@@ -9,7 +9,15 @@ import { GetCapabilitiesWmtsXml } from './wmts.utils';
 import { getAuthToken } from '../auth';
 
 export type GetCapabilitiesWmsXml = {
-  WMS_Capabilities: {
+  WMS_Capabilities?: {
+    Service: [];
+    Capability: [
+      {
+        Layer: [GetCapabilitiesXmlLayer];
+      },
+    ];
+  };
+  WMT_MS_Capabilities?: {
     Service: [];
     Capability: [
       {
@@ -78,10 +86,13 @@ export async function fetchLayersFromGetCapabilitiesXml(
     ogcServiceType,
     reqConfig,
   )) as GetCapabilitiesWmsXml;
+
+  const capabilities = parsedXml.WMT_MS_Capabilities
+    ? parsedXml.WMT_MS_Capabilities
+    : parsedXml.WMS_Capabilities;
+
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
-  const layersInfos = _flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer).filter(
-    layerInfo => layerInfo.Name,
-  );
+  const layersInfos = _flattenLayers(capabilities.Capability[0].Layer).filter(layerInfo => layerInfo.Name);
   return layersInfos;
 }
 
