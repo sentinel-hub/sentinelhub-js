@@ -97,8 +97,8 @@ export function wmsGetMapUrl(
   }
 
   if (params.width && params.height) {
-    queryParams.width = params.width;
-    queryParams.height = params.height;
+    queryParams.width = Math.round(params.width);
+    queryParams.height = Math.round(params.height);
   } else if (params.resx && params.resy) {
     queryParams.resx = params.resx;
     queryParams.resy = params.resy;
