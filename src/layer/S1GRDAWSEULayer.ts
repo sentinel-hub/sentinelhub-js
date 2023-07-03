@@ -12,6 +12,7 @@ import {
   LinkType,
   DataProductId,
   FindTilesAdditionalParameters,
+  MosaickingOrder,
 } from './const';
 import { ProcessingPayload } from './processing';
 import { DATASET_AWSEU_S1GRD } from './dataset';
@@ -60,6 +61,7 @@ interface ConstructorParameters {
   description?: string | null;
   legendUrl?: string | null;
   acquisitionMode?: AcquisitionMode | null;
+  mosaickingOrder?: MosaickingOrder | null;
   polarization?: Polarization | null;
   resolution?: Resolution | null;
   orthorectify?: boolean | null;
@@ -85,6 +87,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   public resolution: Resolution | null = null;
   public orbitDirection: OrbitDirection | null = null;
   public orthorectify: boolean | null = null;
+  public mosaickingOrder: MosaickingOrder | null = null;
   public demInstanceType: DEMInstanceTypeOrthorectification | null = null;
   public backscatterCoeff: BackscatterCoeff | null = BackscatterCoeff.GAMMA0_ELLIPSOID;
   public speckleFilter: SpeckleFilter | null;
@@ -106,6 +109,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     backscatterCoeff = BackscatterCoeff.GAMMA0_ELLIPSOID,
     orbitDirection = null,
     speckleFilter = null,
+    mosaickingOrder = null,
   }: ConstructorParameters) {
     super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
     this.acquisitionMode = acquisitionMode;
@@ -116,6 +120,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     this.backscatterCoeff = backscatterCoeff;
     this.orbitDirection = orbitDirection;
     this.speckleFilter = speckleFilter;
+    this.mosaickingOrder = mosaickingOrder;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
