@@ -51,8 +51,7 @@ test('constructor with no mosaickingOrder parameter', () => {
     polarization: Polarization.DV,
     resolution: Resolution.HIGH,
   });
-  const expectedMosaickingOrder: null = null;
-  expect(layer.mosaickingOrder).toEqual(expectedMosaickingOrder);
+  expect(layer.mosaickingOrder).toEqual(null);
 });
 
 test('constructor with mosaickingOrder parameter', () => {
