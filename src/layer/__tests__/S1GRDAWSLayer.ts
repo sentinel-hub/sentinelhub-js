@@ -8,6 +8,7 @@ import {
   OrbitDirection,
   LinkType,
   setAuthToken,
+  MosaickingOrder,
 } from '../../index';
 
 import {
@@ -40,6 +41,30 @@ test('timezone should NOT be UTC', () => {
   // run these tests in UTC timezone. Env var in package.json should take care of that, but we
   // check here just to be sure.
   expect(new Date().getTimezoneOffset()).not.toBe(0);
+});
+
+test('constructor with no mosaickingOrder parameter', () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
+  expect(layer.mosaickingOrder).toEqual(null);
+});
+
+test('constructor with mosaickingOrder parameter', () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+    mosaickingOrder: MosaickingOrder.MOST_RECENT,
+  });
+  const expectedMosaickingOrder = MosaickingOrder.MOST_RECENT;
+  expect(layer.mosaickingOrder).toEqual(expectedMosaickingOrder);
 });
 
 test.each([
