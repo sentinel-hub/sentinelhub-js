@@ -1,9 +1,11 @@
 import { stringify } from 'query-string';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
+import proj4 from 'proj4';
 
-import { CRS_EPSG4326, CRS_IDS } from '../crs';
+import { CRS_EPSG3857, CRS_EPSG4326, CRS_IDS } from '../crs';
 import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
+import { BBox } from '../bbox';
 
 export enum ServiceType {
   WMS = 'WMS',
@@ -81,8 +83,17 @@ export function wmsGetMapUrl(
   if (!params.bbox) {
     throw new Error('No bbox provided');
   }
-  queryParams.bbox = `${params.bbox.minX},${params.bbox.minY},${params.bbox.maxX},${params.bbox.maxY}`;
-  queryParams.srs = params.bbox.crs.authId;
+
+  let bbox: BBox = params.bbox;
+
+  if (bbox.crs.authId !== CRS_EPSG3857.authId) {
+    [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+    [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+    bbox.crs = CRS_EPSG3857;
+  }
+
+  queryParams.bbox = `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`;
+  queryParams.srs = bbox.crs.authId;
 
   if (params.format) {
     queryParams.format = params.format as MimeType;
