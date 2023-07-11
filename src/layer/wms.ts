@@ -1,11 +1,9 @@
 import { stringify } from 'query-string';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
-import proj4 from 'proj4';
 
-import { CRS_EPSG3857, CRS_EPSG4326, CRS_IDS } from '../crs';
+import { CRS_EPSG4326, CRS_IDS } from '../crs';
 import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
-import { BBox } from '../bbox';
 
 export enum ServiceType {
   WMS = 'WMS',
@@ -84,23 +82,15 @@ export function wmsGetMapUrl(
     throw new Error('No bbox provided');
   }
 
-  let bbox: BBox = params.bbox;
-
-  if (bbox.crs.authId !== CRS_EPSG3857.authId) {
-    [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
-    [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
-    bbox.crs = CRS_EPSG3857;
-  }
-
-  queryParams.bbox = `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`;
-  queryParams.srs = bbox.crs.authId;
+  queryParams.bbox = `${params.bbox.minX},${params.bbox.minY},${params.bbox.maxX},${params.bbox.maxY}`;
+  queryParams.srs = params.bbox.crs.authId;
 
   if (params.format) {
     queryParams.format = params.format as MimeType;
   }
 
   if (!params.fromTime) {
-    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
   } else {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
       .utc(params.toTime)
@@ -108,8 +98,8 @@ export function wmsGetMapUrl(
   }
 
   if (params.width && params.height) {
-    queryParams.width = Math.round(params.width);
-    queryParams.height = Math.round(params.height);
+    queryParams.width = params.width;
+    queryParams.height = params.height;
   } else if (params.resx && params.resy) {
     queryParams.resx = params.resx;
     queryParams.resy = params.resy;
