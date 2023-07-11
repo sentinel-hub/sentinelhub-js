@@ -81,7 +81,6 @@ export function wmsGetMapUrl(
   if (!params.bbox) {
     throw new Error('No bbox provided');
   }
-
   queryParams.bbox = `${params.bbox.minX},${params.bbox.minY},${params.bbox.maxX},${params.bbox.maxY}`;
   queryParams.srs = params.bbox.crs.authId;
 
