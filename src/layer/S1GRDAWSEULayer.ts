@@ -26,6 +26,7 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 export enum AcquisitionMode {
   IW = 'IW',
   EW = 'EW',
+  SM = 'SM',
 }
 
 export enum Polarization {
