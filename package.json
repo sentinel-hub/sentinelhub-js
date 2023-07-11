@@ -7,12 +7,10 @@
   "dependencies": {
     "@turf/area": "^6.0.1",
     "@turf/helpers": "^6.1.4",
-    "@types/proj4": "^2.5.2",
     "@types/xml2js": "^0.4.4",
     "axios": "^0.18.1",
     "moment": "^2.24.0",
     "polygon-clipping": "^0.14.3",
-    "proj4": "^2.9.0",
     "query-string": "^6.4.2",
     "terraformer-wkt-parser": "^1.2.1",
     "xml2js": "^0.4.19"
