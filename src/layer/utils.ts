@@ -96,7 +96,7 @@ export async function fetchLayersFromGetCapabilitiesXml(
     : parsedXml.WMT_MS_Capabilities;
 
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
-  const layersInfos = _flattenLayers(capabilities.Capability[0].Layer).filter(layerInfo => layerInfo.Name);
+  const layersInfos = _flattenLayers(capabilities?.Capability[0].Layer).filter(layerInfo => layerInfo.Name);
   return layersInfos;
 }
 
