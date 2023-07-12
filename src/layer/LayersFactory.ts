@@ -72,6 +72,7 @@ import { S2L1CCDASLayer } from './S2L1CCDASLayer';
 import { S3OLCICDASLayer } from './S3OLCICDASLayer';
 import { S3SLSTRCDASLayer } from './S3SLSTRCDASLayer';
 import { S5PL2CDASLayer } from './S5PL2CDASLayer';
+import { WmsWmtMsLayer } from './WmsWmtMsLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -207,6 +208,13 @@ export class LayersFactory {
           );
         }
         return await this.makeLayersWmts(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+      } else if (baseUrl.includes('services.terrascope.be/wms/v2')) {
+        return await this.makeLayersWmsWmtMs(
+          baseUrl,
+          filterLayers,
+          overrideConstructorParams,
+          innerReqConfig,
+        );
       } else {
         return await this.makeLayersWms(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
       }
@@ -329,6 +337,36 @@ export class LayersFactory {
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl }) =>
         new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
+    );
+  }
+
+  private static async makeLayersWmsWmtMs(
+    baseUrl: string,
+    filterLayers: Function | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    overrideConstructorParams: Record<string, any> | null,
+    reqConfig: RequestConfiguration,
+  ): Promise<AbstractLayer[]> {
+    const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMS, reqConfig);
+    const layersInfos = parsedLayers.map(layerInfo => ({
+      layerId: layerInfo.Name[0],
+      title: layerInfo.Title[0],
+      description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
+      dataset: null,
+      legendUrl:
+        layerInfo.Style && layerInfo.Style[0].LegendURL
+          ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
+          ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+          : null,
+    }));
+
+    const filteredLayersInfos =
+      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+
+    return filteredLayersInfos.map(
+      ({ layerId, title, description, legendUrl }) =>
+        new WmsWmtMsLayer({ baseUrl, layerId, title, description, legendUrl }),
     );
   }
 
