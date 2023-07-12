@@ -27,7 +27,9 @@ interface WMTMSCapabilities {
 
 export type GetCapabilitiesWmsXml = WMSCapabilities | WMTMSCapabilities;
 
-function isWMSCapabilities(capabilitiesXml: GetCapabilitiesWmsXml): capabilitiesXml is WMSCapabilities {
+export function isWMSCapabilities(
+  capabilitiesXml: GetCapabilitiesWmsXml,
+): capabilitiesXml is WMSCapabilities {
   return (capabilitiesXml as WMSCapabilities).WMS_Capabilities !== undefined;
 }
 
