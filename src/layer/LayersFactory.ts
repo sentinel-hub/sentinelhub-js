@@ -6,6 +6,9 @@ import {
   parseSHInstanceId,
   fetchLayerParamsFromConfigurationService,
   getConfigurationServiceHostFromBaseUrl,
+  fetchGetCapabilitiesXml,
+  GetCapabilitiesWmsXml,
+  isWMSCapabilities,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, PLANET_FALSE_COLOR_TEMPLATES } from './const';
@@ -72,6 +75,7 @@ import { S2L1CCDASLayer } from './S2L1CCDASLayer';
 import { S3OLCICDASLayer } from './S3OLCICDASLayer';
 import { S3SLSTRCDASLayer } from './S3SLSTRCDASLayer';
 import { S5PL2CDASLayer } from './S5PL2CDASLayer';
+import { WmsWmtMsLayer } from './WmsWmtMsLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -326,10 +330,19 @@ export class LayersFactory {
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(
-      ({ layerId, title, description, legendUrl }) =>
-        new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
-    );
+    const parsedXml = (await fetchGetCapabilitiesXml(
+      baseUrl,
+      OgcServiceTypes.WMS,
+      reqConfig,
+    )) as GetCapabilitiesWmsXml;
+
+    return filteredLayersInfos.map(({ layerId, title, description, legendUrl }) => {
+      if (isWMSCapabilities(parsedXml)) {
+        return new WmsLayer({ baseUrl, layerId, title, description, legendUrl });
+      } else {
+        return new WmsWmtMsLayer({ baseUrl, layerId, title, description, legendUrl });
+      }
+    });
   }
 
   private static async makeLayersWmts(
