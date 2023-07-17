@@ -6,7 +6,7 @@ import {
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
   fetchLayerParamsFromConfigurationService,
-  getConfigurationServiceHostFromBaseUrl,
+  getSHServiceRootUrlFromBaseUrl,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import {
@@ -278,6 +278,7 @@ export class LayersFactory {
         if (!SHLayerClass) {
           throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
         }
+        const shServiceRootUrl = getSHServiceRootUrlFromBaseUrl(baseUrl);
         return new SHLayerClass({
           instanceId: parseSHInstanceId(baseUrl),
           layerId,
@@ -291,6 +292,7 @@ export class LayersFactory {
           // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
           // otherwise the default values from layer definition on the service will be used.
           ...overrideConstructorParams,
+          shServiceRootUrl: shServiceRootUrl,
         });
       },
     );
@@ -310,7 +312,7 @@ export class LayersFactory {
     if (authToken && preferGetCapabilities === false) {
       try {
         const layers = await fetchLayerParamsFromConfigurationService(
-          getConfigurationServiceHostFromBaseUrl(baseUrl),
+          getSHServiceRootUrlFromBaseUrl(baseUrl),
           parseSHInstanceId(baseUrl),
           reqConfig,
         );

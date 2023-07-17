@@ -3,10 +3,10 @@ import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
 import {
-  DEFAULT_SH_SERVICE_HOSTNAME,
   OgcServiceTypes,
   SH_SERVICE_HOSTNAMES_V1_OR_V2,
   SH_SERVICE_HOSTNAMES_V3,
+  SH_SERVICE_ROOT_URL,
 } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
@@ -145,23 +145,33 @@ export function parseSHInstanceId(baseUrl: string): string {
   throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
 }
 
-export function getConfigurationServiceHostFromBaseUrl(baseUrl: string): string {
+export function getSHServiceRootUrl(host: string): string {
+  const shServiceRootUrl = Object.values(SH_SERVICE_ROOT_URL).find(url => {
+    const regex = new RegExp(url);
+    if (regex.test(host)) {
+      return url;
+    }
+  });
+
+  if (shServiceRootUrl) {
+    return shServiceRootUrl;
+  }
+
+  // The endpoint for fetching the list of layers is typically
+  // https://services.sentinel-hub.com/, even for creodias datasets.
+  // However there is an exception for Copernicus datasets, which have
+  // a different endpoint for fetching the list of layers
+  return SH_SERVICE_ROOT_URL.default;
+}
+
+export function getSHServiceRootUrlFromBaseUrl(baseUrl: string): string {
   let host = baseUrl;
 
   if (/\ogc\/wms/.test(baseUrl)) {
     host = baseUrl.substring(0, baseUrl.indexOf('/ogc/wms') + 1);
   }
 
-  // Copernicus datasets require different endpoint
-  if (/dataspace.copernicus.eu/.test(host)) {
-    return host;
-  }
-
-  // The endpoint for fetching the list of layers is typically
-  // https://services.sentinel-hub.com/, even for creodias datasets.
-  // However there is an exception for Copernicus datasets, which have a different
-  // a different endpoint for fetching the list of layers
-  return DEFAULT_SH_SERVICE_HOSTNAME;
+  return getSHServiceRootUrl(host);
 }
 
 export async function fetchLayerParamsFromConfigurationService(
