@@ -283,7 +283,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return bandsResponseData;
   }
 
-  protected getSHServiceRootUrl(): string {
+  public getSHServiceRootUrl(): string {
     return this.shServiceRootUrl;
   }
 }

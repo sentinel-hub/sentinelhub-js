@@ -680,7 +680,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     };
   }
 
-  protected getSHServiceRootUrl(): string {
+  public getSHServiceRootUrl(): string {
     return getSHServiceRootUrl(this.dataset.shServiceHostname);
   }
 }

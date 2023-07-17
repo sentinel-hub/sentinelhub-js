@@ -127,6 +127,14 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         )
       ) {
         shServiceHostname = bogusFirstLayer.getShServiceHostname();
+      }
+      //check if all layers use same root url and use it for request
+      else if (
+        this.layers.every(
+          layer => layer.layer.getSHServiceRootUrl() === bogusFirstLayer.getSHServiceRootUrl(),
+        )
+      ) {
+        shServiceHostname = bogusFirstLayer.getSHServiceRootUrl();
       } else {
         shServiceHostname = SH_SERVICE_ROOT_URL.default;
       }
