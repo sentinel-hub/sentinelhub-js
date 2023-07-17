@@ -163,6 +163,7 @@ export enum LocationIdSHv3 {
   creo = 'creo',
   mundi = 'mundi',
   gcpUsCentral1 = 'gcp-us-central1',
+  cdse = 'cdse',
 }
 export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
@@ -170,6 +171,7 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.creo]: 'https://creodias.sentinel-hub.com/',
   [LocationIdSHv3.mundi]: 'https://shservices.mundiwebservices.com/',
   [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
+  [LocationIdSHv3.cdse]: 'https://sh.dataspace.copernicus.eu/',
 };
 
 export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
