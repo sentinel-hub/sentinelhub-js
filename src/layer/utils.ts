@@ -173,7 +173,7 @@ export async function fetchLayerParamsFromConfigurationService(
   if (!authToken) {
     throw new Error('Must be authenticated to fetch layer params');
   }
-  const configurationServiceHostName = shServiceHostName ?? DEFAULT_SH_SERVICE_HOSTNAME;
+  const configurationServiceHostName = shServiceHostName ?? SH_SERVICE_ROOT_URL.default;
   const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
   const headers = {
     Authorization: `Bearer ${authToken}`,
