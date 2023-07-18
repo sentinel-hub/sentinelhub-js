@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { DEFAULT_SH_SERVICE_HOSTNAME, OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
@@ -176,7 +176,7 @@ export async function fetchLayerParamsFromConfigurationService(
   if (!authToken) {
     throw new Error('Must be authenticated to fetch layer params');
   }
-  const configurationServiceHostName = shServiceHostName ?? DEFAULT_SH_SERVICE_HOSTNAME;
+  const configurationServiceHostName = shServiceHostName ?? SH_SERVICE_ROOT_URL.default;
   const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
   const headers = {
     Authorization: `Bearer ${authToken}`,

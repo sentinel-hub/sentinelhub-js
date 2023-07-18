@@ -172,7 +172,10 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.cdse]: 'https://sh.dataspace.copernicus.eu/',
 };
 
-export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
+export const SH_SERVICE_ROOT_URL = {
+  default: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1],
+  cdse: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdse],
+};
 
 export type GetStatsParams = {
   fromTime: Date;
