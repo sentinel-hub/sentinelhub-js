@@ -6,7 +6,7 @@ import {
   ApiType,
   PaginatedTiles,
   MosaickingOrder,
-  DEFAULT_SH_SERVICE_HOSTNAME,
+  SH_SERVICE_ROOT_URL,
 } from './const';
 import {
   createProcessingPayload,
@@ -127,8 +127,16 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
         )
       ) {
         shServiceHostname = bogusFirstLayer.getShServiceHostname();
+      }
+      //check if all layers use same root url and use it for request
+      else if (
+        this.layers.every(
+          layer => layer.layer.getSHServiceRootUrl() === bogusFirstLayer.getSHServiceRootUrl(),
+        )
+      ) {
+        shServiceHostname = bogusFirstLayer.getSHServiceRootUrl();
       } else {
-        shServiceHostname = DEFAULT_SH_SERVICE_HOSTNAME;
+        shServiceHostname = SH_SERVICE_ROOT_URL.default;
       }
 
       let blob = await processingGetMap(shServiceHostname, payload, innerReqConfig);
