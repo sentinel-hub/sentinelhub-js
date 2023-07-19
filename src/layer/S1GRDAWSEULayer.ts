@@ -37,6 +37,7 @@ export enum Polarization {
 }
 
 export enum Resolution {
+  FULL = 'FULL',
   HIGH = 'HIGH',
   MEDIUM = 'MEDIUM',
 }
