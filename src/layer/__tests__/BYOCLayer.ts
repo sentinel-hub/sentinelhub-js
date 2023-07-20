@@ -237,7 +237,6 @@ describe.only('shServiceRootUrl', () => {
     mockNetwork.reset();
   });
   const mockedLayerId = 'LAYER_ID';
-  const mockedLayersResponse = [{ id: mockedLayerId, styles: [{}] }];
 
   test.each([
     [
