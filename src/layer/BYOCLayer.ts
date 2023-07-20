@@ -26,6 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
+import { getSHServiceRootUrl } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -70,7 +71,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     this.collectionId = collectionId;
     this.locationId = locationId;
     this.subType = subType;
-    this.shServiceRootUrl = shServiceRootUrl;
+    this.shServiceRootUrl = getSHServiceRootUrl(shServiceRootUrl);
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
