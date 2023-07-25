@@ -1,5 +1,5 @@
 import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
-import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes } from '../const';
+import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes, SH_SERVICE_ROOT_URL } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
@@ -228,5 +228,62 @@ describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
       .replyOnce(200, mockedLayersResponse);
     await layer.updateLayerFromServiceIfNeeded();
     expect(layer.locationId).toEqual(LocationIdSHv3.creo);
+  });
+});
+
+describe.only('shServiceRootUrl', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+  const mockedLayerId = 'LAYER_ID';
+
+  test.each([
+    [
+      'default sh service url is used if not set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+    [
+      'default sh service url is used if set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: SH_SERVICE_ROOT_URL.default,
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+    [
+      'cdse sh service url is used if set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: SH_SERVICE_ROOT_URL.cdse,
+      },
+      SH_SERVICE_ROOT_URL.cdse,
+    ],
+    [
+      'default sh service url is used for unknown shServiceRootUrl',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: 'random url',
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+  ])('%p', async (_title, layerParams, expected) => {
+    const layer = new BYOCLayer(layerParams);
+    expect(layer.getSHServiceRootUrl()).toBe(expected);
   });
 });

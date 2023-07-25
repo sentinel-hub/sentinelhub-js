@@ -17,6 +17,7 @@ import {
   BYOCBand,
   FindTilesAdditionalParameters,
   BYOCSubTypes,
+  SH_SERVICE_ROOT_URL,
 } from './const';
 import { DATASET_BYOC } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -25,6 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
+import { getSHServiceRootUrl } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -37,6 +39,7 @@ interface ConstructorParameters {
   collectionId?: string | null;
   locationId?: LocationIdSHv3 | null;
   subType?: BYOCSubTypes | null;
+  shServiceRootUrl?: string;
 }
 
 type BYOCFindTilesDatasetParameters = {
@@ -49,6 +52,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public collectionId: string;
   public locationId: LocationIdSHv3;
   public subType: BYOCSubTypes;
+  public shServiceRootUrl: string;
 
   public constructor({
     instanceId = null,
@@ -61,11 +65,13 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     collectionId = null,
     locationId = null,
     subType = null,
+    shServiceRootUrl = SH_SERVICE_ROOT_URL.default,
   }: ConstructorParameters) {
     super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
     this.collectionId = collectionId;
     this.locationId = locationId;
     this.subType = subType;
+    this.shServiceRootUrl = getSHServiceRootUrl(shServiceRootUrl);
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
@@ -105,7 +111,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
       if (this.locationId === null) {
         if (this.subType !== BYOCSubTypes.ZARR) {
-          const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
+          const url = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
           const headers = { Authorization: `Bearer ${getAuthToken()}` };
           const res = await axios.get(url, {
             responseType: 'json',
@@ -266,7 +272,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         throw new Error('Fetching available bands for ZARR not supported.');
       }
 
-      const url = `https://services.sentinel-hub.com/api/v1/metadata/collection/${this.getTypeId()}`;
+      const url = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
       const headers = { Authorization: `Bearer ${getAuthToken()}` };
       const res = await axios.get(url, {
         responseType: 'json',
@@ -276,5 +282,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       return res.data.bands;
     }, reqConfig);
     return bandsResponseData;
+  }
+
+  public getSHServiceRootUrl(): string {
+    return this.shServiceRootUrl;
   }
 }

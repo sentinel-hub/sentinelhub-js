@@ -21,7 +21,7 @@ import {
   DEMInstanceTypeOrthorectification,
   LocationIdSHv3,
   SHV3_LOCATIONS_ROOT_URL,
-  DEFAULT_SH_SERVICE_HOSTNAME,
+  SH_SERVICE_ROOT_URL,
 } from '../const';
 import { constructFixtureGetMapRequest } from './fixtures.ProcessingDataFusionLayer';
 import { AcquisitionMode, Resolution } from '../S1GRDAWSEULayer';
@@ -54,7 +54,7 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
 
   test.each([
     [[shServicesLayer, shServicesLayer], shServicesLayer.dataset.shServiceHostname],
-    [[creodiasLayer, shServicesLayer, usWestLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [[creodiasLayer, shServicesLayer, usWestLayer], SH_SERVICE_ROOT_URL.default],
     [[creodiasLayer, creodiasLayer], creodiasLayer.dataset.shServiceHostname],
     [[shServicesLayer, byocLayer], shServicesLayer.dataset.shServiceHostname],
     [
@@ -69,8 +69,8 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
       ],
       SHV3_LOCATIONS_ROOT_URL[byocLayer.locationId],
     ],
-    [[byocLayer, shServicesLayer, creodiasLayer], DEFAULT_SH_SERVICE_HOSTNAME],
-    [[byocLayerMundi, byocLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [[byocLayer, shServicesLayer, creodiasLayer], SH_SERVICE_ROOT_URL.default],
+    [[byocLayerMundi, byocLayer], SH_SERVICE_ROOT_URL.default],
     [
       [
         byocLayerMundi,
