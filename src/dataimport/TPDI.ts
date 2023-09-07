@@ -40,7 +40,7 @@ async function getQuotasInner(
     if (!!TDPICollectionId) {
       requestConfig.params = { collectionId: TDPICollectionId };
     }
-    const res = await axios.get(`${TPDI_SERVICE_URL}/quotas`, requestConfig);
+    const res = await axios.get(`${TPDI_SERVICE_URL}/accountquotas`, requestConfig);
     return res.data.data as Quota[];
   }, reqConfig);
 }
