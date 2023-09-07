@@ -42,7 +42,7 @@ describe('Test TPDI service enpoints', () => {
     await TPDI.getQuotas({});
     expect(mockNetwork.history.get.length).toBe(1);
     const request = mockNetwork.history.get[0];
-    expect(request.url).toBe(`${TPDI_SERVICE_URL}/quotas`);
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/accountquotas`);
   });
 
   it('uses correct endpoint to get orders', async () => {
