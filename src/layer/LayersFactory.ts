@@ -2,17 +2,16 @@ import { parseUrl, stringifyUrl } from 'query-string';
 
 import {
   fetchLayersFromGetCapabilitiesXml,
-  fetchGetCapabilitiesJsonV1,
   fetchGetCapabilitiesJson,
   parseSHInstanceId,
+  fetchLayerParamsFromConfigurationService,
+  getSHServiceRootUrlFromBaseUrl,
+  fetchGetCapabilitiesXml,
+  GetCapabilitiesWmsXml,
+  isWMSCapabilities,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import {
-  OgcServiceTypes,
-  SH_SERVICE_HOSTNAMES_V1_OR_V2,
-  SH_SERVICE_HOSTNAMES_V3,
-  PLANET_FALSE_COLOR_TEMPLATES,
-} from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, PLANET_FALSE_COLOR_TEMPLATES } from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -20,16 +19,13 @@ import {
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
+  DATASET_CDAS_DEM,
   DATASET_AWSEU_S1GRD,
   DATASET_S3SLSTR,
   DATASET_S3OLCI,
   DATASET_BYOC,
   DATASET_S5PL2,
-  DATASET_EOCLOUD_S1GRD,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
+  DATASET_AWS_HLS,
   Dataset,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -39,6 +35,12 @@ import {
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
   DATASET_PLANET_NICFI,
+  DATASET_CDAS_S1GRD,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
+  DATASET_CDAS_S3SLSTR,
+  DATASET_CDAS_S3OLCI,
+  DATASET_CDAS_S5PL2,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -51,13 +53,9 @@ import { S5PL2Layer } from './S5PL2Layer';
 import { MODISLayer } from './MODISLayer';
 import { DEMAWSUSLayer } from './DEMAWSUSLayer';
 import { DEMLayer } from './DEMLayer';
+import { DEMCDASLayer } from './DEMCDASLayer';
 import { Landsat8AWSLayer } from './Landsat8AWSLayer';
 import { BYOCLayer } from './BYOCLayer';
-import { S1GRDEOCloudLayer } from './S1GRDEOCloudLayer';
-import { Landsat5EOCloudLayer } from './Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from './Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from './Landsat8EOCloudLayer';
-import { EnvisatMerisEOCloudLayer } from './EnvisatMerisEOCloudLayer';
 import { RequestConfiguration } from '../utils/cancelRequests';
 import { Landsat8AWSLOTL1Layer } from './Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './Landsat8AWSLOTL2Layer';
@@ -71,6 +69,15 @@ import { PlanetScopeNicfiLayer, PLANETSCOPE_NICFI_CONFIGURATIONS } from './Plane
 import { WmtsLayer } from './WmtsLayer';
 import { fetchLayersFromWmtsGetCapabilitiesXml } from './wmts.utils';
 import { PlanetNicfiLayer } from './PlanetNicfi';
+import { getAuthToken } from '../auth';
+import { HLSAWSLayer } from './HLSAWSLayer';
+import { S1GRDCDASLayer } from './S1GRDCDASLayer';
+import { S2L2ACDASLayer } from './S2L2ACDASLayer';
+import { S2L1CCDASLayer } from './S2L1CCDASLayer';
+import { S3OLCICDASLayer } from './S3OLCICDASLayer';
+import { S3SLSTRCDASLayer } from './S3SLSTRCDASLayer';
+import { S5PL2CDASLayer } from './S5PL2CDASLayer';
+import { WmsWmtMsLayer } from './WmsWmtMsLayer';
 export class LayersFactory {
   /*
     This class is responsible for creating the Layer subclasses from the limited information (like
@@ -78,44 +85,47 @@ export class LayersFactory {
     instantiate appropriate layers.
   */
 
-  private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = {
-    [DATASET_AWSEU_S1GRD.shJsonGetCapabilitiesDataset]: DATASET_AWSEU_S1GRD,
-    [DATASET_S2L2A.shJsonGetCapabilitiesDataset]: DATASET_S2L2A,
-    [DATASET_S2L1C.shJsonGetCapabilitiesDataset]: DATASET_S2L1C,
-    [DATASET_S3SLSTR.shJsonGetCapabilitiesDataset]: DATASET_S3SLSTR,
-    [DATASET_S3OLCI.shJsonGetCapabilitiesDataset]: DATASET_S3OLCI,
-    [DATASET_S5PL2.shJsonGetCapabilitiesDataset]: DATASET_S5PL2,
-    [DATASET_AWS_L8L1C.shJsonGetCapabilitiesDataset]: DATASET_AWS_L8L1C,
-    [DATASET_AWS_LOTL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL1,
-    [DATASET_AWS_LOTL2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LOTL2,
-    [DATASET_AWS_LTML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML1,
-    [DATASET_AWS_LTML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LTML2,
-    [DATASET_AWS_LMSSL1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LMSSL1,
-    [DATASET_AWS_LETML1.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML1,
-    [DATASET_AWS_LETML2.shJsonGetCapabilitiesDataset]: DATASET_AWS_LETML2,
-    [DATASET_EOCLOUD_ENVISAT_MERIS.shJsonGetCapabilitiesDataset]: DATASET_EOCLOUD_ENVISAT_MERIS,
-    [DATASET_MODIS.shJsonGetCapabilitiesDataset]: DATASET_MODIS,
-    [DATASET_AWS_DEM.shJsonGetCapabilitiesDataset]: DATASET_AWS_DEM,
-    [DATASET_BYOC.shJsonGetCapabilitiesDataset]: DATASET_BYOC,
-  };
-
-  private static readonly DATASET_FROM_JSON_GETCAPABILITIES_V1: Record<string, Dataset> = {
-    S1: DATASET_EOCLOUD_S1GRD,
-    S1_EW: DATASET_EOCLOUD_S1GRD,
-    S1_EW_SH: DATASET_EOCLOUD_S1GRD,
-    L5: DATASET_EOCLOUD_LANDSAT5,
-    L7: DATASET_EOCLOUD_LANDSAT7,
-    L8: DATASET_EOCLOUD_LANDSAT8,
-    ENV: DATASET_EOCLOUD_ENVISAT_MERIS,
-  };
+  private static readonly DATASET_FROM_JSON_GETCAPAPABILITIES = [
+    DATASET_AWSEU_S1GRD,
+    DATASET_CDAS_S1GRD,
+    DATASET_S2L2A,
+    DATASET_S2L1C,
+    DATASET_CDAS_S2L2A,
+    DATASET_CDAS_S2L1C,
+    DATASET_S3SLSTR,
+    DATASET_S3OLCI,
+    DATASET_CDAS_S3SLSTR,
+    DATASET_CDAS_S3OLCI,
+    DATASET_S5PL2,
+    DATASET_CDAS_S5PL2,
+    DATASET_AWS_L8L1C,
+    DATASET_AWS_LOTL1,
+    DATASET_AWS_LOTL2,
+    DATASET_AWS_LTML1,
+    DATASET_AWS_LTML2,
+    DATASET_AWS_LMSSL1,
+    DATASET_AWS_LETML1,
+    DATASET_AWS_LETML2,
+    DATASET_AWS_HLS,
+    DATASET_MODIS,
+    DATASET_AWS_DEM,
+    DATASET_CDAS_DEM,
+    DATASET_BYOC,
+  ];
 
   private static readonly LAYER_FROM_DATASET_V3 = {
     [DATASET_AWSEU_S1GRD.id]: S1GRDAWSEULayer,
+    [DATASET_CDAS_S1GRD.id]: S1GRDCDASLayer,
     [DATASET_S2L2A.id]: S2L2ALayer,
     [DATASET_S2L1C.id]: S2L1CLayer,
+    [DATASET_CDAS_S2L2A.id]: S2L2ACDASLayer,
+    [DATASET_CDAS_S2L1C.id]: S2L1CCDASLayer,
     [DATASET_S3SLSTR.id]: S3SLSTRLayer,
+    [DATASET_CDAS_S3SLSTR.id]: S3SLSTRCDASLayer,
     [DATASET_S3OLCI.id]: S3OLCILayer,
+    [DATASET_CDAS_S3OLCI.id]: S3OLCICDASLayer,
     [DATASET_S5PL2.id]: S5PL2Layer,
+    [DATASET_CDAS_S5PL2.id]: S5PL2CDASLayer,
     [DATASET_AWS_L8L1C.id]: Landsat8AWSLayer,
     [DATASET_AWS_LOTL1.id]: Landsat8AWSLOTL1Layer,
     [DATASET_AWS_LOTL2.id]: Landsat8AWSLOTL2Layer,
@@ -124,25 +134,38 @@ export class LayersFactory {
     [DATASET_AWS_LMSSL1.id]: Landsat15AWSLMSSL1Layer,
     [DATASET_AWS_LETML1.id]: Landsat7AWSLETML1Layer,
     [DATASET_AWS_LETML2.id]: Landsat7AWSLETML2Layer,
+    [DATASET_AWS_HLS.id]: HLSAWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
     [DATASET_AWSUS_DEM.id]: DEMAWSUSLayer,
+    [DATASET_CDAS_DEM.id]: DEMCDASLayer,
     [DATASET_BYOC.id]: BYOCLayer,
   };
 
-  private static readonly LAYER_FROM_DATASET_V12 = {
-    [DATASET_EOCLOUD_S1GRD.id]: S1GRDEOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT5.id]: Landsat5EOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT7.id]: Landsat7EOCloudLayer,
-    [DATASET_EOCLOUD_LANDSAT8.id]: Landsat8EOCloudLayer,
-    [DATASET_EOCLOUD_ENVISAT_MERIS.id]: EnvisatMerisEOCloudLayer,
-  };
+  private static matchDatasetFromGetCapabilities(datasetId: string, baseUrl: string): Dataset | undefined {
+    if (!datasetId) {
+      return undefined;
+    }
+
+    const matchingDatasetIds: Dataset[] = LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES.filter(
+      (dataset: Dataset) => dataset.shJsonGetCapabilitiesDataset === datasetId,
+    );
+
+    if (matchingDatasetIds.length === 1) {
+      return matchingDatasetIds[0];
+    }
+
+    return matchingDatasetIds.find((dataset: Dataset) => {
+      return dataset.shServiceHostname && baseUrl.includes(dataset.shServiceHostname);
+    });
+  }
 
   public static async makeLayer(
     baseUrl: string,
     layerId: string,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer> {
     const layer = await ensureTimeout(async innerReqConfig => {
       const layers = await LayersFactory.makeLayers(
@@ -150,6 +173,7 @@ export class LayersFactory {
         (lId: string) => lId === layerId,
         overrideConstructorParams,
         innerReqConfig,
+        preferGetCapabilities,
       );
       if (layers.length === 0) {
         return null;
@@ -164,6 +188,7 @@ export class LayersFactory {
     filterLayers: Function | null = null,
     overrideConstructorParams?: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async innerReqConfig => {
       if (baseUrl === 'planetscope-live-experimental') {
@@ -174,15 +199,16 @@ export class LayersFactory {
       }
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv3(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
+          return await this.makeLayersSHv3(
+            baseUrl,
+            filterLayers,
+            overrideConstructorParams,
+            innerReqConfig,
+            preferGetCapabilities,
+          );
         }
       }
 
-      for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-        if (baseUrl.startsWith(hostname)) {
-          return await this.makeLayersSHv12(baseUrl, filterLayers, overrideConstructorParams, innerReqConfig);
-        }
-      }
       if (baseUrl.includes('/wmts')) {
         if (baseUrl.includes('api.planet.com/basemaps/')) {
           return this.makePlanetBasemapLayers(
@@ -233,93 +259,89 @@ export class LayersFactory {
     filterLayers: Function | null,
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
+    preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
-    const layersInfos = getCapabilitiesJson.map(layerInfo => ({
-      layerId: layerInfo.id,
-      title: layerInfo.name,
-      description: layerInfo.description,
-      dataset:
-        layerInfo.dataset && LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          ? LayersFactory.DATASET_FROM_JSON_GETCAPAPABILITIES[layerInfo.dataset]
-          : null,
-      legendUrl: layerInfo.legendUrl,
-    }));
+    const filteredLayersInfos = await this.getSHv3LayersInfo(
+      baseUrl,
+      reqConfig,
+      filterLayers,
+      preferGetCapabilities,
+    );
+
+    return filteredLayersInfos.map(
+      ({ layerId, dataset, title, description, legendUrl, evalscript, dataProduct, ...rest }) => {
+        if (!dataset) {
+          return new WmsLayer({ baseUrl, layerId, title, description });
+        }
+
+        const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
+        if (!SHLayerClass) {
+          throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
+        }
+        const shServiceRootUrl = getSHServiceRootUrlFromBaseUrl(baseUrl);
+        return new SHLayerClass({
+          instanceId: parseSHInstanceId(baseUrl),
+          layerId,
+          evalscript: evalscript || null,
+          evalscriptUrl: null,
+          dataProduct: dataProduct || null,
+          title,
+          description,
+          legendUrl,
+          ...rest,
+          // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
+          // otherwise the default values from layer definition on the service will be used.
+          ...overrideConstructorParams,
+          shServiceRootUrl: shServiceRootUrl,
+        });
+      },
+    );
+  }
+
+  private static async getSHv3LayersInfo(
+    baseUrl: string,
+    reqConfig: RequestConfiguration,
+    filterLayers: Function,
+    preferGetCapabilities: boolean = true,
+  ): Promise<any[]> {
+    let layersInfos;
+    //also check if auth token is present
+    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+    let layersInfoFetched = false;
+    // use configuration if possible
+    if (authToken && preferGetCapabilities === false) {
+      try {
+        const layers = await fetchLayerParamsFromConfigurationService(
+          getSHServiceRootUrlFromBaseUrl(baseUrl),
+          parseSHInstanceId(baseUrl),
+          reqConfig,
+        );
+        layersInfos = layers.map((l: any) => ({
+          ...l,
+          dataset: LayersFactory.matchDatasetFromGetCapabilities(l.type, baseUrl),
+        }));
+        layersInfoFetched = true;
+      } catch (e) {
+        console.error(e);
+        // fallback to getCapabilities
+      }
+    }
+
+    if (!layersInfoFetched) {
+      const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
+      layersInfos = getCapabilitiesJson.map(layerInfo => ({
+        layerId: layerInfo.id,
+        title: layerInfo.name,
+        description: layerInfo.description,
+        dataset: LayersFactory.matchDatasetFromGetCapabilities(layerInfo.dataset, baseUrl),
+        legendUrl: layerInfo.legendUrl,
+      }));
+    }
 
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(({ layerId, dataset, title, description, legendUrl }) => {
-      if (!dataset) {
-        return new WmsLayer({ baseUrl, layerId, title, description });
-      }
-
-      const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
-      if (!SHLayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
-      }
-      return new SHLayerClass({
-        instanceId: parseSHInstanceId(baseUrl),
-        layerId,
-        evalscript: null,
-        evalscriptUrl: null,
-        dataProduct: null,
-        title,
-        description,
-        legendUrl,
-        // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-        // otherwise the default values from layer definition on the service will be used.
-        ...overrideConstructorParams,
-      });
-    });
-  }
-
-  private static async makeLayersSHv12(
-    baseUrl: string,
-    filterLayers: Function | null,
-    overrideConstructorParams: Record<string, any> | null,
-    reqConfig: RequestConfiguration,
-  ): Promise<AbstractLayer[]> {
-    const getCapabilitiesJsonV1 = await fetchGetCapabilitiesJsonV1(baseUrl, reqConfig);
-
-    const result: AbstractLayer[] = [];
-    for (let layerInfo of getCapabilitiesJsonV1) {
-      const layerId = layerInfo.name;
-      const dataset = LayersFactory.DATASET_FROM_JSON_GETCAPABILITIES_V1[layerInfo.settings.datasourceName];
-      if (!dataset) {
-        throw new Error(`Unknown dataset for layer ${layerId} (${layerInfo.settings.datasourceName})`);
-      }
-
-      if (filterLayers) {
-        const keepLayer = Boolean(filterLayers(layerId, dataset));
-        if (!keepLayer) {
-          continue;
-        }
-      }
-
-      const SH12LayerClass = LayersFactory.LAYER_FROM_DATASET_V12[dataset.id];
-      if (!SH12LayerClass) {
-        throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET_V12`);
-      }
-
-      // We must pass the maxCloudCoverPercent (S-2) or others (S-1) from legacyGetMapFromParams to the Layer
-      // otherwise the default values from layer definition on the service will be used.
-      if (overrideConstructorParams && overrideConstructorParams.maxCloudCoverPercent) {
-        layerInfo.settings.maxCC = overrideConstructorParams.maxCloudCoverPercent;
-      }
-
-      const layer = SH12LayerClass.makeLayer(
-        layerInfo,
-        parseSHInstanceId(baseUrl),
-        layerId,
-        layerInfo.settings.evalJSScript || null,
-        null,
-        layerInfo.settings.title,
-        layerInfo.settings.description,
-      );
-      result.push(layer);
-    }
-    return result;
+    return filteredLayersInfos;
   }
 
   private static async makeLayersWms(
@@ -346,10 +368,19 @@ export class LayersFactory {
     const filteredLayersInfos =
       filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
 
-    return filteredLayersInfos.map(
-      ({ layerId, title, description, legendUrl }) =>
-        new WmsLayer({ baseUrl, layerId, title, description, legendUrl }),
-    );
+    const parsedXml = (await fetchGetCapabilitiesXml(
+      baseUrl,
+      OgcServiceTypes.WMS,
+      reqConfig,
+    )) as GetCapabilitiesWmsXml;
+
+    return filteredLayersInfos.map(({ layerId, title, description, legendUrl }) => {
+      if (isWMSCapabilities(parsedXml)) {
+        return new WmsLayer({ baseUrl, layerId, title, description, legendUrl });
+      } else {
+        return new WmsWmtMsLayer({ baseUrl, layerId, title, description, legendUrl });
+      }
+    });
   }
 
   private static async makeLayersWmts(

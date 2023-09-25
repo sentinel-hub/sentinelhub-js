@@ -78,16 +78,20 @@ export class AbstractSentinelHubV3WithCCLayer extends AbstractSentinelHubV3Layer
     };
   }
 
-  protected createCatalogPayloadQuery(
+  protected createCatalogFilterQuery(
     maxCloudCoverPercent?: number | null,
     datasetParameters?: Record<string, any> | null,
   ): Record<string, any> {
-    let result = { ...super.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters) };
+    let result = { ...super.createCatalogFilterQuery(maxCloudCoverPercent, datasetParameters) };
 
     if (maxCloudCoverPercent !== null && maxCloudCoverPercent !== undefined) {
-      result['eo:cloud_cover'] = {
-        lte: maxCloudCoverPercent,
-      };
+      result['op'] = '<=';
+      result['args'] = [
+        {
+          property: 'eo:cloud_cover',
+        },
+        maxCloudCoverPercent,
+      ];
     }
     return result && Object.keys(result).length > 0 ? result : null;
   }

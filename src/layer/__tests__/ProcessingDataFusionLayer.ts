@@ -1,3 +1,4 @@
+import { AbstractSentinelHubV3Layer } from './../AbstractSentinelHubV3Layer';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
@@ -12,10 +13,16 @@ import {
   CRS_EPSG4326,
   S1GRDAWSEULayer,
   Polarization,
+  BYOCLayer,
 } from '../../index';
-import { DataFusionLayerInfo, DEFAULT_SH_SERVICE_HOSTNAME } from '../ProcessingDataFusionLayer';
+import { DataFusionLayerInfo } from '../ProcessingDataFusionLayer';
 import '../../../jest-setup';
-import { DEMInstanceTypeOrthorectification } from '../const';
+import {
+  DEMInstanceTypeOrthorectification,
+  LocationIdSHv3,
+  SHV3_LOCATIONS_ROOT_URL,
+  SH_SERVICE_ROOT_URL,
+} from '../const';
 import { constructFixtureGetMapRequest } from './fixtures.ProcessingDataFusionLayer';
 import { AcquisitionMode, Resolution } from '../S1GRDAWSEULayer';
 
@@ -27,6 +34,19 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
   const shServicesLayer = new S2L1CLayer({ evalscript: mockEvalscript });
   const creodiasLayer = new S3OLCILayer({ evalscript: mockEvalscript });
   const usWestLayer = new Landsat8AWSLayer({ evalscript: mockEvalscript });
+  const byocLayer = new BYOCLayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    collectionId: 'mockCollectionId',
+    locationId: LocationIdSHv3.awsEuCentral1,
+  });
+
+  const byocLayerMundi = new BYOCLayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    collectionId: 'mockCollectionId',
+    locationId: LocationIdSHv3.mundi,
+  });
 
   const fromTime = new Date(Date.UTC(2018, 11 - 1, 22, 0, 0, 0));
   const toTime = new Date(Date.UTC(2018, 12 - 1, 22, 23, 59, 59));
@@ -34,12 +54,39 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
 
   test.each([
     [[shServicesLayer, shServicesLayer], shServicesLayer.dataset.shServiceHostname],
-    [[creodiasLayer, shServicesLayer, usWestLayer], DEFAULT_SH_SERVICE_HOSTNAME],
+    [[creodiasLayer, shServicesLayer, usWestLayer], SH_SERVICE_ROOT_URL.default],
     [[creodiasLayer, creodiasLayer], creodiasLayer.dataset.shServiceHostname],
+    [[shServicesLayer, byocLayer], shServicesLayer.dataset.shServiceHostname],
+    [
+      [
+        byocLayer,
+        new BYOCLayer({
+          instanceId: 'INSTANCE_ID2',
+          layerId: 'LAYER_ID2',
+          collectionId: 'mockCollectionId2',
+          locationId: LocationIdSHv3.awsEuCentral1,
+        }),
+      ],
+      SHV3_LOCATIONS_ROOT_URL[byocLayer.locationId],
+    ],
+    [[byocLayer, shServicesLayer, creodiasLayer], SH_SERVICE_ROOT_URL.default],
+    [[byocLayerMundi, byocLayer], SH_SERVICE_ROOT_URL.default],
+    [
+      [
+        byocLayerMundi,
+        new BYOCLayer({
+          instanceId: 'INSTANCE_ID2',
+          layerId: 'LAYER_ID2',
+          collectionId: 'mockCollectionId2',
+          locationId: LocationIdSHv3.mundi,
+        }),
+      ],
+      SHV3_LOCATIONS_ROOT_URL[byocLayerMundi.locationId],
+    ],
   ])(
     'ProcessingDataFusionLayer chooses the correct shServiceHostname',
-    async (layers, expectedShServiceHostname) => {
-      const layerInfo: DataFusionLayerInfo[] = layers.map(layer => ({ layer: layer }));
+    async (layers: AbstractSentinelHubV3Layer[], expectedShServiceHostname) => {
+      const layerInfo = layers.map(layer => ({ layer: layer }));
       const dataFusionLayer = new ProcessingDataFusionLayer({
         evalscript: mockEvalscript,
         layers: layerInfo,

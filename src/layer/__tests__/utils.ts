@@ -1,5 +1,5 @@
-import { OgcServiceTypes } from '../const';
-import { createGetCapabilitiesXmlUrl } from '../utils';
+import { OgcServiceTypes, SH_SERVICE_ROOT_URL } from '../const';
+import { createGetCapabilitiesXmlUrl, getSHServiceRootUrlFromBaseUrl } from '../utils';
 
 const cases = [
   {
@@ -24,5 +24,21 @@ describe("'add' utility", () => {
   test.each(cases)('build getCapabilities url', ({ input, ogcServiceType, expected }) => {
     const url = createGetCapabilitiesXmlUrl(input, ogcServiceType);
     expect(url).toStrictEqual(expected);
+  });
+});
+
+describe('getSHServiceRootUrlFromBaseUrl', () => {
+  test.each([
+    ['https://services.sentinel-hub.com/ogc/wms/instanceId', SH_SERVICE_ROOT_URL.default],
+    ['https://services-uswest2.sentinel-hub.com/ogc/wms/instanceId', SH_SERVICE_ROOT_URL.default],
+    ['https://creodias.sentinel-hub.com/ogc/wms/instanceId', SH_SERVICE_ROOT_URL.default],
+    ['https://shservices.mundiwebservices.com/ogc/1wms/instanceId', SH_SERVICE_ROOT_URL.default],
+    ['https://sh.dataspace.copernicus.eu/wms/instance', SH_SERVICE_ROOT_URL.cdse],
+    ['', SH_SERVICE_ROOT_URL.default],
+    [null, SH_SERVICE_ROOT_URL.default],
+    [undefined, SH_SERVICE_ROOT_URL.default],
+    ['not url', SH_SERVICE_ROOT_URL.default],
+  ])('getSHServiceRootUrlFromBaseUrl %p', async (baseUrl, expected) => {
+    expect(getSHServiceRootUrlFromBaseUrl(baseUrl)).toBe(expected);
   });
 });

@@ -22,8 +22,9 @@ import {
   constructFixtureFindDatesUTCSearchIndex,
   constructFixtureFindDatesUTCCatalog,
 } from './fixtures.findDatesUTC';
+import { checkLayersParamsEndpoint } from './testUtils.layers';
 
-const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/search';
+const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S3OLCI/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
@@ -45,16 +46,20 @@ describe('Test findTiles using searchIndex', () => {
   });
 
   test('searchIndex is used if token is not set', async () => {
-    await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
+    await checkIfCorrectEndpointIsUsed(
+      null,
+      constructFixtureFindTilesSearchIndex(S3OLCILayer, {}),
+      SEARCH_INDEX_URL,
+    );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
+    const fixtures = constructFixtureFindTilesSearchIndex(S3OLCILayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex({}));
+    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S3OLCILayer, {}));
   });
 });
 
@@ -65,16 +70,20 @@ describe('Test findTiles using catalog', () => {
   });
 
   test('Catalog is used if token is set', async () => {
-    await checkIfCorrectEndpointIsUsed(AUTH_TOKEN, constructFixtureFindTilesCatalog({}), CATALOG_URL);
+    await checkIfCorrectEndpointIsUsed(
+      AUTH_TOKEN,
+      constructFixtureFindTilesCatalog(S3OLCILayer, {}),
+      CATALOG_URL,
+    );
   });
 
   test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
-    const fixtures = constructFixtureFindTilesCatalog(layerParams);
+    const fixtures = constructFixtureFindTilesCatalog(S3OLCILayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
 
   test('response from catalog', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesCatalog({}));
+    await checkResponseFindTiles(constructFixtureFindTilesCatalog(S3OLCILayer, {}));
   });
 });
 
@@ -152,5 +161,16 @@ describe('Test findDatesUTC using catalog', () => {
       layerId: 'LAYER_ID',
     });
     await checkResponseFindDatesUTC(constructFixtureFindDatesUTCCatalog(layer, {}));
+  });
+});
+
+describe('correct endpoint is used for layer params', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test('updateLayerFromServiceIfNeeded', async () => {
+    await checkLayersParamsEndpoint(mockNetwork, S3OLCILayer, 'https://services.sentinel-hub.com');
   });
 });

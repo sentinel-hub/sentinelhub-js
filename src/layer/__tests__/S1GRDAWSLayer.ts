@@ -8,6 +8,7 @@ import {
   OrbitDirection,
   LinkType,
   setAuthToken,
+  MosaickingOrder,
 } from '../../index';
 
 import {
@@ -40,6 +41,30 @@ test('timezone should NOT be UTC', () => {
   // run these tests in UTC timezone. Env var in package.json should take care of that, but we
   // check here just to be sure.
   expect(new Date().getTimezoneOffset()).not.toBe(0);
+});
+
+test('constructor with no mosaickingOrder parameter', () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+  });
+  expect(layer.mosaickingOrder).toEqual(null);
+});
+
+test('constructor with mosaickingOrder parameter', () => {
+  const layer = new S1GRDAWSEULayer({
+    instanceId: 'INSTANCE_ID',
+    layerId: 'LAYER_ID',
+    acquisitionMode: AcquisitionMode.IW,
+    polarization: Polarization.DV,
+    resolution: Resolution.HIGH,
+    mosaickingOrder: MosaickingOrder.MOST_RECENT,
+  });
+  const expectedMosaickingOrder = MosaickingOrder.MOST_RECENT;
+  expect(layer.mosaickingOrder).toEqual(expectedMosaickingOrder);
 });
 
 test.each([
@@ -159,7 +184,7 @@ test.each([
   },
 );
 
-const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/search';
+const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 const SEARCH_INDEX_URL = 'https://services.sentinel-hub.com/index/v3/collections/S1GRD/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));

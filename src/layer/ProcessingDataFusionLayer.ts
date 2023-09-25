@@ -1,5 +1,13 @@
 import { BBox } from '../bbox';
-import { GetMapParams, Interpolator, PreviewMode, ApiType, PaginatedTiles, MosaickingOrder } from './const';
+import {
+  GetMapParams,
+  Interpolator,
+  PreviewMode,
+  ApiType,
+  PaginatedTiles,
+  MosaickingOrder,
+  SH_SERVICE_ROOT_URL,
+} from './const';
 import {
   createProcessingPayload,
   convertPreviewToString,
@@ -36,8 +44,6 @@ export type DataFusionLayerInfo = {
   upsampling?: Interpolator;
   downsampling?: Interpolator;
 };
-
-export const DEFAULT_SH_SERVICE_HOSTNAME = 'https://services.sentinel-hub.com/';
 
 export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   protected layers: DataFusionLayerInfo[];
@@ -117,12 +123,20 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       let shServiceHostname;
       if (
         this.layers.every(
-          layer => layer.layer.dataset.shServiceHostname === bogusFirstLayer.dataset.shServiceHostname,
+          layer => layer.layer.getShServiceHostname() === bogusFirstLayer.getShServiceHostname(),
         )
       ) {
-        shServiceHostname = bogusFirstLayer.dataset.shServiceHostname;
+        shServiceHostname = bogusFirstLayer.getShServiceHostname();
+      }
+      //check if all layers use same root url and use it for request
+      else if (
+        this.layers.every(
+          layer => layer.layer.getSHServiceRootUrl() === bogusFirstLayer.getSHServiceRootUrl(),
+        )
+      ) {
+        shServiceHostname = bogusFirstLayer.getSHServiceRootUrl();
       } else {
-        shServiceHostname = DEFAULT_SH_SERVICE_HOSTNAME;
+        shServiceHostname = SH_SERVICE_ROOT_URL.default;
       }
 
       let blob = await processingGetMap(shServiceHostname, payload, innerReqConfig);

@@ -9,6 +9,7 @@ export enum TPDICollections {
   AIRBUS_SPOT = 'AIRBUS_SPOT',
   PLANET_SCOPE = 'PLANET_SCOPE',
   MAXAR_WORLDVIEW = 'MAXAR_WORLDVIEW',
+  PLANET_SKYSAT = 'PLANET_SKYSAT',
 }
 
 export enum TPDProvider {
@@ -40,9 +41,36 @@ export enum PlanetProductBundle {
   ANALYTIC_UDM2 = 'analytic_udm2',
   ANALYTIC_SR = 'analytic_sr',
   ANALYTIC_SR_UDM2 = 'analytic_sr_udm2',
+  ANALYTIC_8B_UDM2 = 'analytic_8b_udm2',
+  ANALYTIC_8B_SR_UDM2 = 'analytic_8b_sr_udm2',
+  PANCHROMATIC = 'panchromatic',
 }
 
-export const PlanetItemType = 'PSScene4Band';
+export enum PlanetItemType {
+  PSScene = 'PSScene',
+  PSScene4Band = 'PSScene4Band',
+  SkySatCollect = 'SkySatCollect',
+}
+
+export const PlanetSupportedProductBundles = {
+  [PlanetItemType.PSScene4Band]: [
+    PlanetProductBundle.ANALYTIC,
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_SR,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+  ],
+  [PlanetItemType.PSScene]: [
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_8B_UDM2,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+    PlanetProductBundle.ANALYTIC_8B_SR_UDM2,
+  ],
+  [PlanetItemType.SkySatCollect]: [
+    PlanetProductBundle.ANALYTIC_UDM2,
+    PlanetProductBundle.ANALYTIC_SR_UDM2,
+    PlanetProductBundle.PANCHROMATIC,
+  ],
+};
 
 export const MaxarProductBands = '4BB';
 
@@ -65,13 +93,19 @@ export type TPDISearchParams = {
   constellation?: AirbusConstellation;
   nativeFilter?: any;
   sensor?: MaxarSensor;
+  itemType?: PlanetItemType;
   productBundle?: PlanetProductBundle;
 };
 
-export type TPDIOrderParams = {
+export type TPDITransactionParams = {
   harmonizeTo?: PlanetScopeHarmonization;
   planetApiKey?: string;
   productKernel?: ResamplingKernel;
+};
+
+export type TPDITransactionCompatibleCollection = {
+  id: string;
+  name: string;
 };
 
 type LinksType = {
@@ -91,47 +125,54 @@ export type TPDSearchResult = {
 
 export type Quota = {
   collectionId: TPDICollections;
-  quotaSqkm: number;
-  quotaUsed: number;
+  quotaSqkm: number | null;
+  quotaUsed: number | null;
 };
 
-export enum OrderStatus {
+export enum TPDITransactionStatus {
   CREATED = 'CREATED',
   CANCELLED = 'CANCELLED',
   RUNNING = 'RUNNING',
   DONE = 'DONE',
   PARTIAL = 'PARTIAL',
   FAILED = 'FAILED',
+  COMPLETED = 'COMPLETED',
 }
 
-export type Order = {
+export type TPDITransaction = {
   id: string;
   name: string;
   userId: string;
   collectionId: string;
-  status: OrderStatus;
+  status: TPDITransactionStatus;
   sqkm: number;
   input: Record<string, any>;
 };
 
-export type OrderSearchParams = {
-  status?: OrderStatus;
+export type TPDITransactionSearchParams = {
+  status?: TPDITransactionStatus;
   collectionId?: string;
   search?: string;
 };
 
-export type OrderSearchResult = {
-  data: Order[];
+export type TPDITransactionSearchResult = {
+  data: TPDITransaction[];
   links?: LinksType;
 };
 
 export enum PlanetScopeHarmonization {
   PS2 = 'PS2',
   NONE = 'NONE',
+  SENTINEL2 = 'Sentinel-2',
 }
 
 export enum ResamplingKernel {
   CC = 'CC',
   NN = 'NN',
   MTF = 'MTF',
+}
+
+export enum HLSConstellation {
+  LANDSAT = 'LANDSAT',
+  SENTINEL = 'SENTINEL',
 }

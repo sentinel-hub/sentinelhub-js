@@ -28,8 +28,9 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
-import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
+import { fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -113,42 +114,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not support Processing API (unknown dataset)');
     }
-    const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
-    if (!authToken) {
-      throw new Error('Must be authenticated to fetch layer params');
-    }
-    // Note that for SH v3 service, the endpoint for fetching the list of layers is always
-    // https://services.sentinel-hub.com/, even for creodias datasets:
-    const url = `https://services.sentinel-hub.com/configuration/v1/wms/instances/${this.instanceId}/layers`;
-    const headers = {
-      Authorization: `Bearer ${authToken}`,
-    };
-
-    // reqConfig might include the cache config from getMap, which could cache instances/${this.instanceId}/layers
-    // we do not want this as layer updates will not invalidate this cache, so we rather cache to memory
-    const reqConfigWithMemoryCache = {
-      ...reqConfig,
-      // Do not override cache if cache is disabled with `expiresIn: 0`
-      cache:
-        reqConfig && reqConfig.cache && reqConfig.cache.expiresIn === 0
-          ? reqConfig.cache
-          : CACHE_CONFIG_30MIN_MEMORY,
-    };
-    const requestConfig: AxiosRequestConfig = {
-      responseType: 'json',
-      headers: headers,
-      ...getAxiosReqParams(reqConfigWithMemoryCache, null),
-    };
-    const res = await axios.get(url, requestConfig);
-    const layersParams = res.data.map((l: any) => ({
-      layerId: l.id,
-      ...l.datasourceDefaults,
-      evalscript: l.styles[0].evalScript,
-      dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
-      legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
-        ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
-        : null,
-    }));
+    const layersParams = await fetchLayerParamsFromConfigurationService(
+      this.getSHServiceRootUrl(),
+      this.instanceId,
+      reqConfig,
+    );
 
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
     if (!layerParams) {
@@ -484,7 +454,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.convertResponseFromSearchIndex(response);
   }
 
-  protected createCatalogPayloadQuery(
+  protected createCatalogFilterQuery(
     maxCloudCoverPercent?: number | null, // eslint-disable-line @typescript-eslint/no-unused-vars
     datasetParameters?: Record<string, any> | null, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Record<string, any> {
@@ -546,10 +516,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       payload.bbox = null;
     }
 
-    let payloadQuery = this.createCatalogPayloadQuery(maxCloudCoverPercent, datasetParameters);
-
-    if (payloadQuery) {
-      payload.query = payloadQuery;
+    const filterQuery = this.createCatalogFilterQuery(maxCloudCoverPercent, datasetParameters);
+    if (filterQuery) {
+      payload.filter = filterQuery;
+      payload['filter-lang'] = 'cql2-json';
     }
 
     if (distinct) {
@@ -557,7 +527,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     }
     const shServiceHostname = this.getShServiceHostname();
 
-    return await axios.post(`${shServiceHostname}api/v1/catalog/search`, payload, requestConfig);
+    return await axios.post(`${shServiceHostname}api/v1/catalog/1.0.0/search`, payload, requestConfig);
   }
 
   protected async getFindDatesUTCAdditionalParameters(
@@ -710,5 +680,9 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       maxCloudCoverPercent: null,
       datasetParameters: null,
     };
+  }
+
+  public getSHServiceRootUrl(): string {
+    return getSHServiceRootUrl(this.dataset.shServiceHostname);
   }
 }

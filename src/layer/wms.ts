@@ -2,8 +2,10 @@ import { stringify } from 'query-string';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { CRS_EPSG4326, CRS_IDS } from '../crs';
+import { CRS_EPSG3857, CRS_EPSG4326, CRS_IDS } from '../crs';
 import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
+import { BBox } from '../bbox';
+import proj4 from 'proj4';
 
 export enum ServiceType {
   WMS = 'WMS',
@@ -57,6 +59,79 @@ export function wmsGetMapUrl(
   evalsource: string | null = null,
   additionalParameters: Record<string, any> = {},
 ): string {
+  const queryParams: OgcGetMapOptions = getQueryParams(
+    baseUrl,
+    layers,
+    params,
+    evalscript,
+    evalscriptUrl,
+    evalsource,
+    additionalParameters,
+  );
+
+  return createUrl(baseUrl, queryParams, params);
+}
+
+export function wmsWmtMsGetMapUrl(
+  baseUrl: string,
+  layers: string,
+  params: GetMapParams,
+  evalscript: string | null = null,
+  evalscriptUrl: string | null = null,
+  evalsource: string | null = null,
+  additionalParameters: Record<string, any> = {},
+): string {
+  let queryParams: OgcGetMapOptions = getQueryParams(
+    baseUrl,
+    layers,
+    params,
+    evalscript,
+    evalscriptUrl,
+    evalsource,
+    additionalParameters,
+  );
+
+  let bbox: BBox = params.bbox;
+
+  if (bbox.crs.authId !== CRS_EPSG3857.authId) {
+    [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+    [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+    bbox.crs = CRS_EPSG3857;
+  }
+
+  queryParams.bbox = `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`;
+  queryParams.srs = bbox.crs.authId;
+
+  if (!params.fromTime) {
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
+  } else {
+    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
+      .utc(params.toTime)
+      .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+  }
+
+  if (params.width && params.height) {
+    queryParams.width = Math.round(params.width);
+    queryParams.height = Math.round(params.height);
+  } else if (params.resx && params.resy) {
+    queryParams.resx = params.resx;
+    queryParams.resy = params.resy;
+  } else {
+    throw new Error('One of resx/resy or width/height must be provided');
+  }
+
+  return createUrl(baseUrl, queryParams, params);
+}
+
+function getQueryParams(
+  baseUrl: string,
+  layers: string,
+  params: GetMapParams,
+  evalscript: string | null = null,
+  evalscriptUrl: string | null = null,
+  evalsource: string | null = null,
+  additionalParameters: Record<string, any> = {},
+): OgcGetMapOptions {
   const queryParams: OgcGetMapOptions = {
     version: OGC_SERVICES_IMPLEMENTED_VERSIONS[ServiceType.WMS],
     service: ServiceType.WMS,
@@ -150,6 +225,10 @@ export function wmsGetMapUrl(
     queryParams.temporal = params.temporal;
   }
 
+  return queryParams;
+}
+
+function createUrl(baseUrl: string, queryParams: OgcGetMapOptions, params: GetMapParams): string {
   const queryString = stringify(queryParams, { sort: false });
 
   // To avoid duplicate entries in query params, we perform a double check here, issuing

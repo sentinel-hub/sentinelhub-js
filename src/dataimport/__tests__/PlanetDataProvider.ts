@@ -8,9 +8,10 @@ import { TPDI } from '../TPDI';
 
 import '../../../jest-setup';
 import {
+  PlanetItemType,
   PlanetProductBundle,
   PlanetScopeHarmonization,
-  TPDIOrderParams,
+  TPDITransactionParams,
   TPDISearchParams,
   TPDProvider,
 } from '../const';
@@ -26,9 +27,11 @@ const defaultSearchParams: TPDISearchParams = {
   fromTime: new Date(2021, 5 - 1, 30, 0, 0, 0, 0),
   toTime: new Date(2021, 6 - 1, 31, 23, 59, 59, 999),
   bbox: new BBox(CRS_EPSG4326, 18, 20, 20, 22),
+  itemType: PlanetItemType.PSScene4Band,
+  productBundle: PlanetProductBundle.ANALYTIC,
 };
 
-const defaultOrderParams: TPDIOrderParams = {
+const defaultOrderParams: TPDITransactionParams = {
   planetApiKey: 'PLANET_API_KEY',
 };
 
@@ -73,6 +76,8 @@ describe('Test search', () => {
     ['bbox', 'Parameter bbox and/or geometry must be specified'],
     ['fromTime', 'Parameter fromTime must be specified'],
     ['toTime', 'Parameter toTime must be specified'],
+    ['itemType', 'Parameter itemType must be specified'],
+    ['productBundle', 'Parameter productBundle must be specified'],
   ])('throws an error when required parameter is missing', async (property, errorMessage) => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, defaultSearchParams);
@@ -82,6 +87,50 @@ describe('Test search', () => {
     await expect(TPDI.search(TPDProvider.PLANET, params as TPDISearchParams)).rejects.toThrow(
       new Error(errorMessage),
     );
+  });
+
+  it.each([
+    [PlanetItemType.PSScene4Band, PlanetProductBundle.ANALYTIC, null],
+    [PlanetItemType.PSScene4Band, PlanetProductBundle.ANALYTIC_SR, null],
+    [PlanetItemType.PSScene4Band, PlanetProductBundle.ANALYTIC_UDM2, null],
+    [PlanetItemType.PSScene4Band, PlanetProductBundle.ANALYTIC_SR_UDM2, null],
+    [PlanetItemType.PSScene, PlanetProductBundle.ANALYTIC_8B_SR_UDM2, null],
+    [PlanetItemType.PSScene, PlanetProductBundle.ANALYTIC_8B_UDM2, null],
+    [PlanetItemType.PSScene, PlanetProductBundle.ANALYTIC_UDM2, null],
+    [PlanetItemType.PSScene, PlanetProductBundle.ANALYTIC_SR_UDM2, null],
+    [
+      PlanetItemType.PSScene4Band,
+      PlanetProductBundle.ANALYTIC_8B_SR_UDM2,
+      'Product bundle is not supported for selected item type',
+    ],
+    [
+      PlanetItemType.PSScene4Band,
+      PlanetProductBundle.ANALYTIC_8B_UDM2,
+      'Product bundle is not supported for selected item type',
+    ],
+    [
+      PlanetItemType.PSScene,
+      PlanetProductBundle.ANALYTIC,
+      'Product bundle is not supported for selected item type',
+    ],
+    [
+      PlanetItemType.PSScene,
+      PlanetProductBundle.ANALYTIC_SR,
+      'Product bundle is not supported for selected item type',
+    ],
+  ])('check valid itemType/productBundle combo', async (itemType, productBundle, errorMessage) => {
+    mockNetwork.onPost().reply(200);
+    const params: TPDISearchParams = {
+      ...defaultSearchParams,
+      itemType: itemType,
+      productBundle: productBundle,
+    };
+
+    if (errorMessage) {
+      await expect(TPDI.search(TPDProvider.PLANET, params)).rejects.toThrow(new Error(errorMessage));
+    } else {
+      await expect(TPDI.search(TPDProvider.PLANET, params)).resolves;
+    }
   });
 
   it('throws an error when crs is not set', async () => {
@@ -109,7 +158,6 @@ describe('Test search', () => {
     [{ ...defaultSearchParams, maxCloudCoverage: null }],
     [{ ...defaultSearchParams, maxCloudCoverage: undefined }],
     [{ ...defaultSearchParams, nativeFilter: undefined }],
-    [{ ...defaultSearchParams, productBundle: undefined }],
   ])('checks if parameters are set correctly', async params => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, params);
@@ -122,6 +170,18 @@ describe('Test search', () => {
 });
 
 describe('Test create order payload', () => {
+  it.each([
+    [{ ...defaultSearchParams }, {}, 'Parameter planetApiKey must be specified'],
+    [{ ...defaultSearchParams }, null, 'Parameter planetApiKey must be specified'],
+  ])(
+    'throws an error when mandatory parameters are not set',
+    async (searchParams, orderParams, errorMessage) => {
+      await expect(
+        TPDI.createOrder(TPDProvider.PLANET, 'name', 'collectionId', null, searchParams, orderParams),
+      ).rejects.toThrow(new Error(errorMessage));
+    },
+  );
+
   it.each([
     ['name', 'collectionId', ['id'], { ...defaultSearchParams }, { ...defaultOrderParams }],
     [
@@ -148,13 +208,11 @@ describe('Test create order payload', () => {
     ['name', 'collectionId', [], { ...defaultSearchParams }, { ...defaultOrderParams }],
     ['name', null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
     [null, null, null, { ...defaultSearchParams }, { ...defaultOrderParams }],
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, {}],
-    ['name', 'collectionId', ['id'], { ...defaultSearchParams }, null],
   ])(
     'checks if parameters are set correctly',
     async (name, collectionId, items, searchParams, orderParams) => {
       const tpdp = new PlanetDataProvider();
-      const payload = tpdp.getOrderPayload(name, collectionId, items, searchParams, orderParams);
+      const payload = tpdp.getTransactionPayload(name, collectionId, items, searchParams, orderParams);
 
       if (!!name) {
         expect(payload.name).toBeDefined();

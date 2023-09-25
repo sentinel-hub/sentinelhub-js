@@ -1,19 +1,22 @@
+import { AbstractSentinelHubV3Layer } from './../AbstractSentinelHubV3Layer';
 import moment from 'moment';
 
-import { LinkType, S3OLCILayer, BBox, CRS_EPSG4326 } from '../../index';
+import { LinkType, BBox, CRS_EPSG4326 } from '../../index';
 
-export function constructFixtureFindTilesSearchIndex({
-  sensingTime = '2020-04-30T09:58:12Z',
-  hasMore = true,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-}): Record<any, any> {
-  const layer = new S3OLCILayer({
+export function constructFixtureFindTilesSearchIndex(
+  layerClass: typeof AbstractSentinelHubV3Layer,
+  {
+    sensingTime = '2020-04-30T09:58:12Z',
+    hasMore = true,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
   });
-
   const expectedRequest = {
     clipping: {
       type: 'Polygon',
@@ -227,18 +230,20 @@ export function constructFixtureFindTilesSearchIndex({
   };
 }
 
-export function constructFixtureFindTilesCatalog({
-  sensingTime = '2020-04-30T09:58:12Z',
-  hasMore = false,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-}): Record<any, any> {
-  const layer = new S3OLCILayer({
+export function constructFixtureFindTilesCatalog(
+  layerClass: typeof AbstractSentinelHubV3Layer,
+  {
+    sensingTime = '2020-04-30T09:58:12Z',
+    hasMore = false,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
   });
-
   const expectedRequest = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
@@ -334,13 +339,12 @@ export function constructFixtureFindTilesCatalog({
         },
         links: [
           {
-            href:
-              'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-3-olci/items/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
+            href: `${layer.dataset.shServiceHostname}api/v1/catalog/collections/sentinel-3-olci/items/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3`,
             rel: 'self',
             type: 'application/json',
           },
           {
-            href: 'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-3-olci',
+            href: `${layer.dataset.shServiceHostname}/api/v1/catalog/collections/sentinel-3-olci`,
             rel: 'parent',
           },
         ],
@@ -362,7 +366,7 @@ export function constructFixtureFindTilesCatalog({
     ],
     links: [
       {
-        href: 'https://services.sentinel-hub.com/api/v1/catalog/search',
+        href: `${layer.dataset.shServiceHostname}/api/v1/catalog/search`,
         rel: 'self',
         type: 'application/json',
       },

@@ -36,6 +36,10 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     this.clampNegative = clampNegative;
   }
 
+  public getDemInstance(): DEMInstanceType | null {
+    return this.demInstance;
+  }
+
   private shouldUpdateLayerFromService(): boolean {
     //don't update layer info if layer has already been updated
     if (this.layerUpdatedFromService) {

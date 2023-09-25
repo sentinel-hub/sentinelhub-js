@@ -5,7 +5,7 @@ import { setAuthToken, isAuthTokenSet } from '../../index';
 export const mockNetwork = new MockAdapter(axios);
 
 export const AUTH_TOKEN = 'AUTH_TOKEN';
-export const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/search';
+export const CATALOG_URL = 'https://services.sentinel-hub.com/api/v1/catalog/1.0.0/search';
 
 export async function checkRequestFindTiles(fixtures: Record<string, any>): Promise<void> {
   const { bbox, expectedRequest, fromTime, layer, toTime } = fixtures;

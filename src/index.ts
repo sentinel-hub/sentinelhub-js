@@ -12,6 +12,7 @@ import {
   DEMInstanceType,
   DEMInstanceTypeOrthorectification,
   BYOCSubTypes,
+  GetStatsParams,
 } from './layer/const';
 import { setDebugEnabled } from './utils/debug';
 
@@ -19,12 +20,17 @@ import { LayersFactory } from './layer/LayersFactory';
 import {
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
-  DATASET_EOCLOUD_S1GRD,
+  DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
+  DATASET_CDAS_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
+  DATASET_CDAS_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -33,33 +39,33 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
+  DATASET_AWS_HLS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
   DATASET_PLANETSCOPE_LIVE,
   DATASET_PLANETSCOPE_NICFI,
+  DATASET_CDAS_DEM,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
 import { PlanetNicfiLayer } from './layer/PlanetNicfi';
 import { S1GRDAWSEULayer } from './layer/S1GRDAWSEULayer';
-import { S1GRDEOCloudLayer } from './layer/S1GRDEOCloudLayer';
+import { S1GRDCDASLayer } from './layer/S1GRDCDASLayer';
 import { S2L2ALayer } from './layer/S2L2ALayer';
 import { S2L1CLayer } from './layer/S2L1CLayer';
+import { S2L2ACDASLayer } from './layer/S2L2ACDASLayer';
+import { S2L1CCDASLayer } from './layer/S2L1CCDASLayer';
 import { S3SLSTRLayer, S3SLSTRView } from './layer/S3SLSTRLayer';
+import { S3SLSTRCDASLayer } from './layer/S3SLSTRCDASLayer';
 import { S3OLCILayer } from './layer/S3OLCILayer';
+import { S3OLCICDASLayer } from './layer/S3OLCICDASLayer';
 import { S5PL2Layer } from './layer/S5PL2Layer';
-import { EnvisatMerisEOCloudLayer } from './layer/EnvisatMerisEOCloudLayer';
+import { S5PL2CDASLayer } from './layer/S5PL2CDASLayer';
 import { MODISLayer } from './layer/MODISLayer';
 import { DEMAWSUSLayer } from './layer/DEMAWSUSLayer';
 import { DEMLayer } from './layer/DEMLayer';
-import { Landsat5EOCloudLayer } from './layer/Landsat5EOCloudLayer';
-import { Landsat7EOCloudLayer } from './layer/Landsat7EOCloudLayer';
-import { Landsat8EOCloudLayer } from './layer/Landsat8EOCloudLayer';
+import { DEMCDASLayer } from './layer/DEMCDASLayer';
 import { Landsat8AWSLayer } from './layer/Landsat8AWSLayer';
 import { Landsat8AWSLOTL1Layer } from './layer/Landsat8AWSLOTL1Layer';
 import { Landsat8AWSLOTL2Layer } from './layer/Landsat8AWSLOTL2Layer';
@@ -68,6 +74,7 @@ import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
+import { HLSAWSLayer } from './layer/HLSAWSLayer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { PlanetScopeLiveLayer } from './layer/PlanetScopeLiveLayer';
 import { PlanetScopeNicfiLayer } from './layer/PlanetScopeNicfiLayer';
@@ -87,12 +94,24 @@ import {
   LinkType,
   OverrideGetMapParams,
   SHV3_LOCATIONS_ROOT_URL,
+  PaginatedTiles,
+  Tile,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  BYOCBand,
 } from './layer/const';
-import { registerInitialAxiosInterceptors } from './utils/axiosInterceptors';
+import {
+  addAxiosRequestInterceptor,
+  addAxiosResponseInterceptor,
+  registerInitialAxiosInterceptors,
+} from './utils/axiosInterceptors';
 import { registerHostnameReplacing } from './utils/replaceHostnames';
 import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRequests';
 import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
-import { CacheTarget, invalidateCaches } from './utils/Cache';
+import { CacheTarget, CacheTargets, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
@@ -102,19 +121,23 @@ import {
   AirbusConstellation,
   AirbusProcessingLevel,
   MaxarSensor,
-  OrderSearchParams,
-  OrderSearchResult,
-  OrderStatus,
+  TPDITransactionSearchParams,
+  TPDITransactionSearchResult,
+  TPDITransactionStatus,
   PlanetProductBundle,
+  PlanetItemType,
+  PlanetSupportedProductBundles,
   PlanetScopeHarmonization,
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
   ResamplingKernel,
+  TPDITransactionCompatibleCollection,
+  HLSConstellation,
+  TPDITransactionParams,
 } from './dataimport/const';
 
-import { StatisticsProviderType } from './statistics/StatisticsProvider';
-import { StatisticsUtils } from './statistics/statistics.utils';
+import { ProcessingPayload } from './layer/processing';
 
 registerInitialAxiosInterceptors();
 
@@ -122,12 +145,17 @@ export {
   LayersFactory,
   DATASET_BYOC,
   DATASET_AWSEU_S1GRD,
-  DATASET_EOCLOUD_S1GRD,
+  DATASET_CDAS_S1GRD,
   DATASET_S2L2A,
   DATASET_S2L1C,
+  DATASET_CDAS_S2L2A,
+  DATASET_CDAS_S2L1C,
   DATASET_S3SLSTR,
+  DATASET_CDAS_S3SLSTR,
   DATASET_S3OLCI,
+  DATASET_CDAS_S3OLCI,
   DATASET_S5PL2,
+  DATASET_CDAS_S5PL2,
   DATASET_AWS_L8L1C,
   DATASET_AWS_LOTL1,
   DATASET_AWS_LOTL2,
@@ -136,33 +164,33 @@ export {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
-  DATASET_EOCLOUD_LANDSAT5,
-  DATASET_EOCLOUD_LANDSAT7,
-  DATASET_EOCLOUD_LANDSAT8,
-  DATASET_EOCLOUD_ENVISAT_MERIS,
+  DATASET_AWS_HLS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
   DATASET_AWSUS_DEM,
   DATASET_PLANETSCOPE_LIVE,
   DATASET_PLANETSCOPE_NICFI,
+  DATASET_CDAS_DEM,
   // layers:
   WmsLayer,
   WmtsLayer,
   PlanetNicfiLayer,
   S1GRDAWSEULayer,
-  S1GRDEOCloudLayer,
+  S1GRDCDASLayer,
   S2L2ALayer,
   S2L1CLayer,
+  S2L2ACDASLayer,
+  S2L1CCDASLayer,
   S3SLSTRLayer,
+  S3SLSTRCDASLayer,
   S3OLCILayer,
+  S3OLCICDASLayer,
   S5PL2Layer,
-  EnvisatMerisEOCloudLayer,
+  S5PL2CDASLayer,
   MODISLayer,
   DEMAWSUSLayer,
   DEMLayer,
-  Landsat5EOCloudLayer,
-  Landsat7EOCloudLayer,
-  Landsat8EOCloudLayer,
+  DEMCDASLayer,
   Landsat8AWSLayer,
   Landsat8AWSLOTL1Layer,
   Landsat8AWSLOTL2Layer,
@@ -171,6 +199,7 @@ export {
   Landsat15AWSLMSSL1Layer,
   Landsat7AWSLETML1Layer,
   Landsat7AWSLETML2Layer,
+  HLSAWSLayer,
   BYOCLayer,
   ProcessingDataFusionLayer,
   PlanetScopeLiveLayer,
@@ -183,7 +212,6 @@ export {
   // other:
   GetMapParams,
   OverrideGetMapParams,
-  LinkType,
   ApiType,
   SUPPORTED_CRS_OBJ,
   CRS_EPSG4326,
@@ -216,6 +244,18 @@ export {
   canvasToBlob,
   SHV3_LOCATIONS_ROOT_URL,
   BYOCSubTypes,
+  Tile,
+  PaginatedTiles,
+  LinkType,
+  Link,
+  ImageProperties,
+  DailyChannelStats,
+  FisResponse,
+  Stats,
+  BYOCBand,
+  GetStatsParams,
+  ProcessingPayload,
+  CacheTargets,
   // legacy:
   legacyGetMapFromUrl,
   legacyGetMapWmsUrlFromParams,
@@ -226,9 +266,6 @@ export {
   // map data manipulation
   Effects,
   ColorRange,
-  //StatisticalApi
-  StatisticsProviderType,
-  StatisticsUtils,
   //TPDI
   TPDI,
   TPDICollections,
@@ -236,11 +273,20 @@ export {
   TPDISearchParams,
   AirbusConstellation,
   AirbusProcessingLevel,
-  OrderSearchParams,
-  OrderSearchResult,
-  OrderStatus,
+  TPDITransactionSearchParams,
+  TPDITransactionSearchResult,
+  TPDITransactionStatus,
+  PlanetItemType,
   PlanetProductBundle,
+  PlanetSupportedProductBundles,
   PlanetScopeHarmonization,
   MaxarSensor,
   ResamplingKernel,
+  TPDITransactionCompatibleCollection,
+  HLSConstellation,
+  TPDITransactionParams,
+  addAxiosRequestInterceptor,
+  addAxiosResponseInterceptor,
 };
+
+export * from './statistics/';

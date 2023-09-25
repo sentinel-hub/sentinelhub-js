@@ -3,15 +3,18 @@ import moment from 'moment';
 import { LinkType, S5PL2Layer, BBox, CRS_EPSG4326 } from '../../index';
 import { ProductType } from '../S5PL2Layer';
 
-export function constructFixtureFindTilesSearchIndex({
-  sensingTime = '2020-04-30T12:59:48Z',
-  hasMore = true,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  productType = ProductType.SO2,
-}): Record<any, any> {
-  const layer = new S5PL2Layer({
+export function constructFixtureFindTilesSearchIndex(
+  layerClass: typeof S5PL2Layer,
+  {
+    sensingTime = '2020-04-30T12:59:48Z',
+    hasMore = true,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+    productType = ProductType.SO2,
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     productType: productType,
@@ -210,30 +213,33 @@ export function constructFixtureFindTilesSearchIndex({
   };
 }
 
-export function constructFixtureFindTilesCatalog({
-  sensingTime = '2020-04-30T12:03:00Z',
-  hasMore = false,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  productType = ProductType.SO2,
-}): Record<any, any> {
-  const layer = new S5PL2Layer({
+export function constructFixtureFindTilesCatalog(
+  layerClass: typeof S5PL2Layer,
+  {
+    sensingTime = '2020-04-30T12:03:00Z',
+    hasMore = false,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+    productType = ProductType.SO2,
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     productType: productType,
   });
 
-  const expectedRequest = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-5p-l2'],
     limit: 5,
-    query: { type: { eq: productType } },
   };
 
-  if (!productType) {
-    delete expectedRequest['query']['type'];
+  if (productType) {
+    expectedRequest['filter'] = { op: '=', args: [{ property: 's5p:type' }, productType] };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   /* eslint-disable */
@@ -291,13 +297,12 @@ export function constructFixtureFindTilesCatalog({
         },
         links: [
           {
-            href:
-              'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-5p-l2/items/S5P_OFFL_L2__SO2____20200430T120356_20200430T134526_13196_01_010108_20200502T144627',
+            href: `${layer.dataset.shServiceHostname}/api/v1/catalog/collections/sentinel-5p-l2/items/S5P_OFFL_L2__SO2____20200430T120356_20200430T134526_13196_01_010108_20200502T144627`,
             rel: 'self',
             type: 'application/json',
           },
           {
-            href: 'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-5p-l2',
+            href: `${layer.dataset.shServiceHostname}/api/v1/catalog/collections/sentinel-5p-l2`,
             rel: 'parent',
           },
         ],
@@ -313,7 +318,7 @@ export function constructFixtureFindTilesCatalog({
     ],
     links: [
       {
-        href: 'https://services.sentinel-hub.com/api/v1/catalog/search',
+        href: `${layer.dataset.shServiceHostname}/api/v1/catalog/search`,
         rel: 'self',
         type: 'application/json',
       },

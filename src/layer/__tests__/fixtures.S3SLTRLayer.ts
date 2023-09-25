@@ -1,21 +1,24 @@
+import { AbstractSentinelHubV3WithCCLayer } from './../AbstractSentinelHubV3WithCCLayer';
 import moment from 'moment';
 
-import { LinkType, S3SLSTRLayer, BBox, CRS_EPSG4326 } from '../../index';
+import { LinkType, BBox, CRS_EPSG4326 } from '../../index';
 
-export function constructFixtureFindTilesSearchIndex({
-  sensingTime = '2020-04-30T09:58:11.882Z',
-  hasMore = true,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  maxCloudCoverPercent = 20,
-}): Record<any, any> {
-  const layer = new S3SLSTRLayer({
+export function constructFixtureFindTilesSearchIndex(
+  layerClass: typeof AbstractSentinelHubV3WithCCLayer,
+  {
+    sensingTime = '2020-04-30T09:58:11.882Z',
+    hasMore = true,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+    maxCloudCoverPercent = 20,
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     maxCloudCoverPercent: maxCloudCoverPercent,
   });
-
   const expectedRequest = {
     clipping: {
       type: 'Polygon',
@@ -269,30 +272,32 @@ export function constructFixtureFindTilesSearchIndex({
   };
 }
 
-export function constructFixtureFindTilesCatalog({
-  sensingTime = '2020-04-30T21:18:06.506Z',
-  hasMore = false,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  maxCloudCoverPercent = 20,
-}): Record<any, any> {
-  const layer = new S3SLSTRLayer({
+export function constructFixtureFindTilesCatalog(
+  layerClass: typeof AbstractSentinelHubV3WithCCLayer,
+  {
+    sensingTime = '2020-04-30T21:18:06.506Z',
+    hasMore = false,
+    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
+    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
+    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
+    maxCloudCoverPercent = 20,
+  },
+): Record<any, any> {
+  const layer = new layerClass({
     instanceId: 'INSTANCE_ID',
     layerId: 'LAYER_ID',
     maxCloudCoverPercent: maxCloudCoverPercent,
   });
-
-  const expectedRequest = {
+  const expectedRequest: { [key: string]: any } = {
     bbox: [bbox.minX, bbox.minY, bbox.maxX, bbox.maxY],
     datetime: `${fromTime.toISOString()}/${toTime.toISOString()}`,
     collections: ['sentinel-3-slstr'],
     limit: 5,
-    query: { 'eo:cloud_cover': { lte: maxCloudCoverPercent } },
   };
 
-  if (maxCloudCoverPercent === null) {
-    delete expectedRequest['query'];
+  if (maxCloudCoverPercent !== null) {
+    expectedRequest['filter'] = { op: '<=', args: [{ property: 'eo:cloud_cover' }, maxCloudCoverPercent] };
+    expectedRequest['filter-lang'] = 'cql2-json';
   }
 
   /* eslint-disable */
@@ -347,13 +352,12 @@ export function constructFixtureFindTilesCatalog({
         },
         links: [
           {
-            href:
-              'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-3-slstr/items/S3A_SL_1_RBT____20200430T211807_20200430T212107_20200430T233757_0179_057_357_0540_LN2_O_NR_004.SEN3',
+            href: `${layer.dataset.shServiceHostname}/api/v1/catalog/collections/sentinel-3-slstr/items/S3A_SL_1_RBT____20200430T211807_20200430T212107_20200430T233757_0179_057_357_0540_LN2_O_NR_004.SEN3`,
             rel: 'self',
             type: 'application/json',
           },
           {
-            href: 'https://creodias.sentinel-hub.com/api/v1/catalog/collections/sentinel-3-slstr',
+            href: `${layer.dataset.shServiceHostname}/api/v1/catalog/collections/sentinel-3-slstr`,
             rel: 'parent',
           },
         ],
@@ -375,7 +379,7 @@ export function constructFixtureFindTilesCatalog({
     ],
     links: [
       {
-        href: 'https://services.sentinel-hub.com/api/v1/catalog/search',
+        href: `${layer.dataset.shServiceHostname}api/v1/catalog/search`,
         rel: 'self',
         type: 'application/json',
       },

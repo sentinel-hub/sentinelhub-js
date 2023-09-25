@@ -14,6 +14,8 @@ import {
   TPDProvider,
   TPDI_SERVICE_URL,
   ResamplingKernel,
+  PlanetItemType,
+  PlanetProductBundle,
 } from '../const';
 import { CACHE_CONFIG_NOCACHE } from '../../utils/cacheHandlers';
 
@@ -40,7 +42,7 @@ describe('Test TPDI service enpoints', () => {
     await TPDI.getQuotas({});
     expect(mockNetwork.history.get.length).toBe(1);
     const request = mockNetwork.history.get[0];
-    expect(request.url).toBe(`${TPDI_SERVICE_URL}/quotas`);
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/accountquotas`);
   });
 
   it('uses correct endpoint to get orders', async () => {
@@ -71,6 +73,26 @@ describe('Test TPDI service enpoints', () => {
     expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders`);
   });
 
+  it('uses correct endpoint to create a subscription', async () => {
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    await TPDI.createSubscription(
+      TPDProvider.PLANET,
+      'name',
+      'collectionId',
+      null,
+      {
+        ...defaultSearchParams,
+        itemType: PlanetItemType.PSScene4Band,
+        productBundle: PlanetProductBundle.ANALYTIC,
+      },
+      { planetApiKey: 'planetApiKey' },
+    );
+    expect(mockNetwork.history.post.length).toBe(1);
+    const request = mockNetwork.history.post[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/subscriptions`);
+  });
+
   it('uses correct endpoint to confirm an order', async () => {
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200);
@@ -81,6 +103,16 @@ describe('Test TPDI service enpoints', () => {
     expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders/${orderId}/confirm`);
   });
 
+  it('uses correct endpoint to confirm a subscription', async () => {
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    const subscriptionId = 'subscriptionId';
+    await TPDI.confirmSubscription(subscriptionId);
+    expect(mockNetwork.history.post.length).toBe(1);
+    const request = mockNetwork.history.post[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/subscriptions/${subscriptionId}/confirm`);
+  });
+
   it('uses correct endpoint to delete an order', async () => {
     mockNetwork.reset();
     mockNetwork.onDelete().replyOnce(200);
@@ -89,6 +121,16 @@ describe('Test TPDI service enpoints', () => {
     expect(mockNetwork.history.delete.length).toBe(1);
     const request = mockNetwork.history.delete[0];
     expect(request.url).toBe(`${TPDI_SERVICE_URL}/orders/${orderId}`);
+  });
+
+  it('uses correct endpoint to delete a subscription', async () => {
+    mockNetwork.reset();
+    mockNetwork.onDelete().replyOnce(200);
+    const subscriptionId = 'subscriptionId';
+    await TPDI.deleteSubscription(subscriptionId);
+    expect(mockNetwork.history.delete.length).toBe(1);
+    const request = mockNetwork.history.delete[0];
+    expect(request.url).toBe(`${TPDI_SERVICE_URL}/subscriptions/${subscriptionId}`);
   });
 
   it('uses correct endpoint for search', async () => {
@@ -175,7 +217,15 @@ describe('Test createOrder', () => {
 
   it.each([
     [TPDProvider.AIRBUS, { ...defaultSearchParams, constellation: AirbusConstellation.SPOT }, null],
-    [TPDProvider.PLANET, { ...defaultSearchParams }, { planetApiKey: 'planetApiKey' }],
+    [
+      TPDProvider.PLANET,
+      {
+        ...defaultSearchParams,
+        itemType: PlanetItemType.PSScene4Band,
+        productBundle: PlanetProductBundle.ANALYTIC,
+      },
+      { planetApiKey: 'planetApiKey' },
+    ],
     [TPDProvider.MAXAR, { ...defaultSearchParams }, { productKernel: ResamplingKernel.CC }],
   ])('requires authenthication', async (provider, searchParams, orderParams) => {
     setAuthToken(undefined);
@@ -189,6 +239,84 @@ describe('Test createOrder', () => {
     mockNetwork.onPost().replyOnce(200);
     await TPDI.createOrder(provider, 'name', 'collectionId', null, searchParams, orderParams);
     expect(mockNetwork.history.post.length).toBe(1);
+  });
+});
+
+describe('Test createSubscription', () => {
+  beforeEach(async () => {
+    Object.assign(global, makeServiceWorkerEnv(), fetch);
+    await invalidateCaches();
+    setAuthToken(EXAMPLE_TOKEN);
+  });
+
+  it('requires authenthication', async () => {
+    setAuthToken(undefined);
+
+    const provider = TPDProvider.PLANET;
+    const searchParams = {
+      ...defaultSearchParams,
+      itemType: PlanetItemType.PSScene4Band,
+      productBundle: PlanetProductBundle.ANALYTIC,
+    };
+    const subscriptionParams = { planetApiKey: 'planetApiKey' };
+
+    await expect(
+      TPDI.createSubscription(provider, 'name', 'collectionId', null, searchParams, subscriptionParams),
+    ).rejects.toThrow(new Error('Must be authenticated to perform request'));
+
+    setAuthToken(EXAMPLE_TOKEN);
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+    await TPDI.createSubscription(provider, 'name', 'collectionId', null, searchParams, subscriptionParams);
+    expect(mockNetwork.history.post.length).toBe(1);
+  });
+
+  it.each([
+    [
+      TPDProvider.AIRBUS,
+      { ...defaultSearchParams, constellation: AirbusConstellation.SPOT },
+      null,
+      'Subscriptions are not supported for selected provider',
+    ],
+    [
+      TPDProvider.PLANET,
+      {
+        ...defaultSearchParams,
+        itemType: PlanetItemType.PSScene4Band,
+        productBundle: PlanetProductBundle.ANALYTIC,
+      },
+      { planetApiKey: 'planetApiKey' },
+      null,
+    ],
+    [
+      TPDProvider.PLANET,
+      {
+        ...defaultSearchParams,
+        itemType: PlanetItemType.PSScene4Band,
+        productBundle: PlanetProductBundle.ANALYTIC,
+      },
+      null,
+      'Parameter planetApiKey must be specified',
+    ],
+    [
+      TPDProvider.MAXAR,
+      { ...defaultSearchParams },
+      { productKernel: ResamplingKernel.CC },
+      'Subscriptions are not supported for selected provider',
+    ],
+  ])('createSubscription', async (provider, searchParams, subscriptionParams, errorMessage) => {
+    setAuthToken(EXAMPLE_TOKEN);
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(200);
+
+    if (errorMessage) {
+      await expect(
+        TPDI.createSubscription(provider, 'name', 'collectionId', null, searchParams, subscriptionParams),
+      ).rejects.toThrow(new Error(errorMessage));
+    } else {
+      await TPDI.createSubscription(provider, 'name', 'collectionId', null, searchParams, subscriptionParams);
+      expect(mockNetwork.history.post.length).toBe(1);
+    }
   });
 });
 

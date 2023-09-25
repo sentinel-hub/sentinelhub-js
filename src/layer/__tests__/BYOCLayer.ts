@@ -1,5 +1,5 @@
 import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
-import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes } from '../const';
+import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes, SH_SERVICE_ROOT_URL } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
@@ -24,7 +24,7 @@ import {
 const SEARCH_INDEX_URL = `${
   SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]
 }byoc/v3/collections/CUSTOM/searchIndex`;
-const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/search`;
+const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/1.0.0/search`;
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -190,3 +190,100 @@ describe('Test findDatesUTC using catalog', () => {
 });
 
 test.todo('check if correct location is used');
+
+describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+  const mockedLayerId = 'LAYER_ID';
+  const mockedLayersResponse = [{ id: mockedLayerId, styles: [{}] }];
+
+  test('AWS EU locationId is set by default if not specified', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: mockedLayerId,
+      collectionId: 'mockCollectionId',
+      subType: BYOCSubTypes.ZARR,
+    });
+    expect(layer.locationId).toEqual(null);
+    mockNetwork
+      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .replyOnce(200, mockedLayersResponse);
+    await layer.updateLayerFromServiceIfNeeded();
+    expect(layer.locationId).toEqual(LocationIdSHv3.awsEuCentral1);
+  });
+
+  test('location Id is not overridden', async () => {
+    const layer = new BYOCLayer({
+      instanceId: 'INSTANCE_ID',
+      layerId: mockedLayerId,
+      collectionId: 'mockCollectionId',
+      subType: BYOCSubTypes.ZARR,
+      locationId: LocationIdSHv3.creo,
+    });
+    expect(layer.locationId).toEqual(LocationIdSHv3.creo);
+    mockNetwork
+      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .replyOnce(200, mockedLayersResponse);
+    await layer.updateLayerFromServiceIfNeeded();
+    expect(layer.locationId).toEqual(LocationIdSHv3.creo);
+  });
+});
+
+describe.only('shServiceRootUrl', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+  const mockedLayerId = 'LAYER_ID';
+
+  test.each([
+    [
+      'default sh service url is used if not set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+    [
+      'default sh service url is used if set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: SH_SERVICE_ROOT_URL.default,
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+    [
+      'cdse sh service url is used if set',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: SH_SERVICE_ROOT_URL.cdse,
+      },
+      SH_SERVICE_ROOT_URL.cdse,
+    ],
+    [
+      'default sh service url is used for unknown shServiceRootUrl',
+      {
+        instanceId: 'INSTANCE_ID',
+        layerId: mockedLayerId,
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+        shServiceRootUrl: 'random url',
+      },
+      SH_SERVICE_ROOT_URL.default,
+    ],
+  ])('%p', async (_title, layerParams, expected) => {
+    const layer = new BYOCLayer(layerParams);
+    expect(layer.getSHServiceRootUrl()).toBe(expected);
+  });
+});

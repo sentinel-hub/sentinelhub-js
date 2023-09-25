@@ -2,21 +2,36 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
 
-import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V1_OR_V2, SH_SERVICE_HOSTNAMES_V3 } from './const';
+import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
+import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
 import { GetCapabilitiesWmtsXml } from './wmts.utils';
+import { getAuthToken } from '../auth';
 
-export type GetCapabilitiesWmsXml = {
-  WMS_Capabilities: {
-    Service: [];
-    Capability: [
-      {
-        Layer: [GetCapabilitiesXmlLayer];
-      },
-    ];
-  };
-};
+interface Capabilities {
+  Service: [];
+  Capability: [
+    {
+      Layer: [GetCapabilitiesXmlLayer];
+    },
+  ];
+}
+
+interface WMSCapabilities {
+  WMS_Capabilities: Capabilities;
+}
+
+interface WMTMSCapabilities {
+  WMT_MS_Capabilities: Capabilities;
+}
+
+export type GetCapabilitiesWmsXml = WMSCapabilities | WMTMSCapabilities;
+
+export function isWMSCapabilities(
+  capabilitiesXml: GetCapabilitiesWmsXml,
+): capabilitiesXml is WMSCapabilities {
+  return (capabilitiesXml as WMSCapabilities).WMS_Capabilities !== undefined;
+}
 
 export type GetCapabilitiesXmlLayer = {
   Name?: string[];
@@ -77,10 +92,13 @@ export async function fetchLayersFromGetCapabilitiesXml(
     ogcServiceType,
     reqConfig,
   )) as GetCapabilitiesWmsXml;
+
+  const capabilities = isWMSCapabilities(parsedXml)
+    ? parsedXml.WMS_Capabilities
+    : parsedXml.WMT_MS_Capabilities;
+
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
-  const layersInfos = _flattenLayers(parsedXml.WMS_Capabilities.Capability[0].Layer).filter(
-    layerInfo => layerInfo.Name,
-  );
+  const layersInfos = _flattenLayers(capabilities?.Capability[0].Layer).filter(layerInfo => layerInfo.Name);
   return layersInfos;
 }
 
@@ -127,14 +145,83 @@ export function parseSHInstanceId(baseUrl: string): string {
     const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
     return instanceId;
   }
-  // EOCloud:
-  for (let hostname of SH_SERVICE_HOSTNAMES_V1_OR_V2) {
-    const prefix = `${hostname}v1/wms/`;
-    if (!baseUrl.startsWith(prefix)) {
-      continue;
-    }
-    const instanceId = baseUrl.substr(prefix.length, INSTANCE_ID_LENGTH);
-    return instanceId;
-  }
   throw new Error(`Could not parse instanceId from URL: ${baseUrl}`);
+}
+
+export function getSHServiceRootUrl(host: string): string {
+  const shServiceRootUrl = Object.values(SH_SERVICE_ROOT_URL).find(url => {
+    const regex = new RegExp(url);
+    if (regex.test(host)) {
+      return url;
+    }
+  });
+
+  if (shServiceRootUrl) {
+    return shServiceRootUrl;
+  }
+
+  // The endpoint for fetching the list of layers is typically
+  // https://services.sentinel-hub.com/, even for creodias datasets.
+  // However there is an exception for Copernicus datasets, which have
+  // a different endpoint for fetching the list of layers
+  return SH_SERVICE_ROOT_URL.default;
+}
+
+export function getSHServiceRootUrlFromBaseUrl(baseUrl: string): string {
+  let host = baseUrl;
+
+  if (/\ogc\/wms/.test(baseUrl)) {
+    host = baseUrl.substring(0, baseUrl.indexOf('/ogc/wms') + 1);
+  }
+
+  return getSHServiceRootUrl(host);
+}
+
+export async function fetchLayerParamsFromConfigurationService(
+  shServiceHostName: string,
+  instanceId: string,
+  reqConfig: RequestConfiguration,
+): Promise<any[]> {
+  const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+  if (!authToken) {
+    throw new Error('Must be authenticated to fetch layer params');
+  }
+  const configurationServiceHostName = shServiceHostName ?? SH_SERVICE_ROOT_URL.default;
+  const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  // reqConfig might include the cache config from getMap, which could cache instances/${this.instanceId}/layers
+  // we do not want this as layer updates will not invalidate this cache, so we rather cache to memory
+  const reqConfigWithMemoryCache = {
+    ...reqConfig,
+    // Do not override cache if cache is disabled with `expiresIn: 0`
+    cache:
+      reqConfig && reqConfig.cache && reqConfig.cache.expiresIn === 0
+        ? reqConfig.cache
+        : CACHE_CONFIG_30MIN_MEMORY,
+  };
+  const requestConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    headers: headers,
+    ...getAxiosReqParams(reqConfigWithMemoryCache, null),
+  };
+  const res = await axios.get(url, requestConfig);
+  const layersParams = res.data.map((l: any) => ({
+    layerId: l.id,
+    title: l.title,
+    description: l.description,
+    ...l.datasourceDefaults,
+    //maxCloudCoverPercent vs maxCloudCoverage
+    ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
+      maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
+    }),
+    evalscript: l.styles[0].evalScript,
+    dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
+    legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
+      ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
+      : null,
+  }));
+  return layersParams;
 }
