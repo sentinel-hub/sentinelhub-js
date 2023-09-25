@@ -488,7 +488,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     const headers = {
       Authorization: `Bearer ${authToken}`,
       'Content-Type': 'application/json',
-      'SH-SecretToken': getPlanetScopeAccessToken(),
     };
     const requestConfig: AxiosRequestConfig = {
       headers: headers,
