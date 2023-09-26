@@ -25,13 +25,3 @@ export async function requestAuthToken(clientId: string, clientSecret: string): 
   });
   return response.data.access_token;
 }
-
-let planetScopeAccessToken: string | null = null;
-
-export function getPlanetScopeAccessToken(): string | null {
-  return planetScopeAccessToken;
-}
-
-export function setPlanetScopeAccessToken(newAccessToken: string | null): void {
-  planetScopeAccessToken = newAccessToken;
-}

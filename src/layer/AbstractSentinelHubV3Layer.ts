@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
 import { Geometry } from '@turf/helpers';
 
-import { getAuthToken, getPlanetScopeAccessToken } from '../auth';
+import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
 import {
   GetMapParams,

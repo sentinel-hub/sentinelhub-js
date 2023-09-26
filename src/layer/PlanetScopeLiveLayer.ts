@@ -1,4 +1,3 @@
-import { getPlanetScopeAccessToken } from '../auth';
 import { LocationIdSHv3, DataProductId, BYOCSubTypes } from './const';
 import { DATASET_PLANETSCOPE_LIVE } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
@@ -57,7 +56,6 @@ export class PlanetScopeLiveLayer extends AbstractSentinelHubV3Layer {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     reqConfig?: RequestConfiguration,
   ): Promise<ProcessingPayload> {
-    payload.input.data[datasetSeqNo]['accessToken'] = getPlanetScopeAccessToken();
     return payload;
   }
 }
