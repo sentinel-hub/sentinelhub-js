@@ -1,7 +1,6 @@
 import { LocationIdSHv3, DataProductId, BYOCSubTypes } from './const';
 import { DATASET_PLANETSCOPE_LIVE } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
-import { ProcessingPayload } from './processing';
 import { RequestConfiguration } from '../utils/cancelRequests';
 
 interface ConstructorParameters {
@@ -48,14 +47,5 @@ export class PlanetScopeLiveLayer extends AbstractSentinelHubV3Layer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected async fetchLayerParamsFromSHServiceV3(reqConfig: RequestConfiguration): Promise<any> {
     return await PLANETSCOPE_LIVE_CONFIGURATIONS.find(l => l.layerId === this.layerId);
-  }
-
-  public async _updateProcessingGetMapPayload(
-    payload: ProcessingPayload,
-    datasetSeqNo: number = 0,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    reqConfig?: RequestConfiguration,
-  ): Promise<ProcessingPayload> {
-    return payload;
   }
 }
