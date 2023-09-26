@@ -1,7 +1,8 @@
-import { LocationIdSHv3, DataProductId, BYOCSubTypes, Link } from './const';
+import { LocationIdSHv3, DataProductId, BYOCSubTypes, Link, PaginatedTiles } from './const';
 import { DATASET_PLANETSCOPE_NICFI } from './dataset';
 import { AbstractSentinelHubV3Layer } from './AbstractSentinelHubV3Layer';
 import { RequestConfiguration } from '../utils/cancelRequests';
+import moment from 'moment';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -49,5 +50,17 @@ export class PlanetScopeNicfiLayer extends AbstractSentinelHubV3Layer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinksFromCatalog(feature: Record<string, any>): Link[] {
     return [];
+  }
+
+  protected convertResponseFromCatalog(response: any): PaginatedTiles {
+    return {
+      tiles: response.data.features.map((feature: Record<string, any>) => ({
+        geometry: feature.geometry,
+        sensingTime: moment.utc(feature.properties.start_datetime).toDate(),
+        meta: this.extractFindTilesMetaFromCatalog(feature),
+        links: this.getTileLinksFromCatalog(feature),
+      })),
+      hasMore: !!response.data.context.next,
+    };
   }
 }
