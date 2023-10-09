@@ -131,6 +131,7 @@ import {
   TPDITransactionCompatibleCollection,
   HLSConstellation,
   TPDITransactionParams,
+  setTPDIServiceBaseURL,
 } from './dataimport/const';
 
 import { ProcessingPayload } from './layer/processing';
@@ -278,6 +279,7 @@ export {
   TPDITransactionParams,
   addAxiosRequestInterceptor,
   addAxiosResponseInterceptor,
+  setTPDIServiceBaseURL,
 };
 
 export * from './statistics/';
