@@ -4,7 +4,7 @@ import makeServiceWorkerEnv from 'service-worker-mock';
 import fetch from 'node-fetch';
 
 import { setAuthToken, invalidateCaches, CRS_EPSG4326, BBox } from '../../index';
-import { TPDI } from '../TPDI';
+import { TPDI, TPDI_SERVICE_URL } from '../TPDI';
 
 import '../../../jest-setup';
 import {
@@ -12,7 +12,6 @@ import {
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
-  TPDI_SERVICE_URL,
   ResamplingKernel,
   PlanetItemType,
   PlanetProductBundle,

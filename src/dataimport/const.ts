@@ -2,12 +2,6 @@ import { Polygon, MultiPolygon } from '@turf/helpers';
 import { CRS } from '../crs';
 import { BBox } from '../bbox';
 
-export let TPDI_SERVICE_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
-
-export function setTPDIServiceBaseURL(baseurl: string): void {
-  TPDI_SERVICE_URL = `${baseurl}/api/v1/dataimport`;
-}
-
 export enum TPDICollections {
   AIRBUS_PLEIADES = 'AIRBUS_PLEIADES',
   AIRBUS_SPOT = 'AIRBUS_SPOT',

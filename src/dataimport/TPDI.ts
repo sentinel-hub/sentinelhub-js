@@ -4,7 +4,6 @@ import {
   TPDICollections,
   TPDProvider,
   TPDISearchParams,
-  TPDI_SERVICE_URL,
   TPDITransaction,
   TPDSearchResult,
   TPDITransactionSearchParams,
@@ -22,6 +21,12 @@ import axios, { AxiosRequestConfig } from 'axios';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 
 const dataProviders = [new AirbusDataProvider(), new PlanetDataProvider(), new MaxarDataProvider()];
+
+export let TPDI_SERVICE_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
+
+export function setTPDIServiceBaseURL(baseurl: string): void {
+  TPDI_SERVICE_URL = `${baseurl}/api/v1/dataimport`;
+}
 
 function getThirdPartyDataProvider(provider: TPDProvider): TPDProviderInterface {
   const tpdp = dataProviders.find(p => p.getProvider() === provider);

@@ -112,7 +112,7 @@ import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
 import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
-import { TPDI } from './dataimport/TPDI';
+import { TPDI, setTPDIServiceBaseURL } from './dataimport/TPDI';
 import {
   AirbusConstellation,
   AirbusProcessingLevel,
@@ -131,7 +131,6 @@ import {
   TPDITransactionCompatibleCollection,
   HLSConstellation,
   TPDITransactionParams,
-  setTPDIServiceBaseURL,
 } from './dataimport/const';
 
 import { ProcessingPayload } from './layer/processing';
