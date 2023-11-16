@@ -4,7 +4,7 @@ import makeServiceWorkerEnv from 'service-worker-mock';
 import fetch from 'node-fetch';
 
 import { setAuthToken, invalidateCaches, CRS_EPSG4326, BBox } from '../../index';
-import { TPDI } from '../TPDI';
+import { TPDI, TPDI_SERVICE_URL, setTPDIServiceBaseURL } from '../TPDI';
 
 import '../../../jest-setup';
 import {
@@ -12,7 +12,6 @@ import {
   TPDICollections,
   TPDISearchParams,
   TPDProvider,
-  TPDI_SERVICE_URL,
   ResamplingKernel,
   PlanetItemType,
   PlanetProductBundle,
@@ -372,5 +371,16 @@ describe('Test getOrders', () => {
     expect(mockNetwork.history.get.length).toBe(1);
     const getParams = mockNetwork.history.get[0].params;
     expect(getParams).toStrictEqual(expectedParams);
+  });
+});
+
+describe('Test setting TPDI service URL', () => {
+  it('should be set to default', async () => {
+    expect(TPDI_SERVICE_URL).toBe('https://services.sentinel-hub.com/api/v1/dataimport');
+  });
+
+  it('should update TPDI service URL', async () => {
+    setTPDIServiceBaseURL('https://custom.sentinel.service.com');
+    expect(TPDI_SERVICE_URL).toBe('https://custom.sentinel.service.com/api/v1/dataimport');
   });
 });
