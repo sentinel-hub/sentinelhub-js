@@ -69,10 +69,6 @@ export class PlanetaryVariablesDataProvider extends AbstractTPDProvider {
     const input = this.getSearchPayload(searchParams);
     const dataObject = input.data[0];
 
-    if (transactionParams?.harmonizeTo) {
-      dataObject.harmonizeTo = transactionParams.harmonizeTo;
-    }
-
     if (!transactionParams?.planetApiKey) {
       throw new Error('Parameter planetApiKey must be specified');
     }
