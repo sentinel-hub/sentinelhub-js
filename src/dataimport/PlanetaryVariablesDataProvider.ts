@@ -1,10 +1,14 @@
-import { TPDProvider, TPDISearchParams, PlanetSupportedProductBundles, TPDITransactionParams } from './const';
+import { TPDProvider, TPDISearchParams, TPDITransactionParams, PlanetSupportedPVIds } from './const';
 import { AbstractTPDProvider } from './TPDProvider';
 
 export class PlanetaryVariablesDataProvider extends AbstractTPDProvider {
   public constructor() {
     super();
     this.provider = TPDProvider.PLANETARY_VARIABLES;
+  }
+
+  protected getSearchParamsProvider(): TPDProvider {
+    return TPDProvider.PLANET;
   }
 
   protected getAdditionalSearchParams(params: TPDISearchParams): any {
@@ -21,19 +25,9 @@ export class PlanetaryVariablesDataProvider extends AbstractTPDProvider {
     data.pvType = params.pvType;
     data.pvId = params.pvId;
 
-    //productBundle is a required parameter
-    if (!params.productBundle) {
-      throw new Error('Parameter productBundle must be specified');
-    }
-
-    data.productBundle = params.productBundle;
-
-    //check if productBundle is supported for selected itemType
-    if (
-      PlanetSupportedProductBundles[params.itemType] &&
-      !PlanetSupportedProductBundles[params.itemType].includes(params.productBundle)
-    ) {
-      throw new Error(`Product bundle is not supported for selected item type`);
+    //check if pvId is supported for selected pvType
+    if (PlanetSupportedPVIds[params.pvType] && !PlanetSupportedPVIds[params.pvType].includes(params.pvId)) {
+      throw new Error(`Source ID is not supported for selected Source Type`);
     }
 
     //datafilter
