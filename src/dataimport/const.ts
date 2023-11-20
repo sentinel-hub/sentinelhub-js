@@ -8,12 +8,13 @@ export enum TPDICollections {
   PLANET_SCOPE = 'PLANET_SCOPE',
   MAXAR_WORLDVIEW = 'MAXAR_WORLDVIEW',
   PLANET_SKYSAT = 'PLANET_SKYSAT',
-  PLANET_PLANETARY_VARIABLES = 'PLANET_PLANETARY_VARIABLES',
+  PLANETARY_VARIABLES = 'PLANETARY_VARIABLES',
 }
 
 export enum TPDProvider {
   AIRBUS = 'AIRBUS',
   PLANET = 'PLANET',
+  PLANETARY_VARIABLES = 'PLANETARY_VARIABLES',
   MAXAR = 'MAXAR',
 }
 
@@ -156,6 +157,8 @@ export type TPDISearchParams = {
   sensor?: MaxarSensor;
   itemType?: PlanetItemType;
   productBundle?: PlanetProductBundle;
+  pvType?: PlanetPVType;
+  pvId?: PlanetPVId;
 };
 
 export type TPDITransactionParams = {
