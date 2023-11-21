@@ -46,14 +46,6 @@ export class PlanetaryVariablesDataProvider extends AbstractTPDProvider {
       to: params.toTime.toISOString(),
     };
 
-    if (!isNaN(params.maxCloudCoverage)) {
-      dataFilter.maxCloudCoverage = params.maxCloudCoverage;
-    }
-
-    if (!!params.nativeFilter) {
-      dataFilter.nativeFilter = params.nativeFilter;
-    }
-
     data.dataFilter = dataFilter;
 
     return {
