@@ -165,8 +165,8 @@ export type TPDISearchParams = {
   sensor?: MaxarSensor;
   itemType?: PlanetItemType;
   productBundle?: PlanetProductBundle;
-  pvType?: PlanetPVType;
-  pvId?: PlanetPVId;
+  type?: PlanetPVType;
+  id?: PlanetPVId;
 };
 
 export type TPDITransactionParams = {

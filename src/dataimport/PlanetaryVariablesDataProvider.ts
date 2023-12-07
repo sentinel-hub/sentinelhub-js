@@ -14,19 +14,19 @@ export class PlanetaryVariablesDataProvider extends AbstractTPDProvider {
   protected getAdditionalSearchParams(params: TPDISearchParams): any {
     const data: any = {};
 
-    if (!params.pvType) {
-      throw new Error('Parameter pvType must be specified');
+    if (!params.type) {
+      throw new Error('Parameter type must be specified');
     }
 
-    if (!params.pvId) {
-      throw new Error('Parameter pvId must be specified');
+    if (!params.id) {
+      throw new Error('Parameter id must be specified');
     }
 
-    data.pvType = params.pvType;
-    data.pvId = params.pvId;
+    data.type = params.type;
+    data.id = params.id;
 
-    //check if pvId is supported for selected pvType
-    if (PlanetSupportedPVIds[params.pvType] && !PlanetSupportedPVIds[params.pvType].includes(params.pvId)) {
+    //check if id is supported for selected type
+    if (PlanetSupportedPVIds[params.type] && !PlanetSupportedPVIds[params.type].includes(params.id)) {
       throw new Error(`Source ID is not supported for selected Source Type`);
     }
 
