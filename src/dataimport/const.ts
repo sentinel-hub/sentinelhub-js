@@ -76,7 +76,6 @@ export enum PlanetPVCollections {
   PLANET_BIOMASS_PROXY = 'PLANET_BIOMASS_PROXY',
   PLANET_LAND_SURFACE_TEMPERATURE = 'PLANET_LAND_SURFACE_TEMPERATURE',
   PLANET_SOIL_WATER_CONTENT = 'PLANET_SOIL_WATER_CONTENT',
-  PLANET_VEGETATION_OPTICAL_DEPTH = 'PLANET_VEGETATION_OPTICAL_DEPTH',
   PLANET_FOREST_CARBON_DILIGENCE_30M = 'PLANET_FOREST_CARBON_DILIGENCE_30M',
 }
 
@@ -84,7 +83,6 @@ export enum PlanetPVType {
   BiomassProxy = 'biomass_proxy',
   LandSurfaceTemperature = 'land_surface_temperature',
   SoilWaterContent = 'soil_water_content',
-  VegetationOpticalDepth = 'vegetation_optical_depth',
   ForestCarbonDiligence30m = 'forest_carbon_diligence_30m',
 }
 
@@ -101,10 +99,6 @@ export enum PlanetPVId {
   SWC_AMSR2_C_V4_0_1000 = 'SWC-AMSR2-C_V4.0_1000',
   SWC_AMSR2_X_V4_0_1000 = 'SWC-AMSR2-X_V4.0_1000',
   SWC_SMAP_L_V4_0_1000 = 'SWC-SMAP-L_V4.0_1000',
-  VOD_AMSRE_C_V4_0_1000 = 'VOD-AMSRE-C_V4.0_1000',
-  VOD_AMSRE_X_V4_0_1000 = 'VOD-AMSRE-X_V4.0_1000',
-  VOD_AMSR2_C_V4_0_1000 = 'VOD-AMSR2-C_V4.0_1000',
-  VOD_AMSR2_X_V4_0_1000 = 'VOD-AMSR2-X_V4.0_1000',
   CANOPY_HEIGHT_V1_0_0_30 = 'CANOPY_HEIGHT_v1.0.0_30',
   CANOPY_COVER_V1_0_0_30 = 'CANOPY_COVER_v1.0.0_30',
   ABOVEGROUND_CARBON_DENSITY_V1_0_0_30 = 'ABOVEGROUND_CARBON_DENSITY_v1.0.0_30',
@@ -127,12 +121,6 @@ export const PlanetSupportedPVIds = {
     PlanetPVId.SWC_AMSR2_C_V4_0_1000,
     PlanetPVId.SWC_AMSR2_X_V4_0_1000,
     PlanetPVId.SWC_SMAP_L_V4_0_1000,
-  ],
-  [PlanetPVType.VegetationOpticalDepth]: [
-    PlanetPVId.VOD_AMSRE_C_V4_0_1000,
-    PlanetPVId.VOD_AMSRE_X_V4_0_1000,
-    PlanetPVId.VOD_AMSR2_C_V4_0_1000,
-    PlanetPVId.VOD_AMSR2_X_V4_0_1000,
   ],
   [PlanetPVType.ForestCarbonDiligence30m]: [
     PlanetPVId.CANOPY_HEIGHT_V1_0_0_30,
