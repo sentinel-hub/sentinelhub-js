@@ -155,6 +155,7 @@ export type TPDISearchParams = {
   productBundle?: PlanetProductBundle;
   type?: PlanetPVType;
   id?: PlanetPVId;
+  planetApiKey?: string;
 };
 
 export type TPDITransactionParams = {
