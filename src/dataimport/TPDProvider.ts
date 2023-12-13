@@ -35,10 +35,14 @@ export abstract class AbstractTPDProvider implements TPDProviderInterface {
     requestConfig.params = queryParams;
   }
 
+  protected getSearchParamsProvider(): TPDProvider {
+    return this.provider;
+  }
+
   protected getCommonSearchParams(params: TPDISearchParams): any {
     const payload: any = {};
     //provider
-    payload['provider'] = this.provider;
+    payload['provider'] = this.getSearchParamsProvider();
 
     //bounds
     //Defines the request bounds by specifying the bounding box and/or geometry for the request.

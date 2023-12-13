@@ -7,6 +7,16 @@ export class PlanetDataProvider extends AbstractTPDProvider {
     this.provider = TPDProvider.PLANET;
   }
 
+  protected getCommonSearchParams(params: TPDISearchParams): any {
+    const payload: any = super.getCommonSearchParams(params);
+
+    if (params.planetApiKey) {
+      payload.planetApiKey = params.planetApiKey;
+    }
+
+    return payload;
+  }
+
   protected getAdditionalSearchParams(params: TPDISearchParams): any {
     const data: any = {};
 

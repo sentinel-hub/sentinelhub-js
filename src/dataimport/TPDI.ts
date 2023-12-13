@@ -19,8 +19,14 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { getAuthToken } from '../auth';
 import axios, { AxiosRequestConfig } from 'axios';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
+import { PlanetaryVariablesDataProvider } from './PlanetaryVariablesDataProvider';
 
-const dataProviders = [new AirbusDataProvider(), new PlanetDataProvider(), new MaxarDataProvider()];
+const dataProviders = [
+  new AirbusDataProvider(),
+  new PlanetDataProvider(),
+  new PlanetaryVariablesDataProvider(),
+  new MaxarDataProvider(),
+];
 
 export let TPDI_SERVICE_URL = 'https://services.sentinel-hub.com/api/v1/dataimport';
 
@@ -208,6 +214,7 @@ export class TPDI {
   public static async getThumbnail(
     collectionId: TPDICollections,
     productId: string,
+    planetApiKey?: string,
     reqConfig?: RequestConfiguration,
   ): Promise<Blob> {
     if (!collectionId) {
@@ -222,8 +229,13 @@ export class TPDI {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       requestConfig.responseType = 'blob';
 
+      const params = new URLSearchParams();
+      if (planetApiKey) {
+        params.set('planetApiKey', planetApiKey);
+      }
+
       const response = await axios.get<Blob>(
-        `${TPDI_SERVICE_URL}/collections/${collectionId}/products/${productId}/thumbnail`,
+        `${TPDI_SERVICE_URL}/collections/${collectionId}/products/${productId}/thumbnail?${params.toString()}`,
         requestConfig,
       );
       const thumbnail = response.data;
