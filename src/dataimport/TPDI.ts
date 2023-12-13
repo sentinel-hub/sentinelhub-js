@@ -214,6 +214,7 @@ export class TPDI {
   public static async getThumbnail(
     collectionId: TPDICollections,
     productId: string,
+    planetApiKey?: string,
     reqConfig?: RequestConfiguration,
   ): Promise<Blob> {
     if (!collectionId) {
@@ -228,8 +229,13 @@ export class TPDI {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       requestConfig.responseType = 'blob';
 
+      const params = new URLSearchParams();
+      if (planetApiKey) {
+        params.set('planetApiKey', planetApiKey);
+      }
+
       const response = await axios.get<Blob>(
-        `${TPDI_SERVICE_URL}/collections/${collectionId}/products/${productId}/thumbnail`,
+        `${TPDI_SERVICE_URL}/collections/${collectionId}/products/${productId}/thumbnail?${params.toString()}`,
         requestConfig,
       );
       const thumbnail = response.data;
