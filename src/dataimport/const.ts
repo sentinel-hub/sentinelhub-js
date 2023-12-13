@@ -72,13 +72,6 @@ export const PlanetSupportedProductBundles = {
   ],
 };
 
-export enum PlanetPVCollections {
-  PLANET_BIOMASS_PROXY = 'PLANET_BIOMASS_PROXY',
-  PLANET_LAND_SURFACE_TEMPERATURE = 'PLANET_LAND_SURFACE_TEMPERATURE',
-  PLANET_SOIL_WATER_CONTENT = 'PLANET_SOIL_WATER_CONTENT',
-  PLANET_FOREST_CARBON_DILIGENCE_30M = 'PLANET_FOREST_CARBON_DILIGENCE_30M',
-}
-
 export enum PlanetPVType {
   BiomassProxy = 'biomass_proxy',
   LandSurfaceTemperature = 'land_surface_temperature',
