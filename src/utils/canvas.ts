@@ -3,8 +3,10 @@ import { MimeType, ImageProperties } from '../layer/const';
 export async function drawBlobOnCanvas(
   ctx: CanvasRenderingContext2D,
   blob: Blob,
-  x: number = 0,
-  y: number = 0,
+  dx: number = 0,
+  dy: number = 0,
+  dWidth?: number,
+  dHeight?: number,
 ): Promise<void> {
   const objectURL = URL.createObjectURL(blob);
   try {
@@ -15,7 +17,11 @@ export async function drawBlobOnCanvas(
       img.onerror = reject;
       img.src = objectURL;
     });
-    ctx.drawImage(imgDrawn, x, y);
+
+    const width = dWidth ?? imgDrawn.naturalWidth;
+    const height = dHeight ?? imgDrawn.naturalHeight;
+
+    ctx.drawImage(imgDrawn, dx, dy, width, height);
   } finally {
     URL.revokeObjectURL(objectURL);
   }
