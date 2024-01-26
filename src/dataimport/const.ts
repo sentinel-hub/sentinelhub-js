@@ -124,7 +124,7 @@ export const PlanetSupportedPVIds = {
     PlanetPVId.SWC_SMAP_L_V1_0_100,
     PlanetPVId.SWC_AMSR2_C_V2_0_100,
     PlanetPVId.SWC_AMSR2_X_V2_0_100,
-    PlanetPVId.SWC_SMAP_L_V2_0_100, 
+    PlanetPVId.SWC_SMAP_L_V2_0_100,
     PlanetPVId.SWC_AMSRE_C_V4_0_1000,
     PlanetPVId.SWC_AMSRE_X_V4_0_1000,
     PlanetPVId.SWC_AMSR2_C_V4_0_1000,
