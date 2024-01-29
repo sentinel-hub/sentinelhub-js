@@ -53,6 +53,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public locationId: LocationIdSHv3;
   public subType: BYOCSubTypes;
   public shServiceRootUrl: string;
+  public lowResolutionCollectionId: string;
+  public lowResolutionMetersPerPixelThreshold: number;
 
   public constructor({
     instanceId = null,
@@ -143,8 +145,32 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     reqConfig?: RequestConfiguration,
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    payload.input.data[datasetSeqNo].type = this.getTypeId();
+
+    if (
+      this.lowResolutionCollectionId !== undefined &&
+      this.lowResolutionMetersPerPixelThreshold !== undefined &&
+      this.metersPerPixel(payload) > this.lowResolutionMetersPerPixelThreshold
+    ) {
+      payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
+    } else {
+      payload.input.data[datasetSeqNo].type = this.getTypeId();
+    }
+
+    console.log(payload.input.data[datasetSeqNo].type);
     return payload;
+  }
+
+  private metersPerPixel(payload: ProcessingPayload): number {
+    const bbox = payload.input.bounds.bbox;
+    const width = payload.output.width;
+    const widthInMeters = Math.abs(bbox[2] - bbox[0]);
+    const latitude = (bbox[1] + bbox[3]) / 2;
+
+    return (widthInMeters / width) * Math.cos(this.lat(latitude));
+  }
+
+  private lat(y: number): number {
+    return 2 * (Math.PI / 4 - Math.atan(Math.exp(-y / 6378137)));
   }
 
   protected convertResponseFromSearchIndex(response: {
@@ -206,6 +232,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
   protected getTypeId(): string {
     return `${this.getTypePrefix()}-${this.collectionId}`;
+  }
+
+  protected getTypeIdLowRes(): string {
+    return `${this.getTypePrefix()}-${this.lowResolutionCollectionId}`;
   }
 
   protected getTypePrefix(): string {
