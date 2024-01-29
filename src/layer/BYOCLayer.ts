@@ -27,6 +27,8 @@ import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
 import { getSHServiceRootUrl } from './utils';
+import { CRS_EPSG3857 } from '../crs';
+import proj4 from 'proj4';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -143,13 +145,14 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     payload: ProcessingPayload,
     datasetSeqNo: number = 0,
     reqConfig?: RequestConfiguration,
+    params?: GetMapParams,
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
 
     if (
       this.lowResolutionCollectionId !== undefined &&
       this.lowResolutionMetersPerPixelThreshold !== undefined &&
-      this.metersPerPixel(payload) > this.lowResolutionMetersPerPixelThreshold
+      this.metersPerPixel(params, payload) > this.lowResolutionMetersPerPixelThreshold
     ) {
       payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
     } else {
@@ -160,11 +163,18 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return payload;
   }
 
-  private metersPerPixel(payload: ProcessingPayload): number {
-    const bbox = payload.input.bounds.bbox;
+  private metersPerPixel(params: GetMapParams, payload: ProcessingPayload): number {
+    let bbox: BBox = params.bbox;
+
+    if (bbox.crs.authId !== CRS_EPSG3857.authId) {
+      [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+      [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+      bbox.crs = CRS_EPSG3857;
+    }
+
     const width = payload.output.width;
-    const widthInMeters = Math.abs(bbox[2] - bbox[0]);
-    const latitude = (bbox[1] + bbox[3]) / 2;
+    const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
+    const latitude = (bbox.minY + bbox.maxY) / 2;
 
     return (widthInMeters / width) * Math.cos(this.lat(latitude));
   }
