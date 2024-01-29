@@ -152,27 +152,23 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     if (
       this.lowResolutionCollectionId !== undefined &&
       this.lowResolutionMetersPerPixelThreshold !== undefined &&
-      this.metersPerPixel(params, payload) > this.lowResolutionMetersPerPixelThreshold
+      this.metersPerPixel(params.bbox, payload.output.width) > this.lowResolutionMetersPerPixelThreshold
     ) {
       payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
     } else {
       payload.input.data[datasetSeqNo].type = this.getTypeId();
     }
 
-    console.log(payload.input.data[datasetSeqNo].type);
     return payload;
   }
 
-  private metersPerPixel(params: GetMapParams, payload: ProcessingPayload): number {
-    let bbox: BBox = params.bbox;
-
+  private metersPerPixel(bbox: BBox, width: number): number {
     if (bbox.crs.authId !== CRS_EPSG3857.authId) {
       [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
       [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
       bbox.crs = CRS_EPSG3857;
     }
 
-    const width = payload.output.width;
     const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
     const latitude = (bbox.minY + bbox.maxY) / 2;
 
