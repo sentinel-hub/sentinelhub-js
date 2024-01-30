@@ -230,20 +230,23 @@ export async function fetchLayerParamsFromConfigurationService(
 }
 
 export function ensureMercatorBBox(bbox: BBox): BBox {
-  if (bbox.crs.authId !== CRS_EPSG3857.authId) {
-    [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
-    [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
-    bbox.crs = CRS_EPSG3857;
+  if (bbox.crs.authId === CRS_EPSG3857.authId) {
+    return bbox;
   }
 
-  return bbox;
+  let newBBox: BBox;
+  [newBBox.minX, newBBox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+  [newBBox.maxX, newBBox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+  newBBox.crs = CRS_EPSG3857;
+
+  return newBBox;
 }
 
 export function metersPerPixel(bbox: BBox, width: number): number {
-  bbox = ensureMercatorBBox(bbox);
+  const newBBox = ensureMercatorBBox(bbox);
 
-  const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
-  const latitude = (bbox.minY + bbox.maxY) / 2;
+  const widthInMeters = Math.abs(newBBox.maxX - newBBox.minX);
+  const latitude = (newBBox.minY + newBBox.maxY) / 2;
 
   return (widthInMeters / width) * Math.cos(lat(latitude));
 }
