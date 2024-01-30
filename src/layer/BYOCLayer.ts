@@ -26,7 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
-import { getSHServiceRootUrl } from './utils';
+import { ensureMercatorBBox, getSHServiceRootUrl } from './utils';
 import { CRS_EPSG3857 } from '../crs';
 import proj4 from 'proj4';
 
@@ -163,11 +163,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   private metersPerPixel(bbox: BBox, width: number): number {
-    if (bbox.crs.authId !== CRS_EPSG3857.authId) {
-      [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
-      [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
-      bbox.crs = CRS_EPSG3857;
-    }
+    bbox = ensureMercatorBBox(bbox);
 
     const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
     const latitude = (bbox.minY + bbox.maxY) / 2;
