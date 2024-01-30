@@ -26,9 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
-import { ensureMercatorBBox, getSHServiceRootUrl, metersPerPixel } from './utils';
-import { CRS_EPSG3857 } from '../crs';
-import proj4 from 'proj4';
+import { getSHServiceRootUrl, metersPerPixel } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
