@@ -256,6 +256,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   protected getCatalogCollectionId(): string {
+    if (this.lowResolutionCollectionId !== undefined) {
+      return this.getTypeIdLowRes();
+    }
     return this.getTypeId();
   }
 
