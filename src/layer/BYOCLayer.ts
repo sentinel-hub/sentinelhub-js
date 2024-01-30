@@ -26,7 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
-import { ensureMercatorBBox, getSHServiceRootUrl } from './utils';
+import { ensureMercatorBBox, getSHServiceRootUrl, metersPerPixel } from './utils';
 import { CRS_EPSG3857 } from '../crs';
 import proj4 from 'proj4';
 
@@ -152,7 +152,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     if (
       this.lowResolutionCollectionId !== undefined &&
       this.lowResolutionMetersPerPixelThreshold !== undefined &&
-      this.metersPerPixel(params.bbox, payload.output.width) > this.lowResolutionMetersPerPixelThreshold
+      metersPerPixel(params.bbox, payload.output.width) > this.lowResolutionMetersPerPixelThreshold
     ) {
       payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
     } else {
@@ -160,19 +160,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     }
 
     return payload;
-  }
-
-  private metersPerPixel(bbox: BBox, width: number): number {
-    bbox = ensureMercatorBBox(bbox);
-
-    const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
-    const latitude = (bbox.minY + bbox.maxY) / 2;
-
-    return (widthInMeters / width) * Math.cos(this.lat(latitude));
-  }
-
-  private lat(y: number): number {
-    return 2 * (Math.PI / 4 - Math.atan(Math.exp(-y / 6378137)));
   }
 
   protected convertResponseFromSearchIndex(response: {

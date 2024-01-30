@@ -6,7 +6,7 @@ import { fetchGetCapabilitiesXml, GetCapabilitiesXmlLayer } from './utils';
 
 const DEGREE_TO_RADIAN = Math.PI / 180;
 const RADIAN_TO_DEGREE = 180 / Math.PI;
-const EQUATOR_RADIUS = 6378137.0;
+export const EQUATOR_RADIUS = 6378137.0;
 
 export type GetCapabilitiesWmtsXml = {
   Capabilities: {

@@ -5,7 +5,7 @@ import { parseStringPromise } from 'xml2js';
 import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
-import { GetCapabilitiesWmtsXml } from './wmts.utils';
+import { EQUATOR_RADIUS, GetCapabilitiesWmtsXml } from './wmts.utils';
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
 import { CRS_EPSG3857 } from '../crs';
@@ -237,4 +237,17 @@ export function ensureMercatorBBox(bbox: BBox): BBox {
   }
 
   return bbox;
+}
+
+export function metersPerPixel(bbox: BBox, width: number): number {
+  bbox = ensureMercatorBBox(bbox);
+
+  const widthInMeters = Math.abs(bbox.maxX - bbox.minX);
+  const latitude = (bbox.minY + bbox.maxY) / 2;
+
+  return (widthInMeters / width) * Math.cos(lat(latitude));
+}
+
+function lat(y: number): number {
+  return 2 * (Math.PI / 4 - Math.atan(Math.exp(-y / EQUATOR_RADIUS)));
 }
