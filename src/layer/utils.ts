@@ -234,12 +234,9 @@ export function ensureMercatorBBox(bbox: BBox): BBox {
     return bbox;
   }
 
-  let newBBox: BBox;
-  [newBBox.minX, newBBox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
-  [newBBox.maxX, newBBox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
-  newBBox.crs = CRS_EPSG3857;
-
-  return newBBox;
+  const [minX, minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+  const [maxX, maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+  return new BBox(CRS_EPSG3857, minX, minY, maxX, maxY);
 }
 
 export function metersPerPixel(bbox: BBox, width: number): number {
