@@ -147,7 +147,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-    if (this.shouldUseLowResolutionCollection(params.bbox, payload.output.width)) {
+    if (this.shouldUseLowResolutionCollection(params?.bbox, payload.output.width)) {
       payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
     } else {
       payload.input.data[datasetSeqNo].type = this.getTypeId();
