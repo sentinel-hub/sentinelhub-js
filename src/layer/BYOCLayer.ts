@@ -147,17 +147,21 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
 
-    if (
-      this.lowResolutionCollectionId !== undefined &&
-      this.lowResolutionMetersPerPixelThreshold !== undefined &&
-      metersPerPixel(params.bbox, payload.output.width) > this.lowResolutionMetersPerPixelThreshold
-    ) {
+    if (this.shouldUseLowResolutionCollection(params.bbox, payload.output.width)) {
       payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
     } else {
       payload.input.data[datasetSeqNo].type = this.getTypeId();
     }
 
     return payload;
+  }
+
+  public shouldUseLowResolutionCollection(bbox: BBox, width: number): boolean {
+    return (
+      this.lowResolutionCollectionId !== undefined &&
+      this.lowResolutionMetersPerPixelThreshold !== undefined &&
+      metersPerPixel(bbox, width) > this.lowResolutionMetersPerPixelThreshold
+    );
   }
 
   protected convertResponseFromSearchIndex(response: {
