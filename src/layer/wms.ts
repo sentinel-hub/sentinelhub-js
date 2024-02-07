@@ -2,10 +2,10 @@ import { stringify } from 'query-string';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 
-import { CRS_EPSG3857, CRS_EPSG4326, CRS_IDS } from '../crs';
+import { CRS_EPSG4326, CRS_IDS } from '../crs';
 import { GetMapParams, MimeTypes, MimeType, MosaickingOrder } from './const';
 import { BBox } from '../bbox';
-import proj4 from 'proj4';
+import { ensureMercatorBBox } from './utils';
 
 export enum ServiceType {
   WMS = 'WMS',
@@ -91,13 +91,7 @@ export function wmsWmtMsGetMapUrl(
     additionalParameters,
   );
 
-  let bbox: BBox = params.bbox;
-
-  if (bbox.crs.authId !== CRS_EPSG3857.authId) {
-    [bbox.minX, bbox.minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
-    [bbox.maxX, bbox.maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
-    bbox.crs = CRS_EPSG3857;
-  }
+  const bbox: BBox = ensureMercatorBBox(params.bbox);
 
   queryParams.bbox = `${bbox.minX},${bbox.minY},${bbox.maxX},${bbox.maxY}`;
   queryParams.srs = bbox.crs.authId;

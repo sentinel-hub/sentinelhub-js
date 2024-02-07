@@ -1,4 +1,4 @@
-import { BBox, CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer } from '../../index';
+import { CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer, CRS_EPSG3857, BBox } from '../../index';
 import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes, SH_SERVICE_ROOT_URL } from '../const';
 import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
@@ -231,7 +231,7 @@ describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
   });
 });
 
-describe.only('shServiceRootUrl', () => {
+describe('shServiceRootUrl', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
     mockNetwork.reset();
@@ -286,4 +286,139 @@ describe.only('shServiceRootUrl', () => {
     const layer = new BYOCLayer(layerParams);
     expect(layer.getSHServiceRootUrl()).toBe(expected);
   });
+});
+
+describe('shouldUseLowResolutionCollection', () => {
+  beforeEach(async () => {
+    setAuthToken(AUTH_TOKEN);
+    mockNetwork.reset();
+  });
+
+  test.each([
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      lowResolutionCollectionId: 'LOW_RESOLUTION_COLLECTION_ID',
+      lowResolutionMetersPerPixelThreshold: 300,
+      bbox: new BBox(
+        CRS_EPSG4326,
+        -114.27429199218751,
+        45.85176048817254,
+        -112.17864990234376,
+        48.21003212234042,
+      ),
+      width: 512,
+      expected: true,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      lowResolutionCollectionId: 'LOW_RESOLUTION_COLLECTION_ID',
+      lowResolutionMetersPerPixelThreshold: 300,
+      bbox: new BBox(
+        CRS_EPSG3857,
+        -12601714.2312073,
+        5870363.772301538,
+        -12523442.714243278,
+        5948635.289265559,
+      ),
+      width: 512,
+      expected: false,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      lowResolutionCollectionId: 'LOW_RESOLUTION_COLLECTION_ID',
+      lowResolutionMetersPerPixelThreshold: 300,
+      bbox: new BBox(
+        CRS_EPSG3857,
+        -15028131.257091936,
+        2504688.542848655,
+        -12523442.714243278,
+        5009377.085697314,
+      ),
+      width: 512,
+      expected: true,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      lowResolutionCollectionId: 'LOW_RESOLUTION_COLLECTION_ID',
+      lowResolutionMetersPerPixelThreshold: 300,
+      bbox: new BBox(
+        CRS_EPSG3857,
+        112.81332057952881,
+        63.97041521013803,
+        119.85694837570192,
+        65.98227733565385,
+      ),
+      width: 512,
+      expected: false,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      bbox: new BBox(
+        CRS_EPSG3857,
+        -15028131.257091936,
+        2504688.542848655,
+        -12523442.714243278,
+        5009377.085697314,
+      ),
+      width: 512,
+      expected: false,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      bbox: new BBox(
+        CRS_EPSG3857,
+        112.81332057952881,
+        63.97041521013803,
+        119.85694837570192,
+        65.98227733565385,
+      ),
+      width: 512,
+      expected: false,
+    },
+  ])(
+    'shouldUseLowResolutionCollection %p',
+    async ({
+      layerParams,
+      lowResolutionCollectionId,
+      lowResolutionMetersPerPixelThreshold,
+      bbox,
+      width,
+      expected,
+    }) => {
+      const layer = new BYOCLayer(layerParams);
+      layer.lowResolutionCollectionId = lowResolutionCollectionId;
+      layer.lowResolutionMetersPerPixelThreshold = lowResolutionMetersPerPixelThreshold;
+      expect(layer.shouldUseLowResolutionCollection(bbox, width)).toBe(expected);
+    },
+  );
 });

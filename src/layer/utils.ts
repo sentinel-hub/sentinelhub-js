@@ -5,8 +5,11 @@ import { parseStringPromise } from 'xml2js';
 import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
-import { GetCapabilitiesWmtsXml } from './wmts.utils';
+import { EQUATOR_RADIUS, GetCapabilitiesWmtsXml } from './wmts.utils';
 import { getAuthToken } from '../auth';
+import { BBox } from '../bbox';
+import { CRS_EPSG3857 } from '../crs';
+import proj4 from 'proj4';
 
 interface Capabilities {
   Service: [];
@@ -224,4 +227,27 @@ export async function fetchLayerParamsFromConfigurationService(
       : null,
   }));
   return layersParams;
+}
+
+export function ensureMercatorBBox(bbox: BBox): BBox {
+  if (bbox.crs.authId === CRS_EPSG3857.authId) {
+    return bbox;
+  }
+
+  const [minX, minY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.minX, bbox.minY]);
+  const [maxX, maxY] = proj4(bbox.crs.authId, CRS_EPSG3857.authId, [bbox.maxX, bbox.maxY]);
+  return new BBox(CRS_EPSG3857, minX, minY, maxX, maxY);
+}
+
+export function metersPerPixel(bbox: BBox, width: number): number {
+  const newBBox = ensureMercatorBBox(bbox);
+
+  const widthInMeters = Math.abs(newBBox.maxX - newBBox.minX);
+  const latitude = (newBBox.minY + newBBox.maxY) / 2;
+
+  return (widthInMeters / width) * Math.cos(lat(latitude));
+}
+
+function lat(y: number): number {
+  return 2 * (Math.PI / 4 - Math.atan(Math.exp(-y / EQUATOR_RADIUS)));
 }

@@ -26,7 +26,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { StatisticsProviderType } from '../statistics/StatisticsProvider';
-import { getSHServiceRootUrl } from './utils';
+import { getSHServiceRootUrl, metersPerPixel } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -53,6 +53,8 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   public locationId: LocationIdSHv3;
   public subType: BYOCSubTypes;
   public shServiceRootUrl: string;
+  public lowResolutionCollectionId: string;
+  public lowResolutionMetersPerPixelThreshold: number;
 
   public constructor({
     instanceId = null,
@@ -141,10 +143,25 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     payload: ProcessingPayload,
     datasetSeqNo: number = 0,
     reqConfig?: RequestConfiguration,
+    params?: GetMapParams,
   ): Promise<ProcessingPayload> {
     await this.updateLayerFromServiceIfNeeded(reqConfig);
-    payload.input.data[datasetSeqNo].type = this.getTypeId();
+
+    if (this.shouldUseLowResolutionCollection(params?.bbox, payload.output.width)) {
+      payload.input.data[datasetSeqNo].type = this.getTypeIdLowRes();
+    } else {
+      payload.input.data[datasetSeqNo].type = this.getTypeId();
+    }
+
     return payload;
+  }
+
+  public shouldUseLowResolutionCollection(bbox: BBox, width: number): boolean {
+    return (
+      this.lowResolutionCollectionId !== undefined &&
+      this.lowResolutionMetersPerPixelThreshold !== undefined &&
+      metersPerPixel(bbox, width) > this.lowResolutionMetersPerPixelThreshold
+    );
   }
 
   protected convertResponseFromSearchIndex(response: {
@@ -208,6 +225,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return `${this.getTypePrefix()}-${this.collectionId}`;
   }
 
+  protected getTypeIdLowRes(): string {
+    return `${this.getTypePrefix()}-${this.lowResolutionCollectionId}`;
+  }
+
   protected getTypePrefix(): string {
     switch (this.subType) {
       case BYOCSubTypes.BATCH:
@@ -220,6 +241,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   protected getCatalogCollectionId(): string {
+    if (this.lowResolutionCollectionId !== undefined) {
+      return this.getTypeIdLowRes();
+    }
     return this.getTypeId();
   }
 
