@@ -231,7 +231,7 @@ describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
   });
 });
 
-describe.only('shServiceRootUrl', () => {
+describe('shServiceRootUrl', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
     mockNetwork.reset();
@@ -288,7 +288,7 @@ describe.only('shServiceRootUrl', () => {
   });
 });
 
-describe.only('shServiceRootUrl', () => {
+describe('shouldUseLowResolutionCollection', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
     mockNetwork.reset();
