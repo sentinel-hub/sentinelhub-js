@@ -371,6 +371,40 @@ describe('shouldUseLowResolutionCollection', () => {
       width: 512,
       expected: false,
     },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      bbox: new BBox(
+        CRS_EPSG3857,
+        -15028131.257091936,
+        2504688.542848655,
+        -12523442.714243278,
+        5009377.085697314,
+      ),
+      width: 512,
+      expected: false,
+    },
+    {
+      layerParams: {
+        instanceId: 'INSTANCE_ID',
+        layerId: 'LAYER_ID',
+        collectionId: 'mockCollectionId',
+        subType: BYOCSubTypes.BYOC,
+      },
+      bbox: new BBox(
+        CRS_EPSG3857,
+        112.81332057952881,
+        63.97041521013803,
+        119.85694837570192,
+        65.98227733565385,
+      ),
+      width: 512,
+      expected: false,
+    },
   ])(
     'shouldUseLowResolutionCollection %p',
     async ({
