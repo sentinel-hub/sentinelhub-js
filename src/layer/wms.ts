@@ -158,7 +158,7 @@ function getQueryParams(
   }
 
   if (!params.fromTime) {
-    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z';
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
   } else {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
       .utc(params.toTime)
