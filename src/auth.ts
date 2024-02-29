@@ -17,7 +17,7 @@ export function isAuthTokenSet(): boolean {
 export async function requestAuthToken(clientId: string, clientSecret: string): Promise<any> {
   const response = await axios({
     method: 'post',
-    url: 'https://services.sentinel-hub.com/oauth/token',
+    url: 'https://services.sentinel-hub.com/auth/realms/main/protocol/openid-connect/token',
     headers: { 'content-type': 'application/x-www-form-urlencoded' },
     data: `grant_type=client_credentials&client_id=${encodeURIComponent(
       clientId,
