@@ -1,13 +1,39 @@
-name: Lint
-on: [push, pull_request]
+name: Build dist
+
+on: [push]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - run: npm install
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "dist"
+
+    - name: File exists
+      if: steps.check_files.outputs.files_exists == 'true'
+      run: git rm -r dist
+
+    - run: npm run build
+    - run: git config --local user.name "$GITHUB_ACTOR"
+    - run: git config --local user.email "${{ github.event.pusher.email }}"
+    - run: git add dist
+    - run: git commit -a -m "Build and commit dist"
+    - run: git push origin $GITHUB_REF
+
   test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [8.x, 10.x, 12.x]
+        node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v1
