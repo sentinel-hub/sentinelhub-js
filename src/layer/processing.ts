@@ -109,8 +109,8 @@ export function createProcessingPayload(
         {
           dataFilter: {
             timeRange: {
-              from: params.fromTime.toISOString(),
-              to: params.toTime.toISOString(),
+              from: params.fromTime?.toISOString(),
+              to: params.toTime?.toISOString(),
             },
             mosaickingOrder: mosaickingOrder ? mosaickingOrder : MosaickingOrder.MOST_RECENT,
           },
