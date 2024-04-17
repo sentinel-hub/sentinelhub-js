@@ -157,12 +157,16 @@ function getQueryParams(
     queryParams.format = params.format as MimeType;
   }
 
-  if (!params.fromTime) {
-    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
-  } else {
+  // time is an optional param, and sentinelhub will atleast return the latest image if time=none https://docs.sentinel-hub.com/api/latest/api/ogc/wms/
+  // set time range with fromTime and toTime
+  if (params.fromTime !== null && params.toTime !== null) {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
       .utc(params.toTime)
       .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+  }
+  // Only toTime available. Requesting a single value for TIME parameter is deprecated
+  if (params.fromTime === null && params.toTime !== null) {
+    queryParams.time =  moment.utc(params.toTime).format('YYYY-MM-DD');
   }
 
   if (params.width && params.height) {
