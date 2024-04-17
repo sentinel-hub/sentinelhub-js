@@ -166,7 +166,7 @@ function getQueryParams(
   }
   // Only toTime available. Requesting a single value for TIME parameter is deprecated
   if (params.fromTime === null && params.toTime !== null) {
-    queryParams.time =  moment.utc(params.toTime).format('YYYY-MM-DD');
+    queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
   }
 
   if (params.width && params.height) {
