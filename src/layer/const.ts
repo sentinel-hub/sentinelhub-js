@@ -10,9 +10,9 @@ import { StatisticalApiResponse } from '../statistics/const';
  */
 export type GetMapParams = {
   bbox: BBox;
-  /** Start of the time interval for which the images are fetched. We can not guarantee that BYOYCLayer has a sensingTime defined */
+  /** Start of the time interval for which the images are fetched. We can not guarantee that BYOCLayer has a sensingTime defined */
   fromTime: Date | null;
-  /** End of the time interval for which the images are fetched. We can not guarantee that BYOYCLayer has a sensingTime defined */
+  /** End of the time interval for which the images are fetched. We can not guarantee that BYOCLayer has a sensingTime defined */
   toTime: Date | null;
   format: MimeType | FormatJpegOrPng;
   resx?: string; // either resx + resy or width + height must be specified
