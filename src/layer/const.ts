@@ -10,10 +10,10 @@ import { StatisticalApiResponse } from '../statistics/const';
  */
 export type GetMapParams = {
   bbox: BBox;
-  /** Start of the time interval for which the images are fetched. If null, only `toTime` parameter will be used. */
+  /** Start of the time interval for which the images are fetched. We can not guarantee that BYOCLayer has a sensingTime defined */
   fromTime: Date | null;
-  /** End of the time interval for which the images are fetched. If `fromTime` is null, only this parameter will be used to set time. */
-  toTime: Date;
+  /** End of the time interval for which the images are fetched. We can not guarantee that BYOCLayer has a sensingTime defined */
+  toTime: Date | null;
   format: MimeType | FormatJpegOrPng;
   resx?: string; // either resx + resy or width + height must be specified
   resy?: string;
