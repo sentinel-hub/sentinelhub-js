@@ -157,14 +157,14 @@ function getQueryParams(
     queryParams.format = params.format as MimeType;
   }
 
-  // time is an optional param, and sentinelhub will atleast return the latest image if time=none https://docs.sentinel-hub.com/api/latest/api/ogc/wms/
+  // Time is an optional param on Sentinel hub. If it's not provided Sentinel hub will return latest available image. https://docs.sentinel-hub.com/api/latest/api/ogc/wms/
   // set time range with fromTime and toTime
   if (params.fromTime !== null && params.toTime !== null) {
     queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
       .utc(params.toTime)
       .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
   }
-  // Only toTime available. Requesting a single value for TIME parameter is deprecated
+  // Other WMS providers may support a single value for TIME parameter, but Sentinel hub WMS service doesn't, so this should be handled in the application.
   if (params.fromTime === null && params.toTime !== null) {
     queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
   }
