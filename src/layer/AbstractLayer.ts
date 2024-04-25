@@ -310,7 +310,9 @@ export class AbstractLayer {
               fromTime: tiles[tileIndex].sensingTime,
               toTime: tiles[tileIndex].sensingTime,
               coveragePercent: 0,
-              meta: {},
+              meta: {
+                lowestCloudCoverPercent: tiles[tileIndex].meta.cloudCoverPercent,
+              },
             };
             currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
             sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
@@ -344,7 +346,9 @@ export class AbstractLayer {
               fromTime: tiles[tileIndex].sensingTime,
               toTime: tiles[tileIndex].sensingTime,
               coveragePercent: 0,
-              meta: {},
+              meta: {
+                lowestCloudCoverPercent: tiles[tileIndex].meta.cloudCoverPercent,
+              },
             };
             currentFlyoverGeometry = tiles[tileIndex].geometry.coordinates as Geom;
             sumCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
@@ -356,6 +360,12 @@ export class AbstractLayer {
               this.roundCoordinates(currentFlyoverGeometry),
               this.roundCoordinates(tiles[tileIndex].geometry.coordinates as Geom),
             );
+
+            // update the lowest cloud cover:
+            if (tiles[tileIndex].meta.cloudCoverPercent < tiles[tileIndex - 1].meta.cloudCoverPercent) {
+              flyovers[flyoverIndex].meta.lowestCloudCoverPercent = tiles[tileIndex].meta.cloudCoverPercent;
+            }
+
             sumCloudCoverPercent =
               sumCloudCoverPercent !== undefined
                 ? sumCloudCoverPercent + tiles[tileIndex].meta.cloudCoverPercent
