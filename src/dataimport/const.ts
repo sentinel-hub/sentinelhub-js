@@ -73,6 +73,16 @@ export const PlanetSupportedProductBundles = {
   ],
 };
 
+export enum PlanetARPSType {
+  AnalysisReadyPlanetScope = 'analysis_ready_ps',
+}
+
+export enum PlanetARPSId {
+  PS_ARD_SR_DAILY = 'PS_ARD_SR_DAILY',
+  PS_ARD_SR_BIWEEKLY = 'PS_ARD_SR_BIWEEKLY',
+  PS_ARD_SR_MONTHLY = 'PS_ARD_SR_MONTHLY',
+}
+
 export enum PlanetPVType {
   BiomassProxy = 'biomass_proxy',
   LandSurfaceTemperature = 'land_surface_temperature',
