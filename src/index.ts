@@ -134,6 +134,8 @@ import {
   TPDITransactionCompatibleCollection,
   HLSConstellation,
   TPDITransactionParams,
+  PlanetARPSType,
+  PlanetARPSId,
 } from './dataimport/const';
 
 import { ProcessingPayload } from './layer/processing';
@@ -285,6 +287,8 @@ export {
   addAxiosRequestInterceptor,
   addAxiosResponseInterceptor,
   setTPDIServiceBaseURL,
+  PlanetARPSType,
+  PlanetARPSId,
 };
 
 export * from './statistics/';
