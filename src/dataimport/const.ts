@@ -9,6 +9,7 @@ export enum TPDICollections {
   MAXAR_WORLDVIEW = 'MAXAR_WORLDVIEW',
   PLANET_SKYSAT = 'PLANET_SKYSAT',
   PLANETARY_VARIABLES = 'PLANETARY_VARIABLES',
+  PLANET_ARPS = 'PLANET_ARPS',
 }
 
 export enum TPDProvider {
@@ -71,6 +72,16 @@ export const PlanetSupportedProductBundles = {
     PlanetProductBundle.PANCHROMATIC,
   ],
 };
+
+export enum PlanetARPSType {
+  AnalysisReadyPlanetScope = 'analysis_ready_ps',
+}
+
+export enum PlanetARPSId {
+  PS_ARD_SR_DAILY = 'PS_ARD_SR_DAILY',
+  PS_ARD_SR_BIWEEKLY = 'PS_ARD_SR_BIWEEKLY',
+  PS_ARD_SR_MONTHLY = 'PS_ARD_SR_MONTHLY',
+}
 
 export enum PlanetPVType {
   BiomassProxy = 'biomass_proxy',
