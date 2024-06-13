@@ -11,6 +11,7 @@ export default {
       file: pkg.module,
       format: 'es',
     },
+    { file: pkg.browser, format: 'umd', name: 'bundle' },
   ],
   external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
   plugins: [
