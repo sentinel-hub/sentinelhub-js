@@ -1,6 +1,6 @@
-require('dotenv').config({ path: '../../.env' });
+(await import('dotenv')).config({ path: '../../.env' });
 
-const {
+import {
   LayersFactory,
   WmsLayer,
   S1GRDAWSEULayer,
@@ -15,7 +15,7 @@ const {
   setDebugEnabled,
   CancelToken,
   isCancelled,
-} = require('../../dist/sentinelHub.cjs');
+} from '../../dist/sentinelHub.esm.js';
 
 function printOut(title, value) {
   console.log(`\n${'='.repeat(10)}\n${title}`, JSON.stringify(value, null, 4));
@@ -75,9 +75,9 @@ async function run() {
   // get the list of all of the layers:
   const layers = await LayersFactory.makeLayers(baseUrl);
   printOut(`Layers:`, layers);
-  const layersIds = layers.map(l => l.layerId);
-  const layersTitles = layers.map(l => l.title);
-  const layersDescriptions = layers.map(l => l.description);
+  const layersIds = layers.map((l) => l.layerId);
+  const layersTitles = layers.map((l) => l.title);
+  const layersDescriptions = layers.map((l) => l.description);
   printOut(`Layers ids:`, layersIds);
   printOut(`Layers titles:`, layersTitles);
   printOut(`Layers descriptions:`, layersDescriptions);
@@ -212,7 +212,7 @@ run()
   .then(() => {
     console.log('Done.');
   })
-  .catch(ex => {
+  .catch((ex) => {
     console.error(ex);
     process.exit(1);
   });
