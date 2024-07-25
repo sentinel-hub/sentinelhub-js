@@ -162,6 +162,21 @@ export const DATASET_CDAS_S3OLCI: Dataset = {
   catalogCollectionId: 'sentinel-3-olci',
 };
 
+export const DATASET_CDAS_S3OLCIL2: Dataset = {
+  id: 'CDAS_S3OLCIL2',
+  shJsonGetCapabilitiesDataset: 'S3OLCIL2',
+  shWmsEvalsource: 'sentinel-3-olci-l2',
+  shProcessingApiDatasourceAbbreviation: 'sentinel-3-olci-l2',
+  datasetParametersType: 'S3',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3OLCIL2/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3OLCIL2/findAvailableData',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-olci-l2',
+};
+
 export const DATASET_S5PL2: Dataset = {
   id: 'CRE_S5PL2',
   shJsonGetCapabilitiesDataset: 'S5PL2',
