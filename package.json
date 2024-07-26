@@ -1,6 +1,6 @@
 {
   "name": "@sentinel-hub/sentinelhub-js",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "main": "dist/sentinelHub.cjs.js",
   "module": "dist/sentinelHub.esm.js",
   "browser": "dist/sentinelHub.umd.js",
