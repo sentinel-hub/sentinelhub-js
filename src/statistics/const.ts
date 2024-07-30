@@ -89,3 +89,8 @@ export type StatisticalApiResponse = {
 
   error?: StatisticalApiResponseError;
 }[];
+
+export enum StatisticsProviderType {
+  FIS = 'FIS',
+  STAPI = 'STAPI',
+}

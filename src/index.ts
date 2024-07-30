@@ -141,6 +141,8 @@ import {
 } from './dataimport/const';
 
 import { ProcessingPayload } from './layer/processing';
+import { StatisticalApi } from './statistics/StatisticalApi';
+import { Fis } from './statistics/Fis';
 
 registerInitialAxiosInterceptors();
 
@@ -293,6 +295,7 @@ export {
   setTPDIServiceBaseURL,
   PlanetARPSType,
   PlanetARPSId,
+  StatisticalApi,
+  Fis,
 };
-
 export * from './statistics/';

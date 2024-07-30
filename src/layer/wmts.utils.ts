@@ -1,12 +1,8 @@
 import { RequestConfiguration } from '..';
 import { BBox } from '../bbox';
 import { CRS_EPSG3857, CRS_EPSG4326 } from '../crs';
-import { OgcServiceTypes } from './const';
+import { DEGREE_TO_RADIAN, EQUATOR_RADIUS, OgcServiceTypes, RADIAN_TO_DEGREE } from './const';
 import { fetchGetCapabilitiesXml, GetCapabilitiesXmlLayer } from './utils';
-
-const DEGREE_TO_RADIAN = Math.PI / 180;
-const RADIAN_TO_DEGREE = 180 / Math.PI;
-export const EQUATOR_RADIUS = 6378137.0;
 
 export type GetCapabilitiesWmtsXml = {
   Capabilities: {

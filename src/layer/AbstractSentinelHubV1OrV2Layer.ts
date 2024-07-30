@@ -3,25 +3,26 @@ import moment from 'moment';
 import { stringify } from 'query-string';
 
 import { BBox } from '../bbox';
-import {
-  GetMapParams,
-  ApiType,
-  PaginatedTiles,
-  GetStatsParams,
-  Stats,
-  MosaickingOrder,
-  Interpolator,
-  Link,
-  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
-  OgcServiceTypes,
-} from './const';
-import { wmsGetMapUrl } from './wms';
-import { AbstractLayer } from './AbstractLayer';
-import { fetchLayersFromGetCapabilitiesXml } from './utils';
+import { Fis } from '../statistics/Fis';
+import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
+import { AbstractLayer } from './AbstractLayer';
+import {
+  ApiType,
+  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  GetMapParams,
+  GetStatsParams,
+  Interpolator,
+  Link,
+  MosaickingOrder,
+  OgcServiceTypes,
+  PaginatedTiles,
+  Stats,
+} from './const';
+import { fetchLayersFromGetCapabilitiesXml } from './utils';
+import { wmsGetMapUrl } from './wms';
+import { StatisticsProviderType } from '../statistics';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -244,9 +245,11 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
     const stats = await ensureTimeout(async (innerReqConfig) => {
-      const sp = getStatisticsProvider(statsProvider);
-      const data: Stats = await sp.getStats(this, params, innerReqConfig);
-      return data;
+      if (statsProvider === StatisticsProviderType.FIS) {
+        return await new Fis().handleV1orV2(this, params, innerReqConfig);
+      } else {
+        throw new Error(`Unssuported statistics provider ${statsProvider}`);
+      }
     }, reqConfig);
     return stats;
   }
