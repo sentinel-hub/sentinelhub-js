@@ -63,6 +63,7 @@ export enum PreviewMode {
   DETAIL = 0,
   PREVIEW = 1,
   EXTENDED_PREVIEW = 2,
+  EXTENDED_PREVIEW_UNOFFICIAL = 3,
 }
 
 export enum MosaickingOrder {
