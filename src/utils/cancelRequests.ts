@@ -1,4 +1,9 @@
-import axios, { CancelTokenSource, AxiosRequestConfig, CancelToken as CancelTokenAxios } from 'axios';
+import axios, {
+  CancelTokenSource,
+  AxiosRequestConfig,
+  CancelToken as CancelTokenAxios,
+  ResponseType,
+} from 'axios';
 import { CacheConfig, removeCacheableRequestsInProgress } from './cacheHandlers';
 import { getDefaultRequestsConfig } from './defaultReqsConfig';
 
@@ -8,7 +13,7 @@ export type RequestConfiguration = {
   timeout?: number | null;
   cancelToken?: CancelToken;
   cache?: CacheConfig;
-  responseType?: string;
+  responseType?: ResponseType;
   rewriteUrlFunc?: (url: string) => string;
 };
 

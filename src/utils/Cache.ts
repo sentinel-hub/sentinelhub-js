@@ -1,4 +1,4 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 
 export type CacheTargets = CacheTarget[];
 export enum CacheTarget {
