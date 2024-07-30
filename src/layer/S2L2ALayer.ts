@@ -47,10 +47,7 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
     return {
       ...super.extractFindTilesMeta(tile),
       tileId: tile.id,
-      MGRSLocation: tile.dataUri
-        .split('/')
-        .slice(4, 7)
-        .join(''),
+      MGRSLocation: tile.dataUri.split('/').slice(4, 7).join(''),
     };
   }
 
@@ -58,10 +55,7 @@ export class S2L2ALayer extends AbstractSentinelHubV3WithCCLayer {
     let result: Record<string, any> = super.extractFindTilesMetaFromCatalog(feature);
 
     if (feature.assets && feature.assets.data && feature.assets.data.href) {
-      result.MGRSLocation = feature.assets.data.href
-        .split('/')
-        .slice(4, 7)
-        .join('');
+      result.MGRSLocation = feature.assets.data.href.split('/').slice(4, 7).join('');
     }
     return result;
   }

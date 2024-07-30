@@ -26,7 +26,7 @@ const createRequestPromise = (useCache = true, setRequestError: (err: any) => vo
   }
 
   const thenFn = jest.fn();
-  const catchFn = jest.fn(err => {
+  const catchFn = jest.fn((err) => {
     setRequestError(err);
   });
 
@@ -58,7 +58,7 @@ describe('Handling cancelled requests', () => {
     let requestError = null;
     const { requestPromise, thenFn, catchFn, mockedResponse } = createRequestPromise(
       true,
-      err => (requestError = err),
+      (err) => (requestError = err),
     );
 
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -71,11 +71,11 @@ describe('Handling cancelled requests', () => {
     expect(cacheableRequestsInProgress.size).toBe(0);
   });
 
-  it.each([[true], [false]])('cancels a request', async useCache => {
+  it.each([[true], [false]])('cancels a request', async (useCache) => {
     let requestError = null;
     const { requestPromise, thenFn, catchFn, cancelToken } = createRequestPromise(
       useCache,
-      err => (requestError = err),
+      (err) => (requestError = err),
     );
 
     mockNetwork.onPost().replyOnce(200);
@@ -92,7 +92,7 @@ describe('Handling cancelled requests', () => {
     let requestError = null;
     const { requestPromise, thenFn, catchFn, cancelToken, mockedResponse } = createRequestPromise(
       true,
-      err => (requestError = err),
+      (err) => (requestError = err),
     );
 
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -108,10 +108,11 @@ describe('Handling cancelled requests', () => {
     //repeat request without cancelling
     requestError = null;
 
-    const { requestPromise: requestPromise2, thenFn: thenFn2, catchFn: catchFn2 } = createRequestPromise(
-      true,
-      err => (requestError = err),
-    );
+    const {
+      requestPromise: requestPromise2,
+      thenFn: thenFn2,
+      catchFn: catchFn2,
+    } = createRequestPromise(true, (err) => (requestError = err));
 
     await Promise.all([requestPromise2]);
     expect(thenFn2).toHaveBeenCalled();

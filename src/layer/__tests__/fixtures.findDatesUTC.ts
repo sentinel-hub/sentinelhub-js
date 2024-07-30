@@ -138,7 +138,7 @@ export function constructFixtureFindDatesUTCSearchIndex(
     '2020-04-06',
     '2020-04-03',
     '2020-04-01',
-  ].map(d => new Date(d));
+  ].map((d) => new Date(d));
   return {
     fromTime: fromTime,
     toTime: toTime,
@@ -258,7 +258,7 @@ export function constructFixtureFindDatesUTCCatalog(
     '2020-04-06',
     '2020-04-03',
     '2020-04-01',
-  ].map(d => new Date(d));
+  ].map((d) => new Date(d));
 
   return {
     fromTime: fromTime,

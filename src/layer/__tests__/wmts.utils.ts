@@ -1,7 +1,7 @@
 import { BBox, CRS_EPSG3857, CRS_EPSG4326 } from '../..';
 import { bboxToXyzGrid } from '../wmts.utils';
 
-const tileMatrices256 = [...Array(20).keys()].map(zoom => ({
+const tileMatrices256 = [...Array(20).keys()].map((zoom) => ({
   zoom: zoom,
   tileWidth: 256,
   tileHeight: 256,
@@ -9,7 +9,7 @@ const tileMatrices256 = [...Array(20).keys()].map(zoom => ({
   matrixHeight: Math.pow(2, zoom),
 }));
 
-const tileMatrices512 = [...Array(19).keys()].map(zoom => ({
+const tileMatrices512 = [...Array(19).keys()].map((zoom) => ({
   zoom: zoom + 1,
   tileWidth: 512,
   tileHeight: 512,

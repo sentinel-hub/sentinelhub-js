@@ -99,9 +99,9 @@ export function wmsWmtMsGetMapUrl(
   if (!params.fromTime) {
     queryParams.time = moment.utc(params.toTime).format('YYYY-MM-DD');
   } else {
-    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-      .utc(params.toTime)
-      .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${
+      moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'
+    }`;
   }
 
   if (params.width && params.height) {
@@ -160,9 +160,9 @@ function getQueryParams(
   // Time is an optional param on Sentinel hub. If it's not provided Sentinel hub will return latest available image. https://docs.sentinel-hub.com/api/latest/api/ogc/wms/
   // set time range with fromTime and toTime
   if (params.fromTime !== null && params.toTime !== null) {
-    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-      .utc(params.toTime)
-      .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`;
+    queryParams.time = `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${
+      moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'
+    }`;
   }
   // Other WMS providers may support a single value for TIME parameter, but Sentinel hub WMS service doesn't, so this should be handled in the application.
   if (params.fromTime === null && params.toTime !== null) {
@@ -233,7 +233,7 @@ function createUrl(baseUrl: string, queryParams: OgcGetMapOptions, params: GetMa
   // a warning if some unknown param should be ignored, but wasn't.
   const queryParamsKeys = Object.keys(queryParams);
   const unknownParamsKeys = Object.keys(params.unknown || {});
-  const validUnknownParamsKeys = unknownParamsKeys.filter(k => !queryParamsKeys.includes(k));
+  const validUnknownParamsKeys = unknownParamsKeys.filter((k) => !queryParamsKeys.includes(k));
   if (unknownParamsKeys.length !== validUnknownParamsKeys.length) {
     console.warn(
       "Some of the keys are missing from the list 'IGNORE_KNOWN_PARAMS', removing them. This is a problem with a library and should be fixed, please file a bug report.",

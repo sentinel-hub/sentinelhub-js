@@ -23,15 +23,8 @@ describe('Testing caching', () => {
   });
 
   it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
-    const {
-      fromTime,
-      toTime,
-      bbox,
-      layer,
-      mockedResponse,
-      expectedResultTiles,
-      expectedResultHasMore,
-    } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
+      constructFixtureFindTiles({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -50,15 +43,8 @@ describe('Testing caching', () => {
   });
 
   it('should make a 2nd request after the cache has expired', async () => {
-    const {
-      fromTime,
-      toTime,
-      bbox,
-      layer,
-      mockedResponse,
-      expectedResultTiles,
-      expectedResultHasMore,
-    } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
+      constructFixtureFindTiles({});
     const requestsConfig = {
       cache: {
         expiresIn: 1,
@@ -77,7 +63,7 @@ describe('Testing caching', () => {
     expect(fromCacheResponse.hasMore).toBe(expectedResultHasMore);
     expect(fromCacheResponse).toStrictEqual(responseFromMockNetwork);
 
-    await new Promise(r => setTimeout(r, 1100));
+    await new Promise((r) => setTimeout(r, 1100));
 
     const responseFromMockNetwork2 = await layer.findTiles(
       bbox,
@@ -145,7 +131,7 @@ describe('Testing caching', () => {
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
     expect(mockNetwork.history.post.length).toBe(1); // no network request - cache was used
 
-    await new Promise(r => setTimeout(r, 1100));
+    await new Promise((r) => setTimeout(r, 1100));
 
     await layer.getMap(getMapParams, ApiType.PROCESSING, requestsConfig);
     expect(mockNetwork.history.post.length).toBe(2);
@@ -542,7 +528,7 @@ describe('Unit test for aux request caching', () => {
   ];
   it.each([...listOfRequstConfigs])(
     'It should be cache aux request to memory by default',
-    async requestConfig => {
+    async (requestConfig) => {
       setAuthToken(EXAMPLE_TOKEN);
       const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded(
         {},

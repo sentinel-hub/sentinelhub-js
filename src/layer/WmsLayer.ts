@@ -55,21 +55,21 @@ export class WmsLayer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const dates = await ensureTimeout(async innerReqConfig => {
+    const dates = await ensureTimeout(async (innerReqConfig) => {
       // http://cite.opengeospatial.org/OGCTestData/wms/1.1.1/spec/wms1.1.1.html#dims
       const parsedLayers = await fetchLayersFromGetCapabilitiesXml(
         this.baseUrl,
         OgcServiceTypes.WMS,
         innerReqConfig,
       );
-      const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
+      const layer = parsedLayers.find((layerInfo) => this.layerId === layerInfo.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }
       if (!layer.Dimension) {
         throw new Error('Layer does not supply time information (no Dimension field)');
       }
-      const timeDimension = layer.Dimension.find(d => d['$'].name === 'time');
+      const timeDimension = layer.Dimension.find((d) => d['$'].name === 'time');
       if (!timeDimension) {
         throw new Error("Layer does not supply time information (no Dimension field with name === 'time')");
       }
@@ -104,17 +104,17 @@ export class WmsLayer extends AbstractLayer {
         }
       }
 
-      const found: Moment[] = allTimesMomentUTC.filter(t =>
+      const found: Moment[] = allTimesMomentUTC.filter((t) =>
         t.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'),
       );
       found.sort((a, b) => b.unix() - a.unix());
-      return found.map(m => m.toDate());
+      return found.map((m) => m.toDate());
     }, reqConfig);
     return dates;
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       if (this.legendUrl) {
         return;
       }
@@ -128,7 +128,7 @@ export class WmsLayer extends AbstractLayer {
         OgcServiceTypes.WMS,
         innerReqConfig,
       );
-      const layer = parsedLayers.find(layer => this.layerId === layer.Name[0]);
+      const layer = parsedLayers.find((layer) => this.layerId === layer.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }
@@ -136,8 +136,8 @@ export class WmsLayer extends AbstractLayer {
         layer.Style && layer.Style[0].LegendURL
           ? layer.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
           : layer.Layer && layer.Layer[0].Style && layer.Layer[0].Style[0].LegendURL
-          ? layer.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : null;
+            ? layer.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : null;
       this.legendUrl = legendUrl;
     }, reqConfig);
   }

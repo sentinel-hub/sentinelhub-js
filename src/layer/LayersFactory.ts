@@ -169,7 +169,7 @@ export class LayersFactory {
     reqConfig?: RequestConfiguration,
     preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer> {
-    const layer = await ensureTimeout(async innerReqConfig => {
+    const layer = await ensureTimeout(async (innerReqConfig) => {
       const layers = await LayersFactory.makeLayers(
         baseUrl,
         (lId: string) => lId === layerId,
@@ -192,7 +192,7 @@ export class LayersFactory {
     reqConfig?: RequestConfiguration,
     preferGetCapabilities: boolean = true,
   ): Promise<AbstractLayer[]> {
-    const returnValue = await ensureTimeout(async innerReqConfig => {
+    const returnValue = await ensureTimeout(async (innerReqConfig) => {
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
         if (baseUrl.startsWith(hostname)) {
           return await this.makeLayersSHv3(
@@ -297,7 +297,7 @@ export class LayersFactory {
 
     if (!layersInfoFetched) {
       const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
-      layersInfos = getCapabilitiesJson.map(layerInfo => ({
+      layersInfos = getCapabilitiesJson.map((layerInfo) => ({
         layerId: layerInfo.id,
         title: layerInfo.name,
         description: layerInfo.description,
@@ -307,7 +307,7 @@ export class LayersFactory {
     }
 
     const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+      filterLayers === null ? layersInfos : layersInfos.filter((l) => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos;
   }
@@ -320,7 +320,7 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedLayers = await fetchLayersFromGetCapabilitiesXml(baseUrl, OgcServiceTypes.WMS, reqConfig);
-    const layersInfos = parsedLayers.map(layerInfo => ({
+    const layersInfos = parsedLayers.map((layerInfo) => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
@@ -329,12 +329,12 @@ export class LayersFactory {
         layerInfo.Style && layerInfo.Style[0].LegendURL
           ? layerInfo.Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
           : layerInfo.Layer && layerInfo.Layer[0].Style && layerInfo.Layer[0].Style[0].LegendURL
-          ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
-          : null,
+            ? layerInfo.Layer[0].Style[0].LegendURL[0].OnlineResource[0]['$']['xlink:href']
+            : null,
     }));
 
     const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+      filterLayers === null ? layersInfos : layersInfos.filter((l) => filterLayers(l.layerId, l.dataset));
 
     const parsedXml = (await fetchGetCapabilitiesXml(
       baseUrl,
@@ -359,7 +359,7 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
   ): Promise<AbstractLayer[]> {
     const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(baseUrl, reqConfig);
-    const layersInfos = parsedLayers.map(layerInfo => ({
+    const layersInfos = parsedLayers.map((layerInfo) => ({
       layerId: layerInfo.Name[0],
       title: layerInfo.Title[0],
       description: layerInfo.Abstract ? layerInfo.Abstract[0] : null,
@@ -369,7 +369,7 @@ export class LayersFactory {
     }));
 
     const filteredLayersInfos =
-      filterLayers === null ? layersInfos : layersInfos.filter(l => filterLayers(l.layerId, l.dataset));
+      filterLayers === null ? layersInfos : layersInfos.filter((l) => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl, resourceUrl }) =>
@@ -403,7 +403,7 @@ export class LayersFactory {
       newLayers.push(layer);
       if (layer.layerId.includes('analytic')) {
         const parsedResourceUrl = parseUrl(layer.resourceUrl);
-        const falseColorLayers = PLANET_FALSE_COLOR_TEMPLATES.map(template => ({
+        const falseColorLayers = PLANET_FALSE_COLOR_TEMPLATES.map((template) => ({
           layerId: `${layer.layerId}_${template.titleSuffix}`,
           title: `${layer.title} ${template.titleSuffix}`,
           description: template.description,
@@ -418,7 +418,7 @@ export class LayersFactory {
       }
     }
     const filteredLayersInfos =
-      filterLayers === null ? newLayers : newLayers.filter(l => filterLayers(l.layerId, l.dataset));
+      filterLayers === null ? newLayers : newLayers.filter((l) => filterLayers(l.layerId, l.dataset));
 
     return filteredLayersInfos.map(
       ({ layerId, title, description, legendUrl, resourceUrl }) =>

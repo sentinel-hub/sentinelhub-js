@@ -24,5 +24,5 @@ export function isEffectSet(effect: number | ColorRange | Function): boolean {
 }
 
 export function isAnyEffectSet(effects: Effects): boolean {
-  return Object.values(effects).some(e => isEffectSet(e));
+  return Object.values(effects).some((e) => isEffectSet(e));
 }

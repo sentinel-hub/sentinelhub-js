@@ -69,7 +69,7 @@ describe('Test search', () => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.AIRBUS, defaultSearchParams);
     const params: { [attr: string]: any } = { ...defaultSearchParams };
-    const key: any = Object.keys(defaultSearchParams).find(k => k === property);
+    const key: any = Object.keys(defaultSearchParams).find((k) => k === property);
     delete params[key];
     await expect(TPDI.search(TPDProvider.AIRBUS, params as TPDISearchParams)).rejects.toThrow(
       new Error(errorMessage),
@@ -113,7 +113,7 @@ describe('Test search', () => {
     [{ ...defaultSearchParams, maxCloudCoverage: 0 }],
     [{ ...defaultSearchParams, maxSnowCoverage: 0 }],
     [{ ...defaultSearchParams, maxIncidenceAngle: 0 }],
-  ])('checks if parameters are set correctly', async params => {
+  ])('checks if parameters are set correctly', async (params) => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.AIRBUS, params);
     expect(mockNetwork.history.post.length).toBe(1);

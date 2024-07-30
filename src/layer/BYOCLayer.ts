@@ -77,7 +77,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       if (this.collectionId !== null && this.locationId !== null) {
         return;
       }
@@ -132,7 +132,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       params = await this.decideJpegOrPng(params, innerReqConfig);
       await this.updateLayerFromServiceIfNeeded(innerReqConfig);
       return await super.getMap(params, api, innerReqConfig);
@@ -168,7 +168,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     data: { tiles: any[]; hasMore: boolean };
   }): PaginatedTiles {
     return {
-      tiles: response.data.tiles.map(tile => {
+      tiles: response.data.tiles.map((tile) => {
         return {
           geometry: tile.dataGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),
@@ -288,7 +288,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getAvailableBands(reqConfig?: RequestConfiguration): Promise<BYOCBand[]> {
-    const bandsResponseData = await ensureTimeout(async innerReqConfig => {
+    const bandsResponseData = await ensureTimeout(async (innerReqConfig) => {
       if (this.collectionId === null) {
         throw new Error('Parameter collectionId is not set');
       }

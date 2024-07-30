@@ -163,7 +163,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       params = await this.decideJpegOrPng(params, innerReqConfig);
       // SHv3 services support Processing API:
       if (api === ApiType.PROCESSING) {
@@ -304,7 +304,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     data: { tiles: any[]; hasMore: boolean };
   }): PaginatedTiles {
     return {
-      tiles: response.data.tiles.map(tile => ({
+      tiles: response.data.tiles.map((tile) => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: this.extractFindTilesMeta(tile),
@@ -551,7 +551,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const findDatesUTCValue = await ensureTimeout(async innerReqConfig => {
+    const findDatesUTCValue = await ensureTimeout(async (innerReqConfig) => {
       const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
       const canUseCatalog = authToken && !!this.getCatalogCollectionId();
       if (canUseCatalog) {
@@ -591,7 +591,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
     // Let's sort the data so that we always return most recent results first:
     found.sort((a, b) => b.unix() - a.unix());
-    return found.map(m => m.toDate());
+    return found.map((m) => m.toDate());
   }
 
   protected async findDatesUTCCatalog(
@@ -644,7 +644,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     reqConfig: RequestConfiguration = {},
     statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
-    const stats = await ensureTimeout(async innerReqConfig => {
+    const stats = await ensureTimeout(async (innerReqConfig) => {
       const sp = getStatisticsProvider(statsProvider);
       const data: Stats = await sp.getStats(this, params, innerReqConfig);
       return data;
@@ -653,7 +653,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       const layerParams = await this.fetchLayerParamsFromSHServiceV3(innerReqConfig);
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
 

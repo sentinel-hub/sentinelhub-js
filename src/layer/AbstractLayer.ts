@@ -43,7 +43,7 @@ export class AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    const blob = await ensureTimeout(async innerReqConfig => {
+    const blob = await ensureTimeout(async (innerReqConfig) => {
       switch (api) {
         case ApiType.WMS:
           if (params.outputResponseId || params.outputResponseId === '') {
@@ -124,7 +124,7 @@ export class AbstractLayer {
     api: ApiType,
     reqConfig?: RequestConfiguration,
   ): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const { width, height, bbox } = params;
       if (!width || !height) {
         throw new Error(
@@ -190,9 +190,9 @@ export class AbstractLayer {
       }
 
       // JPEG_OR_PNG is not a real format - use PNG instead:
-      const outputFormat = (params.format === MimeTypes.JPEG_OR_PNG
-        ? MimeTypes.PNG
-        : params.format) as MimeType;
+      const outputFormat = (
+        params.format === MimeTypes.JPEG_OR_PNG ? MimeTypes.PNG : params.format
+      ) as MimeType;
       return await canvasToBlob(canvas, outputFormat);
     }, reqConfig);
   }
@@ -238,7 +238,7 @@ export class AbstractLayer {
     intersects?: Geometry, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<PaginatedTiles> {
     const findTilesResponse = await ensureTimeout(
-      async innerReqConfig =>
+      async (innerReqConfig) =>
         await this.findTilesInner(bbox, fromTime, toTime, maxCount, offset, innerReqConfig, intersects),
       reqConfig,
     );
@@ -254,7 +254,7 @@ export class AbstractLayer {
     reqConfig?: RequestConfiguration,
     overrideOrbitTimeMinutes: number | null = null,
   ): Promise<FlyoverInterval[]> {
-    const flyOvers = await ensureTimeout(async innerReqConfig => {
+    const flyOvers = await ensureTimeout(async (innerReqConfig) => {
       if (overrideOrbitTimeMinutes === null && (!this.dataset || !this.dataset.orbitTimeMinutes)) {
         throw new Error('Orbit time is needed for grouping tiles into flyovers.');
       }

@@ -126,7 +126,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       if (this.polarization !== null && this.acquisitionMode !== null && this.resolution !== null) {
         return;
       }
@@ -196,7 +196,7 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     data: { tiles: any[]; hasMore: boolean };
   }): PaginatedTiles {
     return {
-      tiles: response.data.tiles.map(tile => ({
+      tiles: response.data.tiles.map((tile) => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {

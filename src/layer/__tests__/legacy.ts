@@ -27,14 +27,8 @@ test('parseLegacyWmsGetMapParams with evalscripturl', () => {
     gain: 0.7,
     gamma: 0.9,
   };
-  const {
-    layers,
-    evalscript,
-    evalscriptUrl,
-    evalsource,
-    getMapParams,
-    otherLayerParams,
-  } = parseLegacyWmsGetMapParams(wmsParams);
+  const { layers, evalscript, evalscriptUrl, evalsource, getMapParams, otherLayerParams } =
+    parseLegacyWmsGetMapParams(wmsParams);
 
   expect(evalscript).toEqual(null);
   expect(evalscriptUrl).toEqual(evalscriptUrlOriginal);
@@ -43,14 +37,8 @@ test('parseLegacyWmsGetMapParams with evalscripturl', () => {
 
   const expectedGetMapParams: GetMapParams = {
     bbox: new BBox(CRS_EPSG3857, 1282655, 5053636, 1500575, 5238596),
-    fromTime: moment
-      .utc('2019-12-22')
-      .startOf('day')
-      .toDate(),
-    toTime: moment
-      .utc('2019-12-22')
-      .endOf('day')
-      .toDate(),
+    fromTime: moment.utc('2019-12-22').startOf('day').toDate(),
+    toTime: moment.utc('2019-12-22').endOf('day').toDate(),
     format: 'image/jpeg',
     width: 1700,
     height: 605,

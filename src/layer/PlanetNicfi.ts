@@ -49,19 +49,19 @@ export class PlanetNicfiLayer extends WmtsLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Date[]> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(this.baseUrl, innerReqConfig);
-      const applicableLayers = parsedLayers.filter(l => {
+      const applicableLayers = parsedLayers.filter((l) => {
         return this.getLayerType(this.layerId) === this.getLayerType(l.Name[0]);
       });
-      const datesFromApplicableLayers = applicableLayers.map(l => {
+      const datesFromApplicableLayers = applicableLayers.map((l) => {
         const dateArray = l.Name[0].match(YYYY_MM_REGEX);
         return moment.utc(dateArray[dateArray.length - 1]).endOf('month');
       });
-      const availableDates = datesFromApplicableLayers.filter(d =>
+      const availableDates = datesFromApplicableLayers.filter((d) =>
         d.isBetween(moment.utc(fromTime), moment.utc(toTime), null, '[]'),
       );
-      return availableDates.map(d => d.toDate());
+      return availableDates.map((d) => d.toDate());
     }, reqConfig);
   }
 

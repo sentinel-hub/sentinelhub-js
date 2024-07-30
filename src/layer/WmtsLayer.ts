@@ -51,15 +51,15 @@ export class WmtsLayer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       if (!this.resourceUrl) {
         const parsedLayers = await fetchLayersFromWmtsGetCapabilitiesXml(this.baseUrl, innerReqConfig);
-        const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
+        const layer = parsedLayers.find((layerInfo) => this.layerId === layerInfo.Name[0]);
         this.resourceUrl = layer.ResourceUrl;
       }
       if (!this.tileMatrix) {
         const matrixSets = await getMatrixSets(this.baseUrl, innerReqConfig);
-        const matrixSet = matrixSets.find(set => set.id === this.matrixSet);
+        const matrixSet = matrixSets.find((set) => set.id === this.matrixSet);
         if (!matrixSet) {
           throw new Error(`No matrixSet found for: ${this.matrixSet}`);
         }
@@ -69,7 +69,7 @@ export class WmtsLayer extends AbstractLayer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       await this.updateLayerFromServiceIfNeeded(reqConfig);
       const paramsWithoutEffects = { ...params };
       delete paramsWithoutEffects.gain;
@@ -138,7 +138,7 @@ export class WmtsLayer extends AbstractLayer {
     api: ApiType,
     reqConfig?: RequestConfiguration,
   ): Promise<any> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const { width: requestedImageWidth, height: requestedImageHeight, bbox } = params;
       const { nativeHeight, nativeWidth, tiles } = bboxToXyzGrid(
         bbox,
@@ -162,9 +162,9 @@ export class WmtsLayer extends AbstractLayer {
         const blob = await this.getMap({ ...params, tileCoord: tile }, api, innerReqConfig);
         await drawBlobOnCanvas(ctx, blob, tile.imageOffsetX, tile.imageOffsetY);
       }
-      const outputFormat = (params.format === MimeTypes.JPEG_OR_PNG
-        ? MimeTypes.PNG
-        : params.format) as MimeType;
+      const outputFormat = (
+        params.format === MimeTypes.JPEG_OR_PNG ? MimeTypes.PNG : params.format
+      ) as MimeType;
 
       const requestedSizeCanvas = await scaleCanvasImage(canvas, requestedImageWidth, requestedImageHeight);
       return await canvasToBlob(requestedSizeCanvas, outputFormat);

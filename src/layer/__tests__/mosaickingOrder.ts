@@ -9,7 +9,7 @@ import { constructFixtureMosaickingOrder } from './fixtures.mosaickingOrder';
 
 const extractDataFilterFromPayload = (payload: ProcessingPayload): any => {
   const data: ProcessingPayloadDatasource[] = payload.input.data;
-  const processingPayloadDatasource: ProcessingPayloadDatasource = data.find(ppd => ppd.dataFilter);
+  const processingPayloadDatasource: ProcessingPayloadDatasource = data.find((ppd) => ppd.dataFilter);
   return processingPayloadDatasource.dataFilter;
 };
 

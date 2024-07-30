@@ -64,7 +64,7 @@ export class AirbusDataProvider extends AbstractTPDProvider {
     const input = this.getSearchPayload(searchParams);
     if (!!items && items.length) {
       const dataObject = input.data[0];
-      dataObject.products = items.map(item => ({ id: item }));
+      dataObject.products = items.map((item) => ({ id: item }));
       delete dataObject.dataFilter;
     }
     return input;

@@ -37,9 +37,9 @@ export class Fis implements StatisticsProvider {
       layer: layer.getLayerId(),
       crs: params.crs ? params.crs.authId : CRS_EPSG4326.authId,
       geometry: WKT.convert(params.geometry),
-      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${moment
-        .utc(params.toTime)
-        .format('YYYY-MM-DDTHH:mm:ss') + 'Z'}`,
+      time: `${moment.utc(params.fromTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'}/${
+        moment.utc(params.toTime).format('YYYY-MM-DDTHH:mm:ss') + 'Z'
+      }`,
       resolution: undefined,
       bins: params.bins || 5,
       type: HistogramType.EQUALFREQUENCY,

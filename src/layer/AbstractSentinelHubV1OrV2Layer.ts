@@ -184,7 +184,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
 
     const responseTiles: any[] = response.data.tiles;
     return {
-      tiles: responseTiles.map(tile => ({
+      tiles: responseTiles.map((tile) => ({
         geometry: tile.tileDrawRegionGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: this.extractFindTilesMeta(tile),
@@ -214,7 +214,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     toTime: Date,
     reqConfig?: RequestConfiguration,
   ): Promise<Date[]> {
-    const datesUTC = await ensureTimeout(async innerReqConfig => {
+    const datesUTC = await ensureTimeout(async (innerReqConfig) => {
       if (!this.dataset.findDatesUTCUrl) {
         throw new Error('This dataset does not support searching for dates');
       }
@@ -243,7 +243,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
     reqConfig: RequestConfiguration = {},
     statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
-    const stats = await ensureTimeout(async innerReqConfig => {
+    const stats = await ensureTimeout(async (innerReqConfig) => {
       const sp = getStatisticsProvider(statsProvider);
       const data: Stats = await sp.getStats(this, params, innerReqConfig);
       return data;
@@ -252,7 +252,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    const legendUrl = await ensureTimeout(async innerReqConfig => {
+    const legendUrl = await ensureTimeout(async (innerReqConfig) => {
       if (this.instanceId === null || this.layerId === null) {
         throw new Error(
           "Additional data can't be fetched from service because instanceId and layerId are not defined",
@@ -265,7 +265,7 @@ export class AbstractSentinelHubV1OrV2Layer extends AbstractLayer {
         OgcServiceTypes.WMS,
         innerReqConfig,
       );
-      const layer = parsedLayers.find(layerInfo => this.layerId === layerInfo.Name[0]);
+      const layer = parsedLayers.find((layerInfo) => this.layerId === layerInfo.Name[0]);
       if (!layer) {
         throw new Error('Layer not found');
       }

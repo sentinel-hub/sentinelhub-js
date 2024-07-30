@@ -50,7 +50,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async updateLayerFromServiceIfNeeded(reqConfig?: RequestConfiguration): Promise<void> {
-    await ensureTimeout(async innerReqConfig => {
+    await ensureTimeout(async (innerReqConfig) => {
       if (!(this.instanceId && this.layerId)) {
         return;
       }
@@ -75,7 +75,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       params = await this.decideJpegOrPng(params, innerReqConfig);
       if (api === ApiType.PROCESSING) {
         await this.updateLayerFromServiceIfNeeded(innerReqConfig);
@@ -161,7 +161,7 @@ export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
     reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
   ): Promise<Date[]> {
     const { tiles } = await this.findTiles(bbox, fromTime, toTime);
-    return tiles.map(tile => moment.utc(tile.sensingTime).toDate());
+    return tiles.map((tile) => moment.utc(tile.sensingTime).toDate());
   }
 }
 

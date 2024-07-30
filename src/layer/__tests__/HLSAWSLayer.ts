@@ -22,7 +22,7 @@ describe('Check constellation param is set correctly', () => {
 
   test.each([[null], [undefined], [HLSConstellation.LANDSAT], [HLSConstellation.SENTINEL]])(
     'processing payload has constellation param',
-    async constellation => {
+    async (constellation) => {
       const layer = new HLSAWSLayer({
         evalscript: '//',
         constellation: constellation,
