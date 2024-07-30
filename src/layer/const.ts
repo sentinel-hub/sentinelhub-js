@@ -286,3 +286,14 @@ export const PLANET_FALSE_COLOR_TEMPLATES = [
 export const EQUATOR_RADIUS = 6378137.0;
 export const DEGREE_TO_RADIAN = Math.PI / 180;
 export const RADIAN_TO_DEGREE = 180 / Math.PI;
+
+export const XmlParserOptions = Object.freeze({
+  attributesGroupName: '$',
+  attributeNamePrefix: '',
+  textNodeName: '_',
+  ignoreAttributes: false,
+  isArray: (name: string, jpath: string, isLeafNode: boolean, isAttribute: boolean) => {
+    const isA = !isAttribute && !['Capabilities', 'WMS_Capabilities', 'WMT_MS_Capabilities'].includes(name);
+    return isA;
+  },
+});

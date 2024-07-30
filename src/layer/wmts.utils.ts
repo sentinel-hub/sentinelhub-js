@@ -163,15 +163,19 @@ export function toPixel(
 }
 
 function parseXmlWmtsLayers(parsedXml: GetCapabilitiesWmtsXml): GetCapabilitiesXmlLayer[] {
-  return parsedXml.Capabilities.Contents[0].Layer.map((l) => {
-    return {
-      Name: l['ows:Identifier'],
-      Title: l['ows:Title'],
-      Abstract: l['ows:Abstract'],
-      Style: l.Style,
-      ResourceUrl: getResourceUrl(l),
-    };
-  });
+  try {
+    return parsedXml.Capabilities.Contents[0].Layer.map((l) => {
+      return {
+        Name: l['ows:Identifier'],
+        Title: l['ows:Title'],
+        Abstract: l['ows:Abstract'],
+        Style: l.Style,
+        ResourceUrl: getResourceUrl(l),
+      };
+    });
+  } catch (x) {
+    console.error(x);
+  }
 }
 export async function fetchLayersFromWmtsGetCapabilitiesXml(
   baseUrl: string,
