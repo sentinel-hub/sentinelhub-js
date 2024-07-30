@@ -35,7 +35,7 @@ export function setTPDIServiceBaseURL(baseurl: string): void {
 }
 
 function getThirdPartyDataProvider(provider: TPDProvider): TPDProviderInterface {
-  const tpdp = dataProviders.find(p => p.getProvider() === provider);
+  const tpdp = dataProviders.find((p) => p.getProvider() === provider);
   if (!tpdp) {
     throw new Error(`Unknown data provider ${provider}`);
   }
@@ -46,7 +46,7 @@ async function getQuotasInner(
   TDPICollectionId?: TPDICollections,
   reqConfig?: RequestConfiguration,
 ): Promise<Quota[]> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     if (!!TDPICollectionId) {
       requestConfig.params = { collectionId: TDPICollectionId };
@@ -80,7 +80,7 @@ async function getTransactions(
   count?: number,
   viewtoken?: string,
 ): Promise<TPDITransactionSearchResult> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
 
     let queryParams: Record<string, any> = {};
@@ -108,7 +108,7 @@ async function getTransaction(
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     const { data } = await axios.get<TPDITransaction>(`${serviceEndpoint}/${id}`, requestConfig);
     return data;
@@ -120,7 +120,7 @@ async function deleteTransaction(
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<void> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     await axios.delete(`${serviceEndpoint}/${id}`, requestConfig);
   }, reqConfig);
@@ -131,7 +131,7 @@ async function confirmTransaction(
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     const { data } = await axios.post<TPDITransaction>(`${serviceEndpoint}/${id}/confirm`, {}, requestConfig);
     return data;
@@ -143,7 +143,7 @@ async function cancelTransaction(
   id: string,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     const { data } = await axios.post<TPDITransaction>(`${serviceEndpoint}/${id}/cancel`, {}, requestConfig);
     return data;
@@ -160,7 +160,7 @@ async function createTransaction(
   transactionParams?: TPDITransactionParams,
   reqConfig?: RequestConfiguration,
 ): Promise<TPDITransaction> {
-  return await ensureTimeout(async innerReqConfig => {
+  return await ensureTimeout(async (innerReqConfig) => {
     const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
     const payload = tpdiProvider.getTransactionPayload(
       name,
@@ -197,7 +197,7 @@ export class TPDI {
     count: number = 10,
     viewtoken: string = null,
   ): Promise<TPDSearchResult> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const tpdp = getThirdPartyDataProvider(provider);
       tpdp.addSearchPagination(requestConfig, count, viewtoken);
@@ -225,7 +225,7 @@ export class TPDI {
       throw new Error('productId must be provided');
     }
 
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       requestConfig.responseType = 'blob';
 
@@ -351,7 +351,7 @@ export class TPDI {
     params: TPDISearchParams,
     reqConfig?: RequestConfiguration,
   ): Promise<TPDITransactionCompatibleCollection[]> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       const requestConfig: AxiosRequestConfig = createRequestConfig(innerReqConfig);
       const tpdp = getThirdPartyDataProvider(provider);
 

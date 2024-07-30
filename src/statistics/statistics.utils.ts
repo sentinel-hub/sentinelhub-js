@@ -18,11 +18,12 @@ function convertToFISResponse(data: StatisticalApiResponse, defaultOutput: strin
   for (let statObject of data) {
     const date = new Date(statObject.interval.from);
     const { outputs } = statObject;
-    const outputId = Object.keys(outputs).find(output => output === defaultOutput) || Object.keys(outputs)[0];
+    const outputId =
+      Object.keys(outputs).find((output) => output === defaultOutput) || Object.keys(outputs)[0];
     const outputData = outputs[outputId];
     const { bands } = outputData;
 
-    Object.keys(bands).forEach(band => {
+    Object.keys(bands).forEach((band) => {
       const { stats } = bands[band];
 
       const dailyStats: DailyChannelStats = {
@@ -34,7 +35,7 @@ function convertToFISResponse(data: StatisticalApiResponse, defaultOutput: strin
       if (!!stats.percentiles) {
         const lowEdges = Object.keys(stats.percentiles).sort((a, b) => parseFloat(a) - parseFloat(b));
         const bins = [stats.min, ...lowEdges.map((lowEdge: any) => stats.percentiles[lowEdge])].map(
-          value => ({
+          (value) => ({
             lowEdge: value,
             mean: null,
             count: null,

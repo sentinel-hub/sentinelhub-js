@@ -82,7 +82,7 @@ describe('Test search', () => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, defaultSearchParams);
     const params: { [attr: string]: any } = { ...defaultSearchParams };
-    const key: any = Object.keys(defaultSearchParams).find(k => k === property);
+    const key: any = Object.keys(defaultSearchParams).find((k) => k === property);
     delete params[key];
     await expect(TPDI.search(TPDProvider.PLANET, params as TPDISearchParams)).rejects.toThrow(
       new Error(errorMessage),
@@ -158,7 +158,7 @@ describe('Test search', () => {
     [{ ...defaultSearchParams, maxCloudCoverage: null }],
     [{ ...defaultSearchParams, maxCloudCoverage: undefined }],
     [{ ...defaultSearchParams, nativeFilter: undefined }],
-  ])('checks if parameters are set correctly', async params => {
+  ])('checks if parameters are set correctly', async (params) => {
     mockNetwork.onPost().reply(200);
     await TPDI.search(TPDProvider.PLANET, params);
     expect(mockNetwork.history.post.length).toBe(1);

@@ -76,7 +76,7 @@ function _flattenLayers(
   layers: GetCapabilitiesXmlLayer[],
   result: GetCapabilitiesXmlLayer[] = [],
 ): GetCapabilitiesXmlLayer[] {
-  layers.forEach(l => {
+  layers.forEach((l) => {
     result.push(l);
     if (l.Layer) {
       _flattenLayers(l.Layer, result);
@@ -101,7 +101,7 @@ export async function fetchLayersFromGetCapabilitiesXml(
     : parsedXml.WMT_MS_Capabilities;
 
   // GetCapabilities might use recursion to group layers, we should flatten them and remove those with no `Name`:
-  const layersInfos = _flattenLayers(capabilities?.Capability[0].Layer).filter(layerInfo => layerInfo.Name);
+  const layersInfos = _flattenLayers(capabilities?.Capability[0].Layer).filter((layerInfo) => layerInfo.Name);
   return layersInfos;
 }
 
@@ -152,7 +152,7 @@ export function parseSHInstanceId(baseUrl: string): string {
 }
 
 export function getSHServiceRootUrl(host: string): string {
-  const shServiceRootUrl = Object.values(SH_SERVICE_ROOT_URL).find(url => {
+  const shServiceRootUrl = Object.values(SH_SERVICE_ROOT_URL).find((url) => {
     const regex = new RegExp(url);
     if (regex.test(host)) {
       return url;

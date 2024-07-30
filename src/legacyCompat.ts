@@ -49,14 +49,8 @@ export async function legacyGetMapFromParams(
   requestConfig?: RequestConfiguration,
   preferGetCapabilities: boolean = true,
 ): Promise<Blob> {
-  const {
-    layers,
-    evalscript,
-    evalscriptUrl,
-    evalsource,
-    getMapParams,
-    otherLayerParams,
-  } = parseLegacyWmsGetMapParams(wmsParams);
+  const { layers, evalscript, evalscriptUrl, evalsource, getMapParams, otherLayerParams } =
+    parseLegacyWmsGetMapParams(wmsParams);
 
   let layer;
   // Layers parameter may contain list of layers which is at the moment supported only by WmsLayer.
@@ -346,7 +340,7 @@ function bboxFromParams(service: ServiceType, version: string, crsAuthId: CRS_ID
     throw new Error('Parameter bbox is mandatory');
   }
   const bboxStr: string = params.bbox;
-  const coords = params.bbox instanceof Array ? params.bbox : bboxStr.split(',').map(c => parseFloat(c));
+  const coords = params.bbox instanceof Array ? params.bbox : bboxStr.split(',').map((c) => parseFloat(c));
   const crs = SUPPORTED_CRS_OBJ[crsAuthId];
   let minX, minY, maxX, maxY;
   switch (crs) {

@@ -67,7 +67,7 @@ describe('Test findTiles using searchIndex', () => {
     await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -87,7 +87,7 @@ describe('Test findTiles using catalog', () => {
     await checkIfCorrectEndpointIsUsed(AUTH_TOKEN, constructFixtureFindTilesCatalog({}), CATALOG_URL);
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesCatalog(layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -115,7 +115,7 @@ describe('Test findDatesUTC using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
     if (layerParams.maxCloudCoverPercent !== null && layerParams.maxCloudCoverPercent !== undefined) {
       constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
@@ -156,7 +156,7 @@ describe('Test findDatesUTC using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
     if (layerParams.maxCloudCoverPercent !== null && layerParams.maxCloudCoverPercent !== undefined) {
       constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;

@@ -87,7 +87,7 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     data: { tiles: any[]; hasMore: boolean };
   }): PaginatedTiles {
     return {
-      tiles: response.data.tiles.map(tile => {
+      tiles: response.data.tiles.map((tile) => {
         return {
           geometry: tile.tileDrawRegionGeometry,
           sensingTime: moment.utc(tile.sensingTime).toDate(),

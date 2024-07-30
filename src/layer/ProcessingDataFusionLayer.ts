@@ -60,7 +60,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
   }
 
   public async getMap(params: GetMapParams, api: ApiType, reqConfig?: RequestConfiguration): Promise<Blob> {
-    return await ensureTimeout(async innerReqConfig => {
+    return await ensureTimeout(async (innerReqConfig) => {
       params = await this.decideJpegOrPng(params, innerReqConfig);
       if (api !== ApiType.PROCESSING) {
         throw new Error(`Only API type "PROCESSING" is supported`);
@@ -123,7 +123,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       let shServiceHostname;
       if (
         this.layers.every(
-          layer => layer.layer.getShServiceHostname() === bogusFirstLayer.getShServiceHostname(),
+          (layer) => layer.layer.getShServiceHostname() === bogusFirstLayer.getShServiceHostname(),
         )
       ) {
         shServiceHostname = bogusFirstLayer.getShServiceHostname();
@@ -131,7 +131,7 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
       //check if all layers use same root url and use it for request
       else if (
         this.layers.every(
-          layer => layer.layer.getSHServiceRootUrl() === bogusFirstLayer.getSHServiceRootUrl(),
+          (layer) => layer.layer.getSHServiceRootUrl() === bogusFirstLayer.getSHServiceRootUrl(),
         )
       ) {
         shServiceHostname = bogusFirstLayer.getSHServiceRootUrl();

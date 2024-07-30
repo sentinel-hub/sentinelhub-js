@@ -53,7 +53,7 @@ describe('Test findTiles using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesSearchIndex(S3OLCILayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -77,7 +77,7 @@ describe('Test findTiles using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesCatalog(S3OLCILayer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -105,7 +105,7 @@ describe('Test findDatesUTC using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
 
     const layer = new S3OLCILayer({
@@ -143,7 +143,7 @@ describe('Test findDatesUTC using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
 
     const layer = new S3OLCILayer({

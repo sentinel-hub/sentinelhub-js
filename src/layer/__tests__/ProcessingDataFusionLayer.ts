@@ -86,7 +86,7 @@ describe("Test data fusion uses correct URL depending on layers' combination", (
   ])(
     'ProcessingDataFusionLayer chooses the correct shServiceHostname',
     async (layers: AbstractSentinelHubV3Layer[], expectedShServiceHostname) => {
-      const layerInfo = layers.map(layer => ({ layer: layer }));
+      const layerInfo = layers.map((layer) => ({ layer: layer }));
       const dataFusionLayer = new ProcessingDataFusionLayer({
         evalscript: mockEvalscript,
         layers: layerInfo,
@@ -161,7 +161,7 @@ describe('Test data fusion passes layer parameters correctly', () => {
       ],
     ],
   ])('ProcessingDataFusionLayer passes the correct parameters', async (layers, expectedData) => {
-    const layerInfo: DataFusionLayerInfo[] = layers.map(layer => ({ layer: layer }));
+    const layerInfo: DataFusionLayerInfo[] = layers.map((layer) => ({ layer: layer }));
     const dataFusionLayer = new ProcessingDataFusionLayer({
       evalscript: mockEvalscript,
       layers: layerInfo,

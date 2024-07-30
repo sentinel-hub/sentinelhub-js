@@ -194,7 +194,7 @@ const isRequestCachable = (request: AxiosRequestConfig): boolean => {
 };
 
 const sleep = async (sleepTimeMs: number): Promise<void> => {
-  await new Promise(resolve => {
+  await new Promise((resolve) => {
     setTimeout(resolve, sleepTimeMs);
   });
 };

@@ -156,7 +156,7 @@ export function toPixel(
   zoom: number,
 ): { pixelX: number; pixelY: number } {
   const [longitude, latitude] = coord;
-  const tileMatrix = tileMatrices.find(matrix => matrix.zoom === zoom);
+  const tileMatrix = tileMatrices.find((matrix) => matrix.zoom === zoom);
   const mapWidth = tileMatrix.tileWidth * tileMatrix.matrixWidth;
   const sinLatitude = Math.min(Math.max(Math.sin(DEGREE_TO_RADIAN * latitude), -0.9999), 0.9999);
   const pixelX = Math.round(((longitude + 180) / 360) * mapWidth);
@@ -167,7 +167,7 @@ export function toPixel(
 }
 
 function parseXmlWmtsLayers(parsedXml: GetCapabilitiesWmtsXml): GetCapabilitiesXmlLayer[] {
-  return parsedXml.Capabilities.Contents[0].Layer.map(l => {
+  return parsedXml.Capabilities.Contents[0].Layer.map((l) => {
     return {
       Name: l['ows:Identifier'],
       Title: l['ows:Title'],
@@ -181,11 +181,11 @@ export async function fetchLayersFromWmtsGetCapabilitiesXml(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<GetCapabilitiesXmlLayer[]> {
-  const parsedXml = ((await fetchGetCapabilitiesXml(
+  const parsedXml = (await fetchGetCapabilitiesXml(
     baseUrl,
     OgcServiceTypes.WMTS,
     reqConfig,
-  )) as unknown) as GetCapabilitiesWmtsXml;
+  )) as unknown as GetCapabilitiesWmtsXml;
   const layers = parseXmlWmtsLayers(parsedXml);
   return layers;
 }
@@ -201,14 +201,14 @@ export function getResourceUrl(xmlLayer: GetCapabilitiesXmlWmtsLayer): string | 
 }
 
 export async function getMatrixSets(baseUrl: string, reqConfig: RequestConfiguration): Promise<MatrixSet[]> {
-  const parsedXml = ((await fetchGetCapabilitiesXml(
+  const parsedXml = (await fetchGetCapabilitiesXml(
     baseUrl,
     OgcServiceTypes.WMTS,
     reqConfig,
-  )) as unknown) as GetCapabilitiesWmtsXml;
-  return parsedXml.Capabilities.Contents[0].TileMatrixSet.map(tileMatrixSet => ({
+  )) as unknown as GetCapabilitiesWmtsXml;
+  return parsedXml.Capabilities.Contents[0].TileMatrixSet.map((tileMatrixSet) => ({
     id: tileMatrixSet['ows:Identifier'][0],
-    tileMatrices: tileMatrixSet.TileMatrix.map(tileMatrix => ({
+    tileMatrices: tileMatrixSet.TileMatrix.map((tileMatrix) => ({
       zoom: Number(tileMatrix['ows:Identifier'][0]),
       tileWidth: Number(tileMatrix.TileWidth[0]),
       tileHeight: Number(tileMatrix.TileHeight[0]),

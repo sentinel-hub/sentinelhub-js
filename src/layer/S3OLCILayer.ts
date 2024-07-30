@@ -11,7 +11,7 @@ export class S3OLCILayer extends AbstractSentinelHubV3Layer {
     data: { tiles: any[]; hasMore: boolean };
   }): PaginatedTiles {
     return {
-      tiles: response.data.tiles.map(tile => ({
+      tiles: response.data.tiles.map((tile) => ({
         geometry: tile.dataGeometry,
         sensingTime: moment.utc(tile.sensingTime).toDate(),
         meta: {},

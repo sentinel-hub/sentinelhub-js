@@ -40,7 +40,7 @@ const layerParamsArr: Record<string, any>[] = [
     toTime: toTime,
     bbox: bbox,
   },
-  ...Object.keys(ProductType).map(productType => ({
+  ...Object.keys(ProductType).map((productType) => ({
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
@@ -62,7 +62,7 @@ describe('Test findTiles using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesSearchIndex(S5PL2Layer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -86,7 +86,7 @@ describe('Test findTiles using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesCatalog(S5PL2Layer, layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -114,7 +114,7 @@ describe('Test findDatesUTC using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
     if (layerParams && layerParams.productType) {
       constructorParams.productType = layerParams.productType;
@@ -155,7 +155,7 @@ describe('Test findDatesUTC using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
     if (layerParams && layerParams.productType) {
       constructorParams.productType = layerParams.productType;

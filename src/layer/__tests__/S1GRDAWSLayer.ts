@@ -192,7 +192,7 @@ const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
 const bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21);
 
 const layerParamsArr: Record<string, any>[] = [
-  ...Object.keys(AcquisitionMode).map(acquisitionMode => ({
+  ...Object.keys(AcquisitionMode).map((acquisitionMode) => ({
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
@@ -201,7 +201,7 @@ const layerParamsArr: Record<string, any>[] = [
     resolution: Resolution.HIGH,
     orbitDirection: OrbitDirection.ASCENDING,
   })),
-  ...Object.keys(Polarization).map(polarization => ({
+  ...Object.keys(Polarization).map((polarization) => ({
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
@@ -210,7 +210,7 @@ const layerParamsArr: Record<string, any>[] = [
     resolution: Resolution.HIGH,
     orbitDirection: OrbitDirection.ASCENDING,
   })),
-  ...Object.keys(Resolution).map(resolution => ({
+  ...Object.keys(Resolution).map((resolution) => ({
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
@@ -219,7 +219,7 @@ const layerParamsArr: Record<string, any>[] = [
     resolution: resolution,
     orbitDirection: OrbitDirection.ASCENDING,
   })),
-  ...Object.keys(OrbitDirection).map(orbitDirection => ({
+  ...Object.keys(OrbitDirection).map((orbitDirection) => ({
     fromTime: fromTime,
     toTime: toTime,
     bbox: bbox,
@@ -240,7 +240,7 @@ describe('Test findTiles using searchIndex', () => {
     await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -260,7 +260,7 @@ describe('Test findTiles using catalog', () => {
     await checkIfCorrectEndpointIsUsed(AUTH_TOKEN, constructFixtureFindTilesCatalog({}), CATALOG_URL);
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     const fixtures = constructFixtureFindTilesCatalog(layerParams);
     await checkRequestFindTiles(fixtures);
   });
@@ -288,7 +288,7 @@ describe('Test findDatesUTC using searchIndex', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
 
     if (layerParams && layerParams.acquisitionMode) {
@@ -353,7 +353,7 @@ describe('Test findDatesUTC using catalog', () => {
     );
   });
 
-  test.each(layerParamsArr)('check if correct request is constructed', async layerParams => {
+  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
     let constructorParams: Record<string, any> = {};
 
     if (layerParams && layerParams.acquisitionMode) {

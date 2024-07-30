@@ -30,10 +30,10 @@ export const registerInitialAxiosInterceptors = (): any => {
   // - the interceptors are called in reverse order in which they are registered - last
   //   defined interceptor is called first
   // - some interceptors might also be added in other places (`registerHostnameReplacing()`)
-  axios.interceptors.request.use(logCurl, error => Promise.reject(error));
-  axios.interceptors.request.use(fetchCachedResponse, error => Promise.reject(error));
-  axios.interceptors.request.use(rewriteUrl, error => Promise.reject(error));
-  axios.interceptors.response.use(saveCacheResponse, error => retryRequests(error));
+  axios.interceptors.request.use(logCurl, (error) => Promise.reject(error));
+  axios.interceptors.request.use(fetchCachedResponse, (error) => Promise.reject(error));
+  axios.interceptors.request.use(rewriteUrl, (error) => Promise.reject(error));
+  axios.interceptors.response.use(saveCacheResponse, (error) => retryRequests(error));
 };
 
 const rewriteUrl = async (config: any): Promise<any> => {
@@ -61,8 +61,8 @@ const logCurl = async (config: any): Promise<any> => {
       ...config.headers.common,
       ...config.headers[config.method],
     };
-    const addedHeadersKeys = Object.keys(config.headers).filter(k => typeof config.headers[k] === 'string');
-    addedHeadersKeys.forEach(k => (headers[k] = config.headers[k]));
+    const addedHeadersKeys = Object.keys(config.headers).filter((k) => typeof config.headers[k] === 'string');
+    addedHeadersKeys.forEach((k) => (headers[k] = config.headers[k]));
 
     // findDatesUTC on S1GRDAWSEULayer doesn't specify JSON Content-Type, but the request still works as if it was specified. On
     // the other hand, when requesting auth token, we use Content-Type 'application/x-www-form-urlencoded'. This hack updates a
@@ -123,7 +123,7 @@ const retryRequests = (err: any): any => {
     const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
-      return new Promise(resolve => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
+      return new Promise((resolve) => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
     }
   }
 
@@ -142,11 +142,11 @@ const shouldRetry = (error: AxiosError): boolean => {
 export const addAxiosRequestInterceptor = (
   customInterceptor: (config: AxiosRequestConfig) => AxiosRequestConfig | Promise<AxiosRequestConfig>,
 ): void => {
-  axios.interceptors.request.use(customInterceptor, error => Promise.reject(error));
+  axios.interceptors.request.use(customInterceptor, (error) => Promise.reject(error));
 };
 
 export const addAxiosResponseInterceptor = (
   customInterceptor: (config: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>,
 ): void => {
-  axios.interceptors.response.use(customInterceptor, error => Promise.reject(error));
+  axios.interceptors.response.use(customInterceptor, (error) => Promise.reject(error));
 };
