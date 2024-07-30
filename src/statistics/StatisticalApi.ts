@@ -1,14 +1,13 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { RequestConfiguration } from '..';
 import { getAuthToken } from '../auth';
+import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
 import { GetStatsParams } from '../layer/const';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
 import { getAxiosReqParams } from '../utils/cancelRequests';
-import { StatisticsProvider } from './StatisticsProvider';
-import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
 import { StatisticsUtils } from './statistics.utils';
-
-import { StatisticalApiResponse, StatisticalApiPayload } from './const';
+import { StatisticsProvider } from './StatisticsProvider';
+import { StatisticalApiPayload, StatisticalApiResponse } from './const';
 
 const STATS_DEFAULT_OUTPUT = 'default';
 

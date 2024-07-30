@@ -25,8 +25,8 @@ import { ProcessingPayload } from './processing';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { ensureTimeout } from '../utils/ensureTimeout';
 import { CACHE_CONFIG_30MIN } from '../utils/cacheHandlers';
-import { StatisticsProviderType } from '../statistics/StatisticsProvider';
 import { getSHServiceRootUrl, metersPerPixel } from './utils';
+import { StatisticsProviderType } from '../statistics/const';
 
 interface ConstructorParameters {
   instanceId?: string | null;

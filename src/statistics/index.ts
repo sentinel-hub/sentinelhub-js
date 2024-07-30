@@ -1,3 +1,4 @@
+export { getStatisticsProvider } from './StatisticsProvider';
 export {
   BandHistogram,
   BandStats,
@@ -7,6 +8,6 @@ export {
   StatisticalApiOutput,
   StatisticalApiPayload,
   StatisticalApiResponse,
+  StatisticsProviderType,
 } from './const';
-export { StatisticsProviderType, getStatisticsProvider } from './StatisticsProvider';
 export { StatisticsUtils } from './statistics.utils';

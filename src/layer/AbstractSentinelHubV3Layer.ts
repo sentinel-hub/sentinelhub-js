@@ -1,36 +1,39 @@
+import { Geometry } from '@turf/helpers';
 import axios, { AxiosRequestConfig } from 'axios';
 import moment, { Moment } from 'moment';
-import { Geometry } from '@turf/helpers';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import { ensureTimeout } from '../utils/ensureTimeout';
+import { AbstractLayer } from './AbstractLayer';
 import {
-  GetMapParams,
   ApiType,
-  PaginatedTiles,
-  MosaickingOrder,
+  CATALOG_SEARCH_MAX_LIMIT,
+  DataProductId,
+  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  FindTilesAdditionalParameters,
+  GetMapParams,
   GetStatsParams,
-  Stats,
   Interpolator,
   Link,
   LinkType,
-  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
+  MosaickingOrder,
+  PaginatedTiles,
+  Stats,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
-  DataProductId,
-  FindTilesAdditionalParameters,
-  CATALOG_SEARCH_MAX_LIMIT,
 } from './const';
+import { createProcessingPayload, processingGetMap, ProcessingPayload } from './processing';
 import { wmsGetMapUrl } from './wms';
-import { processingGetMap, createProcessingPayload, ProcessingPayload } from './processing';
-import { AbstractLayer } from './AbstractLayer';
-import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
-import { ensureTimeout } from '../utils/ensureTimeout';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { Fis } from '../statistics/Fis';
+import { StatisticalApi } from '../statistics/StatisticalApi';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { getStatisticsProvider, StatisticsProviderType } from '../statistics/StatisticsProvider';
 import { fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
+import { StatisticsProviderType } from '../statistics/const';
+
 interface ConstructorParameters {
   instanceId?: string | null;
   layerId?: string | null;
@@ -645,10 +648,17 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     statsProvider: StatisticsProviderType = StatisticsProviderType.FIS,
   ): Promise<Stats> {
     const stats = await ensureTimeout(async (innerReqConfig) => {
-      const sp = getStatisticsProvider(statsProvider);
-      const data: Stats = await sp.getStats(this, params, innerReqConfig);
+      let data: Stats;
+      if (statsProvider === StatisticsProviderType.FIS) {
+        data = await new Fis().handleV3(this, params, innerReqConfig);
+      } else if (statsProvider === StatisticsProviderType.STAPI) {
+        data = await new StatisticalApi().getStats(this, params, innerReqConfig);
+      } else {
+        throw new Error(`Unssuported statistics provider ${statsProvider}`);
+      }
       return data;
     }, reqConfig);
+
     return stats;
   }
 

@@ -1,11 +1,10 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
 import { parseStringPromise } from 'xml2js';
-
-import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
+import { EQUATOR_RADIUS, OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
-import { EQUATOR_RADIUS, GetCapabilitiesWmtsXml } from './wmts.utils';
+import type { GetCapabilitiesWmtsXml } from './wmts.utils';
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
 import { CRS_EPSG3857 } from '../crs';

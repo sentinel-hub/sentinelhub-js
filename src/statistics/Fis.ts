@@ -1,22 +1,16 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
-import { RequestConfiguration } from '../utils/cancelRequests';
 import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
-import { AbstractLayer } from '../layer/AbstractLayer';
+import type { AbstractLayer } from '../layer/AbstractLayer';
 import { AbstractSentinelHubV1OrV2Layer } from '../layer/AbstractSentinelHubV1OrV2Layer';
-import { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
+import type { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
 import { FisPayload, FisResponse, GetStatsParams, HistogramType } from '../layer/const';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { getAxiosReqParams } from '../utils/cancelRequests';
-import { StatisticsProvider } from './StatisticsProvider';
-import { StatisticalApiResponse } from './const';
+import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
+import type { StatisticsProvider } from './StatisticsProvider';
 
 export class Fis implements StatisticsProvider {
-  public getStatistics(): Promise<StatisticalApiResponse> {
-    throw new Error('Method not implemented.');
-  }
-
   private createFISPayload(
     layer: AbstractSentinelHubV3Layer | AbstractSentinelHubV1OrV2Layer,
     params: GetStatsParams,
@@ -63,7 +57,7 @@ export class Fis implements StatisticsProvider {
       } else {
         payload.evalscript = Buffer.from(layer.getEvalscript(), 'utf8').toString('base64');
       }
-      if (layer instanceof AbstractSentinelHubV1OrV2Layer) {
+      if ('getEvalsource' in layer && layer.getEvalsource instanceof Function) {
         payload.evalsource = layer.getEvalsource();
       }
     }
@@ -83,19 +77,13 @@ export class Fis implements StatisticsProvider {
 
   public async getStats(
     layer: AbstractLayer,
-    params: GetStatsParams,
+    _params: GetStatsParams,
     reqConfig?: RequestConfiguration,
   ): Promise<FisResponse> {
-    if (layer instanceof AbstractSentinelHubV3Layer) {
-      return this.handleV3(layer, params, reqConfig);
-    } else if (layer instanceof AbstractSentinelHubV1OrV2Layer) {
-      return this.handleV1orV2(layer, params, reqConfig);
-    } else {
-      throw new Error('Not supported');
-    }
+    return layer.getStats(layer, reqConfig);
   }
 
-  private async handleV3(
+  public async handleV3(
     layer: AbstractSentinelHubV3Layer,
     params: GetStatsParams,
     reqConfig?: RequestConfiguration,
@@ -115,7 +103,7 @@ export class Fis implements StatisticsProvider {
     return this.convertFISResponse(data);
   }
 
-  private async handleV1orV2(
+  public async handleV1orV2(
     layer: AbstractSentinelHubV1OrV2Layer,
     params: GetStatsParams,
     reqConfig?: RequestConfiguration,

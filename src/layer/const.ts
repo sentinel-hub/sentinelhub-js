@@ -282,3 +282,7 @@ export const PLANET_FALSE_COLOR_TEMPLATES = [
   { description: '', titleSuffix: 'TGI', resourceUrlParams: { proc: 'tgi' } },
   { description: '', titleSuffix: 'CIR', resourceUrlParams: { proc: 'cir' } },
 ];
+
+export const EQUATOR_RADIUS = 6378137.0;
+export const DEGREE_TO_RADIAN = Math.PI / 180;
+export const RADIAN_TO_DEGREE = 180 / Math.PI;
