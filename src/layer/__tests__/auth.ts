@@ -79,8 +79,6 @@ test('requestAuthToken correctly encodes URI parameters', async () => {
 test('getMap with different authToken following an identical failed getMap makes a request', async () => {
   const { layer, getMapParams } = constructFixtureGetMap();
 
-  jest.setTimeout(30000);
-
   mockNetwork.reset();
   mockNetwork.onPost().replyOnce(429, '');
   mockNetwork.onPost().replyOnce(429, '');
@@ -100,4 +98,4 @@ test('getMap with different authToken following an identical failed getMap makes
   expect(mockNetwork.history.post.length).toBe(4);
   expect(mockNetwork.history.post[2].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN1}`);
   expect(mockNetwork.history.post[3].headers.Authorization).toBe(`Bearer ${EXAMPLE_TOKEN2}`);
-});
+}, 30000);
