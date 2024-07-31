@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
