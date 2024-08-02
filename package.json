@@ -88,5 +88,8 @@
   "files": [
     "dist",
     "dist/src/index.d.ts"
-  ]
+  ],
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.19.2"
+  }
 }
