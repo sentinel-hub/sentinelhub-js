@@ -1,14 +1,23 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { stringify, parseUrl, stringifyUrl } from 'query-string';
-import { parseStringPromise } from 'xml2js';
-import { EQUATOR_RADIUS, OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, SH_SERVICE_ROOT_URL } from './const';
+
 import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_30MIN_MEMORY } from '../utils/cacheHandlers';
-import type { GetCapabilitiesWmtsXml } from './wmts.utils';
+import { XMLParser } from 'fast-xml-parser';
+import proj4 from 'proj4';
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
 import { CRS_EPSG3857 } from '../crs';
-import proj4 from 'proj4';
+import {
+  EQUATOR_RADIUS,
+  OgcServiceTypes,
+  SH_SERVICE_HOSTNAMES_V3,
+  SH_SERVICE_ROOT_URL,
+  XmlParserOptions,
+} from './const';
+import { GetCapabilitiesWmtsXml } from './wmts.utils';
+
+export const xmlParser = new XMLParser(XmlParserOptions);
 
 interface Capabilities {
   Service: [];
@@ -67,7 +76,7 @@ export async function fetchGetCapabilitiesXml(
   };
   const url = createGetCapabilitiesXmlUrl(baseUrl, ogcServiceType);
   const res = await axios.get(url, axiosReqConfig);
-  const parsedXml = await parseStringPromise(res.data);
+  const parsedXml = xmlParser.parse(res.data);
   return parsedXml;
 }
 
