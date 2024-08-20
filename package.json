@@ -1,8 +1,8 @@
 {
   "name": "@sentinel-hub/sentinelhub-js",
   "version": "1.0.0",
-  "main": "dist/sentinelHub.cjs.js",
-  "module": "dist/sentinelHub.esm.js",
+  "main": "dist/sentinelHub.cjs",
+  "module": "dist/sentinelHub.js",
   "browser": "dist/sentinelHub.umd.js",
   "type": "module",
   "peerDependencies": {
