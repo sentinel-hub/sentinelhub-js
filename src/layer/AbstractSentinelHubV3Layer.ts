@@ -28,11 +28,11 @@ import { wmsGetMapUrl } from './wms';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { StatisticsProviderType } from '../statistics/const';
 import { Fis } from '../statistics/Fis';
 import { StatisticalApi } from '../statistics/StatisticalApi';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
-import { StatisticsProviderType } from '../statistics/const';
+import { fetchDataProduct, fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -668,8 +668,16 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       this.legend = layerParams['legend'] ? layerParams['legend'] : null;
 
       if (!this.evalscript) {
-        this.evalscript = layerParams['evalscript'] ? layerParams['evalscript'] : null;
+        const dataProductUrl = layerParams['dataProduct'];
+        this.evalscript = layerParams['evalscript'];
+        if (!this.evalscript && dataProductUrl) {
+          const response = await fetchDataProduct(dataProductUrl, innerReqConfig);
+          this.evalscript = response.data?.evalScript;
+          // now that evalscript here, dataProduct=null will make rest of logic use ApiType.PROCESSING
+          this.dataProduct = null;
+        }
       }
+
       if (!this.mosaickingOrder && layerParams.mosaickingOrder) {
         this.mosaickingOrder = layerParams.mosaickingOrder;
       }
@@ -679,8 +687,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (!this.downsampling && layerParams.downsampling) {
         this.downsampling = layerParams.downsampling;
       }
-      // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
-      this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
   }
 
