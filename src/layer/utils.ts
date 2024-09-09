@@ -237,6 +237,34 @@ export async function fetchLayerParamsFromConfigurationService(
   return layersParams;
 }
 
+export async function fetchDataProduct(url: string, reqConfig: RequestConfiguration): Promise<any> {
+  const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
+  if (!authToken) {
+    throw new Error('Must be authenticated to fetch layer params');
+  }
+  const headers = {
+    Authorization: `Bearer ${authToken}`,
+  };
+
+  const requestConfig: AxiosRequestConfig = {
+    responseType: 'json',
+    headers: headers,
+    ...getAxiosReqParams(
+      {
+        ...reqConfig,
+        // Do not override cache if cache is disabled with `expiresIn: 0`
+        cache:
+          reqConfig && reqConfig.cache && reqConfig.cache.expiresIn === 0
+            ? reqConfig.cache
+            : CACHE_CONFIG_30MIN_MEMORY,
+      },
+      null,
+    ),
+  };
+  const res = await axios.get(url, requestConfig);
+  return res;
+}
+
 export function ensureMercatorBBox(bbox: BBox): BBox {
   if (bbox.crs.authId === CRS_EPSG3857.authId) {
     return bbox;
