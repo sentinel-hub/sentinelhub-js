@@ -28,11 +28,11 @@ import { wmsGetMapUrl } from './wms';
 
 import { Effects } from '../mapDataManipulation/const';
 import { runEffectFunctions } from '../mapDataManipulation/runEffectFunctions';
+import { StatisticsProviderType } from '../statistics/const';
 import { Fis } from '../statistics/Fis';
 import { StatisticalApi } from '../statistics/StatisticalApi';
 import { CACHE_CONFIG_30MIN, CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
-import { fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
-import { StatisticsProviderType } from '../statistics/const';
+import { fetchDataProduct, fetchLayerParamsFromConfigurationService, getSHServiceRootUrl } from './utils';
 
 interface ConstructorParameters {
   instanceId?: string | null;
@@ -127,6 +127,19 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!layerParams) {
       throw new Error('Layer params could not be found');
     }
+
+    if (
+      !layerParams['evalscript'] &&
+      layerParams['dataProduct'] &&
+      !SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(layerParams['dataProduct'])
+    ) {
+      const response = await fetchDataProduct(layerParams['dataProduct'], reqConfig);
+      const evalScript = response?.data?.evalScript;
+      if (evalScript) {
+        layerParams['evalscript'] = evalScript;
+      }
+    }
+
     return layerParams;
   }
 
@@ -236,10 +249,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   }
 
   public supportsApiType(api: ApiType): boolean {
-    if (this.dataProduct && !SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(this.dataProduct)) {
-      return api === ApiType.WMS;
+    if (this.dataProduct && SUPPORTED_DATA_PRODUCTS_PROCESSING.includes(this.dataProduct)) {
+      return api === ApiType.PROCESSING;
     }
-    return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset);
+    return api === ApiType.WMS || (api === ApiType.PROCESSING && !!this.dataset && !!this.evalscript);
   }
 
   protected getWmsGetMapUrlAdditionalParameters(): Record<string, any> {
@@ -679,7 +692,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (!this.downsampling && layerParams.downsampling) {
         this.downsampling = layerParams.downsampling;
       }
-      // this is a hotfix for `supportsApiType()` not having enough information - should be fixed properly later:
+
       this.dataProduct = layerParams['dataProduct'] ? layerParams['dataProduct'] : null;
     }, reqConfig);
   }
