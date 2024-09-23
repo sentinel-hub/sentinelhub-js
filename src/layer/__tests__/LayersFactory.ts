@@ -155,7 +155,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: [] }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
+        return `https://services.sentinel-hub.com/api/v2/configuration/instances/${instanceId}/layers`;
       },
     ],
     [
@@ -217,7 +217,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: [] }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/configuration/v1/wms/instances/${instanceId}/layers`;
+        return `https://sh.dataspace.copernicus.eu/api/v2/configuration/instances/${instanceId}/layers`;
       },
     ],
     [
@@ -255,7 +255,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: [] }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services.sentinel-hub.com/configuration/v1/wms/instances/${instanceId}/layers`;
+        return `https://services.sentinel-hub.com/api/v2/configuration/instances/${instanceId}/layers`;
       },
     ],
 
@@ -281,7 +281,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: [] }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/configuration/v1/wms/instances/${instanceId}/layers`;
+        return `https://sh.dataspace.copernicus.eu/api/v2/configuration/instances/${instanceId}/layers`;
       },
     ],
 

@@ -26,6 +26,6 @@ export const checkLayersParamsEndpoint = async (
   });
   await layer.updateLayerFromServiceIfNeeded({});
   expect(mockNetwork.history.get[0].url).toBe(
-    `${expectedEndpoint}/configuration/v1/wms/instances/${instanceId}/layers`,
+    `${expectedEndpoint}/api/v2/configuration/instances/${instanceId}/layers`,
   );
 };

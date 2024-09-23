@@ -298,7 +298,7 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
   const mockedResponse = [
     {
       '@id':
-        'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC3',
+        'https://services.sentinel-hub.com/api/v2/configuration/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC3',
       id: 'BYOC3',
       title: 'byoc3',
       description: '',
@@ -313,7 +313,7 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
       orderHint: 0,
       instance: {
         '@id':
-          'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
+          'https://services.sentinel-hub.com/api/v2/configuration/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
       },
       dataset: {
         '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM',
@@ -339,7 +339,7 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
     },
     {
       '@id':
-        'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC_AZER_SKY_TRUE_COLOR',
+        'https://services.sentinel-hub.com/api/v2/configuration/instances/cc6082af-2788-4b20-b0fe-54e13454bc66/layers/BYOC_AZER_SKY_TRUE_COLOR',
       id: 'BYOC_AZER_SKY_TRUE_COLOR',
       title: 'BYOC_AZER_SKY_TRUE_COLOR',
       description: '',
@@ -354,7 +354,7 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
       orderHint: 0,
       instance: {
         '@id':
-          'https://services.sentinel-hub.com/configuration/v1/wms/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
+          'https://services.sentinel-hub.com/api/v2/configuration/instances/cc6082af-2788-4b20-b0fe-54e13454bc66',
       },
       dataset: {
         '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/CUSTOM',

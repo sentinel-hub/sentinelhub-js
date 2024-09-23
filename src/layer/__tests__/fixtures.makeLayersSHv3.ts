@@ -2,7 +2,7 @@ import { DATASET_S2L2A } from '../dataset';
 
 export const getLayersFromConfigurationService = [
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId/layers/1_TRUE_COLOR',
+    '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId/layers/1_TRUE_COLOR',
     id: '1_TRUE_COLOR',
     title: 'True color',
     description: 'Based on bands 4,3,2',
@@ -15,7 +15,7 @@ export const getLayersFromConfigurationService = [
     ],
     orderHint: 0,
     instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
+      '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId',
     },
     dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
     datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
@@ -27,7 +27,7 @@ export const getLayersFromConfigurationService = [
     },
   },
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId/layers/8-NDSI',
+    '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId/layers/8-NDSI',
     id: '8-NDSI',
     title: 'NDSI',
     description: 'Based on combination of bands (B3 - B11)/(B3 + B11)',
@@ -41,7 +41,7 @@ export const getLayersFromConfigurationService = [
     ],
     orderHint: 70,
     instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
+      '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId',
     },
     dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
     datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
@@ -56,7 +56,7 @@ export const getLayersFromConfigurationService = [
     },
   },
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
+    '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId',
     id: 'B8A',
     title: 'B8A',
     description: 'Band 8A - Vegetation Red Edge - 865 nm|#bc0e10',
@@ -72,7 +72,7 @@ export const getLayersFromConfigurationService = [
     ],
     orderHint: 0,
     instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
+      '@id': 'https://services.sentinel-hub.com/api/v2/configuration/instances/instanceId',
     },
     dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
     datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
