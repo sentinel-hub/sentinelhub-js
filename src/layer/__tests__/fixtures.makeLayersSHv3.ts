@@ -2,7 +2,6 @@ import { DATASET_S2L2A } from '../dataset';
 
 export const getLayersFromConfigurationService = [
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId/layers/1_TRUE_COLOR',
     id: '1_TRUE_COLOR',
     title: 'True color',
     description: 'Based on bands 4,3,2',
@@ -14,11 +13,9 @@ export const getLayersFromConfigurationService = [
       },
     ],
     orderHint: 0,
-    instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
-    },
-    dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
-    datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
+    instanceId: 'instanceId',
+    collectionType: 'S2L2A',
+    datasetSourceIdId: '2',
     defaultStyleName: 'default',
     datasourceDefaults: {
       temporal: false,
@@ -27,7 +24,6 @@ export const getLayersFromConfigurationService = [
     },
   },
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId/layers/8-NDSI',
     id: '8-NDSI',
     title: 'NDSI',
     description: 'Based on combination of bands (B3 - B11)/(B3 + B11)',
@@ -40,11 +36,9 @@ export const getLayersFromConfigurationService = [
       },
     ],
     orderHint: 70,
-    instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
-    },
-    dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
-    datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
+    instanceId: 'instanceId',
+    collectionType: 'S2L2A',
+    datasetSourceId: '2',
     defaultStyleName: 'default',
     datasourceDefaults: {
       upsampling: 'NEAREST',
@@ -56,7 +50,6 @@ export const getLayersFromConfigurationService = [
     },
   },
   {
-    '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
     id: 'B8A',
     title: 'B8A',
     description: 'Band 8A - Vegetation Red Edge - 865 nm|#bc0e10',
@@ -65,17 +58,14 @@ export const getLayersFromConfigurationService = [
         name: 'default',
         description: 'Default layer style',
         dataProduct: {
-          '@id':
-            'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/dataproducts/dataProductId',
+          id: 'dataProductId',
         },
       },
     ],
     orderHint: 0,
-    instance: {
-      '@id': 'https://services.sentinel-hub.com/configuration/v1/wms/instances/instanceId',
-    },
-    dataset: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A' },
-    datasetSource: { '@id': 'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/sources/2' },
+    instanceId: 'instanceId',
+    collectionType: 'S2L2A',
+    datasetSourceId: '2',
     defaultStyleName: 'default',
     datasourceDefaults: {
       mosaickingOrder: 'mostRecent',
@@ -215,7 +205,7 @@ export const expectedResultConfigurationService = (
     evalscript: null as string,
     evalscriptUrl: null as string,
     dataProduct:
-      'https://services.sentinel-hub.com/configuration/v1/datasets/S2L2A/dataproducts/dataProductId',
+      'https://services.sentinel-hub.com/api/v2/configuration/datasets/S2L2A/dataproducts/dataProductId',
     upsampling: null as string,
     downsampling: null as string,
     mosaickingOrder: 'mostRecent',

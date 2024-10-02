@@ -208,7 +208,7 @@ describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
     });
     expect(layer.locationId).toEqual(null);
     mockNetwork
-      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .onGet('https://services.sentinel-hub.com/api/v2/configuration/instances/INSTANCE_ID/layers')
       .replyOnce(200, mockedLayersResponse);
     await layer.updateLayerFromServiceIfNeeded();
     expect(layer.locationId).toEqual(LocationIdSHv3.awsEuCentral1);
@@ -224,7 +224,7 @@ describe('Test updateLayerFromServiceIfNeeded for ZARR', () => {
     });
     expect(layer.locationId).toEqual(LocationIdSHv3.creo);
     mockNetwork
-      .onGet('https://services.sentinel-hub.com/configuration/v1/wms/instances/INSTANCE_ID/layers')
+      .onGet('https://services.sentinel-hub.com/api/v2/configuration/instances/INSTANCE_ID/layers')
       .replyOnce(200, mockedLayersResponse);
     await layer.updateLayerFromServiceIfNeeded();
     expect(layer.locationId).toEqual(LocationIdSHv3.creo);

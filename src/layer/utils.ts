@@ -198,7 +198,7 @@ export async function fetchLayerParamsFromConfigurationService(
     throw new Error('Must be authenticated to fetch layer params');
   }
   const configurationServiceHostName = shServiceHostName ?? SH_SERVICE_ROOT_URL.default;
-  const url = `${configurationServiceHostName}configuration/v1/wms/instances/${instanceId}/layers`;
+  const url = `${configurationServiceHostName}api/v2/configuration/instances/${instanceId}/layers`;
   const headers = {
     Authorization: `Bearer ${authToken}`,
   };
@@ -229,7 +229,9 @@ export async function fetchLayerParamsFromConfigurationService(
       maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
     }),
     evalscript: l.styles[0].evalScript,
-    dataProduct: l.styles[0].dataProduct ? l.styles[0].dataProduct['@id'] : undefined,
+    dataProduct: l.styles[0].dataProduct
+      ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${l.styles[0].dataProduct['id']}`
+      : undefined,
     legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
       ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
       : null,
