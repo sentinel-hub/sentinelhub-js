@@ -219,23 +219,25 @@ export async function fetchLayerParamsFromConfigurationService(
     ...getAxiosReqParams(reqConfigWithMemoryCache, null),
   };
   const res = await axios.get(url, requestConfig);
-  const layersParams = res.data.map((l: any) => ({
-    layerId: l.id,
-    title: l.title,
-    description: l.description,
-    ...l.datasourceDefaults,
-    //maxCloudCoverPercent vs maxCloudCoverage
-    ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
-      maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
-    }),
-    evalscript: l.styles[0].evalScript,
-    dataProduct: l.styles[0].dataProductId
-      ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${l.styles[0].dataProductId}`
-      : undefined,
-    legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
-      ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
-      : null,
-  }));
+  const layersParams = res.data.map((l: any) => {
+    const defaultStyle = l.styles.find((s: any) => s.name === l.defaultStyleName) ?? l.styles[0];
+
+    return {
+      layerId: l.id,
+      title: l.title,
+      description: l.description,
+      ...l.datasourceDefaults,
+      //maxCloudCoverPercent vs maxCloudCoverage
+      ...(l.datasourceDefaults?.maxCloudCoverage !== undefined && {
+        maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
+      }),
+      evalscript: defaultStyle.evalScript,
+      dataProduct: defaultStyle.dataProductId
+        ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${defaultStyle.dataProductId}`
+        : undefined,
+      legend: defaultStyle ? defaultStyle.legend : null,
+    };
+  });
   return layersParams;
 }
 
