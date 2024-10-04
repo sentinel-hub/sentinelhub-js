@@ -57,9 +57,7 @@ export const getLayersFromConfigurationService = [
       {
         name: 'default',
         description: 'Default layer style',
-        dataProduct: {
-          id: 'dataProductId',
-        },
+        dataProductId: 'dataProductId',
       },
     ],
     orderHint: 0,

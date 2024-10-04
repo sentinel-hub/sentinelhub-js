@@ -229,8 +229,8 @@ export async function fetchLayerParamsFromConfigurationService(
       maxCloudCoverPercent: l.datasourceDefaults.maxCloudCoverage,
     }),
     evalscript: l.styles[0].evalScript,
-    dataProduct: l.styles[0].dataProduct
-      ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${l.styles[0].dataProduct['id']}`
+    dataProduct: l.styles[0].dataProductId
+      ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${l.styles[0].dataProductId}`
       : undefined,
     legend: l.styles.find((s: any) => s.name === l.defaultStyleName)
       ? l.styles.find((s: any) => s.name === l.defaultStyleName).legend
