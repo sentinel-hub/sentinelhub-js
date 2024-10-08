@@ -79,8 +79,6 @@ export enum PlanetARPSType {
 
 export enum PlanetARPSId {
   PS_ARD_SR_DAILY = 'PS_ARD_SR_DAILY',
-  PS_ARD_SR_BIWEEKLY = 'PS_ARD_SR_BIWEEKLY',
-  PS_ARD_SR_MONTHLY = 'PS_ARD_SR_MONTHLY',
 }
 
 export enum PlanetPVType {
