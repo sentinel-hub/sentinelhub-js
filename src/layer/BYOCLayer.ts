@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from 'axios';
 import moment from 'moment';
-import axios from 'axios';
+import axios, { ResponseType } from 'axios';
 import { Geometry } from '@turf/helpers';
 
 import { getAuthToken } from '../auth';
@@ -296,14 +296,23 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         throw new Error('Fetching available bands for ZARR not supported.');
       }
 
-      const url = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
-      const headers = { Authorization: `Bearer ${getAuthToken()}` };
-      const res = await axios.get(url, {
-        responseType: 'json',
-        headers: headers,
+      const commonReqConfig = {
+        responseType: 'json' as ResponseType,
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
         ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-      });
-      return res.data.bands;
+      };
+
+      const metadataUrl = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
+      const metadataRes = await axios.get(metadataUrl, commonReqConfig);
+      const metadataBands: BYOCBand[] = metadataRes.data.bands;
+
+      const catalogUrl = `${metadataRes.data.location.catalogUrl}/collections/${this.getTypeId()}`;
+      const catalogRes = await axios.get(catalogUrl, commonReqConfig);
+      const catalogBands: { name: string }[] = catalogRes.data.summaries['eo:bands'];
+
+      // we need bands' sampleTypes that are returned from Metadata API
+      // but want to use only bands that are also returned from Catalog API
+      return metadataBands.filter((mb) => !!catalogBands.find((cb) => cb.name === mb.name));
     }, reqConfig);
     return bandsResponseData;
   }
