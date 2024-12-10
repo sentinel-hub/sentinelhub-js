@@ -24,6 +24,7 @@ interface ConstructorParameters {
   legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
   view?: S3SLSTRView | null;
+  highlights?: AbstractSentinelHubV3WithCCLayer['highlights'];
 }
 
 export enum S3SLSTRView {

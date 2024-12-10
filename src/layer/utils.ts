@@ -188,17 +188,27 @@ export function getSHServiceRootUrlFromBaseUrl(baseUrl: string): string {
   return getSHServiceRootUrl(host);
 }
 
-export async function fetchLayerParamsFromConfigurationService(
-  shServiceHostName: string,
-  instanceId: string,
-  reqConfig: RequestConfiguration,
-): Promise<any[]> {
+export async function fetchLayerParamsFromConfigurationService({
+  shServiceHostName,
+  instanceId,
+  includeHighlights,
+  reqConfig,
+}: {
+  shServiceHostName: string;
+  instanceId: string;
+  includeHighlights?: boolean;
+  reqConfig: RequestConfiguration;
+}): Promise<any[]> {
   const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
   if (!authToken) {
     throw new Error('Must be authenticated to fetch layer params');
   }
   const configurationServiceHostName = shServiceHostName ?? SH_SERVICE_ROOT_URL.default;
-  const url = `${configurationServiceHostName}api/v2/configuration/instances/${instanceId}/layers`;
+  const url = new URL(`${configurationServiceHostName}api/v2/configuration/instances/${instanceId}/layers`);
+  if (includeHighlights) {
+    url.searchParams.set('listHighlights', 'true');
+  }
+
   const headers = {
     Authorization: `Bearer ${authToken}`,
   };
@@ -218,7 +228,7 @@ export async function fetchLayerParamsFromConfigurationService(
     headers: headers,
     ...getAxiosReqParams(reqConfigWithMemoryCache, null),
   };
-  const res = await axios.get(url, requestConfig);
+  const res = await axios.get(url.toString(), requestConfig);
   const layersParams = res.data.map((l: any) => {
     const defaultStyle = l.styles.find((s: any) => s.name === l.defaultStyleName) ?? l.styles[0];
 
@@ -236,6 +246,7 @@ export async function fetchLayerParamsFromConfigurationService(
         ? `${configurationServiceHostName}api/v2/configuration/datasets/${l.collectionType}/dataproducts/${defaultStyle.dataProductId}`
         : undefined,
       legend: defaultStyle ? defaultStyle.legend : null,
+      highlights: l.highlights?.member,
     };
   });
   return layersParams;
