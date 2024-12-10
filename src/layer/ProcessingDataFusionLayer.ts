@@ -32,6 +32,7 @@ interface ConstructorParameters {
   layers: DataFusionLayerInfo[];
   title?: string | null;
   description?: string | null;
+  highlights?: AbstractSentinelHubV3Layer['highlights'];
 }
 
 export type DataFusionLayerInfo = {
@@ -54,8 +55,9 @@ export class ProcessingDataFusionLayer extends AbstractSentinelHubV3Layer {
     evalscript = null,
     evalscriptUrl = null,
     layers,
+    highlights = null,
   }: ConstructorParameters) {
-    super({ title, description, evalscript, evalscriptUrl });
+    super({ title, description, evalscript, evalscriptUrl, highlights });
     this.layers = layers;
   }
 

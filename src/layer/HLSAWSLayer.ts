@@ -16,6 +16,7 @@ interface ConstructorParameters {
   legendUrl?: string | null;
   maxCloudCoverPercent?: number | null;
   constellation?: HLSConstellation | null;
+  highlights?: AbstractSentinelHubV3WithCCLayer['highlights'];
 }
 
 type HLSFindTilesDatasetParameters = {

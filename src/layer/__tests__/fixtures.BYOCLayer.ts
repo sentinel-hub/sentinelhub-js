@@ -395,6 +395,7 @@ export function constructFixtureUpdateLayerFromServiceIfNeeded({
     legend: undefined as any,
     title: 'byoc3',
     description: '',
+    highlights: undefined as any,
   };
 
   return {
