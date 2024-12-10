@@ -297,3 +297,15 @@ export const XmlParserOptions = Object.freeze({
     return isA;
   },
 });
+
+export interface Highlight {
+  id: string;
+  layerId: string;
+  instanceId: string;
+  title: string;
+  description: string;
+  areaOfInterest: object;
+  fromTime: string;
+  toTime: string;
+  orderHint: string;
+}

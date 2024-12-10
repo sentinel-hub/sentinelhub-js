@@ -21,6 +21,7 @@ export interface ConstructorParameters {
   demInstance?: DEMInstanceType | null;
   egm?: boolean | null;
   clampNegative?: boolean | null;
+  highlights?: AbstractSentinelHubV3Layer['highlights'];
 }
 
 export class AbstractDEMLayer extends AbstractSentinelHubV3Layer {
