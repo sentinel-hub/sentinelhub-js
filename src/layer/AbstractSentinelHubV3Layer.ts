@@ -22,6 +22,7 @@ import {
   PaginatedTiles,
   Stats,
   SUPPORTED_DATA_PRODUCTS_PROCESSING,
+  Highlight,
 } from './const';
 import { createProcessingPayload, processingGetMap, ProcessingPayload } from './processing';
 import { wmsGetMapUrl } from './wms';
@@ -46,6 +47,7 @@ interface ConstructorParameters {
   upsampling?: Interpolator | null;
   downsampling?: Interpolator | null;
   legendUrl?: string | null;
+  highlights?: Highlight[] | null;
 }
 
 // this class provides any SHv3-specific functionality to the subclasses:
@@ -59,6 +61,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   public mosaickingOrder: MosaickingOrder | null; // public because ProcessingDataFusionLayer needs to read it directly
   public upsampling: Interpolator | null;
   public downsampling: Interpolator | null;
+  public highlights?: Highlight[] | null;
 
   public constructor({
     instanceId = null,
@@ -72,6 +75,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     upsampling = null,
     downsampling = null,
     legendUrl = null,
+    highlights = null,
   }: ConstructorParameters) {
     super({ title, description, legendUrl });
     if (
@@ -92,6 +96,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     this.mosaickingOrder = mosaickingOrder;
     this.upsampling = upsampling;
     this.downsampling = downsampling;
+    this.highlights = highlights;
   }
 
   public getLayerId(): string {
@@ -117,11 +122,11 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     if (!this.dataset) {
       throw new Error('This layer does not support Processing API (unknown dataset)');
     }
-    const layersParams = await fetchLayerParamsFromConfigurationService(
-      this.getSHServiceRootUrl(),
-      this.instanceId,
+    const layersParams = await fetchLayerParamsFromConfigurationService({
+      shServiceHostName: this.getSHServiceRootUrl(),
+      instanceId: this.instanceId,
       reqConfig,
-    );
+    });
 
     const layerParams = layersParams.find((l: any) => l.layerId === this.layerId);
     if (!layerParams) {

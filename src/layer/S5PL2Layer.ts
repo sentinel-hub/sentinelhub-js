@@ -37,6 +37,7 @@ interface ConstructorParameters {
   productType?: ProductType | null;
   maxCloudCoverPercent?: number | null;
   minQa?: number | null;
+  highlights?: AbstractSentinelHubV3Layer['highlights'];
 }
 
 type S5PL2FindTilesDatasetParameters = {
@@ -63,8 +64,19 @@ export class S5PL2Layer extends AbstractSentinelHubV3Layer {
     productType = null,
     maxCloudCoverPercent = 100,
     minQa = null,
+    highlights = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
+    super({
+      instanceId,
+      layerId,
+      evalscript,
+      evalscriptUrl,
+      dataProduct,
+      title,
+      description,
+      legendUrl,
+      highlights,
+    });
     this.productType = productType;
     this.maxCloudCoverPercent = maxCloudCoverPercent;
     this.minQa = minQa;
