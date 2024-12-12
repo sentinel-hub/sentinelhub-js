@@ -71,6 +71,7 @@ interface ConstructorParameters {
   backscatterCoeff?: BackscatterCoeff | null;
   orbitDirection?: OrbitDirection | null;
   speckleFilter?: SpeckleFilter | null;
+  highlights?: AbstractSentinelHubV3Layer['highlights'];
 }
 
 type S1GRDFindTilesDatasetParameters = {
@@ -112,8 +113,19 @@ export class S1GRDAWSEULayer extends AbstractSentinelHubV3Layer {
     orbitDirection = null,
     speckleFilter = null,
     mosaickingOrder = null,
+    highlights = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, legendUrl });
+    super({
+      instanceId,
+      layerId,
+      evalscript,
+      evalscriptUrl,
+      dataProduct,
+      title,
+      description,
+      legendUrl,
+      highlights,
+    });
     this.acquisitionMode = acquisitionMode;
     this.polarization = polarization;
     this.resolution = resolution;
