@@ -44,7 +44,7 @@ export const DATASET_CDAS_S1GRD: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S1GRD: Dataset = {
-  id: 'CDAS_OTC_S1GRD',
+  id: 'CDAS_S1GRD',
   shJsonGetCapabilitiesDataset: 'S1GRD',
   shWmsEvalsource: 'S1GRD',
   shProcessingApiDatasourceAbbreviation: 'S1GRD',
@@ -104,7 +104,7 @@ export const DATASET_CDAS_S2L2A: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S2L2A: Dataset = {
-  id: 'CDAS_OTC_S2L2A',
+  id: 'CDAS_S2L2A',
   shJsonGetCapabilitiesDataset: 'S2L2A',
   shWmsEvalsource: 'S2L2A',
   shProcessingApiDatasourceAbbreviation: 'S2L2A',
@@ -134,7 +134,7 @@ export const DATASET_CDAS_S2L1C: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S2L1C: Dataset = {
-  id: 'CDAS_OTC_S2L1C',
+  id: 'CDAS_S2L1C',
   shJsonGetCapabilitiesDataset: 'S2L1C',
   shWmsEvalsource: 'S2',
   shProcessingApiDatasourceAbbreviation: 'S2L1C',
@@ -179,7 +179,7 @@ export const DATASET_CDAS_S3SLSTR: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S3SLSTR: Dataset = {
-  id: 'CDAS_OTC_S3SLSTR',
+  id: 'CDAS_S3SLSTR',
   shJsonGetCapabilitiesDataset: 'S3SLSTR',
   shWmsEvalsource: 'S3SLSTR',
   shProcessingApiDatasourceAbbreviation: 'S3SLSTR',
@@ -224,7 +224,7 @@ export const DATASET_CDAS_S3OLCI: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S3OLCI: Dataset = {
-  id: 'CDAS_OTC_S3OLCI',
+  id: 'CDAS_S3OLCI',
   shJsonGetCapabilitiesDataset: 'S3OLCI',
   shWmsEvalsource: 'S3OLCI',
   shProcessingApiDatasourceAbbreviation: 'S3OLCI',
@@ -254,7 +254,7 @@ export const DATASET_CDAS_S3OLCIL2: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S3OLCIL2: Dataset = {
-  id: 'CDAS_OTC_S3OLCIL2',
+  id: 'CDAS_S3OLCIL2',
   shJsonGetCapabilitiesDataset: 'S3OLCIL2',
   shWmsEvalsource: 'sentinel-3-olci-l2',
   shProcessingApiDatasourceAbbreviation: 'sentinel-3-olci-l2',
@@ -299,7 +299,7 @@ export const DATASET_CDAS_S5PL2: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_S5PL2: Dataset = {
-  id: 'CDAS_OTC_S5PL2',
+  id: 'CDAS_S5PL2',
   shJsonGetCapabilitiesDataset: 'S5PL2',
   shWmsEvalsource: 'S5P_L2',
   shProcessingApiDatasourceAbbreviation: 'S5PL2',
@@ -506,7 +506,7 @@ export const DATASET_CDAS_DEM: Dataset = {
 };
 
 export const DATASET_CDAS_OTC_DEM: Dataset = {
-  id: 'CDAS_OTC_DEM',
+  id: 'CDAS_DEM',
   shJsonGetCapabilitiesDataset: 'DEM',
   shWmsEvalsource: 'DEM',
   shProcessingApiDatasourceAbbreviation: 'DEM',
