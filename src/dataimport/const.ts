@@ -79,8 +79,6 @@ export enum PlanetARPSType {
 
 export enum PlanetARPSId {
   PS_ARD_SR_DAILY = 'PS_ARD_SR_DAILY',
-  PS_ARD_SR_BIWEEKLY = 'PS_ARD_SR_BIWEEKLY',
-  PS_ARD_SR_MONTHLY = 'PS_ARD_SR_MONTHLY',
 }
 
 export enum PlanetPVType {
@@ -91,7 +89,6 @@ export enum PlanetPVType {
 }
 
 export enum PlanetPVId {
-  BIOMASS_PROXY_V3_0_10 = 'BIOMASS-PROXY_V3.0_10',
   BIOMASS_PROXY_V4_0_10 = 'BIOMASS-PROXY_V4.0_10',
   LST_AMSR2_V1_0_100 = 'LST-AMSR2_V1.0_100',
   LST_AMSRE_V1_0_1000 = 'LST-AMSRE_V1.0_1000',
@@ -118,7 +115,7 @@ export enum PlanetPVId {
 }
 
 export const PlanetSupportedPVIds = {
-  [PlanetPVType.BiomassProxy]: [PlanetPVId.BIOMASS_PROXY_V3_0_10, PlanetPVId.BIOMASS_PROXY_V4_0_10],
+  [PlanetPVType.BiomassProxy]: [PlanetPVId.BIOMASS_PROXY_V4_0_10],
   [PlanetPVType.LandSurfaceTemperature]: [
     PlanetPVId.LST_AMSR2_V1_0_100,
     PlanetPVId.LST_AMSRE_V1_0_1000,

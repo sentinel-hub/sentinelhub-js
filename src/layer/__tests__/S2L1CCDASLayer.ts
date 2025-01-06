@@ -187,8 +187,8 @@ describe('Test findDatesUTC using catalog', () => {
 });
 
 test.each([
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/99999', false],
-  ['https://services.sentinel-hub.com/configuration/v1/datasets/S2L1C/dataproducts/643', true],
+  ['https://services.sentinel-hub.com/api/v2/configuration/datasets/S2L1C/dataproducts/99999', false],
+  ['https://services.sentinel-hub.com/api/v2/configuration/datasets/S2L1C/dataproducts/643', true],
 ])(
   'AbstractSentinelHubV3Layer.supportsApiType correctly handles DataProducts supported by Processing API',
   (dataProduct, expectedResult) => {
