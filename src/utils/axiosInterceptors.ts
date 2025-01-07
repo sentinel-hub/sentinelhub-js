@@ -130,13 +130,26 @@ const retryRequests = (err: any): any => {
   return Promise.reject(err);
 };
 
-const shouldRetry = (error: AxiosError): boolean => {
-  // error.response is not always defined, as the error could be thrown before we get a response from the server
-  // https://github.com/axios/axios/issues/960#issuecomment-398269712
-  if (!error.response || !error.response.status) {
+const isNetworkError = (error: AxiosError): boolean => {
+  const CODE_EXCLUDE_LIST = ['ERR_CANCELED', 'ECONNABORTED'];
+
+  if (error.response) {
     return false;
   }
-  return error.response.status == 429 || (error.response.status >= 500 && error.response.status <= 599);
+  if (!error.code) {
+    return false;
+  }
+  return !CODE_EXCLUDE_LIST.includes(error.code);
+};
+
+const shouldRetry = (error: AxiosError): boolean => {
+  console.log(error);
+  return (
+    isNetworkError(error) ||
+    !error.response ||
+    error.response.status === 429 ||
+    (error.response.status >= 500 && error.response.status <= 599)
+  );
 };
 
 export const addAxiosRequestInterceptor = (
