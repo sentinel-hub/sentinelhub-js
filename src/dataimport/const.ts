@@ -86,7 +86,6 @@ export enum PlanetPVType {
   LandSurfaceTemperature = 'land_surface_temperature',
   SoilWaterContent = 'soil_water_content',
   ForestCarbonDiligence30m = 'forest_carbon_diligence_30m',
-  ForestCarbonMonitoring3m = 'forest_carbon_monitoring_3m',
 }
 
 export enum PlanetPVId {
@@ -113,12 +112,6 @@ export enum PlanetPVId {
   CANOPY_HEIGHT_V1_1_0_30 = 'CANOPY_HEIGHT_v1.1.0_30',
   CANOPY_COVER_V1_1_0_30 = 'CANOPY_COVER_v1.1.0_30',
   ABOVEGROUND_CARBON_DENSITY_V1_1_0_30 = 'ABOVEGROUND_CARBON_DENSITY_v1.1.0_30',
-  CANOPY_HEIGHT_V1_2_0_30 = 'CANOPY_HEIGHT_v1.2.0_30',
-  CANOPY_COVER_V1_2_0_30 = 'CANOPY_COVER_v1.2.0_30',
-  ABOVEGROUND_CARBON_DENSITY_V1_2_0_30 = 'ABOVEGROUND_CARBON_DENSITY_v1.2.0_30',
-  CANOPY_HEIGHT_V1_0_0_3 = 'CANOPY_HEIGHT_v1.0.0_3',
-  CANOPY_COVER_V1_0_0_3 = 'CANOPY_COVER_v1.0.0_3',
-  ABOVEGROUND_CARBON_DENSITY_V1_0_0_3 = 'ABOVEGROUND_CARBON_DENSITY_v1.0.0_3',
 }
 
 export const PlanetSupportedPVIds = {
@@ -150,14 +143,6 @@ export const PlanetSupportedPVIds = {
     PlanetPVId.CANOPY_HEIGHT_V1_1_0_30,
     PlanetPVId.CANOPY_COVER_V1_1_0_30,
     PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_1_0_30,
-    PlanetPVId.CANOPY_HEIGHT_V1_2_0_30,
-    PlanetPVId.CANOPY_COVER_V1_2_0_30,
-    PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_2_0_30,
-  ],
-  [PlanetPVType.ForestCarbonMonitoring3m]: [
-    PlanetPVId.CANOPY_HEIGHT_V1_0_0_3,
-    PlanetPVId.CANOPY_COVER_V1_0_0_3,
-    PlanetPVId.ABOVEGROUND_CARBON_DENSITY_V1_0_0_3,
   ],
 };
 
