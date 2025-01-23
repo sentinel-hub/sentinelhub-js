@@ -215,6 +215,7 @@ export class LayersFactory {
     overrideConstructorParams?: Record<string, any> | null,
     reqConfig?: RequestConfiguration,
     preferGetCapabilities: boolean = true,
+    includeHighlights: boolean = false,
   ): Promise<AbstractLayer[]> {
     const returnValue = await ensureTimeout(async (innerReqConfig) => {
       for (let hostname of SH_SERVICE_HOSTNAMES_V3) {
@@ -225,6 +226,7 @@ export class LayersFactory {
             overrideConstructorParams,
             innerReqConfig,
             preferGetCapabilities,
+            includeHighlights,
           );
         }
       }
@@ -252,12 +254,14 @@ export class LayersFactory {
     overrideConstructorParams: Record<string, any> | null,
     reqConfig: RequestConfiguration,
     preferGetCapabilities: boolean = true,
+    includeHighlights: boolean = false,
   ): Promise<AbstractLayer[]> {
     const filteredLayersInfos = await this.getSHv3LayersInfo(
       baseUrl,
       reqConfig,
       filterLayers,
       preferGetCapabilities,
+      includeHighlights,
     );
 
     return filteredLayersInfos.map(
@@ -295,6 +299,7 @@ export class LayersFactory {
     reqConfig: RequestConfiguration,
     filterLayers: Function,
     preferGetCapabilities: boolean = true,
+    includeHighlights: boolean = false,
   ): Promise<any[]> {
     let layersInfos;
     //also check if auth token is present
@@ -303,11 +308,12 @@ export class LayersFactory {
     // use configuration if possible
     if (authToken && preferGetCapabilities === false) {
       try {
-        const layers = await fetchLayerParamsFromConfigurationService(
-          getSHServiceRootUrlFromBaseUrl(baseUrl),
-          parseSHInstanceId(baseUrl),
+        const layers = await fetchLayerParamsFromConfigurationService({
+          shServiceHostName: getSHServiceRootUrlFromBaseUrl(baseUrl),
+          instanceId: parseSHInstanceId(baseUrl),
+          includeHighlights,
           reqConfig,
-        );
+        });
         layersInfos = layers.map((l: any) => ({
           ...l,
           dataset: LayersFactory.matchDatasetFromGetCapabilities(l.type, baseUrl),

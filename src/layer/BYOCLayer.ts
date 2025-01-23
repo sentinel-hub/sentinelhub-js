@@ -40,6 +40,7 @@ interface ConstructorParameters {
   locationId?: LocationIdSHv3 | null;
   subType?: BYOCSubTypes | null;
   shServiceRootUrl?: string;
+  highlights?: AbstractSentinelHubV3Layer['highlights'];
 }
 
 type BYOCFindTilesDatasetParameters = {
@@ -68,8 +69,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     locationId = null,
     subType = null,
     shServiceRootUrl = SH_SERVICE_ROOT_URL.default,
+    highlights = null,
   }: ConstructorParameters) {
-    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description });
+    super({ instanceId, layerId, evalscript, evalscriptUrl, dataProduct, title, description, highlights });
     this.collectionId = collectionId;
     this.locationId = locationId;
     this.subType = subType;
