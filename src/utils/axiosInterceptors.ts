@@ -123,6 +123,7 @@ const retryRequests = (err: any): any => {
     const shouldRetry = err.config.retriesCount < maxRetries;
     if (shouldRetry) {
       err.config.retriesCount += 1;
+      err.config.transformRequest = [(data: any) => data];
       return new Promise((resolve) => setTimeout(() => resolve(axios(err.config)), DEFAULT_RETRY_DELAY));
     }
   }
