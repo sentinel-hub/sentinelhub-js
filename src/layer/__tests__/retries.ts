@@ -172,3 +172,18 @@ test(
   },
   10 * 3000 + 1000,
 );
+
+test(
+  'Compare payload is the same on retry',
+  async () => {
+    const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+    mockNetwork.reset();
+    mockNetwork.onPost().replyOnce(500);
+    mockNetwork.onPost().replyOnce(500);
+
+    await expect(layer.findTiles(bbox, fromTime, toTime, null, null, { retries: 1 })).rejects.toThrow();
+    expect(mockNetwork.history.post.length).toBe(2);
+    expect(mockNetwork.history.post[1].data).toBe(mockNetwork.history.post[0].data);
+  },
+  2 * 3000 + 1000,
+);
