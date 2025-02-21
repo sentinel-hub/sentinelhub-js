@@ -165,6 +165,7 @@ export enum LocationIdSHv3 {
   gcpUsCentral1 = 'gcp-us-central1',
   cdse = 'cdse',
   cdseOtc = 'cdse-otc',
+  cdseStaging = 'cdse-staging',
 }
 export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
@@ -174,12 +175,14 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
   [LocationIdSHv3.cdse]: 'https://sh.dataspace.copernicus.eu/',
   [LocationIdSHv3.cdseOtc]: 'https://sh-otc.dataspace.copernicus.eu/',
+  [LocationIdSHv3.cdseStaging]: 'https://sh.staging.dataspace.copernicus.eu/',
 };
 
 export const SH_SERVICE_ROOT_URL = {
   default: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1],
   cdse: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdse],
   cdseOtc: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdseOtc],
+  cdseStaging: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdseStaging],
 };
 
 export type GetStatsParams = {
