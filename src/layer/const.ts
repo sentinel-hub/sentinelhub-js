@@ -153,6 +153,7 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://creodias.sentinel-hub.com/',
   'https://sh.dataspace.copernicus.eu/',
   'https://sh-otc.dataspace.copernicus.eu/',
+  'https://sh.staging.dataspace.copernicus.eu/',
 ];
 
 // See https://services.sentinel-hub.com/api/v1/metadata/location/ for an up-to-date
