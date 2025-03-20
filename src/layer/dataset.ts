@@ -223,21 +223,6 @@ export const DATASET_CDAS_S3OLCI: Dataset = {
   catalogCollectionId: 'sentinel-3-olci',
 };
 
-export const DATASET_CDAS_OTC_S3OLCI: Dataset = {
-  id: 'CDAS_S3OLCI',
-  shJsonGetCapabilitiesDataset: 'S3OLCI',
-  shWmsEvalsource: 'S3OLCI',
-  shProcessingApiDatasourceAbbreviation: 'S3OLCI',
-  datasetParametersType: 'S3',
-  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
-  searchIndexUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/S3OLCI/searchIndex',
-  findDatesUTCUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/S3OLCI/findAvailableData',
-  orbitTimeMinutes: 50.495,
-  minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
-  maxDate: null,
-  catalogCollectionId: 'sentinel-3-olci',
-};
-
 export const DATASET_CDAS_S3OLCIL2: Dataset = {
   id: 'CDAS_S3OLCIL2',
   shJsonGetCapabilitiesDataset: 'S3OLCIL2',
@@ -251,6 +236,37 @@ export const DATASET_CDAS_S3OLCIL2: Dataset = {
   minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
   maxDate: null,
   catalogCollectionId: 'sentinel-3-olci-l2',
+};
+
+export const DATASET_CDAS_S3SYNERGYL2: Dataset = {
+  id: 'CDAS_S3SYNL2',
+  shJsonGetCapabilitiesDataset: 'S3SYNL2',
+  shWmsEvalsource: 'sentinel-3-synergy-l2',
+  shProcessingApiDatasourceAbbreviation: 'sentinel-3-synergy-l2',
+  datasetParametersType: 'S3',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SYNL2/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SYNL2/findAvailableData',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-synergy-l2',
+};
+console.log('TEEEST');
+
+export const DATASET_CDAS_OTC_S3OLCI: Dataset = {
+  id: 'CDAS_S3OLCI',
+  shJsonGetCapabilitiesDataset: 'S3OLCI',
+  shWmsEvalsource: 'S3OLCI',
+  shProcessingApiDatasourceAbbreviation: 'S3OLCI',
+  datasetParametersType: 'S3',
+  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/S3OLCI/searchIndex',
+  findDatesUTCUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/S3OLCI/findAvailableData',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 25, 11, 33, 14)), // 2016-04-25T11:33:14
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-olci',
 };
 
 export const DATASET_CDAS_OTC_S3OLCIL2: Dataset = {
