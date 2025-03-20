@@ -45,6 +45,7 @@ import {
   DATASET_AWSUS_DEM,
   DATASET_CDAS_DEM,
   DATASET_CDAS_S3OLCIL2,
+  DATASET_CDAS_S3SYNERGYL2,
 } from './layer/dataset';
 import { WmsLayer } from './layer/WmsLayer';
 import { WmtsLayer } from './layer/WmtsLayer';
@@ -143,6 +144,7 @@ import {
 import { ProcessingPayload } from './layer/processing';
 import { StatisticalApi } from './statistics/StatisticalApi';
 import { Fis } from './statistics/Fis';
+import { S3SYNL2CDASLayer } from './layer/S3SYNL2CDASLayer';
 
 registerInitialAxiosInterceptors();
 
@@ -160,6 +162,7 @@ export {
   DATASET_S3OLCI,
   DATASET_CDAS_S3OLCI,
   DATASET_CDAS_S3OLCIL2,
+  DATASET_CDAS_S3SYNERGYL2,
   DATASET_S5PL2,
   DATASET_CDAS_S5PL2,
   DATASET_AWS_L8L1C,
@@ -190,6 +193,7 @@ export {
   S3OLCILayer,
   S3OLCICDASLayer,
   S3OLCIL2CDASLayer,
+  S3SYNL2CDASLayer,
   S5PL2Layer,
   S5PL2CDASLayer,
   MODISLayer,
