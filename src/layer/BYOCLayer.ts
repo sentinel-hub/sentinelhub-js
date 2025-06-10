@@ -114,21 +114,10 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       }
 
       if (this.locationId === null) {
-        if (this.subType !== BYOCSubTypes.ZARR) {
-          const url = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
-          const headers = { Authorization: `Bearer ${getAuthToken()}` };
-          const res = await axios.get(url, {
-            responseType: 'json',
-            headers: headers,
-            ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-          });
-
-          this.locationId = res.data.location.id;
-        } else {
-          // Obtaining location ID is currently not possible for ZARR.
-          // We hardcode AWS EU as the only currently supported location.
-          this.locationId = LocationIdSHv3.awsEuCentral1;
-        }
+        this.locationId =
+          (Object.entries(SHV3_LOCATIONS_ROOT_URL).find(
+            ([, url]) => url === this.shServiceRootUrl,
+          )?.[0] as LocationIdSHv3) ?? LocationIdSHv3.awsEuCentral1;
       }
     }, reqConfig);
   }
@@ -304,17 +293,17 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
 
-      const metadataUrl = `${this.getSHServiceRootUrl()}api/v1/metadata/collection/${this.getTypeId()}`;
+      const metadataUrl = `${this.getSHServiceRootUrl()}api/v1/catalog/1.0.0/collections/${this.getTypeId()}`;
       const metadataRes = await axios.get(metadataUrl, commonReqConfig);
-      const metadataBands: BYOCBand[] = metadataRes.data.bands;
-
-      const catalogUrl = `${metadataRes.data.location.catalogUrl}/collections/${this.getTypeId()}`;
-      const catalogRes = await axios.get(catalogUrl, commonReqConfig);
-      const catalogBands: { name: string }[] = catalogRes.data.summaries['eo:bands'];
-
-      // we need bands' sampleTypes that are returned from Metadata API
-      // but want to use only bands that are also returned from Catalog API
-      return metadataBands.filter((mb) => !!catalogBands.find((cb) => cb.name === mb.name));
+      const metadataBands: BYOCBand[] = (
+        metadataRes.data.summaries['eo:bands'] as { name: string }[] | undefined
+      )?.map(({ name }, index) => {
+        return {
+          name,
+          sampleType: metadataRes.data.summaries?.['raster:bands']?.[index]?.data_type?.toUpperCase(),
+        };
+      });
+      return metadataBands;
     }, reqConfig);
     return bandsResponseData;
   }
