@@ -300,7 +300,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       )?.map(({ name }, index) => {
         return {
           name,
-          sampleType: metadataRes.data.summaries?.['raster:bands']?.[index]?.data_type?.toUpperCase(),
+          sampleType: metadataRes.data.summaries['raster:bands']?.[index].data_type.toUpperCase(),
         };
       });
       return metadataBands;
