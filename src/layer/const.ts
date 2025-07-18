@@ -171,7 +171,7 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsUsWest2]: 'https://services-uswest2.sentinel-hub.com/',
   [LocationIdSHv3.creo]: 'https://creodias.sentinel-hub.com/',
   [LocationIdSHv3.mundi]: 'https://shservices.mundiwebservices.com/',
-  [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp-us-central1.sentinel-hub.com/',
+  [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp.sentinel-hub.com/',
   [LocationIdSHv3.cdse]: 'https://sh.dataspace.copernicus.eu/',
   [LocationIdSHv3.cdseOtc]: 'https://sh-otc.dataspace.copernicus.eu/',
 };
