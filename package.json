@@ -9,7 +9,7 @@
     "@turf/area": "^6.0.1",
     "@turf/helpers": "^6.1.4",
     "@types/proj4": "^2.5.2",
-    "axios": "^0.21.1",
+    "axios": "^1.10.0",
     "fast-xml-parser": "^4.4.1",
     "moment": "^2.24.0",
     "polygon-clipping": "^0.14.3",
