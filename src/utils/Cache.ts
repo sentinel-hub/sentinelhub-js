@@ -207,7 +207,24 @@ class CacheApi implements ShCache {
       default:
         throw new Error('Unsupported response type: ' + response.request.responseType);
     }
-    return new Response(responseData, response);
+    // return new Response(responseData, response);
+
+    // Convert Axios headers to format expected by Response constructor
+    const headers = new Headers();
+    Object.entries(response.headers).forEach(([key, value]) => {
+      if (value !== undefined) {
+        headers.append(key, value.toString());
+      }
+    });
+
+    /* eslint-disable-next-line no-console */
+    console.log('resp headers', { h: response.headers, headers });
+
+    return new Response(responseData, {
+      headers,
+      status: response.status,
+      statusText: response.statusText,
+    });
   }
 
   private async deSerializeResponseData(

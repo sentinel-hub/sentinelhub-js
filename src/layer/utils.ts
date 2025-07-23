@@ -229,7 +229,8 @@ export async function fetchLayerParamsFromConfigurationService({
     ...getAxiosReqParams(reqConfigWithMemoryCache, null),
   };
   const res = await axios.get(url.toString(), requestConfig);
-  const layersParams = res.data.map((l: any) => {
+  const resData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+  const layersParams = resData.map((l: any) => {
     const defaultStyle = l.styles.find((s: any) => s.name === l.defaultStyleName) ?? l.styles[0];
 
     return {
