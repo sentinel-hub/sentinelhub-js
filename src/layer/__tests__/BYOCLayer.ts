@@ -1,6 +1,6 @@
 import { CRS_EPSG4326, setAuthToken, LocationIdSHv3, BYOCLayer, CRS_EPSG3857, BBox } from '../../index';
 import { SHV3_LOCATIONS_ROOT_URL, BYOCSubTypes, SH_SERVICE_ROOT_URL } from '../const';
-import { constructFixtureFindTilesSearchIndex, constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
+import { constructFixtureFindTilesCatalog } from './fixtures.BYOCLayer';
 
 import {
   AUTH_TOKEN,
@@ -16,14 +16,8 @@ import {
   checkResponseFindDatesUTC,
 } from './testUtils.findDatesUTC';
 
-import {
-  constructFixtureFindDatesUTCSearchIndex,
-  constructFixtureFindDatesUTCCatalog,
-} from './fixtures.findDatesUTC';
+import { constructFixtureFindDatesUTCCatalog } from './fixtures.findDatesUTC';
 
-const SEARCH_INDEX_URL = `${
-  SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]
-}byoc/v3/collections/CUSTOM/searchIndex`;
 const CATALOG_URL = `${SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1]}api/v1/catalog/1.0.0/search`;
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
@@ -49,26 +43,6 @@ const layerParamsArr: Record<string, any>[] = [
   },
 ];
 
-describe('Test findTiles using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('searchIndex is used if token is not set', async () => {
-    await checkIfCorrectEndpointIsUsed(null, constructFixtureFindTilesSearchIndex({}), SEARCH_INDEX_URL);
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    const fixtures = constructFixtureFindTilesSearchIndex(layerParams);
-    await checkRequestFindTiles(fixtures);
-  });
-
-  test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex({}));
-  });
-});
-
 describe('Test findTiles using catalog', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
@@ -89,55 +63,6 @@ describe('Test findTiles using catalog', () => {
   });
 });
 
-describe('Test findDatesUTC using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('findAvailableData is used if token is not set', async () => {
-    const layer = new BYOCLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-      collectionId: 'mockCollectionId',
-      locationId: LocationIdSHv3.awsEuCentral1,
-    });
-    await checkIfCorrectEndpointIsUsedFindDatesUTC(
-      null,
-      constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      'https://services.sentinel-hub.com/byoc/v3/collections/CUSTOM/findAvailableData',
-    );
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    let constructorParams: Record<string, any> = {};
-    if (layerParams && layerParams.collectionId) {
-      constructorParams.collectionId = layerParams.collectionId;
-    }
-
-    if (layerParams && layerParams.locationId) {
-      constructorParams.locationId = layerParams.locationId;
-    }
-
-    const layer = new BYOCLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-      ...constructorParams,
-    });
-    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
-    await checkRequestFindDatesUTC(fixtures);
-  });
-
-  test('response from service', async () => {
-    const layer = new BYOCLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-      collectionId: 'mockCollectionId',
-      locationId: LocationIdSHv3.awsEuCentral1,
-    });
-    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCSearchIndex(layer, {}));
-  });
-});
 describe('Test findDatesUTC using catalog', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
