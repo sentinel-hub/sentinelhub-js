@@ -249,12 +249,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return this.getTypeId();
   }
 
-  protected getSearchIndexUrl(): string {
-    const rootUrl = this.getShServiceHostname();
-    const searchIndexUrl = `${rootUrl}byoc/v3/collections/CUSTOM/searchIndex`;
-    return searchIndexUrl;
-  }
-
   protected createSearchIndexRequestConfig(): AxiosRequestConfig {
     return {};
   }
