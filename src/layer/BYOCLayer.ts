@@ -253,13 +253,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(reqConfig: RequestConfiguration): Promise<string> {
-    await this.updateLayerFromServiceIfNeeded(reqConfig);
-    const rootUrl = SHV3_LOCATIONS_ROOT_URL[this.locationId];
-    const findDatesUTCUrl = `${rootUrl}byoc/v3/collections/CUSTOM/findAvailableData`;
-    return findDatesUTCUrl;
-  }
-
   protected async getFindDatesUTCAdditionalParameters(
     reqConfig: RequestConfiguration,
   ): Promise<Record<string, any>> {
