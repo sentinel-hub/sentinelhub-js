@@ -168,10 +168,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return this.dataset.catalogCollectionId;
   }
 
-  protected getSearchIndexUrl(): string {
-    return this.dataset.searchIndexUrl;
-  }
-
   protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
     if (this.evalscriptUrl && !this.evalscript) {
       const response = await axios.get(this.evalscriptUrl, {
