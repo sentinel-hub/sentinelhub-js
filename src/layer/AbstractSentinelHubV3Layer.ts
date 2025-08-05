@@ -406,16 +406,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       );
       result = this.convertResponseFromCatalog(response);
     } else {
-      result = await this.findTilesUsingSearchIndex(
-        this.getSearchIndexUrl(),
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-        this.getFindTilesAdditionalParameters(),
-      );
+      throw new Error('Please authenticate and provide collection id.');
     }
     return result;
   }
@@ -427,52 +418,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
-  }
-
-  protected async findTilesUsingSearchIndex(
-    searchIndexUrl: string,
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig: RequestConfiguration,
-    findTilesAdditionalParameters: FindTilesAdditionalParameters,
-  ): Promise<PaginatedTiles> {
-    if (maxCount === null) {
-      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
-    }
-    if (offset === null) {
-      offset = 0;
-    }
-    if (!searchIndexUrl) {
-      throw new Error('This dataset does not support searching for tiles');
-    }
-
-    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
-
-    const bboxPolygon = bbox.toGeoJSON();
-    // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
-    // the tiles we get cloudCoverPercentage (0..100).
-    const payload: any = {
-      clipping: bboxPolygon,
-      maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
-      timeFrom: fromTime.toISOString(),
-      timeTo: toTime.toISOString(),
-      offset: offset,
-    };
-
-    if (datasetParameters) {
-      payload.datasetParameters = datasetParameters;
-    }
-
-    const response = await axios.post(
-      searchIndexUrl,
-      payload,
-      this.createSearchIndexRequestConfig(reqConfig),
-    );
-    return this.convertResponseFromSearchIndex(response);
   }
 
   protected createCatalogFilterQuery(
