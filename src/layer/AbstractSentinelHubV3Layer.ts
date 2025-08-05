@@ -1,6 +1,6 @@
 import { Geometry } from '@turf/helpers';
 import axios, { AxiosRequestConfig } from 'axios';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
@@ -11,7 +11,6 @@ import {
   ApiType,
   CATALOG_SEARCH_MAX_LIMIT,
   DataProductId,
-  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   FindTilesAdditionalParameters,
   GetMapParams,
   GetStatsParams,
