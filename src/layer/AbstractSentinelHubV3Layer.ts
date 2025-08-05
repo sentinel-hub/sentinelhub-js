@@ -505,12 +505,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): Promise<string> {
-    return this.dataset.findDatesUTCUrl;
-  }
-
   public async findDatesUTC(
     bbox: BBox,
     fromTime: Date,
@@ -523,41 +517,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (canUseCatalog) {
         return await this.findDatesUTCCatalog(innerReqConfig, authToken, bbox, fromTime, toTime);
       } else {
-        return await this.findDatesUTCSearchIndex(innerReqConfig, bbox, fromTime, toTime);
+        throw new Error('Please authenticate and provide collection id.');
       }
     }, reqConfig);
     return findDatesUTCValue;
-  }
-
-  private async findDatesUTCSearchIndex(
-    innerReqConfig: RequestConfiguration,
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-  ): Promise<Date[]> {
-    const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerReqConfig);
-    if (!findDatesUTCUrl) {
-      throw new Error('This dataset does not support searching for dates');
-    }
-
-    const bboxPolygon = bbox.toGeoJSON();
-    const payload: any = {
-      queryArea: bboxPolygon,
-      from: fromTime.toISOString(),
-      to: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
-    };
-
-    const axiosReqConfig: AxiosRequestConfig = {
-      ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-    };
-    const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
-    const found: Moment[] = response.data.map((date: string) => moment.utc(date));
-
-    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
-    // Let's sort the data so that we always return most recent results first:
-    found.sort((a, b) => b.unix() - a.unix());
-    return found.map((m) => m.toDate());
   }
 
   protected async findDatesUTCCatalog(
