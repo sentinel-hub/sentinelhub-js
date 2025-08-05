@@ -1,23 +1,20 @@
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-
-import { invalidateCaches } from '../../index';
+import { setAuthToken, invalidateCaches } from '../../index';
 
 import '../../../jest-setup';
-import { constructFixtureFindTiles } from './fixtures.findTiles';
+import { constructFixtureFindTilesCatalog } from './fixtures.S1GRDAWSLayer';
 import { CACHE_CONFIG_30MIN } from '../../utils/cacheHandlers';
-
-const mockNetwork = new MockAdapter(axios);
+import { AUTH_TOKEN, mockNetwork } from './testUtils.findTiles';
 
 beforeEach(async () => {
   await invalidateCaches();
+  setAuthToken(AUTH_TOKEN);
 });
 
 test('Retries correctly on network errors', async () => {
   // we need to adjust jest timeout until we have support for setting the delay when retrying,
   // otherwise the test will time out:
   const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-    constructFixtureFindTiles({});
+    constructFixtureFindTilesCatalog({});
 
   mockNetwork.reset();
   mockNetwork.onPost().replyOnce(500);
@@ -33,7 +30,7 @@ test('Retries correctly on network errors', async () => {
 
 test("Doesn't retry if not needed", async () => {
   const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-    constructFixtureFindTiles({});
+    constructFixtureFindTilesCatalog({});
 
   mockNetwork.reset();
   mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -48,7 +45,7 @@ test("Doesn't retry if not needed", async () => {
 test(
   'Fails if max. retries (default == 2) was exceeded',
   async () => {
-    const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer } = constructFixtureFindTilesCatalog({});
 
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(500);
@@ -65,7 +62,7 @@ test(
 test(
   'Fails if max. retries (explicitly set) was exceeded',
   async () => {
-    const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer } = constructFixtureFindTilesCatalog({});
 
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(500);
@@ -81,7 +78,7 @@ test(
 );
 
 test("Doesn't retry if retrying is disabled", async () => {
-  const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+  const { fromTime, toTime, bbox, layer } = constructFixtureFindTilesCatalog({});
   mockNetwork.reset();
   mockNetwork.onPost().replyOnce(500);
 
@@ -92,7 +89,7 @@ test("Doesn't retry if retrying is disabled", async () => {
 test(
   'Uses default number of retries (2) if null is set',
   async () => {
-    const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer } = constructFixtureFindTilesCatalog({});
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(500);
     mockNetwork.onPost().replyOnce(500);
@@ -108,7 +105,7 @@ test(
   'Retries correctly when caching is enabled',
   async () => {
     const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-      constructFixtureFindTiles({});
+      constructFixtureFindTilesCatalog({});
 
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(500);
@@ -140,7 +137,7 @@ test(
   'Retries concurrent requests when caching is enabled',
   async () => {
     const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-      constructFixtureFindTiles({});
+      constructFixtureFindTilesCatalog({});
 
     //first request will fail, all other will succeed
     mockNetwork.reset();
@@ -176,7 +173,7 @@ test(
 test(
   'Compare payload is the same on retry',
   async () => {
-    const { fromTime, toTime, bbox, layer } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer } = constructFixtureFindTilesCatalog({});
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(500);
     mockNetwork.onPost().replyOnce(500);
