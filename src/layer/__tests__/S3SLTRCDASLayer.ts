@@ -1,9 +1,6 @@
 import { setAuthToken } from '../../index';
-import { BBox, CRS_EPSG4326, S3SLSTRCDASLayer, DATASET_CDAS_S3SLSTR } from '../../index';
-import {
-  constructFixtureFindTilesSearchIndex,
-  constructFixtureFindTilesCatalog,
-} from './fixtures.S3SLTRLayer';
+import { BBox, CRS_EPSG4326, S3SLSTRCDASLayer } from '../../index';
+import { constructFixtureFindTilesCatalog } from './fixtures.S3SLTRLayer';
 
 import {
   AUTH_TOKEN,
@@ -19,14 +16,10 @@ import {
   checkResponseFindDatesUTC,
 } from './testUtils.findDatesUTC';
 
-import {
-  constructFixtureFindDatesUTCSearchIndex,
-  constructFixtureFindDatesUTCCatalog,
-} from './fixtures.findDatesUTC';
+import { constructFixtureFindDatesUTCCatalog } from './fixtures.findDatesUTC';
 import { checkLayersParamsEndpoint } from './testUtils.layers';
 
 const CATALOG_URL = 'https://sh.dataspace.copernicus.eu/api/v1/catalog/1.0.0/search';
-const SEARCH_INDEX_URL = 'https://sh.dataspace.copernicus.eu/index/v3/collections/S3SLSTR/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -59,30 +52,6 @@ const layerParamsArr: Record<string, any>[] = [
   },
 ];
 
-describe('Test findTiles using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('searchIndex is used if token is not set', async () => {
-    await checkIfCorrectEndpointIsUsed(
-      null,
-      constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, {}),
-      SEARCH_INDEX_URL,
-    );
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    const fixtures = constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, layerParams);
-    await checkRequestFindTiles(fixtures);
-  });
-
-  test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S3SLSTRCDASLayer, {}));
-  });
-});
-
 describe('Test findTiles using catalog', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
@@ -107,47 +76,6 @@ describe('Test findTiles using catalog', () => {
   });
 });
 
-describe('Test findDatesUTC using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('findAvailableData is used if token is not set', async () => {
-    const layer = new S3SLSTRCDASLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-    });
-    await checkIfCorrectEndpointIsUsedFindDatesUTC(
-      null,
-      constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      DATASET_CDAS_S3SLSTR.findDatesUTCUrl,
-    );
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    let constructorParams: Record<string, any> = {};
-    if (layerParams.maxCloudCoverPercent !== null && layerParams.maxCloudCoverPercent !== undefined) {
-      constructorParams.maxCloudCoverPercent = layerParams.maxCloudCoverPercent;
-    }
-
-    const layer = new S3SLSTRCDASLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-      ...constructorParams,
-    });
-    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
-    await checkRequestFindDatesUTC(fixtures);
-  });
-
-  test('response from service', async () => {
-    const layer = new S3SLSTRCDASLayer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-    });
-    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCSearchIndex(layer, {}));
-  });
-});
 describe('Test findDatesUTC using catalog', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);

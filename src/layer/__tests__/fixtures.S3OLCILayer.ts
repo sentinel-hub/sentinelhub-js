@@ -3,219 +3,6 @@ import moment from 'moment';
 
 import { LinkType, BBox, CRS_EPSG4326 } from '../../index';
 
-export function constructFixtureFindTilesSearchIndex(
-  layerClass: typeof AbstractSentinelHubV3Layer,
-  {
-    sensingTime = '2020-04-30T09:58:12Z',
-    hasMore = true,
-    fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-    toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-    bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  },
-): Record<any, any> {
-  const layer = new layerClass({
-    instanceId: 'INSTANCE_ID',
-    layerId: 'LAYER_ID',
-  });
-  const expectedRequest = {
-    clipping: {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::4326' } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
-      ],
-    },
-    maxCloudCoverage: null as any,
-    maxcount: 5,
-    timeFrom: fromTime.toISOString(),
-    timeTo: toTime.toISOString(),
-    offset: 0,
-  };
-
-  const mockedResponse = {
-    tiles: [
-      {
-        type: 'S3',
-        id: 1248462,
-        originalId:
-          'EODATA/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
-        dataUri:
-          'http://data.cloudferro.com/EODATA/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
-        dataGeometry: {
-          type: 'MultiPolygon',
-          crs: {
-            type: 'name',
-            properties: {
-              name: 'urn:ogc:def:crs:EPSG::4326',
-            },
-          },
-          coordinates: [
-            [
-              [
-                [-2.097644, 52.417860999999995],
-                [-2.172493, 51.979997999999995],
-                [-2.183793, 51.978117],
-                [-2.561625, 49.603713],
-                [-2.572228, 49.601855],
-                [-3.073191, 46.495608],
-                [-3.0831899999999997, 46.493795999999996],
-                [-3.504053, 43.885569],
-                [-3.513627, 43.883797],
-                [-3.607164, 43.27735],
-                [-3.6074219999999997, 43.154911999999996],
-                [-3.6361869999999996, 43.053247999999996],
-                [-3.817099, 41.927941],
-                [-1.938081, 41.73704],
-                [-0.057815, 41.51406],
-                [1.7088379999999999, 41.275048],
-                [3.7856549999999998, 40.961298],
-                [5.530151, 40.664483],
-                [7.28933, 40.330644],
-                [9.088379, 39.959548999999996],
-                [10.778061, 39.583197],
-                [11.383687, 41.110478],
-                [12.133628999999999, 42.931393],
-                [12.531452, 43.846731999999996],
-                [13.640557999999999, 46.288629],
-                [14.369261999999999, 47.770258],
-                [15.192131, 49.350468],
-                [15.507169, 49.926114999999996],
-                [13.496939999999999, 50.363264],
-                [11.372238, 50.781327999999995],
-                [9.271621999999999, 51.15164],
-                [7.152584999999999, 51.476853],
-                [4.709772, 51.797017],
-                [2.512508, 52.042319],
-                [0.224742, 52.251915999999994],
-                [-2.097644, 52.417860999999995],
-              ],
-            ],
-          ],
-        },
-        sensingTime: '2020-04-30T09:58:12Z',
-        productName:
-          'S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
-        cycle: 57,
-        relativeOrbit: 350,
-        frame: 2160,
-        timeliness: 'NR',
-        additionalData: {
-          pixelEnvelope: {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [145.0, 0.0],
-                [145.0, 4090.0],
-                [4821.0, 4090.0],
-                [4821.0, 0.0],
-                [145.0, 0.0],
-              ],
-            ],
-          },
-          errorEstimates: [10.12398400734969, 1.543008548245325, 0.606379343100804, 0.3931914366197954],
-          xCoefficients: [
-            4596.2055587768555, 430.72991293668747, -74.63191604614258, -0.623042234336026,
-            -1.3956050127744675, -0.42653124034404755, -0.006992724314841325, 0.007913307377748424,
-            -0.039211956842336804, 0.008093118842225522,
-          ],
-          yCoefficients: [
-            19320.13011932373, -95.66507685184479, -358.415894985199, -1.6208207387244329, 0.7785560581833124,
-            -0.17121314257383347, -0.0013507152152669732, 0.0025232208136003464, 0.009004542836919427,
-            -8.248505182564259e-4,
-          ],
-        },
-      },
-    ],
-    hasMore: hasMore,
-    maxOrderKey: '2020-04-12T09:59:24Z;4.997170846080444E9;12425636;13.99',
-  };
-  const expectedResultTiles = [
-    {
-      geometry: {
-        type: 'MultiPolygon',
-        crs: {
-          type: 'name',
-          properties: {
-            name: 'urn:ogc:def:crs:EPSG::4326',
-          },
-        },
-        coordinates: [
-          [
-            [
-              [-2.097644, 52.417860999999995],
-              [-2.172493, 51.979997999999995],
-              [-2.183793, 51.978117],
-              [-2.561625, 49.603713],
-              [-2.572228, 49.601855],
-              [-3.073191, 46.495608],
-              [-3.0831899999999997, 46.493795999999996],
-              [-3.504053, 43.885569],
-              [-3.513627, 43.883797],
-              [-3.607164, 43.27735],
-              [-3.6074219999999997, 43.154911999999996],
-              [-3.6361869999999996, 43.053247999999996],
-              [-3.817099, 41.927941],
-              [-1.938081, 41.73704],
-              [-0.057815, 41.51406],
-              [1.7088379999999999, 41.275048],
-              [3.7856549999999998, 40.961298],
-              [5.530151, 40.664483],
-              [7.28933, 40.330644],
-              [9.088379, 39.959548999999996],
-              [10.778061, 39.583197],
-              [11.383687, 41.110478],
-              [12.133628999999999, 42.931393],
-              [12.531452, 43.846731999999996],
-              [13.640557999999999, 46.288629],
-              [14.369261999999999, 47.770258],
-              [15.192131, 49.350468],
-              [15.507169, 49.926114999999996],
-              [13.496939999999999, 50.363264],
-              [11.372238, 50.781327999999995],
-              [9.271621999999999, 51.15164],
-              [7.152584999999999, 51.476853],
-              [4.709772, 51.797017],
-              [2.512508, 52.042319],
-              [0.224742, 52.251915999999994],
-              [-2.097644, 52.417860999999995],
-            ],
-          ],
-        ],
-      },
-      sensingTime: moment.utc(sensingTime).toDate(),
-      meta: {},
-      links: [
-        {
-          target:
-            '/eodata/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
-          type: LinkType.CREODIAS,
-        },
-        {
-          target:
-            'https://finder.creodias.eu/files/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002-ql.jpg',
-          type: 'preview',
-        },
-      ],
-    },
-  ];
-  return {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-    layer: layer,
-    mockedResponse: mockedResponse,
-    expectedRequest: expectedRequest,
-    expectedResultTiles: expectedResultTiles,
-    expectedResultHasMore: hasMore,
-  };
-}
-
 export function constructFixtureFindTilesCatalog(
   layerClass: typeof AbstractSentinelHubV3Layer,
   {
@@ -243,8 +30,7 @@ export function constructFixtureFindTilesCatalog(
     features: [
       {
         stac_version: '0.9.0',
-        id:
-          'S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
+        id: 'S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
         geometry: {
           type: 'MultiPolygon',
           crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:OGC::CRS84' } },
@@ -336,14 +122,12 @@ export function constructFixtureFindTilesCatalog(
         ],
         assets: {
           thumbnail: {
-            href:
-              'https://finder.creodias.eu/files/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002-ql.jpg',
+            href: 'https://finder.creodias.eu/files/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002-ql.jpg',
             title: 'thumbnail',
             type: 'image/jpeg',
           },
           data: {
-            href:
-              's3://DIAS/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
+            href: 's3://DIAS/Sentinel-3/OLCI/OL_1_EFR/2020/04/30/S3A_OL_1_EFR____20200430T095812_20200430T100112_20200430T114934_0180_057_350_2160_LN1_O_NR_002.SEN3',
             title: 's3',
             type: 'inode/directory',
           },

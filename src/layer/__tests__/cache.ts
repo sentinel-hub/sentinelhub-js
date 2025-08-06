@@ -1,8 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 import makeServiceWorkerEnv from 'service-worker-mock';
 import fetch from 'node-fetch';
 
@@ -10,24 +8,21 @@ import { ApiType, setAuthToken, invalidateCaches, CacheTarget } from '../../inde
 import { cacheStillValid, EXPIRY_HEADER_KEY } from '../../utils/cacheHandlers';
 
 import '../../../jest-setup';
-import { constructFixtureFindTiles } from './fixtures.findTiles';
+import { AUTH_TOKEN, mockNetwork } from './testUtils.findTiles';
+import { constructFixtureFindTilesCatalog } from './fixtures.S1GRDAWSLayer';
 import { constructFixtureGetMap } from './fixtures.getMap';
 import { constructFixtureUpdateLayerFromServiceIfNeeded } from './fixtures.BYOCLayer';
-
-const mockNetwork = new MockAdapter(axios);
-
-const EXAMPLE_TOKEN = 'TOKEN111';
 
 describe('Testing caching', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
   });
 
   it('should fetch a request and cache it, where 2nd request is served from the cache', async () => {
     const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-      constructFixtureFindTiles({});
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -47,7 +42,7 @@ describe('Testing caching', () => {
 
   it('should make a 2nd request after the cache has expired', async () => {
     const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles, expectedResultHasMore } =
-      constructFixtureFindTiles({});
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 1,
@@ -86,12 +81,19 @@ describe('Testing caching', () => {
   });
 
   it('test that no responses are cached', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+    const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTilesCatalog({});
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
 
-    await layer.findTiles(bbox, fromTime, toTime);
+    // findTilesUsingCatalog have a 30-minute cache by default
+    const requestsConfig = {
+      cache: {
+        expiresIn: 0,
+      },
+    };
+
+    await layer.findTiles(bbox, fromTime, toTime, null, null, requestsConfig);
     await layer.findTiles(bbox, fromTime, toTime);
 
     expect(mockNetwork.history.post.length).toBe(2);
@@ -101,7 +103,6 @@ describe('Testing caching', () => {
     // arrayBuffer needs to be used, and removing this will cause getMap to fetch a blob, as window.Blob was created with jsdom
     window.Blob = undefined;
     const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
-    setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -121,7 +122,6 @@ describe('Testing caching', () => {
       },
     };
     const { layer, getMapParams, mockedResponse } = constructFixtureGetMap();
-    setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -153,7 +153,6 @@ describe('Testing caching', () => {
       },
     };
 
-    setAuthToken(EXAMPLE_TOKEN);
     mockNetwork.reset();
     mockNetwork.onPost().reply(mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse);
@@ -169,13 +168,12 @@ describe('Testing cache targets', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
   });
 
   it('should cache to cache api', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -200,9 +198,8 @@ describe('Testing cache targets', () => {
   });
 
   it('should cache to memory', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -234,9 +231,8 @@ describe('Testing cache targets', () => {
   });
 
   it('should default to caching to cache_api', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -261,9 +257,8 @@ describe('Testing cache targets', () => {
   });
 
   it('should invalidate caches', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const reqConfigCacheApi = {
       cache: {
         expiresIn: 1,
@@ -337,13 +332,12 @@ describe('Testing cache targets when cache_api is not available', () => {
   beforeEach(async () => {
     Object.assign(global, { caches: undefined }, fetch); // adds these functions to the global object and removes caches from global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
   });
 
   it('should default to memory if window.caches is undefined and no targets were defined', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -376,9 +370,8 @@ describe('Testing cache targets when cache_api is not available', () => {
   });
 
   it('should not use cache if cache-api is specified as target', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -411,13 +404,12 @@ describe('Reading from cache twice', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object and removes caches from global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
   });
 
   it('should read from cache-api twice', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -442,9 +434,8 @@ describe('Reading from cache twice', () => {
   });
 
   it('should read from memory cache twice', async () => {
-    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } = constructFixtureFindTiles(
-      {},
-    );
+    const { fromTime, toTime, bbox, layer, mockedResponse, expectedResultTiles } =
+      constructFixtureFindTilesCatalog({});
     const requestsConfig = {
       cache: {
         expiresIn: 60,
@@ -491,7 +482,7 @@ describe('Unit test for aux request caching', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
   });
 
   const listOfRequstConfigs = [
@@ -532,7 +523,6 @@ describe('Unit test for aux request caching', () => {
   it.each([...listOfRequstConfigs])(
     'It should be cache aux request to memory by default',
     async (requestConfig) => {
-      setAuthToken(EXAMPLE_TOKEN);
       const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded(
         {},
       );
@@ -555,7 +545,6 @@ describe('Unit test for aux request caching', () => {
     },
   );
   it('It should not cache aux request when cache is disabled', async () => {
-    setAuthToken(EXAMPLE_TOKEN);
     const { layer, mockedResponse, expectedLayerParams } = constructFixtureUpdateLayerFromServiceIfNeeded({});
     const requestsConfig = {
       cache: {

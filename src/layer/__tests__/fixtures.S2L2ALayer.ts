@@ -2,209 +2,6 @@ import moment from 'moment';
 
 import { LinkType, S2L2ALayer, BBox, CRS_EPSG4326 } from '../../index';
 
-export function constructFixtureFindTilesSearchIndex({
-  sensingTime = '2020-04-30T10:09:22Z',
-  hasMore = true,
-  fromTime = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0)),
-  toTime = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 0)),
-  bbox = new BBox(CRS_EPSG4326, 19, 20, 20, 21),
-  maxCloudCoverPercent = 20,
-}): Record<any, any> {
-  const layer = new S2L2ALayer({
-    instanceId: 'INSTANCE_ID',
-    layerId: 'LAYER_ID',
-    maxCloudCoverPercent: maxCloudCoverPercent,
-  });
-
-  const expectedRequest = {
-    clipping: {
-      type: 'Polygon',
-      crs: { type: 'name', properties: { name: 'urn:ogc:def:crs:EPSG::4326' } },
-      coordinates: [
-        [
-          [bbox.minX, bbox.minY],
-          [bbox.maxX, bbox.minY],
-          [bbox.maxX, bbox.maxY],
-          [bbox.minX, bbox.maxY],
-          [bbox.minX, bbox.minY],
-        ],
-      ],
-    },
-    maxcount: 5,
-    maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
-    timeFrom: fromTime.toISOString(),
-    timeTo: toTime.toISOString(),
-    offset: 0,
-  };
-
-  const mockedResponse = {
-    tiles: [
-      {
-        type: 'S2',
-        id: 9299470,
-        originalId: 'S2B_OPER_MSI_L2A_TL_MPS__20200430T131222_A016450_T32TQL_N02.14',
-        dataUri: 's3://sentinel-s2-l2a/tiles/32/T/QL/2020/4/30/0',
-        dataIndexUri: 's3://sentinel-s2-l2a-index/tiles/32/T/QL/2020/4/30/0',
-        tileEnvelope: {
-          type: 'Polygon',
-          crs: {
-            type: 'name',
-            properties: {
-              name: 'urn:ogc:def:crs:EPSG::32632',
-            },
-          },
-          coordinates: [
-            [
-              [699960.0, 4600020.0],
-              [809760.0, 4600020.0],
-              [809760.0, 4490220.0],
-              [699960.0, 4490220.0],
-              [699960.0, 4600020.0],
-            ],
-          ],
-        },
-        dataGeometry: {
-          type: 'MultiPolygon',
-          crs: {
-            type: 'name',
-            properties: {
-              name: 'urn:ogc:def:crs:EPSG::4326',
-            },
-          },
-          coordinates: [
-            [
-              [
-                [11.396715230122707, 41.52685304084347],
-                [11.361121157317946, 40.53862626065115],
-                [12.655543739210799, 40.504895198570296],
-                [12.71056219697988, 41.49193502979004],
-                [11.396715230122707, 41.52685304084347],
-              ],
-            ],
-          ],
-        },
-        cloudCoverPercentage: 6.89,
-        sensingTime: '2020-04-30T10:09:22Z',
-        unitsPerPixel: 10.0,
-        area: 1.2055600804e10,
-        hasLowQuantification: false,
-        dos1: {
-          B01: -1172,
-          B02: -774,
-          B03: -383,
-          B04: -170,
-          B05: -132,
-          B06: -104,
-          B07: -87,
-          B08: -48,
-          B09: 0,
-          B10: 0,
-          B11: 0,
-          B12: 0,
-          B8A: -45,
-        },
-        processingData: {
-          availableData: {
-            R10m: {
-              bandCombinations: ['AOT', 'B02', 'B03', 'B04', 'B08', 'WVP'],
-            },
-            R20m: {
-              bandCombinations: [
-                'AOT',
-                'B02',
-                'B03',
-                'B04',
-                'B05',
-                'B06',
-                'B07',
-                'B08',
-                'B11',
-                'B12',
-                'B8A',
-                'SCL',
-                'WVP',
-              ],
-            },
-            R60m: {
-              bandCombinations: [
-                'AOT',
-                'B01',
-                'B02',
-                'B03',
-                'B04',
-                'B05',
-                'B06',
-                'B07',
-                'B08',
-                'B09',
-                'B11',
-                'B12',
-                'B8A',
-                'SCL',
-                'WVP',
-              ],
-            },
-          },
-          url: 's3://sentinel-s2-l2a/tiles/32/T/QL/2020/4/30/0',
-          jp2Format: 'N0209',
-        },
-        productId: 'S2B_MSIL2A_20200430T100019_N0214_R122_T32TQL_20200430T131222',
-        copernicusHubProductId: '6159c4bc-2871-470b-a13f-c45da49c75a2',
-        orbitId: 41129,
-        l1cPath: 'tiles/32/T/QL/2020/4/30/0',
-      },
-    ],
-    hasMore: hasMore,
-    maxOrderKey: '2020-04-12T09:59:24Z;4.997170846080444E9;12425636;13.99',
-  };
-  const expectedResultTiles = [
-    {
-      geometry: {
-        type: 'MultiPolygon',
-        crs: {
-          type: 'name',
-          properties: {
-            name: 'urn:ogc:def:crs:EPSG::4326',
-          },
-        },
-        coordinates: [
-          [
-            [
-              [11.396715230122707, 41.52685304084347],
-              [11.361121157317946, 40.53862626065115],
-              [12.655543739210799, 40.504895198570296],
-              [12.71056219697988, 41.49193502979004],
-              [11.396715230122707, 41.52685304084347],
-            ],
-          ],
-        ],
-      },
-      sensingTime: moment.utc(sensingTime).toDate(),
-      meta: { MGRSLocation: '32TQL', cloudCoverPercent: 6.89, tileId: 9299470 },
-      links: [
-        {
-          target: 's3://sentinel-s2-l2a/tiles/32/T/QL/2020/4/30/0',
-          type: LinkType.AWS,
-        },
-        {
-          target: 'https://roda.sentinel-hub.com/sentinel-s2-l1c/tiles/32/T/QL/2020/4/30/0/preview.jpg',
-          type: LinkType.PREVIEW,
-        },
-      ],
-    },
-  ];
-  return {
-    fromTime: fromTime,
-    toTime: toTime,
-    bbox: bbox,
-    layer: layer,
-    mockedResponse: mockedResponse,
-    expectedRequest: expectedRequest,
-    expectedResultTiles: expectedResultTiles,
-    expectedResultHasMore: hasMore,
-  };
-}
-
 export function constructFixtureFindTilesCatalog({
   sensingTime = '2020-04-30T10:09:22Z',
   hasMore = false,
@@ -296,8 +93,7 @@ export function constructFixtureFindTilesCatalog({
         },
         links: [
           {
-            href:
-              'https://services.sentinel-hub.com/api/v1/catalog/collections/sentinel-2-l2a/items/S2B_MSIL2A_20200430T100019_N0214_R122_T33TTF_20200430T131222',
+            href: 'https://services.sentinel-hub.com/api/v1/catalog/collections/sentinel-2-l2a/items/S2B_MSIL2A_20200430T100019_N0214_R122_T33TTF_20200430T131222',
             rel: 'self',
             type: 'application/json',
           },
@@ -306,8 +102,7 @@ export function constructFixtureFindTilesCatalog({
             rel: 'parent',
           },
           {
-            href:
-              "https://scihub.copernicus.eu/dhus/odata/v1/Products('72a034ef-cb01-4081-821d-c493ac3fdb0b')/$value",
+            href: "https://scihub.copernicus.eu/dhus/odata/v1/Products('72a034ef-cb01-4081-821d-c493ac3fdb0b')/$value",
             rel: 'derived_from',
             title: 'scihub download',
           },

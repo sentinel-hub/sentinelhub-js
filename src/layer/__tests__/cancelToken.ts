@@ -7,12 +7,13 @@ import { setAuthToken, invalidateCaches, CacheTarget, CancelToken, isCancelled, 
 import { cacheableRequestsInProgress } from '../../utils/cacheHandlers';
 
 import '../../../jest-setup';
-import { constructFixtureFindTiles } from './fixtures.findTiles';
+import { constructFixtureFindTilesCatalog } from './fixtures.S1GRDAWSLayer';
 import { RequestConfiguration } from '../../utils/cancelRequests';
 import { constructFixtureGetMap } from './fixtures.getMap';
+import { AUTH_TOKEN } from './testUtils.findTiles';
 
 const createRequestPromise = (useCache = true, setRequestError: (err: any) => void): any => {
-  const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTiles({});
+  const { fromTime, toTime, bbox, layer, mockedResponse } = constructFixtureFindTilesCatalog({});
   let cancelToken = new CancelToken();
   const requestsConfig: RequestConfiguration = {
     cancelToken: cancelToken,
@@ -49,7 +50,7 @@ describe('Handling cancelled requests', () => {
   beforeEach(async () => {
     Object.assign(global, makeServiceWorkerEnv(), fetch); // adds these functions to the global object
     await invalidateCaches();
-    setAuthToken(undefined);
+    setAuthToken(AUTH_TOKEN);
     mockNetwork.reset();
     cacheableRequestsInProgress.clear();
   });
@@ -129,8 +130,6 @@ describe('Handling cancelled requests', () => {
 
     mockNetwork.onPost().replyOnce(200, mockedResponse);
     mockNetwork.onPost().replyOnce(200, mockedResponse2);
-
-    setAuthToken('EXAMPLE_TOKEN');
 
     await Promise.all([
       requestPromise,
