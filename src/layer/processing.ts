@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { Polygon, BBox as BBoxTurf, MultiPolygon } from '@turf/helpers';
+import { validate as validateUUID } from 'uuid';
 
 import { getAuthToken } from '../auth';
 
@@ -30,8 +31,10 @@ export type ProcessingPayload = {
     data: ProcessingPayloadDatasource[];
   };
   output: {
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
+    resx?: number;
+    resy?: number;
     responses: [
       {
         identifier: string;
@@ -96,7 +99,11 @@ export function createProcessingPayload(
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,
 ): ProcessingPayload {
-  const { bbox } = params;
+  const { bbox, width, height, resx, resy } = params;
+
+  if ((width != null || height != null) && (resx != null || resy != null)) {
+    throw new Error('Either height/width or resx/resy should be defined with Processing API');
+  }
 
   const payload: ProcessingPayload = {
     input: {
@@ -120,8 +127,7 @@ export function createProcessingPayload(
       ],
     },
     output: {
-      width: params.width,
-      height: params.height,
+      ...(width == null ? { resx, resy } : { width, height }),
       responses: [
         {
           identifier: params.outputResponseId ? params.outputResponseId : 'default',

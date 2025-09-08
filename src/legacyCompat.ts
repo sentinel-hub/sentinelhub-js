@@ -426,7 +426,7 @@ function mimeTypeFromParams(params: any): MimeType {
   return params.format ? params.format : 'image/png';
 }
 
-function resXYFromParams(params: any): string[] {
+function resXYFromParams(params: any): number[] {
   return [params.resx, params.resy];
 }
 

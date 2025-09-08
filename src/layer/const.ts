@@ -15,8 +15,8 @@ export type GetMapParams = {
   /** End of the time interval for which the images are fetched. We can not guarantee that BYOCLayer has a sensingTime defined */
   toTime: Date | null;
   format: MimeType | FormatJpegOrPng;
-  resx?: string; // either resx + resy or width + height must be specified
-  resy?: string;
+  resx?: number; // either resx + resy or width + height must be specified
+  resy?: number;
   width?: number;
   height?: number;
   // optional additional parameters:
