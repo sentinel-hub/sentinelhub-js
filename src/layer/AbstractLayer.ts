@@ -123,6 +123,7 @@ export class AbstractLayer {
     params: GetMapParams,
     api: ApiType,
     reqConfig?: RequestConfiguration,
+    evalScriptId?: string,
   ): Promise<Blob> {
     return await ensureTimeout(async (innerReqConfig) => {
       const { width, height, bbox } = params;
@@ -149,6 +150,9 @@ export class AbstractLayer {
 
       const LIMIT_DIM = 2500;
       if (width <= LIMIT_DIM && height <= LIMIT_DIM) {
+        if (evalScriptId) {
+          params.evalscriptId = evalScriptId;
+        }
         return await this.getMap(params, api, innerReqConfig);
       }
 
