@@ -96,7 +96,7 @@ export function createProcessingPayload(
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,
 ): ProcessingPayload {
-  const { bbox } = params;
+  const { bbox, evalscriptParams } = params;
 
   const payload: ProcessingPayload = {
     input: {
@@ -131,6 +131,7 @@ export function createProcessingPayload(
         },
       ],
     },
+    ...(evalscriptParams ? { evalscriptParams } : {}),
   };
 
   if (bbox) {
@@ -169,6 +170,7 @@ export async function processingGetMap(
   shServiceHostname: string,
   payload: ProcessingPayload,
   reqConfig: RequestConfiguration,
+  useV2?: boolean,
 ): Promise<Blob> {
   const authToken = reqConfig && reqConfig.authToken ? reqConfig.authToken : getAuthToken();
   if (!authToken) {
@@ -185,6 +187,10 @@ export async function processingGetMap(
     responseType: typeof window !== 'undefined' && window.Blob ? 'blob' : 'arraybuffer',
     ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
   };
-  const response = await axios.post(`${shServiceHostname}api/v1/process`, payload, requestConfig);
+  const response = await axios.post(
+    `${shServiceHostname}api/${useV2 ? 'v2' : 'v1'}/process`,
+    payload,
+    requestConfig,
+  );
   return response.data;
 }

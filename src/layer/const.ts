@@ -43,6 +43,8 @@ export type GetMapParams = {
     y: number;
     z: number;
   };
+  evalscriptId?: string;
+  evalscriptParams?: Record<string, unknown>;
   // and any that we don't know about, but might have been passed to us through legacy methods:
   unknown?: {
     [key: string]: string;
