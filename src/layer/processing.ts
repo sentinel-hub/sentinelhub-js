@@ -98,7 +98,7 @@ export function createProcessingPayload(
   upsampling: Interpolator | null = null,
   downsampling: Interpolator | null = null,
 ): ProcessingPayload {
-  const { bbox, width, height, resx, resy } = params;
+  const { bbox, width, height, resx, resy, evalscriptParams } = params;
 
   if ((width != null || height != null) && (resx != null || resy != null)) {
     throw new Error('Either height/width or resx/resy should be defined with Processing API');
@@ -136,6 +136,7 @@ export function createProcessingPayload(
         },
       ],
     },
+    ...(evalscriptParams ? { evalscriptParams } : {}),
   };
 
   if (bbox) {
