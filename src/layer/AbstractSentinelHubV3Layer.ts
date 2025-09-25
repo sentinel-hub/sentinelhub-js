@@ -1,6 +1,6 @@
 import { Geometry } from '@turf/helpers';
 import axios, { AxiosRequestConfig } from 'axios';
-import moment, { Moment } from 'moment';
+import moment from 'moment';
 
 import { getAuthToken } from '../auth';
 import { BBox } from '../bbox';
@@ -11,7 +11,6 @@ import {
   ApiType,
   CATALOG_SEARCH_MAX_LIMIT,
   DataProductId,
-  DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER,
   FindTilesAdditionalParameters,
   GetMapParams,
   GetStatsParams,
@@ -167,10 +166,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
 
   protected getCatalogCollectionId(): string {
     return this.dataset.catalogCollectionId;
-  }
-
-  protected getSearchIndexUrl(): string {
-    return this.dataset.searchIndexUrl;
   }
 
   protected async fetchEvalscriptUrlIfNeeded(reqConfig: RequestConfiguration): Promise<void> {
@@ -411,16 +406,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       );
       result = this.convertResponseFromCatalog(response);
     } else {
-      result = await this.findTilesUsingSearchIndex(
-        this.getSearchIndexUrl(),
-        bbox,
-        fromTime,
-        toTime,
-        maxCount,
-        offset,
-        reqConfig,
-        this.getFindTilesAdditionalParameters(),
-      );
+      throw new Error('Please authenticate and provide collection id.');
     }
     return result;
   }
@@ -432,52 +418,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected getTileLinks(tile: Record<string, any>): Link[] {
     return [];
-  }
-
-  protected async findTilesUsingSearchIndex(
-    searchIndexUrl: string,
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-    maxCount: number | null = null,
-    offset: number | null = null,
-    reqConfig: RequestConfiguration,
-    findTilesAdditionalParameters: FindTilesAdditionalParameters,
-  ): Promise<PaginatedTiles> {
-    if (maxCount === null) {
-      maxCount = DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER;
-    }
-    if (offset === null) {
-      offset = 0;
-    }
-    if (!searchIndexUrl) {
-      throw new Error('This dataset does not support searching for tiles');
-    }
-
-    const { maxCloudCoverPercent, datasetParameters } = findTilesAdditionalParameters;
-
-    const bboxPolygon = bbox.toGeoJSON();
-    // Note: we are requesting maxCloudCoverage as a number between 0 and 1, but in
-    // the tiles we get cloudCoverPercentage (0..100).
-    const payload: any = {
-      clipping: bboxPolygon,
-      maxcount: maxCount,
-      maxCloudCoverage: maxCloudCoverPercent !== null ? maxCloudCoverPercent / 100 : null,
-      timeFrom: fromTime.toISOString(),
-      timeTo: toTime.toISOString(),
-      offset: offset,
-    };
-
-    if (datasetParameters) {
-      payload.datasetParameters = datasetParameters;
-    }
-
-    const response = await axios.post(
-      searchIndexUrl,
-      payload,
-      this.createSearchIndexRequestConfig(reqConfig),
-    );
-    return this.convertResponseFromSearchIndex(response);
   }
 
   protected createCatalogFilterQuery(
@@ -565,12 +505,6 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
     return {};
   }
 
-  protected async getFindDatesUTCUrl(
-    reqConfig?: RequestConfiguration, // eslint-disable-line @typescript-eslint/no-unused-vars
-  ): Promise<string> {
-    return this.dataset.findDatesUTCUrl;
-  }
-
   public async findDatesUTC(
     bbox: BBox,
     fromTime: Date,
@@ -583,41 +517,10 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
       if (canUseCatalog) {
         return await this.findDatesUTCCatalog(innerReqConfig, authToken, bbox, fromTime, toTime);
       } else {
-        return await this.findDatesUTCSearchIndex(innerReqConfig, bbox, fromTime, toTime);
+        throw new Error('Please authenticate and provide collection id.');
       }
     }, reqConfig);
     return findDatesUTCValue;
-  }
-
-  private async findDatesUTCSearchIndex(
-    innerReqConfig: RequestConfiguration,
-    bbox: BBox,
-    fromTime: Date,
-    toTime: Date,
-  ): Promise<Date[]> {
-    const findDatesUTCUrl = await this.getFindDatesUTCUrl(innerReqConfig);
-    if (!findDatesUTCUrl) {
-      throw new Error('This dataset does not support searching for dates');
-    }
-
-    const bboxPolygon = bbox.toGeoJSON();
-    const payload: any = {
-      queryArea: bboxPolygon,
-      from: fromTime.toISOString(),
-      to: toTime.toISOString(),
-      ...(await this.getFindDatesUTCAdditionalParameters(innerReqConfig)),
-    };
-
-    const axiosReqConfig: AxiosRequestConfig = {
-      ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
-    };
-    const response = await axios.post(findDatesUTCUrl, payload, axiosReqConfig);
-    const found: Moment[] = response.data.map((date: string) => moment.utc(date));
-
-    // S-5P, S-3 and possibly other datasets return the results in reverse order (leastRecent).
-    // Let's sort the data so that we always return most recent results first:
-    found.sort((a, b) => b.unix() - a.unix());
-    return found.map((m) => m.toDate());
   }
 
   protected async findDatesUTCCatalog(

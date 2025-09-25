@@ -3,7 +3,6 @@ import moment from 'moment';
 import WKT from 'terraformer-wkt-parser';
 import { CRS_EPSG4326, CRS_WGS84, findCrsFromUrn } from '../crs';
 import type { AbstractLayer } from '../layer/AbstractLayer';
-import { AbstractSentinelHubV1OrV2Layer } from '../layer/AbstractSentinelHubV1OrV2Layer';
 import type { AbstractSentinelHubV3Layer } from '../layer/AbstractSentinelHubV3Layer';
 import { FisPayload, FisResponse, GetStatsParams, HistogramType } from '../layer/const';
 import { CACHE_CONFIG_NOCACHE } from '../utils/cacheHandlers';
@@ -11,10 +10,7 @@ import { getAxiosReqParams, RequestConfiguration } from '../utils/cancelRequests
 import type { StatisticsProvider } from './StatisticsProvider';
 
 export class Fis implements StatisticsProvider {
-  private createFISPayload(
-    layer: AbstractSentinelHubV3Layer | AbstractSentinelHubV1OrV2Layer,
-    params: GetStatsParams,
-  ): FisPayload {
+  private createFISPayload(layer: AbstractSentinelHubV3Layer, params: GetStatsParams): FisPayload {
     if (!params.geometry) {
       throw new Error('Parameter "geometry" needs to be provided');
     }
@@ -99,21 +95,6 @@ export class Fis implements StatisticsProvider {
       payload,
       axiosReqConfig,
     );
-
-    return this.convertFISResponse(data);
-  }
-
-  public async handleV1orV2(
-    layer: AbstractSentinelHubV1OrV2Layer,
-    params: GetStatsParams,
-    reqConfig?: RequestConfiguration,
-  ): Promise<FisResponse> {
-    const payload: FisPayload = this.createFISPayload(layer, params);
-
-    const { data } = await axios.get(layer.dataset.shServiceHostname + 'v1/fis/' + layer.getInstanceId(), {
-      params: payload,
-      ...getAxiosReqParams(reqConfig, CACHE_CONFIG_NOCACHE),
-    });
 
     return this.convertFISResponse(data);
   }

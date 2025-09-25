@@ -1,9 +1,6 @@
 import { setAuthToken } from '../../index';
-import { BBox, CRS_EPSG4326, S5PL2Layer, DATASET_S5PL2 } from '../../index';
-import {
-  constructFixtureFindTilesSearchIndex,
-  constructFixtureFindTilesCatalog,
-} from './fixtures.S5PL2Layer';
+import { BBox, CRS_EPSG4326, S5PL2Layer } from '../../index';
+import { constructFixtureFindTilesCatalog } from './fixtures.S5PL2Layer';
 
 import {
   AUTH_TOKEN,
@@ -19,16 +16,12 @@ import {
   checkResponseFindDatesUTC,
 } from './testUtils.findDatesUTC';
 
-import {
-  constructFixtureFindDatesUTCSearchIndex,
-  constructFixtureFindDatesUTCCatalog,
-} from './fixtures.findDatesUTC';
+import { constructFixtureFindDatesUTCCatalog } from './fixtures.findDatesUTC';
 
 import { ProductType } from '../S5PL2Layer';
 import { checkLayersParamsEndpoint } from './testUtils.layers';
 
 const CATALOG_URL = 'https://creodias.sentinel-hub.com/api/v1/catalog/1.0.0/search';
-const SEARCH_INDEX_URL = 'https://creodias.sentinel-hub.com/index/v3/collections/S5PL2/searchIndex';
 
 const fromTime: Date = new Date(Date.UTC(2020, 4 - 1, 1, 0, 0, 0, 0));
 const toTime: Date = new Date(Date.UTC(2020, 5 - 1, 1, 23, 59, 59, 999));
@@ -47,30 +40,6 @@ const layerParamsArr: Record<string, any>[] = [
     productType: productType,
   })),
 ];
-
-describe('Test findTiles using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('searchIndex is used if token is not set', async () => {
-    await checkIfCorrectEndpointIsUsed(
-      null,
-      constructFixtureFindTilesSearchIndex(S5PL2Layer, {}),
-      SEARCH_INDEX_URL,
-    );
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    const fixtures = constructFixtureFindTilesSearchIndex(S5PL2Layer, layerParams);
-    await checkRequestFindTiles(fixtures);
-  });
-
-  test('response from searchIndex', async () => {
-    await checkResponseFindTiles(constructFixtureFindTilesSearchIndex(S5PL2Layer, {}));
-  });
-});
 
 describe('Test findTiles using catalog', () => {
   beforeEach(async () => {
@@ -96,47 +65,6 @@ describe('Test findTiles using catalog', () => {
   });
 });
 
-describe('Test findDatesUTC using searchIndex', () => {
-  beforeEach(async () => {
-    setAuthToken(null);
-    mockNetwork.reset();
-  });
-
-  test('findAvailableData is used if token is not set', async () => {
-    const layer = new S5PL2Layer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-    });
-    await checkIfCorrectEndpointIsUsedFindDatesUTC(
-      null,
-      constructFixtureFindDatesUTCSearchIndex(layer, {}),
-      DATASET_S5PL2.findDatesUTCUrl,
-    );
-  });
-
-  test.each(layerParamsArr)('check if correct request is constructed', async (layerParams) => {
-    let constructorParams: Record<string, any> = {};
-    if (layerParams && layerParams.productType) {
-      constructorParams.productType = layerParams.productType;
-    }
-
-    const layer = new S5PL2Layer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-      ...constructorParams,
-    });
-    const fixtures = constructFixtureFindDatesUTCSearchIndex(layer, layerParams);
-    await checkRequestFindDatesUTC(fixtures);
-  });
-
-  test('response from service', async () => {
-    const layer = new S5PL2Layer({
-      instanceId: 'INSTANCE_ID',
-      layerId: 'LAYER_ID',
-    });
-    await checkResponseFindDatesUTC(constructFixtureFindDatesUTCSearchIndex(layer, {}));
-  });
-});
 describe('Test findDatesUTC using catalog', () => {
   beforeEach(async () => {
     setAuthToken(AUTH_TOKEN);
