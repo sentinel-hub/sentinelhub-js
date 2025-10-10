@@ -128,7 +128,8 @@ export async function fetchGetCapabilitiesJson(
     ...getAxiosReqParams(reqConfig, CACHE_CONFIG_30MIN),
   };
   const res = await axios.get(url, axiosReqConfig);
-  return res.data.layers;
+  const resData = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+  return resData.layers;
 }
 
 export async function fetchGetCapabilitiesJsonV1(
