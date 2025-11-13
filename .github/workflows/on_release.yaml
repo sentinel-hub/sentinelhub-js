@@ -27,7 +27,6 @@ jobs:
         if: success() && startsWith(github.ref, 'refs/tags/v')
         env:
           GITHUB_REF_TAG: ${{ github.ref }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo "Extracting version from GITHUB_REF_TAG: $GITHUB_REF_TAG"
           export VERSION=$(echo "$GITHUB_REF_TAG" | sed -e "s#^refs/tags/##")
