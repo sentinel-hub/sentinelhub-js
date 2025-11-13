@@ -1,6 +1,10 @@
 {
   "name": "@sentinel-hub/sentinelhub-js",
   "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sentinel-hub/sentinelhub-js.git"
+  },
   "main": "dist/sentinelHub.cjs",
   "module": "dist/sentinelHub.js",
   "browser": "dist/sentinelHub.umd.js",
