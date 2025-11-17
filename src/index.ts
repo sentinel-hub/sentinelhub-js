@@ -75,6 +75,8 @@ import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
+import { Landsat8CDASLOTL1Layer } from './layer/Landsat8CDASLOTL1Layer';
+import { Landsat9CDASLOTL1Layer } from './layer/Landsat9CDASLOTL1Layer';
 import { HLSAWSLayer } from './layer/HLSAWSLayer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
@@ -208,6 +210,8 @@ export {
   Landsat15AWSLMSSL1Layer,
   Landsat7AWSLETML1Layer,
   Landsat7AWSLETML2Layer,
+  Landsat8CDASLOTL1Layer,
+  Landsat9CDASLOTL1Layer,
   HLSAWSLayer,
   BYOCLayer,
   ProcessingDataFusionLayer,

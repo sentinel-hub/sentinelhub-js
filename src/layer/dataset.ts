@@ -358,6 +358,66 @@ export const DATASET_AWS_LOTL1: Dataset = {
   catalogCollectionId: 'landsat-ot-l1',
 };
 
+export const DATASET_CDAS_L8_LOTL1: Dataset = {
+  id: 'CDAS_L8_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: 'LOTL1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
+export const DATASET_CDAS_OTC_L8_LOTL1: Dataset = {
+  id: 'CDAS_L8_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: 'LOTL1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
+  findDatesUTCUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
+export const DATASET_CDAS_L9_LOTL1: Dataset = {
+  id: 'CDAS_L9_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L9',
+  shProcessingApiDatasourceAbbreviation: 'LOTL1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
+  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
+export const DATASET_CDAS_OTC_L9_LOTL1: Dataset = {
+  id: 'CDAS_L9_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L9',
+  shProcessingApiDatasourceAbbreviation: 'LOTL1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
+  searchIndexUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
+  findDatesUTCUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2013, 3 - 1, 18, 15, 58, 14)), // 2013-03-18T15:58:14Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
 export const DATASET_AWS_LOTL2: Dataset = {
   id: 'AWS_LOTL2',
   shJsonGetCapabilitiesDataset: 'LOTL2',
