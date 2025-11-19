@@ -236,8 +236,6 @@ export type FisResponse = {
 
 export type Stats = FisResponse | StatisticalApiResponse;
 
-export const DEFAULT_FIND_TILES_MAX_COUNT_PARAMETER = 50;
-
 export type DataProductId = string;
 
 export const SUPPORTED_DATA_PRODUCTS_PROCESSING: DataProductId[] = [
