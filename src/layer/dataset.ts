@@ -317,8 +317,6 @@ export const DATASET_CDAS_L8_L9_LOTL1: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'landsat-ot-l1',
   datasetParametersType: null,
   shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
-  searchIndexUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
-  findDatesUTCUrl: 'https://sh.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2021, 1 - 1, 1, 0, 0, 0)), // 2021-01-01T00:00:00Z
   maxDate: null,
@@ -332,8 +330,6 @@ export const DATASET_CDAS_OTC_L8_L9_LOTL1: Dataset = {
   shProcessingApiDatasourceAbbreviation: 'landsat-ot-l1',
   datasetParametersType: null,
   shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
-  searchIndexUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/searchIndex',
-  findDatesUTCUrl: 'https://sh-otc.dataspace.copernicus.eu/index/v3/collections/LOTL1/findAvailableData',
   orbitTimeMinutes: 99,
   minDate: new Date(Date.UTC(2021, 1 - 1, 1, 0, 0, 0)), // 2021-01-01T00:00:00Z
   maxDate: null,
