@@ -39,6 +39,7 @@ import {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
+  DATASET_CDAS_L8_L9_LOTL1,
   DATASET_AWS_HLS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
@@ -75,6 +76,7 @@ import { Landsat45AWSLTML2Layer } from './layer/Landsat45AWSLTML2Layer';
 import { Landsat15AWSLMSSL1Layer } from './layer/Landsat15AWSLMSSL1Layer';
 import { Landsat7AWSLETML1Layer } from './layer/Landsat7AWSLETML1Layer';
 import { Landsat7AWSLETML2Layer } from './layer/Landsat7AWSLETML2Layer';
+import { Landsat89CDASLOTL1Layer } from './layer/Landsat89CDASLOTL1Layer';
 import { HLSAWSLayer } from './layer/HLSAWSLayer';
 import { BYOCLayer } from './layer/BYOCLayer';
 import { ProcessingDataFusionLayer } from './layer/ProcessingDataFusionLayer';
@@ -173,6 +175,7 @@ export {
   DATASET_AWS_LMSSL1,
   DATASET_AWS_LETML1,
   DATASET_AWS_LETML2,
+  DATASET_CDAS_L8_L9_LOTL1,
   DATASET_AWS_HLS,
   DATASET_MODIS,
   DATASET_AWS_DEM,
@@ -208,6 +211,7 @@ export {
   Landsat15AWSLMSSL1Layer,
   Landsat7AWSLETML1Layer,
   Landsat7AWSLETML2Layer,
+  Landsat89CDASLOTL1Layer,
   HLSAWSLayer,
   BYOCLayer,
   ProcessingDataFusionLayer,
