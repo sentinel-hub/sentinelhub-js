@@ -310,6 +310,32 @@ export const DATASET_AWS_LOTL1: Dataset = {
   catalogCollectionId: 'landsat-ot-l1',
 };
 
+export const DATASET_CDAS_L8_L9_LOTL1: Dataset = {
+  id: 'CDAS_L8_L9_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: 'landsat-ot-l1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2021, 1 - 1, 1, 0, 0, 0)), // 2021-01-01T00:00:00Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
+export const DATASET_CDAS_OTC_L8_L9_LOTL1: Dataset = {
+  id: 'CDAS_L8_L9_LOTL1',
+  shJsonGetCapabilitiesDataset: 'LOTL1',
+  shWmsEvalsource: 'L8',
+  shProcessingApiDatasourceAbbreviation: 'landsat-ot-l1',
+  datasetParametersType: null,
+  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
+  orbitTimeMinutes: 99,
+  minDate: new Date(Date.UTC(2021, 1 - 1, 1, 0, 0, 0)), // 2021-01-01T00:00:00Z
+  maxDate: null,
+  catalogCollectionId: 'landsat-ot-l1',
+};
+
 export const DATASET_AWS_LOTL2: Dataset = {
   id: 'AWS_LOTL2',
   shJsonGetCapabilitiesDataset: 'LOTL2',
