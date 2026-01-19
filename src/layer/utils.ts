@@ -55,11 +55,23 @@ export type GetCapabilitiesXmlLayer = {
 };
 
 export function createGetCapabilitiesXmlUrl(baseUrl: string, ogcServiceType: OgcServiceTypes): string {
-  const defaultQueryParams = {
+  type DefaultQueryParams = {
+    service: OgcServiceTypes;
+    request: string;
+    format: string;
+    endpoint_filter?: string;
+  };
+
+  const defaultQueryParams: DefaultQueryParams = {
     service: ogcServiceType,
     request: 'GetCapabilities',
     format: 'text/xml',
   };
+
+  const urlObj = new URL(baseUrl);
+  if (SH_SERVICE_HOSTNAMES_V3.includes(`${urlObj.origin}/`)) {
+    defaultQueryParams.endpoint_filter = 'false';
+  }
 
   const { url, query } = parseUrl(baseUrl);
   return stringifyUrl({ url: url, query: { ...defaultQueryParams, ...query } }, { sort: false });
@@ -117,10 +129,22 @@ export async function fetchGetCapabilitiesJson(
   baseUrl: string,
   reqConfig: RequestConfiguration,
 ): Promise<any[]> {
-  const query = {
+  type QueryParams = {
+    request: string;
+    format: string;
+    endpoint_filter?: string;
+  };
+
+  const query: QueryParams = {
     request: 'GetCapabilities',
     format: 'application/json',
   };
+
+  const urlObj = new URL(baseUrl);
+  if (SH_SERVICE_HOSTNAMES_V3.includes(`${urlObj.origin}/`)) {
+    query.endpoint_filter = 'false';
+  }
+
   const queryString = stringify(query, { sort: false });
   const url = `${baseUrl}?${queryString}`;
   const axiosReqConfig: AxiosRequestConfig = {
