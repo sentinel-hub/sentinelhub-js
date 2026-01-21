@@ -118,7 +118,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -130,7 +130,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -143,7 +143,7 @@ describe('Test endpoints for getting layers parameters', () => {
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         //not authenticated
-        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -167,7 +167,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 401 }, { code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://services.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
 
@@ -180,7 +180,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -192,7 +192,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -205,7 +205,7 @@ describe('Test endpoints for getting layers parameters', () => {
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
         //not authenticated
-        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -229,7 +229,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 401 }, { code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
 
@@ -242,7 +242,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
 
@@ -268,7 +268,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://sh.dataspace.copernicus.eu/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
 
@@ -294,7 +294,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://services-uswest2.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://services-uswest2.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
@@ -306,7 +306,7 @@ describe('Test endpoints for getting layers parameters', () => {
       },
       [{ code: 200, data: { layers: [] } }],
       function expectedEndpoint(instanceId: string): string {
-        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson`;
+        return `https://creodias.sentinel-hub.com/ogc/wms/${instanceId}?request=GetCapabilities&format=application%2Fjson&endpoint_filter=false`;
       },
     ],
     [
