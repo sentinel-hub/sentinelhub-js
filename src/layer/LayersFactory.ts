@@ -11,7 +11,13 @@ import {
   isWMSCapabilities,
 } from './utils';
 import { ensureTimeout } from '../utils/ensureTimeout';
-import { OgcServiceTypes, SH_SERVICE_HOSTNAMES_V3, PLANET_FALSE_COLOR_TEMPLATES } from './const';
+import {
+  OgcServiceTypes,
+  SH_SERVICE_HOSTNAMES_V3,
+  PLANET_FALSE_COLOR_TEMPLATES,
+  SHV3_LOCATIONS_ROOT_URL,
+  LocationIdSHv3,
+} from './const';
 import {
   DATASET_S2L2A,
   DATASET_AWS_L8L1C,
@@ -193,7 +199,27 @@ export class LayersFactory {
     }
 
     return matchingDatasetIds.find((dataset: Dataset) => {
-      return dataset.shServiceHostname && baseUrl.includes(dataset.shServiceHostname);
+      if (!dataset.shServiceHostname) {
+        return false;
+      }
+
+      // Provided baseUrl is a parameter for the configuration.
+      // Configurations that are on AWS EU Central 1 can
+      // contain layers using collections from AWS US West 2.
+      // But using the baseUrl from the configuration won't find correct Dataset object.
+      // Workaround is to check [if the baseUrl matches AWS EU Central 1] and
+      // [if the shServiceHostname from the datasets with
+      // shJsonGetCapabilitiesDataset matching the provided datasetId
+      // matches AWS US West 2].
+      const providedHost = getSHServiceRootUrlFromBaseUrl(baseUrl);
+      const datasetHost = dataset.shServiceHostname;
+      if (
+        providedHost === SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1] &&
+        datasetHost === SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsUsWest2]
+      ) {
+        return true;
+      }
+      return baseUrl.includes(datasetHost);
     });
   }
 
