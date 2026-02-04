@@ -114,7 +114,7 @@ import { CancelToken, isCancelled, RequestConfiguration } from './utils/cancelRe
 import { setDefaultRequestsConfig } from './utils/defaultReqsConfig';
 import { CacheTarget, CacheTargets, invalidateCaches } from './utils/Cache';
 import { wmsGetMapUrl as _wmsGetMapUrl } from './layer/wms';
-import { drawBlobOnCanvas, canvasToBlob } from './utils/canvas';
+import { drawBlobOnCanvas, canvasToBlob, getBlob, getImageProperties } from './utils/canvas';
 
 import { Effects, ColorRange } from './mapDataManipulation/const';
 import { TPDI, setTPDIServiceBaseURL } from './dataimport/TPDI';
@@ -252,6 +252,8 @@ export {
   setDefaultRequestsConfig,
   drawBlobOnCanvas,
   canvasToBlob,
+  getBlob,
+  getImageProperties,
   SHV3_LOCATIONS_ROOT_URL,
   BYOCSubTypes,
   Tile,
