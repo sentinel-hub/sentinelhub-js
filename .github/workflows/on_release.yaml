@@ -11,6 +11,8 @@ jobs:
       id-token: write  # Required for trusted publishing (OIDC)
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -30,12 +32,18 @@ jobs:
         if: startsWith(github.event.release.tag_name, 'v')
         env:
           VERSION: ${{ github.event.release.tag_name }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo "Version is $VERSION"
           npm version --no-git-tag-version "${VERSION}"
           npm run build
-          [ $(echo "${VERSION}" | grep rc) ] && echo "publishing with next tag to npm - ${VERSION}" || echo "publishing with latest tag to npm - ${VERSION}"
-          [ $(echo "${VERSION}" | grep rc) ] && npm publish --access public --tag next --provenance || npm publish --access public --provenance
+          if [[ "${VERSION}" == *"rc"* ]]; then
+            echo "Publishing with next tag to npm - ${VERSION}"
+            npm publish --access public --tag next --provenance
+          else
+            echo "Publishing with latest tag to npm - ${VERSION}"
+            npm publish --access public --provenance
+          fi
           echo "Published to npm registry"
           tar -cvzf /tmp/dist.tar.gz dist/
 
