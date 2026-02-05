@@ -10,7 +10,7 @@ jobs:
       contents: read
       id-token: write  # Required for trusted publishing (OIDC)
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -22,17 +22,15 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install packages
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         run: |
           npm install
 
       - name: Build and deploy
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         env:
-          GITHUB_REF_TAG: ${{ github.ref }}
+          VERSION: ${{ github.event.release.tag_name }}
         run: |
-          echo "Extracting version from GITHUB_REF_TAG: $GITHUB_REF_TAG"
-          export VERSION=$(echo "$GITHUB_REF_TAG" | sed -e "s#^refs/tags/##")
           echo "Version is $VERSION"
           npm version --no-git-tag-version "${VERSION}"
           npm run build
@@ -42,7 +40,7 @@ jobs:
           tar -cvzf /tmp/dist.tar.gz dist/
 
       - name: Create artifacts
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         uses: actions/upload-artifact@master
         with:
           name: dist.tar.gz
