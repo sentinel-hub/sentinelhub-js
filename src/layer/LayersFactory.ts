@@ -59,6 +59,15 @@ import {
   DATASET_CDAS_S3SYNERGYL2,
   DATASET_CDAS_L8_L9_LOTL1,
   DATASET_CDAS_OTC_L8_L9_LOTL1,
+  DATASET_CDAS_STAGING_S1GRD,
+  DATASET_CDAS_STAGING_S2L2A,
+  DATASET_CDAS_STAGING_S2L1C,
+  DATASET_CDAS_STAGING_S3SLSTR,
+  DATASET_CDAS_STAGING_S3OLCI,
+  DATASET_CDAS_STAGING_S3OLCIL2,
+  DATASET_CDAS_STAGING_S5PL2,
+  DATASET_CDAS_STAGING_L8_L9_LOTL1,
+  DATASET_CDAS_STAGING_DEM,
 } from './dataset';
 import { AbstractLayer } from './AbstractLayer';
 import { WmsLayer } from './WmsLayer';
@@ -136,6 +145,15 @@ export class LayersFactory {
     DATASET_AWS_LETML2,
     DATASET_CDAS_L8_L9_LOTL1,
     DATASET_CDAS_OTC_L8_L9_LOTL1,
+    DATASET_CDAS_STAGING_S1GRD,
+    DATASET_CDAS_STAGING_S2L2A,
+    DATASET_CDAS_STAGING_S2L1C,
+    DATASET_CDAS_STAGING_S3SLSTR,
+    DATASET_CDAS_STAGING_S3OLCI,
+    DATASET_CDAS_STAGING_S3OLCIL2,
+    DATASET_CDAS_STAGING_S5PL2,
+    DATASET_CDAS_STAGING_L8_L9_LOTL1,
+    DATASET_CDAS_STAGING_DEM,
     DATASET_AWS_HLS,
     DATASET_MODIS,
     DATASET_AWS_DEM,
@@ -176,6 +194,15 @@ export class LayersFactory {
     [DATASET_AWS_LETML2.id]: Landsat7AWSLETML2Layer,
     [DATASET_CDAS_L8_L9_LOTL1.id]: Landsat89CDASLOTL1Layer,
     [DATASET_CDAS_OTC_L8_L9_LOTL1.id]: Landsat89CDASLOTL1Layer,
+    [DATASET_CDAS_STAGING_S1GRD.id]: S1GRDCDASLayer,
+    [DATASET_CDAS_STAGING_S2L2A.id]: S2L2ACDASLayer,
+    [DATASET_CDAS_STAGING_S2L1C.id]: S2L1CCDASLayer,
+    [DATASET_CDAS_STAGING_S3SLSTR.id]: S3SLSTRCDASLayer,
+    [DATASET_CDAS_STAGING_S3OLCI.id]: S3OLCICDASLayer,
+    [DATASET_CDAS_STAGING_S3OLCIL2.id]: S3OLCIL2CDASLayer,
+    [DATASET_CDAS_STAGING_S5PL2.id]: S5PL2CDASLayer,
+    [DATASET_CDAS_STAGING_L8_L9_LOTL1.id]: Landsat89CDASLOTL1Layer,
+    [DATASET_CDAS_STAGING_DEM.id]: DEMCDASLayer,
     [DATASET_AWS_HLS.id]: HLSAWSLayer,
     [DATASET_MODIS.id]: MODISLayer,
     [DATASET_AWS_DEM.id]: DEMLayer,
@@ -300,13 +327,11 @@ export class LayersFactory {
       preferGetCapabilities,
       includeHighlights,
     );
-
     return filteredLayersInfos.map(
       ({ layerId, dataset, title, description, legendUrl, evalscript, dataProduct, ...rest }) => {
         if (!dataset) {
           return new WmsLayer({ baseUrl, layerId, title, description });
         }
-
         const SHLayerClass = LayersFactory.LAYER_FROM_DATASET_V3[dataset.id];
         if (!SHLayerClass) {
           throw new Error(`Dataset ${dataset.id} is not defined in LayersFactory.LAYER_FROM_DATASET`);
@@ -361,7 +386,6 @@ export class LayersFactory {
         // fallback to getCapabilities
       }
     }
-
     if (!layersInfoFetched) {
       const getCapabilitiesJson = await fetchGetCapabilitiesJson(baseUrl, reqConfig);
       layersInfos = getCapabilitiesJson.map((layerInfo) => ({
