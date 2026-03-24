@@ -233,12 +233,7 @@ export class AbstractSentinelHubV3Layer extends AbstractLayer {
         // allow subclasses to update payload with their own parameters:
         const updatedPayload = await this._updateProcessingGetMapPayload(payload, 0, innerReqConfig, params);
         const shServiceHostname = this.getShServiceHostname();
-        let blob = await processingGetMap(
-          shServiceHostname,
-          updatedPayload,
-          innerReqConfig,
-          Boolean(params.evalscriptId),
-        );
+        let blob = await processingGetMap(shServiceHostname, updatedPayload, innerReqConfig);
 
         // apply effects:
         // support deprecated GetMapParams.gain and .gamma parameters
