@@ -155,6 +155,7 @@ export const SH_SERVICE_HOSTNAMES_V3: string[] = [
   'https://creodias.sentinel-hub.com/',
   'https://sh.dataspace.copernicus.eu/',
   'https://sh-otc.dataspace.copernicus.eu/',
+  'https://sh.staging.dataspace.copernicus.eu/',
 ];
 
 // See https://services.sentinel-hub.com/api/v1/metadata/location/ for an up-to-date
@@ -167,6 +168,7 @@ export enum LocationIdSHv3 {
   gcpUsCentral1 = 'gcp-us-central1',
   cdse = 'cdse',
   cdseOtc = 'cdse-otc',
+  stagingCdse = 'staging-cdse',
 }
 export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.awsEuCentral1]: 'https://services.sentinel-hub.com/',
@@ -176,12 +178,14 @@ export const SHV3_LOCATIONS_ROOT_URL: Record<LocationIdSHv3, string> = {
   [LocationIdSHv3.gcpUsCentral1]: 'https://services-gcp.sentinel-hub.com/',
   [LocationIdSHv3.cdse]: 'https://sh.dataspace.copernicus.eu/',
   [LocationIdSHv3.cdseOtc]: 'https://sh-otc.dataspace.copernicus.eu/',
+  [LocationIdSHv3.stagingCdse]: 'https://sh.staging.dataspace.copernicus.eu/',
 };
 
 export const SH_SERVICE_ROOT_URL = {
   default: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.awsEuCentral1],
   cdse: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdse],
   cdseOtc: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.cdseOtc],
+  stagingCdse: SHV3_LOCATIONS_ROOT_URL[LocationIdSHv3.stagingCdse],
 };
 
 export type GetStatsParams = {

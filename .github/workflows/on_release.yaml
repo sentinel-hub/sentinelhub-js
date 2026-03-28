@@ -10,7 +10,9 @@ jobs:
       contents: read
       id-token: write  # Required for trusted publishing (OIDC)
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -22,27 +24,31 @@ jobs:
         run: npm install -g npm@latest
 
       - name: Install packages
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         run: |
           npm install
 
       - name: Build and deploy
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         env:
-          GITHUB_REF_TAG: ${{ github.ref }}
+          VERSION: ${{ github.event.release.tag_name }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          echo "Extracting version from GITHUB_REF_TAG: $GITHUB_REF_TAG"
-          export VERSION=$(echo "$GITHUB_REF_TAG" | sed -e "s#^refs/tags/##")
           echo "Version is $VERSION"
           npm version --no-git-tag-version "${VERSION}"
           npm run build
-          [ $(echo "${VERSION}" | grep rc) ] && echo "publishing with next tag to npm - ${VERSION}" || echo "publishing with latest tag to npm - ${VERSION}"
-          [ $(echo "${VERSION}" | grep rc) ] && npm publish --access public --tag next --provenance || npm publish --access public --provenance
+          if [[ "${VERSION}" == *"rc"* ]]; then
+            echo "Publishing with next tag to npm - ${VERSION}"
+            npm publish --access public --tag next --provenance
+          else
+            echo "Publishing with latest tag to npm - ${VERSION}"
+            npm publish --access public --provenance
+          fi
           echo "Published to npm registry"
           tar -cvzf /tmp/dist.tar.gz dist/
 
       - name: Create artifacts
-        if: success() && startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.event.release.tag_name, 'v')
         uses: actions/upload-artifact@master
         with:
           name: dist.tar.gz
