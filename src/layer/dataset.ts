@@ -154,6 +154,19 @@ export const DATASET_CDAS_S3SLSTR: Dataset = {
   catalogCollectionId: 'sentinel-3-slstr',
 };
 
+export const DATASET_CDAS_S3SLSTRL2: Dataset = {
+  id: 'CDAS_S3SLSTRL2',
+  shJsonGetCapabilitiesDataset: 'S3SLSTRL2',
+  shWmsEvalsource: 'S3SLSTRL2',
+  shProcessingApiDatasourceAbbreviation: 'S3SLSTRL2',
+  datasetParametersType: 'S3SLSTR',
+  shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-slstr-l2',
+};
+
 export const DATASET_CDAS_OTC_S3SLSTR: Dataset = {
   id: 'CDAS_S3SLSTR',
   shJsonGetCapabilitiesDataset: 'S3SLSTR',
@@ -165,6 +178,19 @@ export const DATASET_CDAS_OTC_S3SLSTR: Dataset = {
   minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
   maxDate: null,
   catalogCollectionId: 'sentinel-3-slstr',
+};
+
+export const DATASET_CDAS_OTC_S3SLSTRL2: Dataset = {
+  id: 'CDAS_S3SLSTRL2',
+  shJsonGetCapabilitiesDataset: 'S3SLSTRL2',
+  shWmsEvalsource: 'S3SLSTRL2',
+  shProcessingApiDatasourceAbbreviation: 'S3SLSTRL2',
+  datasetParametersType: 'S3SLSTR',
+  shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
+  orbitTimeMinutes: 50.495,
+  minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
+  maxDate: null,
+  catalogCollectionId: 'sentinel-3-slstr-l2',
 };
 
 export const DATASET_S3OLCI: Dataset = {
