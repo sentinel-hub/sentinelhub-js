@@ -135,6 +135,7 @@ export class AbstractLayer {
       if (
         params.format !== MimeTypes.JPEG &&
         params.format !== MimeTypes.PNG &&
+        params.format !== MimeTypes.WEBP &&
         params.format !== MimeTypes.JPEG_OR_PNG
       ) {
         throw new Error(
@@ -142,8 +143,10 @@ export class AbstractLayer {
             params.format +
             ' not supported, only ' +
             MimeTypes.PNG +
-            ' and ' +
+            ', ' +
             MimeTypes.JPEG +
+            ' and ' +
+            MimeTypes.WEBP +
             ' are allowed',
         );
       }
