@@ -162,7 +162,7 @@ export const DATASET_CDAS_S3SLSTRL2: Dataset = {
   datasetParametersType: 'S3SLSTR',
   shServiceHostname: 'https://sh.dataspace.copernicus.eu/',
   orbitTimeMinutes: 50.495,
-  minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
+  minDate: new Date(Date.UTC(2018, 5 - 1, 1, 0, 46, 32)), // 2018-05-01T00:46:32.578
   maxDate: null,
   catalogCollectionId: 'sentinel-3-slstr-l2',
 };
@@ -188,7 +188,7 @@ export const DATASET_CDAS_OTC_S3SLSTRL2: Dataset = {
   datasetParametersType: 'S3SLSTR',
   shServiceHostname: 'https://sh-otc.dataspace.copernicus.eu/',
   orbitTimeMinutes: 50.495,
-  minDate: new Date(Date.UTC(2016, 4 - 1, 19, 0, 46, 32)), // 2016-04-19T00:46:32.578
+  minDate: new Date(Date.UTC(2018, 5 - 1, 1, 0, 46, 32)), // 2018-05-01T00:46:32.578
   maxDate: null,
   catalogCollectionId: 'sentinel-3-slstr-l2',
 };
