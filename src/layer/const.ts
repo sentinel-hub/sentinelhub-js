@@ -129,6 +129,7 @@ export type MimeType =
   | 'text/xml'
   | 'image/png'
   | 'image/jpeg'
+  | 'image/webp'
   | 'image/tiff'
   | 'image/tiff;depth=8'
   | 'image/tiff;depth=16'
@@ -139,6 +140,7 @@ export type FormatJpegOrPng = 'JPEG_OR_PNG';
 export const MimeTypes: Record<string, MimeType | FormatJpegOrPng> = {
   JPEG: 'image/jpeg',
   PNG: 'image/png',
+  WEBP: 'image/webp',
   JPEG_OR_PNG: 'JPEG_OR_PNG',
 };
 
