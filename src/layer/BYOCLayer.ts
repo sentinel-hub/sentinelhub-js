@@ -129,7 +129,15 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
             ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
           });
 
-          this.locationId = res.data.data.find((item: any) => item.id === this.collectionId)?.location;
+          const collectionFromService = res.data.data.find((item: any) => item.id === this.collectionId);
+          console.log('SHJS collection from service', { collectionFromService });
+          if (!collectionFromService) {
+            const err = `Collection ${this.collectionId} not found on service ${this.shServiceRootUrl}. User might not have access to it!`;
+            console.error(err);
+            throw new Error(err);
+          }
+
+          this.locationId = collectionFromService.location;
         } else {
           // Obtaining location ID is currently not possible for ZARR.
           // We hardcode AWS EU as the only currently supported location.
