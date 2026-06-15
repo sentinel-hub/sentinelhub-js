@@ -115,7 +115,13 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
       if (this.locationId === null) {
         if (this.subType !== BYOCSubTypes.ZARR) {
-          const url = `${this.getSHServiceRootUrl()}api/v1/byoc/global/?ids=${this.collectionId}`;
+          if (!this.shServiceRootUrl) {
+            const err = 'Service URL not found.';
+            console.error(err);
+            throw new Error(err);
+          }
+
+          const url = `${this.shServiceRootUrl}api/v1/byoc/global/?ids=${this.collectionId}`;
           const headers = { Authorization: `Bearer ${getAuthToken()}` };
           const res = await axios.get(url, {
             responseType: 'json',
@@ -284,6 +290,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       if (this.subType === BYOCSubTypes.ZARR) {
         throw new Error('Fetching available bands for ZARR not supported.');
       }
+      if (!this.shServiceRootUrl) {
+        throw new Error('Service URL not set.');
+      }
 
       const commonReqConfig = {
         responseType: 'json' as ResponseType,
@@ -291,7 +300,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
 
-      const metadataUrl = `${this.getSHServiceRootUrl()}api/v1/catalog/1.0.0/collections/${this.getTypeId()}`;
+      const metadataUrl = `${this.shServiceRootUrl}api/v1/catalog/1.0.0/collections/${this.getTypeId()}`;
       const metadataRes = await axios.get(metadataUrl, commonReqConfig);
       const metadataBands: BYOCBand[] = (
         metadataRes.data.summaries['eo:bands'] as { name: string }[] | undefined
