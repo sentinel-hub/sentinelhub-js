@@ -298,7 +298,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         throw new Error('Fetching available bands for ZARR not supported.');
       }
       if (!this.shServiceRootUrl) {
-        throw new Error('Service URL not set.');
+        throw new Error('Service URL not found.');
       }
 
       const commonReqConfig = {
