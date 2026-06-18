@@ -115,7 +115,12 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
 
       if (this.locationId === null) {
         if (this.subType !== BYOCSubTypes.ZARR) {
-          const url = `${this.getSHServiceRootUrl()}api/v1/byoc/global/?ids=${this.collectionId}`;
+          if (!this.shServiceRootUrl) {
+            const err = 'Service URL not found.';
+            throw new Error(err);
+          }
+
+          const url = `${this.shServiceRootUrl}api/v1/byoc/global/?ids=${this.collectionId}`;
           const headers = { Authorization: `Bearer ${getAuthToken()}` };
           const res = await axios.get(url, {
             responseType: 'json',
@@ -123,7 +128,13 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
             ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
           });
 
-          this.locationId = res.data.data.find((item: any) => item.id === this.collectionId)?.location;
+          const collectionFromService = res.data.data.find((item: any) => item.id === this.collectionId);
+          if (!collectionFromService) {
+            const err = `Collection ${this.collectionId} not found on service ${this.shServiceRootUrl}. User might not have access to it!`;
+            throw new Error(err);
+          }
+
+          this.locationId = collectionFromService.location;
         } else {
           // Obtaining location ID is currently not possible for ZARR.
           // We hardcode AWS EU as the only currently supported location.
@@ -284,6 +295,9 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
       if (this.subType === BYOCSubTypes.ZARR) {
         throw new Error('Fetching available bands for ZARR not supported.');
       }
+      if (!this.shServiceRootUrl) {
+        throw new Error('Service URL not found.');
+      }
 
       const commonReqConfig = {
         responseType: 'json' as ResponseType,
@@ -291,7 +305,7 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         ...getAxiosReqParams(innerReqConfig, CACHE_CONFIG_30MIN),
       };
 
-      const metadataUrl = `${this.getSHServiceRootUrl()}api/v1/catalog/1.0.0/collections/${this.getTypeId()}`;
+      const metadataUrl = `${this.shServiceRootUrl}api/v1/catalog/1.0.0/collections/${this.getTypeId()}`;
       const metadataRes = await axios.get(metadataUrl, commonReqConfig);
       const metadataBands: BYOCBand[] = (
         metadataRes.data.summaries['eo:bands'] as { name: string }[] | undefined
