@@ -117,7 +117,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
         if (this.subType !== BYOCSubTypes.ZARR) {
           if (!this.shServiceRootUrl) {
             const err = 'Service URL not found.';
-            console.error(err);
             throw new Error(err);
           }
 
@@ -132,7 +131,6 @@ export class BYOCLayer extends AbstractSentinelHubV3Layer {
           const collectionFromService = res.data.data.find((item: any) => item.id === this.collectionId);
           if (!collectionFromService) {
             const err = `Collection ${this.collectionId} not found on service ${this.shServiceRootUrl}. User might not have access to it!`;
-            console.error(err);
             throw new Error(err);
           }
 
